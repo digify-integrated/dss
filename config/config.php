@@ -21,7 +21,7 @@ date_default_timezone_set('Asia/Manila');
 # -------------------------------------------------------------
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'disdb');
+define('DB_NAME', 'dssdb');
 define('DB_USER', 'dis');
 define('DB_PASS', 'qKHJpbkgC6t93nQr');
 

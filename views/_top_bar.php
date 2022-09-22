@@ -21,26 +21,6 @@
 
                     <div class="d-flex">
 
-                        <div class="dropdown d-inline-block d-lg-none ms-2">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-magnify"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-search-dropdown">
-                    
-                                <form class="p-3">
-                                    <div class="form-group m-0">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Search input">
-                                
-                                            <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>s
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
                         <div class="dropdown d-none d-lg-inline-block ms-1">
                             <button type="button" class="btn header-item noti-icon waves-effect"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -103,7 +83,7 @@
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <?php
-                                    $employee_details = $api->get_employee_details($username);
+                                    /*$employee_details = $api->get_employee_details($username);
                                     $employee_id = $employee_details[0]['EMPLOYEE_ID'] ?? $username;
 
                                     $unread_notification = $api->get_notification_count($employee_id, 0);
@@ -113,7 +93,7 @@
                                     }
                                     else{
                                         echo '<i class="bx bx-bell"></i>';
-                                    }
+                                    }*/
                                 ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
@@ -130,7 +110,7 @@
                                 </div>
                                 <div data-simplebar style="max-height: 250px;">
                                     <?php
-                                        echo $api->generate_notification_list($employee_id);
+                                        //echo $api->generate_notification_list($employee_id);
                                     ?>
                                 </div>
                                 <div class="p-2 border-top d-grid">
