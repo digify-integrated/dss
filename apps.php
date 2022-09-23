@@ -55,110 +55,15 @@
                         </div>
 
                         <div class="row">
+                            
                             <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="employee.php">
+                                <a class="dropdown-icon-item" href="menu-items.php">
                                     <div class="card text-center">
                                         <div class="card-body">
                                             <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-user-circle"></i>
+                                                <i class="bx bx-cog"></i>
                                             </div>
-                                            <h6>Employees</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="time-in-time-out.php">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-time"></i>
-                                            </div>
-                                            <h6>Attendance</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="my-leave.php">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-calendar"></i>
-                                            </div>
-                                            <h6>Leave Management</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="#">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-money"></i>
-                                            </div>
-                                            <h6>Payroll</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="approval-type.php">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-user-check"></i>
-                                            </div>
-                                            <h6>Approvals</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <!--<div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="#">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-user-plus"></i>
-                                            </div>
-                                            <h6>Recruitment</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="#">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-receipt"></i>
-                                            </div>
-                                            <h6>Expense</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="#">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-car"></i>
-                                            </div>
-                                            <h6>Fleet</h6>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>-->
-                            <div class="col-sm-2">
-                                <a class="dropdown-icon-item" href="general-setting.php">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <div class="font-size-24 text-primary mb-2">
-                                                <i class="bx bx-wrench"></i>
-                                            </div>
-                                            <h6>Settings</h6>
+                                            <h6>Technical</h6>
                                         </div>
                                     </div>
                                 </a>
