@@ -6,10 +6,10 @@
 
                             <a href="apps.php" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="<?php echo $menu_icon; ?>" alt="menu icon" height="50">
+                                    <img src="./assets/images/default/default-menu-icon.png" alt="menu icon" height="50">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="<?php echo $menu_logo; ?>" alt="menu logo" height="70">
+                                    <img src="./assets/images/default/default-menu-icon.png" alt="menu logo" height="70">
                                 </span>
                             </a>
                         </div>

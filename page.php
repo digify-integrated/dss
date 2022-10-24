@@ -1,5 +1,4 @@
 <?php
-    require('session.php');
     require('config/config.php');
     require('classes/api.php');
 
@@ -58,14 +57,14 @@
                                                         <h4 class="card-title">Menu List</h4>
                                                     </div>
                                                     <div class="d-flex gap-2">
-                                                                    <a href="menu-new.php" class="btn btn-primary waves-effect btn-label waves-light" id="create-company"><i class="bx bx-plus label-icon"></i> Create</a>
-                                                                </div>
+                                                        <a href="menu-new.php" class="btn btn-primary waves-effect btn-label waves-light" id="create-company"><i class="bx bx-plus label-icon"></i> Create</a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="company-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="technical-menu-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th>

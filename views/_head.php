@@ -2,4 +2,4 @@
         <meta charset="utf-8" />
         <title><?php echo $page_title; ?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="<?php echo $favicon; ?>" />
+        <link rel="shortcut icon" href="./assets/images/default/default-favicon.png" />
