@@ -655,6 +655,222 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #   Check methods
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_modal_scrollable
+    # Purpose    : Check if the modal to be generated
+    #              is scrollable or not.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function check_modal_scrollable($scrollable){
+        if($scrollable){
+            return 'modal-dialog-scrollable';
+        }
+        else{
+            return '';
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_modal_size
+    # Purpose    : Check the size of the modal.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function check_modal_size($size){
+        if($size == 'SM'){
+            return 'modal-sm';
+        }
+        else if($size == 'LG'){
+            return 'modal-lg';
+        }
+        else if($size == 'XL'){
+            return 'modal-xl';
+        }
+        else {
+            return '';
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_number
+    # Purpose    : Checks the number if empty or 0 
+    #              return 0 or return number given.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_number($number){
+        if(is_numeric($number) && (!empty($number) || $number > 0) && !empty($number)){
+            return $number;
+        }
+        else{
+            return '0';
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_date
+    # Purpose    : Checks the date with different format
+    #
+    # Returns    : Date
+    #
+    # -------------------------------------------------------------
+    public function check_date($type, $date, $time, $format, $modify, $system_date, $current_time){
+        if($type == 'default'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return $system_date;
+            }
+        }
+        else if($type == 'empty'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return null;
+            }
+        }
+        else if($type == 'attendance empty'){
+            if(!empty($date) && $date != ' '){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return null;
+            }
+        }
+        else if($type == 'summary'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return '--';
+            }
+        }
+        else if($type == 'na'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'complete'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'encoded'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'date time'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'default time'){
+            if(!empty($date)){
+                return $time;
+            }
+            else{
+                return $current_time;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_image
+    # Purpose    : Checks the image.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function check_image($image, $type){
+        if(empty($image) || !file_exists($image)){
+            switch ($type) {
+                case 'profile':
+                    return './assets/images/default/default-avatar.png';
+                break;
+                case 'login background':
+                    return './assets/images/default/default-bg.jpg';
+                break;
+                case 'login logo':
+                    return './assets/images/default/default-login-logo.png';
+                break;
+                case 'menu logo':
+                    return './assets/images/default/default-menu-logo.png';
+                break;
+                case 'menu icon':
+                    return './assets/images/default/default-menu-icon.png';
+                break;
+                case 'favicon':
+                    return './assets/images/default/default-favicon.png';
+                break;
+                case 'company logo':
+                    return './assets/images/default/default-company-logo.png';
+                break;
+                default:
+                    return './assets/images/default/default-image-placeholder.png';
+            }
+        }
+        else{
+            return $image;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_user_account_status
+    # Purpose    : Checks the user account status. 
+    #
+    # Returns    : Date
+    #
+    # -------------------------------------------------------------
+    public function check_user_account_status($username){
+        if ($this->databaseConnection()) {
+            $user_account_details = $this->get_user_account_details($username);
+            $user_status = $user_account_details[0]['USER_STATUS'];
+            $failed_login = $user_account_details[0]['FAILED_LOGIN'];
+
+            if($user_status == 'Active' && $failed_login < 5){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Generate methods
     # -------------------------------------------------------------
 

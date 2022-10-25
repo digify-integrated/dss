@@ -26,6 +26,7 @@
 
             <?php 
                 require('views/_top_bar.php');
+                require('views/menu/_menu.php');
             ?>
 
             <div class="main-content">
