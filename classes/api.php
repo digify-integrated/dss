@@ -298,7 +298,7 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function send_email_notification($notification_type, $email, $subject, $body, $link, $is_html, $character_set){
+    public function send_email_notification($notification_type, $email, $subject, $body, $link, $is_menu_item, $character_set){
         $email_configuration_details = $this->get_email_configuration_details(1);
         $mail_host = $email_configuration_details[0]['MAIL_HOST'];
         $port = $email_configuration_details[0]['PORT'];
@@ -330,7 +330,7 @@ class Api{
 
         if($notification_type == 1 || $notification_type == 2 || $notification_type == 3 || $notification_type == 4 || $notification_type == 5 || $notification_type == 6 || $notification_type == 7 || $notification_type == 8 || $notification_type == 9 || $notification_type == 10 || $notification_type == 11 || $notification_type == 12 || $notification_type == 13 || $notification_type == 14 || $notification_type == 15 || $notification_type == 16 || $notification_type == 17 || $notification_type == 18 || $notification_type == 19){
             if(!empty($link)){
-                $message = file_get_contents('email_template/basic-notification-with-button.html');
+                $message = file_get_contents('email_template/basic-notification-with-button.menu_item');
                 $message = str_replace('@link', $link, $message);
 
                 if($notification_type == 1 || $notification_type == 2){
@@ -344,7 +344,7 @@ class Api{
                 }
             }
             else{
-                $message = file_get_contents('email_template/basic-notification.html'); 
+                $message = file_get_contents('email_template/basic-notification.menu_item'); 
             }
             
             $message = str_replace('@company_name', $company_name, $message);
@@ -356,7 +356,7 @@ class Api{
             $message = $body;
         }
 
-        if($is_html){
+        if($is_menu_item){
             $mail->isHTML(true);
             $mail->MsgHTML($message);
             $mail->CharSet = $character_set;
@@ -648,7 +648,34 @@ class Api{
 
     # -------------------------------------------------------------
     #   Get methods
-    # -------------------------------------------------------------    
+    # -------------------------------------------------------------
+    
+    # -------------------------------------------------------------
+    #
+    # Name       : get_access_rights_count
+    # Purpose    : Gets the roles' access right count based on access type.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_access_rights_count($role_id, $access_right_id, $access_type){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL get_access_rights_count(:role_id, :access_right_id, :access_type)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':access_right_id', $access_right_id);
+            $sql->bindValue(':access_type', $access_type);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
 
     # -------------------------------------------------------------
     #   Check methods
@@ -871,7 +898,119 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_role_access_rights
+    # Purpose    : Checks the access rights of the role based on type.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_role_access_rights($username, $access_right_id, $access_type){
+        if ($this->databaseConnection()) {
+            $total = 0;
+
+            $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :username');
+            $sql->bindValue(':username', $username);
+
+            if($sql->execute()){       
+                while($row = $sql->fetch()){
+                    $role_id = $row['ROLE_ID'];
+
+                    $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
+                }
+
+                return $total;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Generate methods
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_menu_array
+    # Purpose    : Generates menu array for menu generation.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function generate_menu_array($module_id, $username){
+        if ($this->databaseConnection()) {
+            $response = array(
+                'ITEMS' => array(),
+                'PARENTS' => array()
+            );
+
+            $sql = $this->db_connection->prepare('SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id ORDER BY ORDER_SEQUENCE');
+            $sql->bindValue(':module_id', $module_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $menu_id = $row['MENU_ID'];
+
+                    $menu_access_right = $this->check_role_access_rights($username, $menu_id, 'menu');
+
+                    if($menu_access_right > 0){
+                        $response['ITEMS'][$menu_id] = $row;
+                        $response['PARENTS'][$row['PARENT_MENU']][] = $menu_id;
+                    }
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_menu
+    # Purpose    : Generates menu.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function generate_menu($parent, $menu){
+        if ($this->databaseConnection()) {
+            $menu_item = '';
+            if (isset($menu['PARENTS'][$parent])) {
+                foreach ($menu['PARENTS'][$parent] as $item_id) {
+                    if (!isset($menu['PARENTS'][$item_id])) {
+                       # if($menu['PARENTS'][0] != $menu['PARENTS'][$item_id]){
+                        /*if(in_array(, $menu['PARENTS'][0])){
+                            $menu_item .= '<li class="nav-item dropdown"><a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="nav-link">'. $menu['ITEMS'][$item_id]['MENU'] .'</a></li>';
+                        }
+                        else{
+                            $menu_item .= '<a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="dropdown-item"">'. $menu['ITEMS'][$item_id]['MENU'] .'</a>';
+                        }*/
+
+                        $menu_item .= '<a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="dropdown-item"">'. $menu['ITEMS'][$item_id]['MENU'] .'</a>';
+                    }
+                    
+                    if (isset($menu['PARENTS'][$item_id])) {
+                        $menu_item .= '<li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle arrow-none" href="javascript: void(0);" id="topnav-user-access" role="button">
+                                                <span key="t-user-access">'. $menu['ITEMS'][$item_id]['MENU'] .'</span> <div class="arrow-down"></div>
+                                            </a>';
+                        $menu_item .= '<div class="dropdown-menu" aria-labelledby="topnav-user-access">';
+                        $menu_item .= $this->generate_menu($item_id, $menu);
+                        $menu_item .= '</div></li>';
+                    }
+                }
+            }
+
+            return $menu_item;
+        }
+    }
     # -------------------------------------------------------------
 
 }

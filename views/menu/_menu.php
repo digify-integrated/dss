@@ -1,22 +1,21 @@
-<div class="vertical-menu">
+<?php
+    $menu_array = $api->generate_menu_array('1', $username);
+?>
 
-                <div data-simplebar class="h-100">
+<div class="topnav">
+            <div class="container-fluid">
+                <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
 
-                    <div id="sidebar-menu">
-                        <ul class="metismenu list-unstyled" id="side-menu">                    
+                    <div class="collapse navbar-collapse" id="topnav-menu-content">
+                        <ul class="navbar-nav">
+                            <?php
+                                echo $api->generate_menu(0, $menu_array);
+                                #echo json_encode($menu_array['PARENTS'][0]);
 
-                           
-
-                            <li class="menu-title" key="t-apps">Apps</li>
-                            
-                            <li>
-                                <a href="chat.html" class="waves-effect">
-                                    <i class="bx bx-chat"></i>
-                                    <span key="t-chat">Chat</span>
-                                </a>
-                            </li>
-
+                                #echo in_array('1', $menu_array['PARENTS'][0])
+                            ?>
                         </ul>
                     </div>
-                </div>
+                </nav>
             </div>
+        </div>
