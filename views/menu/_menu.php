@@ -1,5 +1,5 @@
 <?php
-    $menu_array = $api->generate_menu_array('1', $username);
+    #$menu_array = $api->generate_menu_array('1', $username);
 ?>
 
 <div class="topnav">
@@ -9,7 +9,7 @@
                     <div class="collapse navbar-collapse" id="topnav-menu-content">
                         <ul class="navbar-nav">
                             <?php
-                                echo $api->generate_menu(0, $menu_array);
+                                echo $api->generate_menu(1, $username);
                                 #echo json_encode($menu_array['PARENTS'][0]);
 
                                 #echo in_array('1', $menu_array['PARENTS'][0])

@@ -682,10 +682,6 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
-    #   Check methods
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
     #
     # Name       : check_modal_scrollable
     # Purpose    : Check if the modal to be generated
@@ -934,21 +930,44 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : generate_menu_array
+    # Name       : generate_menu
     # Purpose    : Generates menu array for menu generation.
     #
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function generate_menu_array($module_id, $username){
+    public function generate_menu($module_id, $username){
         if ($this->databaseConnection()) {
-            $response = array(
-                'ITEMS' => array(),
-                'PARENTS' => array()
-            );
+           return $this->generate_multilevel_menu($module_id, $username);
+        }
+    }
+    # -------------------------------------------------------------
 
-            $sql = $this->db_connection->prepare('SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id ORDER BY ORDER_SEQUENCE');
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_multilevel_menu
+    # Purpose    : Generates multi-level for menu.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function generate_multilevel_menu($module_id, $username, $parent_menu = null){
+        if ($this->databaseConnection()) {     
+            $menu = '';
+
+            if(!empty($parent_menu)){
+                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU = :parent_menu ORDER BY ORDER_SEQUENCE';
+            }
+            else{
+                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU IS NULL ORDER BY ORDER_SEQUENCE';
+            }
+
+            $sql = $this->db_connection->prepare($query);
             $sql->bindValue(':module_id', $module_id);
+
+            if(!empty($parent_menu)){
+                $sql->bindValue(':parent_menu', $parent_menu);
+            }
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
@@ -957,58 +976,24 @@ class Api{
                     $menu_access_right = $this->check_role_access_rights($username, $menu_id, 'menu');
 
                     if($menu_access_right > 0){
-                        $response['ITEMS'][$menu_id] = $row;
-                        $response['PARENTS'][$row['PARENT_MENU']][] = $menu_id;
+                        if(!empty($row['MENU_LINK'])){
+                            $menu .= '<li><a href="'. $row['MENU_LINK'] .'">'. $row['MENU'] .'</a>';
+                        }
+                        else{
+                            $menu .= '<li><a href="#">'. $row['MENU'] .'</a>';
+                        }
+
+                        $menu .= '<ul>' . $this->generate_multilevel_menu($module_id, $username, $row['PARENT_MENU']) . '</ul>';
+
+                        $menu .= '</li>';
                     }
                 }
 
-                return $response;
+                return $menu_id;
             }
             else{
                 return $sql->errorInfo()[2];
             }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : generate_menu
-    # Purpose    : Generates menu.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function generate_menu($parent, $menu){
-        if ($this->databaseConnection()) {
-            $menu_item = '';
-            if (isset($menu['PARENTS'][$parent])) {
-                foreach ($menu['PARENTS'][$parent] as $item_id) {
-                    if (!isset($menu['PARENTS'][$item_id])) {
-                       # if($menu['PARENTS'][0] != $menu['PARENTS'][$item_id]){
-                        /*if(in_array(, $menu['PARENTS'][0])){
-                            $menu_item .= '<li class="nav-item dropdown"><a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="nav-link">'. $menu['ITEMS'][$item_id]['MENU'] .'</a></li>';
-                        }
-                        else{
-                            $menu_item .= '<a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="dropdown-item"">'. $menu['ITEMS'][$item_id]['MENU'] .'</a>';
-                        }*/
-
-                        $menu_item .= '<a href="'. $menu['ITEMS'][$item_id]['MENU_LINK'] .'" class="dropdown-item"">'. $menu['ITEMS'][$item_id]['MENU'] .'</a>';
-                    }
-                    
-                    if (isset($menu['PARENTS'][$item_id])) {
-                        $menu_item .= '<li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle arrow-none" href="javascript: void(0);" id="topnav-user-access" role="button">
-                                                <span key="t-user-access">'. $menu['ITEMS'][$item_id]['MENU'] .'</span> <div class="arrow-down"></div>
-                                            </a>';
-                        $menu_item .= '<div class="dropdown-menu" aria-labelledby="topnav-user-access">';
-                        $menu_item .= $this->generate_menu($item_id, $menu);
-                        $menu_item .= '</div></li>';
-                    }
-                }
-            }
-
-            return $menu_item;
         }
     }
     # -------------------------------------------------------------
