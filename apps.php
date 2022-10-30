@@ -25,14 +25,13 @@
         <?php require('views/_required_css.php'); ?>
     </head>
 
-    <body data-sidebar="dark" data-layout-mode="light">
+    <body data-topbar="dark" data-layout="horizontal">
 
         <?php require('views/_preloader.php'); ?>
 
         <div id="layout-wrapper">            
             
             <?php require('views/_top_bar.php'); ?>
-            <?php require('views/menu/_menu.php'); ?>
 
             <div class="main-content">
 

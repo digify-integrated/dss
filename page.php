@@ -4,7 +4,42 @@
     require('classes/api.php');
 
     $api = new Api;
-    $page_title = 'Menu Items';
+
+    if(isset($_GET['module']) && isset($_GET['menu']) && !empty($_GET['module']) && !empty($_GET['menu'])){
+        $module_id = $api->decrypt_data($_GET['module']);
+        $menu_id = $api->decrypt_data($_GET['menu']);
+
+        $menu_access_right = $api->check_role_access_rights($username, $menu_id, 'menu');
+
+        if($menu_access_right == 0){
+            header('location: apps.php');
+        }
+        else{
+            $technical_menu_details = $api->get_technical_menu_details($menu_id);
+            $full_path = $technical_menu_details[0]['FULL_PATH'];
+            $page_title = $technical_menu_details[0]['MENU'];
+            $menu_web_icon = $api->check_image($technical_menu_details[0]['MENU_WEB_ICON'], 'favicon');
+
+            if(isset($_GET['system']) && !empty($_GET['system'])){
+                $system = $api->decrypt_data($_GET['system']);
+                $full_path = $full_path . '<li class="breadcrumb-item" id="system-id">'. $system .'</li>';
+            }
+
+            if(isset($_GET['views']) && !empty($_GET['views'])){
+                $generate_technical_view = $api->generate_technical_view($menu_id, $_GET['views']);
+            }
+            else{
+                $generate_technical_view = $api->generate_technical_view($menu_id);
+            }
+
+            #$technical_view_css = $generate_technical_view[0]['CSS'];
+            #$technical_view_view = $generate_technical_view[0]['VIEW'];
+            #$technical_view_javascript = $generate_technical_view[0]['JAVASCRIPT'];
+        }
+    }
+    else{
+        header('location: apps.php');
+    }
 
     require('views/_interface_settings.php');
 ?>
@@ -39,25 +74,14 @@
                                     <h4 class="mb-sm-0 font-size-18"><?php echo $page_title; ?></h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Leave Management</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
-                                            <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
+                                            <?php echo $full_path; ?>
                                         </ol>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                           
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <?php echo $generate_technical_view; ?>
                     </div>
                 </div>
 

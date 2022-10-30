@@ -632,8 +632,46 @@ class Api{
                         'FAILED_LOGIN' => $row['FAILED_LOGIN'],
                         'LAST_FAILED_LOGIN' => $row['LAST_FAILED_LOGIN'],
                         'LAST_CONNECTION_DATE' => $row['LAST_CONNECTION_DATE'],
-                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
-                        'RECORD_LOG' => $row['RECORD_LOG']
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_technical_menu_details
+    # Purpose    : Gets the technical menu details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_technical_menu_details($menu_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_technical_menu_details(:menu_id)');
+            $sql->bindValue(':menu_id', $menu_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'MODULE_ID' => $row['MODULE_ID'],
+                        'PARENT_MENU' => $row['PARENT_MENU'],
+                        'MENU' => $row['MENU'],
+                        'MENU_ICON' => $row['MENU_ICON'],
+                        'MENU_WEB_ICON' => $row['MENU_WEB_ICON'],
+                        'FULL_PATH' => $row['FULL_PATH'],
+                        'IS_LINK' => $row['IS_LINK'],
+                        'MENU_LINK' => $row['MENU_LINK'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
                     );
                 }
 
@@ -931,14 +969,17 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : generate_menu
-    # Purpose    : Generates menu array for menu generation.
+    # Purpose    : Generates menu generation.
     #
-    # Returns    : Array
+    # Returns    : String
     #
     # -------------------------------------------------------------
     public function generate_menu($module_id, $username){
         if ($this->databaseConnection()) {
-           return $this->generate_multilevel_menu($module_id, $username);
+            $menu = '';
+            $menu .= $this->generate_multilevel_menu($module_id, $username);
+
+           return $menu;
         }
     }
     # -------------------------------------------------------------
@@ -946,9 +987,9 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : generate_multilevel_menu
-    # Purpose    : Generates multi-level for menu.
+    # Purpose    : Generates multi-level menu.
     #
-    # Returns    : Array
+    # Returns    : String
     #
     # -------------------------------------------------------------
     public function generate_multilevel_menu($module_id, $username, $parent_menu = null){
@@ -956,10 +997,10 @@ class Api{
             $menu = '';
 
             if(!empty($parent_menu)){
-                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU = :parent_menu ORDER BY ORDER_SEQUENCE';
+                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU = :parent_menu ORDER BY ORDER_SEQUENCE, MENU';
             }
             else{
-                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, IS_LINK, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU IS NULL ORDER BY ORDER_SEQUENCE';
+                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU IS NULL ORDER BY ORDER_SEQUENCE, MENU';
             }
 
             $sql = $this->db_connection->prepare($query);
@@ -976,20 +1017,82 @@ class Api{
                     $menu_access_right = $this->check_role_access_rights($username, $menu_id, 'menu');
 
                     if($menu_access_right > 0){
-                        if(!empty($row['MENU_LINK'])){
-                            $menu .= '<li><a href="'. $row['MENU_LINK'] .'">'. $row['MENU'] .'</a>';
+                        if(empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
+                            $menu .= '<li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="javascript: void(0);" id="m-'. $menu_id .'" role="button">
+                                            <span key="t-user-access">'. $row['MENU'] .'</span> <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="m-'. $menu_id .'">';
+                        }
+                        else if(!empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
+                            $menu .= '<div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="javascript: void(0);" id="m-'. $menu_id .'"
+                                            role="button">
+                                            <span key="t-email-templates">'. $row['MENU'] .'</span> <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="m-'. $menu_id .'">';
+                        }
+                        else if(empty($row['PARENT_MENU']) && !empty($row['MENU_LINK'])){
+                            $menu .= '<li class="nav-item dropdown"><a href="'. $row['MENU_LINK'] .'" class="nav-link">'. $row['MENU'] .'</a></li>';
                         }
                         else{
-                            $menu .= '<li><a href="#">'. $row['MENU'] .'</a>';
+                            $menu .= '<a href="'. $row['MENU_LINK'] .'" class="dropdown-item" key="m-'. $menu_id .'">'. $row['MENU'] .'</a>';
                         }
 
-                        $menu .= '<ul>' . $this->generate_multilevel_menu($module_id, $username, $row['PARENT_MENU']) . '</ul>';
+                        $menu .= $this->generate_multilevel_menu($module_id, $username, $row['MENU_ID']);
 
-                        $menu .= '</li>';
+                        if(empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
+                            $menu .= '</div>';
+                        }
+                        else if(!empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
+                            $menu .= '</div></div>';
+                        }
                     }
                 }
 
-                return $menu_id;
+                return $menu;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_technical_view
+    # Purpose    : Generates technical view.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function generate_technical_view($menu_id, $views = null){
+        if ($this->databaseConnection()) {
+            $generated_view = '';
+
+            if(!empty($views)){
+                $query = 'SELECT VIEW_ID, ARCHITECTURE, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (:views) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
+            }
+            else{
+                $query = 'SELECT VIEW_ID, ARCHITECTURE, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
+            }
+
+            $sql = $this->db_connection->prepare($query);
+
+            if(!empty($views)){
+                $sql->bindValue(':views', $views);
+            }
+            else{
+                $sql->bindValue(':menu_id', $menu_id);
+            }
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    
+                }
+
+                return $generated_view;
             }
             else{
                 return $sql->errorInfo()[2];

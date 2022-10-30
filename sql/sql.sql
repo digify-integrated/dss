@@ -36,9 +36,11 @@ CREATE TABLE technical_menu(
 	MENU VARCHAR(100) NOT NULL,
 	MENU_ICON VARCHAR(50),
 	MENU_WEB_ICON VARCHAR(500),
+	FULL_PATH LONGTEXT NOT NULL,
 	IS_LINK TINYINT(1) NOT NULL,
 	MENU_LINK VARCHAR(500),
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
+	RECORD_LOG VARCHAR(100) NOT NULL,
 	ORDER_SEQUENCE INT
 );
 
@@ -55,6 +57,9 @@ CREATE TABLE technical_menu_access_rights(
 CREATE TABLE technical_view(
 	VIEW_ID VARCHAR(100) PRIMARY KEY,
 	VIEW_NAME VARCHAR(200) NOT NULL,
+	ARCHITECTURE LONGTEXT NOT NULL,
+	CSS_CODE LONGTEXT NOT NULL,
+	JAVASCRIPT_CODE LONGTEXT NOT NULL,
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 	ORDER_SEQUENCE INT
 );
@@ -64,19 +69,11 @@ CREATE TABLE technical_view_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE technical_view_architecture(
-	VIEW_ID VARCHAR(100) PRIMARY KEY,
-	ARCHITECHTURE LONGTEXT NOT NULL
-);
-
-CREATE TABLE technical_view_javascript(
-	VIEW_ID VARCHAR(100) PRIMARY KEY,
-	JAVASCRIPT LONGTEXT NOT NULL
-);
-
-CREATE TABLE technical_view_css(
-	VIEW_ID VARCHAR(100) PRIMARY KEY,
-	JAVASCRIPT LONGTEXT NOT NULL
+CREATE TABLE technical_plugin(
+	PLUGIN_ID VARCHAR(100) PRIMARY KEY,
+	PLUGIN_NAME VARCHAR(200) NOT NULL,
+	CSS_CODE LONGTEXT,
+	JAVSCRIPT_CODE LONGTEXT
 );
 
 CREATE TABLE global_system_code(
@@ -113,7 +110,7 @@ CREATE TABLE global_user_account(
 	RECORD_LOG VARCHAR(100)
 );
 
-CREATE TABLE global_transaction_log( 
+CREATE TABLE global_transaction_log(
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 	USERNAME VARCHAR(50) NOT NULL,
 	LOG_TYPE VARCHAR(100) NOT NULL,
@@ -129,6 +126,7 @@ CREATE INDEX technical_module_index ON technical_module(MODULE_ID);
 CREATE INDEX technical_model_index ON technical_model(MODEL_ID);
 CREATE INDEX technical_menu_index ON technical_menu(MENU_ID);
 CREATE INDEX technical_view_index ON technical_view(VIEW_ID);
+CREATE INDEX technical_plugin_index ON technical_plugin(PLUGIN_ID);
 CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
 
@@ -232,6 +230,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE get_technical_menu_details(IN menu_id VARCHAR(100))
+BEGIN
+	SET @menu_id = menu_id;
+
+	SET @query = 'SELECT MODULE_ID, PARENT_MENU, MENU, MENU_ICON, MENU_WEB_ICON, FULL_PATH, IS_LINK, MENU_LINK, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_menu WHERE MENU_ID = @menu_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Insert Transaction */
 
 INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Administrator', 'Active', '2022-12-30', 0, null, 'TL-1');
@@ -259,3 +268,31 @@ INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('4', '1');
 INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('5', '1');
 INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('6', '1');
 INSERT INTO global_role_user_account (ROLE_ID, USERNAME) VALUES ('1', 'ADMIN');
+INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('1', 'Max Length', null, '<script src="assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>');
+INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('2', 'Sweet Alert', '<link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">', '<script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>');
+INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('3', 'Data Table (Basic)', '<link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script><script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script><script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script><script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>');
+INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('4', 'JQuery Validation', null, '<script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>');
+INSERT INTO technical_menu_view (MENU_ID, VIEW_ID) VALUES ('4', '1');
+
+INSERT INTO technical_view (VIEW_ID, VIEW_NAME, ARCHITECTURE, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Menu Item Data Table', ' <div class="row mt-4">
+                                            <div class="col-md-12">
+                                                <table id="permission-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="all">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" id="datatable-checkbox" type="checkbox">
+                                                                </div>
+                                                            </th>
+                                                            <th class="all">Permission ID</th>
+                                                            <th class="all">Permission</th>
+                                                            <th class="all">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody><tbody>
+                                                </table>
+                                            </div>
+                                        </div>', 'TL-13', '1');
+
+
+
