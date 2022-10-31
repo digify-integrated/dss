@@ -685,6 +685,40 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_technical_plugin_details
+    # Purpose    : Gets the technical plugin details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_technical_plugin_details($plugin_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_technical_plugin_details(:plugin_id)');
+            $sql->bindValue(':plugin_id', $plugin_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'PLUGIN_NAME' => $row['PLUGIN_NAME'],
+                        'CSS_CODE' => $row['CSS_CODE'],
+                        'JAVSCRIPT_CODE' => $row['JAVSCRIPT_CODE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -1069,7 +1103,10 @@ class Api{
     # -------------------------------------------------------------
     public function generate_technical_view($menu_id, $views = null){
         if ($this->databaseConnection()) {
+            $response = array();
             $generated_view = '';
+            $generated_css_code = '';
+            $generated_javascript_code = '';
 
             if(!empty($views)){
                 $query = 'SELECT VIEW_ID, ARCHITECTURE, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (:views) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
@@ -1089,10 +1126,72 @@ class Api{
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
-                    
+                    $generated_view .= $row['ARCHITECTURE'];
+                    $generated_css_code .= $row['CSS_CODE'];
+                    $generated_javascript_code .= $row['JAVASCRIPT_CODE'];
                 }
 
-                return $generated_view;
+                $response[] = array(
+                    'VIEW' => $generated_view,
+                    'CSS' => $generated_css_code,
+                    'JAVASCRIPT' => $generated_javascript_code
+                );
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_technical_view_plugins
+    # Purpose    : Generates technical view plugins.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function generate_technical_view_plugins($menu_id, $views = null){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $generated_css_code = '';
+            $generated_javascript_code = '';
+
+            if(!empty($views)){
+                $query = 'SELECT DISTINCT(PLUGIN_ID) AS PLUGIN_ID FROM technical_view_plugin WHERE VIEW_ID IN (:views)';
+            }
+            else{
+                $query = 'SELECT DISTINCT(PLUGIN_ID) AS PLUGIN_ID FROM technical_view_plugin WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id)';
+            }
+
+            $sql = $this->db_connection->prepare($query);
+
+            if(!empty($views)){
+                $sql->bindValue(':views', $views);
+            }
+            else{
+                $sql->bindValue(':menu_id', $menu_id);
+            }
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $plugin_id = $row['PLUGIN_ID'];
+                    
+                    $get_technical_plugin_details = $this->get_technical_plugin_details($plugin_id);
+                    $generated_css_code .= $get_technical_plugin_details[0]['CSS_CODE'];
+                    $generated_javascript_code .= $get_technical_plugin_details[0]['JAVSCRIPT_CODE'];
+
+                }
+
+                $response[] = array(
+                    'CSS' => $generated_css_code,
+                    'JAVASCRIPT' => $generated_javascript_code
+                );
+
+                return $response;
             }
             else{
                 return $sql->errorInfo()[2];

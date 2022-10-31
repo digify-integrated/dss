@@ -27,14 +27,12 @@
 
             if(isset($_GET['views']) && !empty($_GET['views'])){
                 $generate_technical_view = $api->generate_technical_view($menu_id, $_GET['views']);
+                $generate_technical_view_plugins = $api->generate_technical_view_plugins($menu_id, $_GET['views']);
             }
             else{
                 $generate_technical_view = $api->generate_technical_view($menu_id);
+                $generate_technical_view_plugins = $api->generate_technical_view_plugins($menu_id);
             }
-
-            #$technical_view_css = $generate_technical_view[0]['CSS'];
-            #$technical_view_view = $generate_technical_view[0]['VIEW'];
-            #$technical_view_javascript = $generate_technical_view[0]['JAVASCRIPT'];
         }
     }
     else{
@@ -48,10 +46,9 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
-        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
-        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <?php echo $generate_technical_view_plugins[0]['CSS'] ?? null; ?>
         <?php require('views/_required_css.php'); ?>
+        <?php echo $generate_technical_view[0]['CSS'] ?? null; ?>
     </head>
 
     <body data-topbar="dark" data-layout="horizontal">
@@ -73,15 +70,13 @@
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                                     <h4 class="mb-sm-0 font-size-18"><?php echo $page_title; ?></h4>
                                     <div class="page-title-right">
-                                        <ol class="breadcrumb m-0">
-                                            <?php echo $full_path; ?>
-                                        </ol>
+                                        <ol class="breadcrumb m-0"><?php echo $full_path; ?></ol>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <?php echo $generate_technical_view; ?>
+                        <?php echo $generate_technical_view[0]['VIEW']; ?>
                     </div>
                 </div>
 
@@ -91,15 +86,8 @@
         </div>
 
         <?php require('views/_script.php'); ?>
-        <script src="assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
-        <script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-        <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
-        <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
-        <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
-        <script src="assets/libs/select2/js/select2.min.js"></script>
+        <?php echo $generate_technical_view_plugins[0]['JAVASCRIPT'] ?? null; ?>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/leave-type.js?v=<?php echo rand(); ?>"></script>
+        <?php echo $generate_technical_view[0]['JAVASCRIPT'] ?? null; ?>
     </body>
 </html>

@@ -64,6 +64,11 @@ CREATE TABLE technical_view(
 	ORDER_SEQUENCE INT
 );
 
+CREATE TABLE technical_view_plugin(
+	VIEW_ID VARCHAR(100) NOT NULL,
+	PLUGIN_ID VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE technical_view_access_rights(
 	VIEW_ID VARCHAR(100) PRIMARY KEY,
 	ROLE_ID VARCHAR(100) NOT NULL
@@ -73,7 +78,8 @@ CREATE TABLE technical_plugin(
 	PLUGIN_ID VARCHAR(100) PRIMARY KEY,
 	PLUGIN_NAME VARCHAR(200) NOT NULL,
 	CSS_CODE LONGTEXT,
-	JAVSCRIPT_CODE LONGTEXT
+	JAVSCRIPT_CODE LONGTEXT,
+	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 );
 
 CREATE TABLE global_system_code(
@@ -241,6 +247,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE get_technical_plugin_details(IN plugin_id VARCHAR(100))
+BEGIN
+	SET @plugin_id = plugin_id;
+
+	SET @query = 'SELECT PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE, TRANSACTION_LOG_ID FROM technical_plugin WHERE PLUGIN_ID = @plugin_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Insert Transaction */
 
 INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Administrator', 'Active', '2022-12-30', 0, null, 'TL-1');
@@ -255,6 +272,7 @@ INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TR
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('4', '1', '1', 'Menu Items', '', 'TL-10', '3');
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('5', '1', '1', 'Views', '', 'TL-11', '4');
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('6', '1', '1', 'Plugins', '', 'TL-12', '5');
+INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('7', '1', '1', 'Actions', '', 'TL-13', '5');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '2');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '3');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '4');
@@ -272,7 +290,9 @@ INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) 
 INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('2', 'Sweet Alert', '<link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">', '<script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>');
 INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('3', 'Data Table (Basic)', '<link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script><script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script><script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script><script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>');
 INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('4', 'JQuery Validation', null, '<script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>');
+INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('5', 'Select2', '<link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/select2/js/select2.min.js"></script>');
 INSERT INTO technical_menu_view (MENU_ID, VIEW_ID) VALUES ('4', '1');
+INSERT INTO technical_view_plugin (VIEW_ID, PLUGIN_ID) VALUES ('1', '3');
 
 INSERT INTO technical_view (VIEW_ID, VIEW_NAME, ARCHITECTURE, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Menu Item Data Table', ' <div class="row mt-4">
                                             <div class="col-md-12">
