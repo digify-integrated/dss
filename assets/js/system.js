@@ -6205,6 +6205,26 @@ function initialize_form_validation(form_type){
     }
 }
 
+function initialize_card_actions(menu_id, filter = false){
+    if ($('#card-header').length) {
+        var type = 'card header';
+        var username = $('#username').text();
+
+        $.ajax({
+            url: 'system-generation.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {type : type, menu_id : menu_id, filter : filter, username : username},
+            success: function(response) {
+                document.getElementById('card-header').innerHTML = response[0].CARD_HEADER;
+            },
+            complete: function(){
+                initialize_global_functions();
+            }
+        });
+    }
+}
+
 // Display functions
 function display_form_details(form_type){
     var transaction;

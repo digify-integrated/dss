@@ -719,6 +719,89 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_module_details
+    # Purpose    : Gets the module details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_module_details($module_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_module_details(:module_id)');
+            $sql->bindValue(':module_id', $module_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'MODULE_NAME' => $row['MODULE_NAME'],
+                        'MODULE_VERSION' => $row['MODULE_VERSION'],
+                        'MODULE_DESCRIPION' => $row['MODULE_DESCRIPION'],
+                        'MODULE_ICON' => $row['MODULE_ICON'],
+                        'MODULE_CATEGORY' => $row['MODULE_CATEGORY'],
+                        'IS_INSTALLABLE' => $row['IS_INSTALLABLE'],
+                        'IS_APPLICATION' => $row['IS_APPLICATION'],
+                        'IS_INSTALLED' => $row['IS_INSTALLED'],
+                        'INSTALLATION_DATE' => $row['INSTALLATION_DATE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG'],
+                        'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_menu_details
+    # Purpose    : Gets the menu details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_menu_details($menu_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_menu_details(:menu_id)');
+            $sql->bindValue(':menu_id', $menu_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'MODULE_ID' => $row['MODULE_ID'],
+                        'PARENT_MENU' => $row['PARENT_MENU'],
+                        'MENU' => $row['MENU'],
+                        'MENU_ICON' => $row['MENU_ICON'],
+                        'MENU_WEB_ICON' => $row['MENU_WEB_ICON'],
+                        'FULL_PATH' => $row['FULL_PATH'],
+                        'IS_LINK' => $row['IS_LINK'],
+                        'MENU_LINK' => $row['MENU_LINK'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG'],
+                        'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -1192,6 +1275,80 @@ class Api{
                 );
 
                 return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #   Generate options methods
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_module_options
+    # Purpose    : Generates module options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_module_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_module_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $module_id = $row['MODULE_ID'];
+                        $module_name = $row['MODULE_NAME'];
+    
+                        $option .= "<option value='". $module_id ."'>". $module_name ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_menu_options
+    # Purpose    : Generates menu options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_menu_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_menu_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $menu_id = $row['MENU_ID'];
+                        $menu = $row['MENU'];
+    
+                        $option .= "<option value='". $menu_id ."'>". $menu ."</option>";
+                    }
+    
+                    return $option;
+                }
             }
             else{
                 return $sql->errorInfo()[2];

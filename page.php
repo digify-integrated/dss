@@ -8,6 +8,7 @@
     if(isset($_GET['module']) && isset($_GET['menu']) && !empty($_GET['module']) && !empty($_GET['menu'])){
         $module_id = $api->decrypt_data($_GET['module']);
         $menu_id = $api->decrypt_data($_GET['menu']);
+        $menu_javascript = null;
 
         $menu_access_right = $api->check_role_access_rights($username, $menu_id, 'menu');
 
@@ -32,6 +33,10 @@
             else{
                 $generate_technical_view = $api->generate_technical_view($menu_id);
                 $generate_technical_view_plugins = $api->generate_technical_view_plugins($menu_id);
+            }
+
+            if(!empty($generate_technical_view[0]['JAVASCRIPT'])){
+                $menu_javascript = str_replace('{version}', rand(), $generate_technical_view[0]['JAVASCRIPT']);
             }
         }
     }
@@ -71,6 +76,7 @@
                                     <h4 class="mb-sm-0 font-size-18"><?php echo $page_title; ?></h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0"><?php echo $full_path; ?></ol>
+                                        <input type="hidden" id="menu_id" value='<?php echo $menu_id; ?>'>
                                     </div>
                                 </div>
                             </div>
@@ -88,6 +94,6 @@
         <?php require('views/_script.php'); ?>
         <?php echo $generate_technical_view_plugins[0]['JAVASCRIPT'] ?? null; ?>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <?php echo $generate_technical_view[0]['JAVASCRIPT'] ?? null; ?>
+        <?php print $menu_javascript; ?>
     </body>
 </html>
