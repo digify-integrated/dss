@@ -1184,7 +1184,7 @@ class Api{
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function generate_technical_view($menu_id, $views = null){
+    public function generate_technical_view($menu_id, $views = null, $username){
         if ($this->databaseConnection()) {
             $response = array();
             $generated_view = '';

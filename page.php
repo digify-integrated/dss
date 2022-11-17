@@ -27,11 +27,11 @@
             }
 
             if(isset($_GET['views']) && !empty($_GET['views'])){
-                $generate_technical_view = $api->generate_technical_view($menu_id, $_GET['views']);
+                $generate_technical_view = $api->generate_technical_view($menu_id, $_GET['views'], $username);
                 $generate_technical_view_plugins = $api->generate_technical_view_plugins($menu_id, $_GET['views']);
             }
             else{
-                $generate_technical_view = $api->generate_technical_view($menu_id);
+                $generate_technical_view = $api->generate_technical_view($menu_id, null, $username);
                 $generate_technical_view_plugins = $api->generate_technical_view_plugins($menu_id);
             }
 

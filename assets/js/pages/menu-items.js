@@ -6,12 +6,6 @@
             initialize_menu_item_table('#menu-item-datatable');
         }
 
-        if($('#card-header').length){
-            var menu_id = $('#menu_id').val();
-
-            initialize_card_actions(menu_id, true);
-        }
-
         initialize_click_events();
     });
 })(jQuery);

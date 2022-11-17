@@ -75,12 +75,28 @@ CREATE TABLE technical_view_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE technical_view_action(
+	VIEW_ID VARCHAR(100) NOT NULL,
+	ACTION_ID VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE technical_plugin(
 	PLUGIN_ID VARCHAR(100) PRIMARY KEY,
 	PLUGIN_NAME VARCHAR(200) NOT NULL,
 	CSS_CODE LONGTEXT,
 	JAVSCRIPT_CODE LONGTEXT,
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
+);
+
+CREATE TABLE technical_action(
+	ACTION_ID VARCHAR(100) PRIMARY KEY,
+	ACTION_NAME VARCHAR(200) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE technical_action_access_rights(
+	ACTION_ID VARCHAR(100) PRIMARY KEY,
+	ROLE_ID VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE global_system_code(
@@ -134,6 +150,7 @@ CREATE INDEX technical_model_index ON technical_model(MODEL_ID);
 CREATE INDEX technical_menu_index ON technical_menu(MENU_ID);
 CREATE INDEX technical_view_index ON technical_view(VIEW_ID);
 CREATE INDEX technical_plugin_index ON technical_plugin(PLUGIN_ID);
+CREATE INDEX technical_action_index ON technical_action(ACTION_ID);
 CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
 
@@ -314,6 +331,9 @@ INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TR
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('5', '1', '1', 'Views', '', 'TL-11', '4');
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('6', '1', '1', 'Plugins', '', 'TL-12', '5');
 INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('7', '1', '1', 'Actions', '', 'TL-13', '5');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('1', 'Add Menu Item', 'TL-14');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('2', 'Update Menu Item', 'TL-15');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID,) VALUES ('3', 'Delete Menu Item', 'TL-16');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '2');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '3');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '4');
@@ -334,6 +354,12 @@ INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) 
 INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('5', 'Select2', '<link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/select2/js/select2.min.js"></script>');
 INSERT INTO technical_menu_view (MENU_ID, VIEW_ID) VALUES ('4', '1');
 INSERT INTO technical_view_plugin (VIEW_ID, PLUGIN_ID) VALUES ('1', '3');
+
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('1', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('3', '1');
+INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '1');
+INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '3');
 
 INSERT INTO technical_view (VIEW_ID, VIEW_NAME, ARCHITECTURE, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Menu Item Data Table', ' <div class="row mt-4">
                                             <div class="col-md-12">
