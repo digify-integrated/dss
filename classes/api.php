@@ -802,6 +802,72 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_action_details
+    # Purpose    : Gets the action details.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_action_details($view_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_action_details(:view_id)');
+            $sql->bindValue(':view_id', $view_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ACTION_NAME' => $row['ACTION_NAME'],
+                        'ACTION_TYPE' => $row['ACTION_TYPE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_view_action_details
+    # Purpose    : Gets the actions assigned to views.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_view_action_details($view_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_view_action_details(:view_id)');
+            $sql->bindValue(':view_id', $view_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ACTION_ID' => $row['ACTION_ID']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -1184,24 +1250,24 @@ class Api{
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function generate_technical_view($menu_id, $views = null, $username){
+    public function generate_technical_view($menu_id, $view = null, $username){
         if ($this->databaseConnection()) {
             $response = array();
             $generated_view = '';
             $generated_css_code = '';
             $generated_javascript_code = '';
 
-            if(!empty($views)){
-                $query = 'SELECT VIEW_ID, ARCHITECTURE, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (:views) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
+            if(!empty($view)){
+                $query = 'SELECT VIEW_ID, ARCHITECTURE, HAS_FILTER, HAS_ACTION, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (:view) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
             }
             else{
-                $query = 'SELECT VIEW_ID, ARCHITECTURE, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
+                $query = 'SELECT VIEW_ID, ARCHITECTURE, HAS_FILTER, HAS_ACTION, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
             }
 
             $sql = $this->db_connection->prepare($query);
 
-            if(!empty($views)){
-                $sql->bindValue(':views', $views);
+            if(!empty($view)){
+                $sql->bindValue(':view', $view);
             }
             else{
                 $sql->bindValue(':menu_id', $menu_id);
@@ -1209,7 +1275,91 @@ class Api{
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
-                    $generated_view .= $row['ARCHITECTURE'];
+                    $view_id = $row['VIEW_ID'];
+                    $architecture = $row['ARCHITECTURE'];
+                    $has_filter = $row['HAS_FILTER'];
+                    $has_action = $row['HAS_ACTION'];
+
+                    if($has_filter){
+                        $architecture = str_replace('{filter_button}', '<button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>', $architecture);
+                        
+                        if($view_id == '1'){
+                            $filter_canvas = '<div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                <div class="offcanvas-header">
+                                                    <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                </div>
+                                                <div class="offcanvas-body">
+                                                    <div class="mb-3">
+                                                        <p class="text-muted">Module</p>
+                                                        <select class="form-control filter-select2" id="filter_module">
+                                                            <option value="">All Modules</option>
+                                                            '. $this->generate_module_options() .'
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                    <p class="text-muted">Parent Menu</p>
+
+                                                    <select class="form-control filter-select2" id="filter_parent_menu">
+                                                        <option value="">All Parent Menus</option>
+                                                        '. $this->generate_menu_options() .'
+                                                    </select>
+                                                </div>
+                                                    <div>
+                                                        <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
+                                                    </div>
+                                                </div>
+                                            </div>';
+                        }
+                        else{
+                            $filter_canvas = '';
+                        }
+
+                        $architecture = str_replace('{filter}', $filter_canvas, $architecture);
+                    }
+                    else{
+                        $architecture = str_replace('{filter_button}', null, $architecture);
+                        $architecture = str_replace('{filter}', null, $architecture);
+                    }
+
+                    if($has_action){
+                        $action_button = '';
+                        $action_dropdown = '<div class="btn-group">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Actions <i class="mdi mdi-chevron-down"></i></button>
+                                                <div class="dropdown-menu">
+                                                    {action_button}
+                                                </div>
+                                            </div>';
+
+                        $view_action_details = $this->get_view_action_details($view_id);
+
+                        for($i = 0; $i < count($view_action_details); $i++) {
+                            $action_id = $view_action_details[$i]['ACTION_ID'];
+
+                            $actions_details = $this->get_action_details($action_id);
+                            $action_name = $actions_details[0]['ACTION_NAME'];
+                            $action_type = $actions_details[0]['ACTION_TYPE'];
+
+                            $action_access_right = $this->check_role_access_rights($username, $action_id, 'action');
+
+                            if($action_access_right > 0){
+                                $action_button .= ' <a class="dropdown-item action-button" href="javascript: void(0);" data-action-type="'. $action_type .'">'. $action_name .'</a>';
+                            }
+                        }
+
+                        if(!empty($action_button)){
+                            $action_dropdown = str_replace('{action_button}', $action_button, $action_dropdown);
+                            $architecture = str_replace('{action}', $action_dropdown, $architecture);
+                        }
+                        else{
+                            $action_dropdown = '';
+                        }
+                    }
+                    else{
+                        $architecture = str_replace('{action}', null, $architecture);
+                    }
+
+                    $generated_view .= $architecture;
                     $generated_css_code .= $row['CSS_CODE'];
                     $generated_javascript_code .= $row['JAVASCRIPT_CODE'];
                 }
