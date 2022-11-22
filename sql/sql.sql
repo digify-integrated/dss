@@ -67,6 +67,14 @@ CREATE TABLE technical_view(
 	ORDER_SEQUENCE INT
 );
 
+CREATE TABLE technical_view_type(
+	VIEW_TYPE_ID VARCHAR(100) PRIMARY KEY,
+	VIEW_TYPE VARCHAR(200) NOT NULL,
+	TEMPLATE LONGTEXT NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL
+);
+
+
 CREATE TABLE technical_view_plugin(
 	VIEW_ID VARCHAR(100) NOT NULL,
 	PLUGIN_ID VARCHAR(100) NOT NULL
@@ -157,6 +165,7 @@ CREATE INDEX technical_plugin_index ON technical_plugin(PLUGIN_ID);
 CREATE INDEX technical_action_index ON technical_action(ACTION_ID);
 CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
+CREATE INDEX technical_view_type_index ON technical_view_type(VIEW_TYPE_ID);
 
 /* Stored Procedure */
 
@@ -326,6 +335,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE get_view_type_details(IN view_type_id VARCHAR(100))
+BEGIN
+	SET @view_type_id = view_type_id;
+
+	SET @query = 'SELECT VIEW_TYPE, TEMPLATE, TRANSACTION_LOG_ID FROM technical_view_type WHERE VIEW_TYPE_ID = @view_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 CREATE PROCEDURE generate_module_options()
 BEGIN
 	SET @query = 'SELECT MODULE_ID, MODULE_NAME FROM technical_module ORDER BY MODULE_NAME';
@@ -373,6 +393,34 @@ INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TR
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('1', 'Add Menu Item', 'TL-24');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('2', 'Update Menu Item', 'TL-25');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID,) VALUES ('3', 'Delete Menu Item', 'TL-26');
+
+INSERT INTO technical_view_type (VIEW_TYPE_ID, VIEW_TYPE, TEMPLATE, TRANSACTION_LOG_ID) VALUES ('1', 'Data Table', '<div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+											<div class="col-md-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="flex-grow-1 align-self-center">
+                                                        <h4 class="card-title">{card_title}</h4>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        {action}
+														{filter_button}
+                                                    </div>
+                                                </div>
+												{filter}
+                                            </div>
+										</div>
+                                        <div class="row mt-4">
+                                            <div class="col-md-12">
+                                                {data_table}
+                                            </div>
+                                        </div>       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>', 'TL-27');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '2');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '3');
 INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '4');
@@ -399,26 +447,6 @@ INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1'
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('3', '1');
 INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '1');
 INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '3');
-
-INSERT INTO technical_view (VIEW_ID, VIEW_NAME, ARCHITECTURE, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Menu Item Data Table', ' <div class="row mt-4">
-                                            <div class="col-md-12">
-                                                <table id="permission-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="all">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" id="datatable-checkbox" type="checkbox">
-                                                                </div>
-                                                            </th>
-                                                            <th class="all">Permission ID</th>
-                                                            <th class="all">Permission</th>
-                                                            <th class="all">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody><tbody>
-                                                </table>
-                                            </div>
-                                        </div>', 'TL-13', '1');
 
 
 
