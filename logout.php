@@ -14,7 +14,7 @@ if (isset($_GET['logout'])) {
     $user_account_details = $api->get_user_account_details($username);
     $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
 
-    $insert_transaction_log = $api->insert_transaction_log($transaction_log_id, $username, 'Log In', 'User ' . $username . ' logged out.');
+    $insert_transaction_log = $api->insert_transaction_log($transaction_log_id, $username, 'Log Out', 'User ' . $username . ' logged out.');
                                         
     if($insert_transaction_log){
         session_destroy();

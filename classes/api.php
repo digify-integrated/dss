@@ -647,79 +647,6 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : get_technical_menu_details
-    # Purpose    : Gets the technical menu details.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function get_technical_menu_details($menu_id){
-        if ($this->databaseConnection()) {
-            $response = array();
-
-            $sql = $this->db_connection->prepare('CALL get_technical_menu_details(:menu_id)');
-            $sql->bindValue(':menu_id', $menu_id);
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $response[] = array(
-                        'MODULE_ID' => $row['MODULE_ID'],
-                        'PARENT_MENU' => $row['PARENT_MENU'],
-                        'MENU' => $row['MENU'],
-                        'MENU_ICON' => $row['MENU_ICON'],
-                        'MENU_WEB_ICON' => $row['MENU_WEB_ICON'],
-                        'FULL_PATH' => $row['FULL_PATH'],
-                        'IS_LINK' => $row['IS_LINK'],
-                        'MENU_LINK' => $row['MENU_LINK'],
-                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
-                    );
-                }
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : get_technical_plugin_details
-    # Purpose    : Gets the technical plugin details.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function get_technical_plugin_details($plugin_id){
-        if ($this->databaseConnection()) {
-            $response = array();
-
-            $sql = $this->db_connection->prepare('CALL get_technical_plugin_details(:plugin_id)');
-            $sql->bindValue(':plugin_id', $plugin_id);
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $response[] = array(
-                        'PLUGIN_NAME' => $row['PLUGIN_NAME'],
-                        'CSS_CODE' => $row['CSS_CODE'],
-                        'JAVSCRIPT_CODE' => $row['JAVSCRIPT_CODE'],
-                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
-                    );
-                }
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
     # Name       : get_module_details
     # Purpose    : Gets the module details.
     #
@@ -762,131 +689,26 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : get_menu_details
-    # Purpose    : Gets the menu details.
+    # Name       : get_page_details
+    # Purpose    : Gets the page details.
     #
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function get_menu_details($menu_id){
+    public function get_page_details($page_id){
         if ($this->databaseConnection()) {
             $response = array();
 
-            $sql = $this->db_connection->prepare('CALL get_menu_details(:menu_id)');
-            $sql->bindValue(':menu_id', $menu_id);
+            $sql = $this->db_connection->prepare('CALL get_page_details(:page_id)');
+            $sql->bindValue(':page_id', $page_id);
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
                     $response[] = array(
+                        'PAGE_NAME' => $row['PAGE_NAME'],
                         'MODULE_ID' => $row['MODULE_ID'],
-                        'PARENT_MENU' => $row['PARENT_MENU'],
-                        'MENU' => $row['MENU'],
-                        'MENU_ICON' => $row['MENU_ICON'],
-                        'MENU_WEB_ICON' => $row['MENU_WEB_ICON'],
-                        'FULL_PATH' => $row['FULL_PATH'],
-                        'IS_LINK' => $row['IS_LINK'],
-                        'MENU_LINK' => $row['MENU_LINK'],
-                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
-                        'RECORD_LOG' => $row['RECORD_LOG'],
-                        'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
-                    );
-                }
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : get_action_details
-    # Purpose    : Gets the action details.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function get_action_details($view_id){
-        if ($this->databaseConnection()) {
-            $response = array();
-
-            $sql = $this->db_connection->prepare('CALL get_action_details(:view_id)');
-            $sql->bindValue(':view_id', $view_id);
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $response[] = array(
-                        'ACTION_NAME' => $row['ACTION_NAME'],
-                        'ACTION_TYPE' => $row['ACTION_TYPE'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
-                    );
-                }
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : get_view_action_details
-    # Purpose    : Gets the actions assigned to views.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function get_view_action_details($view_id){
-        if ($this->databaseConnection()) {
-            $response = array();
-
-            $sql = $this->db_connection->prepare('CALL get_view_action_details(:view_id)');
-            $sql->bindValue(':view_id', $view_id);
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $response[] = array(
-                        'ACTION_ID' => $row['ACTION_ID']
-                    );
-                }
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : get_view_type_details
-    # Purpose    : Gets the view type details.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function get_view_type_details($view_type_id){
-        if ($this->databaseConnection()) {
-            $response = array();
-
-            $sql = $this->db_connection->prepare('CALL get_view_type_details(:view_type_id)');
-            $sql->bindValue(':view_type_id', $view_type_id);
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $response[] = array(
-                        'VIEW_TYPE' => $row['VIEW_TYPE'],
-                        'TEMPLATE' => $row['TEMPLATE'],
-                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID']
                     );
                 }
 
@@ -1164,7 +986,6 @@ class Api{
             if($sql->execute()){       
                 while($row = $sql->fetch()){
                     $role_id = $row['ROLE_ID'];
-
                     $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
                 }
 
@@ -1182,375 +1003,33 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
-    #
-    # Name       : generate_menu
-    # Purpose    : Generates menu generation.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function generate_menu($module_id, $username){
-        if ($this->databaseConnection()) {
-            $menu = '';
-            $menu .= $this->generate_multilevel_menu($module_id, $username);
-
-           return $menu;
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : generate_multilevel_menu
-    # Purpose    : Generates multi-level menu.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function generate_multilevel_menu($module_id, $username, $parent_menu = null){
-        if ($this->databaseConnection()) {     
-            $menu = '';
-
-            if(!empty($parent_menu)){
-                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU = :parent_menu ORDER BY ORDER_SEQUENCE, MENU';
-            }
-            else{
-                $query = 'SELECT MENU_ID, MENU, PARENT_MENU, MENU_LINK FROM technical_menu WHERE MODULE_ID = :module_id AND PARENT_MENU IS NULL ORDER BY ORDER_SEQUENCE, MENU';
-            }
-
-            $sql = $this->db_connection->prepare($query);
-            $sql->bindValue(':module_id', $module_id);
-
-            if(!empty($parent_menu)){
-                $sql->bindValue(':parent_menu', $parent_menu);
-            }
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $menu_id = $row['MENU_ID'];
-
-                    $menu_access_right = $this->check_role_access_rights($username, $menu_id, 'menu');
-
-                    if($menu_access_right > 0){
-                        if(empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
-                            $menu .= '<li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle arrow-none" href="javascript: void(0);" id="m-'. $menu_id .'" role="button">
-                                            <span key="t-user-access">'. $row['MENU'] .'</span> <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="m-'. $menu_id .'">';
-                        }
-                        else if(!empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
-                            $menu .= '<div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="javascript: void(0);" id="m-'. $menu_id .'"
-                                            role="button">
-                                            <span key="t-email-templates">'. $row['MENU'] .'</span> <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="m-'. $menu_id .'">';
-                        }
-                        else if(empty($row['PARENT_MENU']) && !empty($row['MENU_LINK'])){
-                            $menu .= '<li class="nav-item dropdown"><a href="'. $row['MENU_LINK'] .'" class="nav-link">'. $row['MENU'] .'</a></li>';
-                        }
-                        else{
-                            $menu .= '<a href="'. $row['MENU_LINK'] .'" class="dropdown-item" key="m-'. $menu_id .'">'. $row['MENU'] .'</a>';
-                        }
-
-                        $menu .= $this->generate_multilevel_menu($module_id, $username, $row['MENU_ID']);
-
-                        if(empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
-                            $menu .= '</div>';
-                        }
-                        else if(!empty($row['PARENT_MENU']) && empty($row['MENU_LINK'])){
-                            $menu .= '</div></div>';
-                        }
-                    }
-                }
-
-                return $menu;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : generate_technical_view
-    # Purpose    : Generates technical view.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function generate_technical_view($menu_id, $view = null, $username){
-        if ($this->databaseConnection()) {
-            $response = array();
-            $generated_view = '';
-            $generated_css_code = '';
-            $generated_javascript_code = '';
-
-            if(!empty($view)){
-                $query = 'SELECT VIEW_ID, ARCHITECTURE, VIEW_TYPE, HAS_FILTER, HAS_ACTION, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (:view) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
-            }
-            else{
-                $query = 'SELECT VIEW_ID, ARCHITECTURE, VIEW_TYPE, HAS_FILTER, HAS_ACTION, CSS_CODE, JAVASCRIPT_CODE FROM technical_view WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id) ORDER BY ORDER_SEQUENCE, VIEW_NAME';
-            }
-
-            $sql = $this->db_connection->prepare($query);
-
-            if(!empty($view)){
-                $sql->bindValue(':view', $view);
-            }
-            else{
-                $sql->bindValue(':menu_id', $menu_id);
-            }
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $view_id = $row['VIEW_ID'];
-                    $architecture = $row['ARCHITECTURE'];
-                    $has_filter = $row['HAS_FILTER'];
-                    $has_action = $row['HAS_ACTION'];
-                    $view_type = $row['VIEW_TYPE'];
-
-                    $view_type_details = $this->get_view_type_details($view_type);
-                    $template = $view_type_details[0]['TEMPLATE'];
-                    
-                    if($view_id == '1'){
-                        $template = str_replace('{card_title}', 'Menu Item List', $template);
-                    }
-                    else{
-                        $template = str_replace('{content}', $architecture, $template);
-                    }
-
-                    if($has_filter){
-                        if($view_type == '1'){
-                            $template = str_replace('{filter_button}', '<button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>', $template);
-                        }
-                        else{
-                            $template = str_replace('{filter_button}', null, $template);
-                        }
-
-                        if($view_id == '1'){
-                            $filter_canvas = '<div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                <div class="offcanvas-header">
-                                                    <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                </div>
-                                                <div class="offcanvas-body">
-                                                    <div class="mb-3">
-                                                        <p class="text-muted">Module</p>
-                                                        <select class="form-control filter-select2" id="filter_module">
-                                                            <option value="">All Modules</option>
-                                                            '. $this->generate_module_options() .'
-                                                        </select>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                    <p class="text-muted">Parent Menu</p>
-
-                                                    <select class="form-control filter-select2" id="filter_parent_menu">
-                                                        <option value="">All Parent Menus</option>
-                                                        '. $this->generate_menu_options() .'
-                                                    </select>
-                                                </div>
-                                                    <div>
-                                                        <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
-                                                    </div>
-                                                </div>
-                                            </div>';
-                        }
-                        else{
-                            $filter_canvas = null;
-                        }
-
-                        $template = str_replace('{filter}', $filter_canvas, $template);
-                    }
-                    else{
-                        $template = str_replace('{filter_button}', null, $template);
-                        $template = str_replace('{filter}', null, $template);
-                    }
-
-                    if($has_action){
-                        $action_button = '';
-                        
-                        if($view_type == '1'){
-                            $action_dropdown = '<div class="btn-group">
-                                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Actions <i class="mdi mdi-chevron-down"></i></button>
-                                                <div class="dropdown-menu">
-                                                    {action_button}
-                                                </div>
-                                            </div>';
-
-                            $view_action_details = $this->get_view_action_details($view_id);
-
-                            for($i = 0; $i < count($view_action_details); $i++) {
-                                $action_id = $view_action_details[$i]['ACTION_ID'];
-
-                                $actions_details = $this->get_action_details($action_id);
-                                $action_name = $actions_details[0]['ACTION_NAME'];
-                                $action_type = $actions_details[0]['ACTION_TYPE'];
-
-                                $action_access_right = $this->check_role_access_rights($username, $action_id, 'action');
-
-                                if($action_access_right > 0){
-                                    $action_button .= ' <a class="dropdown-item action-button" href="javascript: void(0);" data-action-type="'. $action_type .'">'. $action_name .'</a>';
-                                }
-                            }
-
-                            if(!empty($action_button)){
-                                $action_dropdown = str_replace('{action_button}', $action_button, $action_dropdown);
-                                $template = str_replace('{action}', $action_dropdown, $template);
-                            }
-                            else{
-                                $action_dropdown = null;
-                            }
-                        }
-                        else{
-                            $template = str_replace('{action}', null, $template);
-                        }
-                    }
-                    else{
-                        $template = str_replace('{action}', null, $template);
-                    }
-
-                    $template = str_replace('{content}', $architecture, $template);
-
-                    $generated_view .= $template;
-                    $generated_css_code .= $row['CSS_CODE'];
-                    $generated_javascript_code .= $row['JAVASCRIPT_CODE'];
-                }
-
-                $response[] = array(
-                    'VIEW' => $generated_view,
-                    'CSS' => $generated_css_code,
-                    'JAVASCRIPT' => $generated_javascript_code
-                );
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : generate_technical_view_plugins
-    # Purpose    : Generates technical view plugins.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function generate_technical_view_plugins($menu_id, $views = null){
-        if ($this->databaseConnection()) {
-            $response = array();
-            $generated_css_code = '';
-            $generated_javascript_code = '';
-
-            if(!empty($views)){
-                $query = 'SELECT DISTINCT(PLUGIN_ID) AS PLUGIN_ID FROM technical_view_plugin WHERE VIEW_ID IN (:views)';
-            }
-            else{
-                $query = 'SELECT DISTINCT(PLUGIN_ID) AS PLUGIN_ID FROM technical_view_plugin WHERE VIEW_ID IN (SELECT VIEW_ID FROM technical_menu_view WHERE MENU_ID = :menu_id)';
-            }
-
-            $sql = $this->db_connection->prepare($query);
-
-            if(!empty($views)){
-                $sql->bindValue(':views', $views);
-            }
-            else{
-                $sql->bindValue(':menu_id', $menu_id);
-            }
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $plugin_id = $row['PLUGIN_ID'];
-                    
-                    $get_technical_plugin_details = $this->get_technical_plugin_details($plugin_id);
-                    $generated_css_code .= $get_technical_plugin_details[0]['CSS_CODE'];
-                    $generated_javascript_code .= $get_technical_plugin_details[0]['JAVSCRIPT_CODE'];
-
-                }
-
-                $response[] = array(
-                    'CSS' => $generated_css_code,
-                    'JAVASCRIPT' => $generated_javascript_code
-                );
-
-                return $response;
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
     #   Generate options methods
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
     #
-    # Name       : generate_module_options
-    # Purpose    : Generates module options of dropdown.
+    # Name       : generate_system_code_options
+    # Purpose    : Generates system code options of dropdown.
     #
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function generate_module_options(){
+    public function generate_system_code_options($system_type){
         if ($this->databaseConnection()) {
             $option = '';
             
-            $sql = $this->db_connection->prepare('CALL generate_module_options()');
+            $sql = $this->db_connection->prepare('CALL generate_system_code_options(:system_type)');
+            $sql->bindValue(':system_type', $system_type);
 
             if($sql->execute()){
                 $count = $sql->rowCount();
         
                 if($count > 0){
                     while($row = $sql->fetch()){
-                        $module_id = $row['MODULE_ID'];
-                        $module_name = $row['MODULE_NAME'];
+                        $system_code = $row['SYSTEM_CODE'];
+                        $system_description = $row['SYSTEM_DESCRIPTION'];
     
-                        $option .= "<option value='". $module_id ."'>". $module_name ."</option>";
-                    }
-    
-                    return $option;
-                }
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : generate_menu_options
-    # Purpose    : Generates menu options of dropdown.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function generate_menu_options(){
-        if ($this->databaseConnection()) {
-            $option = '';
-            
-            $sql = $this->db_connection->prepare('CALL generate_menu_options()');
-
-            if($sql->execute()){
-                $count = $sql->rowCount();
-        
-                if($count > 0){
-                    while($row = $sql->fetch()){
-                        $menu_id = $row['MENU_ID'];
-                        $menu = $row['MENU'];
-    
-                        $option .= "<option value='". $menu_id ."'>". $menu ."</option>";
+                        $option .= "<option value='". $system_code ."'>". $system_description ."</option>";
                     }
     
                     return $option;

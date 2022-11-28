@@ -1,4 +1,4 @@
-/* Create Table */
+/* Technical Module */
 CREATE TABLE technical_module(
 	MODULE_ID VARCHAR(100) PRIMARY KEY,
 	MODULE_NAME VARCHAR(200) NOT NULL,
@@ -20,88 +20,16 @@ CREATE TABLE technical_module_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE technical_model(
-	MODEL_ID VARCHAR(100) PRIMARY KEY,
-	MODULE_ID VARCHAR(200) NOT NULL,
-	MODEL_NAME VARCHAR(100) NOT NULL,
-	MODEL_DESCRIPTION VARCHAR(500),
-	MODEL LONGTEXT,
-	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
-	ORDER_SEQUENCE INT
-);
+CREATE INDEX technical_module_index ON technical_module(MODULE_ID);
 
-CREATE TABLE technical_menu(
-	MENU_ID VARCHAR(100) PRIMARY KEY,
-	MODULE_ID VARCHAR(200) NOT NULL,
-	PARENT_MENU VARCHAR(100),
-	MENU VARCHAR(100) NOT NULL,
-	MENU_ICON VARCHAR(50),
-	MENU_WEB_ICON VARCHAR(500),
-	FULL_PATH LONGTEXT NOT NULL,
-	IS_LINK TINYINT(1) NOT NULL,
-	MENU_LINK VARCHAR(500),
-	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
-	RECORD_LOG VARCHAR(100) NOT NULL,
-	ORDER_SEQUENCE INT
-);
+INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPION, MODULE_CATEGORY, IS_INSTALLABLE, IS_APPLICATION, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Technical', '1.0.0', 'Administrator Module', 'TECHNICAL', '1', '1', 'TL-3', '99');
 
-CREATE TABLE technical_menu_view(
-	MENU_ID VARCHAR(100) PRIMARY KEY,
-	VIEW_ID VARCHAR(100) NOT NULL
-);
+INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES ('1', '1');
 
-CREATE TABLE technical_menu_access_rights(
-	MENU_ID VARCHAR(100) PRIMARY KEY,
-	ROLE_ID VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE technical_view(
-	VIEW_ID VARCHAR(100) PRIMARY KEY,
-	VIEW_NAME VARCHAR(200) NOT NULL,
-	HAS_FILTER TINYINT(1) NOT NULL,
-	HAS_ACTION TINYINT(1) NOT NULL,
-	ARCHITECTURE LONGTEXT NOT NULL,
-	CSS_CODE LONGTEXT NOT NULL,
-	JAVASCRIPT_CODE LONGTEXT NOT NULL,
-	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
-	ORDER_SEQUENCE INT
-);
-
-CREATE TABLE technical_view_type(
-	VIEW_TYPE_ID VARCHAR(100) PRIMARY KEY,
-	VIEW_TYPE VARCHAR(200) NOT NULL,
-	TEMPLATE LONGTEXT NOT NULL,
-	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL
-);
-
-
-CREATE TABLE technical_view_plugin(
-	VIEW_ID VARCHAR(100) NOT NULL,
-	PLUGIN_ID VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE technical_view_access_rights(
-	VIEW_ID VARCHAR(100) PRIMARY KEY,
-	ROLE_ID VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE technical_view_action(
-	VIEW_ID VARCHAR(100) NOT NULL,
-	ACTION_ID VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE technical_plugin(
-	PLUGIN_ID VARCHAR(100) PRIMARY KEY,
-	PLUGIN_NAME VARCHAR(200) NOT NULL,
-	CSS_CODE LONGTEXT,
-	JAVSCRIPT_CODE LONGTEXT,
-	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
-);
-
+/* Technical Action */
 CREATE TABLE technical_action(
 	ACTION_ID VARCHAR(100) PRIMARY KEY,
 	ACTION_NAME VARCHAR(200) NOT NULL,
-	ACTION_TYPE VARCHAR(20) NOT NULL,
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 	RECORD_LOG VARCHAR(100)
 );
@@ -111,6 +39,37 @@ CREATE TABLE technical_action_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
+CREATE INDEX technical_action_index ON technical_action(ACTION_ID);
+
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('1', 'Add Module', 'TL-7');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('2', 'Update Module', 'TL-8');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('3', 'Delete Module', 'TL-9');
+
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('1', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('3', '1');
+
+/* Technical Action */
+CREATE TABLE technical_page(
+	PAGE_ID VARCHAR(100) PRIMARY KEY,
+	PAGE_NAME VARCHAR(200) NOT NULL,
+	MODULE_ID VARCHAR(100) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE technical_page_access_rights(
+	PAGE_ID VARCHAR(100) PRIMARY KEY,
+	ROLE_ID VARCHAR(100) NOT NULL
+);
+
+CREATE INDEX technical_page_index ON technical_page(PAGE_ID);
+
+INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('1', 'Modules', 1, 'TL-10');
+
+INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('1', '1');
+
+/* Global System Code */
 CREATE TABLE global_system_code(
 	SYSTEM_TYPE VARCHAR(20) NOT NULL,
 	SYSTEM_CODE VARCHAR(20) NOT NULL,
@@ -119,6 +78,13 @@ CREATE TABLE global_system_code(
 	RECORD_LOG VARCHAR(100)
 );
 
+CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
+
+INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'SYSTYPE', 'System Code', 'TL-4');
+INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'MODULECAT', 'Module Category', 'TL-5');
+INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('MODULECAT', 'TECHNICAL', 'Technical', 'TL-6');
+
+/* Global Role */
 CREATE TABLE global_role(
 	ROLE_ID VARCHAR(50) PRIMARY KEY,
 	ROLE VARCHAR(100) NOT NULL,
@@ -132,6 +98,11 @@ CREATE TABLE global_role_user_account(
 	USERNAME VARCHAR(50) NOT NULL
 );
 
+CREATE INDEX global_role_index ON global_role(ROLE_ID);
+
+INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('1', 'Administrator', 'Administrator', 'TL-2');
+
+/* Global User Account */
 CREATE TABLE global_user_account(
 	USERNAME VARCHAR(50) PRIMARY KEY,
 	PASSWORD VARCHAR(200) NOT NULL,
@@ -145,6 +116,11 @@ CREATE TABLE global_user_account(
 	RECORD_LOG VARCHAR(100)
 );
 
+CREATE INDEX global_user_account_index ON global_user_account(USERNAME);
+
+INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Administrator', 'Active', '2022-12-30', 0, null, 'TL-1');.
+
+/* Global Transaction Log */
 CREATE TABLE global_transaction_log(
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 	USERNAME VARCHAR(50) NOT NULL,
@@ -153,19 +129,7 @@ CREATE TABLE global_transaction_log(
 	LOG VARCHAR(4000)
 );
 
-/* Index */
-
-CREATE INDEX global_user_account_index ON global_user_account(USERNAME);
 CREATE INDEX global_transaction_log_index ON global_transaction_log(TRANSACTION_LOG_ID);
-CREATE INDEX technical_module_index ON technical_module(MODULE_ID);
-CREATE INDEX technical_model_index ON technical_model(MODEL_ID);
-CREATE INDEX technical_menu_index ON technical_menu(MENU_ID);
-CREATE INDEX technical_view_index ON technical_view(VIEW_ID);
-CREATE INDEX technical_plugin_index ON technical_plugin(PLUGIN_ID);
-CREATE INDEX technical_action_index ON technical_action(ACTION_ID);
-CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
-CREATE INDEX global_role_index ON global_role(ROLE_ID);
-CREATE INDEX technical_view_type_index ON technical_view_type(VIEW_TYPE_ID);
 
 /* Stored Procedure */
 
@@ -256,10 +220,8 @@ BEGIN
 
 	IF @access_type = 'module' THEN
 		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = @access_right_id AND ROLE_ID = @role_id';
-	ELSEIF @access_type = 'menu' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_menu_access_rights WHERE MENU_ID = @access_right_id AND ROLE_ID = @role_id';
-	ELSEIF @access_type = 'view' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_view_access_rights WHERE VIEW_ID = @access_right_id AND ROLE_ID = @role_id';
+	ELSEIF @access_type = 'page' THEN
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = @access_right_id AND ROLE_ID = @role_id';
 	ELSE
 		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = @access_right_id AND ROLE_ID = @role_id';
     END IF;
@@ -269,33 +231,11 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE get_technical_menu_details(IN menu_id VARCHAR(100))
+CREATE PROCEDURE get_page_details(IN page_id VARCHAR(100))
 BEGIN
-	SET @menu_id = menu_id;
+	SET @page_id = page_id;
 
-	SET @query = 'SELECT MODULE_ID, PARENT_MENU, MENU, MENU_ICON, MENU_WEB_ICON, FULL_PATH, IS_LINK, MENU_LINK, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_menu WHERE MENU_ID = @menu_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_technical_plugin_details(IN plugin_id VARCHAR(100))
-BEGIN
-	SET @plugin_id = plugin_id;
-
-	SET @query = 'SELECT PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_plugin WHERE PLUGIN_ID = @plugin_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_menu_details(IN menu_id VARCHAR(100))
-BEGIN
-	SET @menu_id = menu_id;
-
-	SET @query = 'SELECT MODULE_ID, PARENT_MENU, MENU, MENU_ICON, MENU_WEB_ICON, FULL_PATH, IS_LINK, MENU_LINK, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_menu WHERE MENU_ID = @menu_id';
+	SET @query = 'SELECT PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_page WHERE PAGE_ID = @page_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -313,140 +253,13 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE get_action_details(IN action_id VARCHAR(100))
+CREATE PROCEDURE generate_system_code_options(IN system_type VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
+	SET @system_type = system_type;
 
-	SET @query = 'SELECT ACTION_NAME, ACTION_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_action WHERE ACTION_ID = @action_id';
+	SET @query = 'SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = @system_type ORDER BY SYSTEM_DESCRIPTION';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
 	DROP PREPARE stmt;
 END //
-
-CREATE PROCEDURE get_view_action_details(IN view_id VARCHAR(100))
-BEGIN
-	SET @view_id = view_id;
-
-	SET @query = 'SELECT ACTION_ID FROM technical_view_action WHERE VIEW_ID = @view_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_view_type_details(IN view_type_id VARCHAR(100))
-BEGIN
-	SET @view_type_id = view_type_id;
-
-	SET @query = 'SELECT VIEW_TYPE, TEMPLATE, TRANSACTION_LOG_ID FROM technical_view_type WHERE VIEW_TYPE_ID = @view_type_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE generate_module_options()
-BEGIN
-	SET @query = 'SELECT MODULE_ID, MODULE_NAME FROM technical_module ORDER BY MODULE_NAME';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE generate_menu_options()
-BEGIN
-	SET @query = 'SELECT MENU_ID, MENU FROM technical_menu ORDER BY MENU';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-/* Insert Transaction */
-
-INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Administrator', 'Active', '2022-12-30', 0, null, 'TL-1');
-INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('1', 'Administrator', 'Administrator', 'TL-2');
-INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPION, MODULE_CATEGORY, IS_INSTALLABLE, IS_APPLICATION, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Technical', '1.0.0', 'Administrator Module', 'TECHNICAL', '1', '1', 'TL-3', '99');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'SYSTYPE', 'System Code', 'TL-4');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'MODULECAT', 'Module Category', 'TL-5');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('MODULECAT', 'TECHNICAL', 'Technical', 'TL-6');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', '1', 'Settings', 'bx bx-cog', 'TL-7', '1');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('2', '1', '1', 'Modules', '', 'TL-8', '1');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('3', '1', '1', 'Models', '', 'TL-9', '2');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('4', '1', '1', 'Menu Items', '', 'TL-10', '3');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('5', '1', '1', 'Views', '', 'TL-11', '4');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('6', '1', '1', 'Plugins', '', 'TL-12', '5');
-INSERT INTO technical_menu (MENU_ID, MODULE_ID, PARENT_MENU, MENU, MENU_ICON, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('7', '1', '1', 'Actions', '', 'TL-13', '5');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'ACTTYPE', 'Action Type', 'TL-14');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'ADD', 'Add', 'TL-14');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'UPDATE', 'Update', 'TL-15');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'DELETE', 'Delete', 'TL-16');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'ACTIVATE', 'Activate', 'TL-17');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'DEACTIVATE', 'Deactivate', 'TL-18');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'LOCK', 'Lock', 'TL-19');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'UNLOCK', 'Unlock', 'TL-20');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'APPROVE', 'Approve', 'TL-21');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'REJECT', 'Reject', 'TL-22');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('ACTTYPE', 'CANCEL', 'Cancel', 'TL-23');
-INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('1', 'Add Menu Item', 'TL-24');
-INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('2', 'Update Menu Item', 'TL-25');
-INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID,) VALUES ('3', 'Delete Menu Item', 'TL-26');
-
-INSERT INTO technical_view_type (VIEW_TYPE_ID, VIEW_TYPE, TEMPLATE, TRANSACTION_LOG_ID) VALUES ('1', 'Data Table', '<div class="row">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row">
-											<div class="col-md-12">
-                                                <div class="d-flex align-items-start">
-                                                    <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">{card_title}</h4>
-                                                    </div>
-                                                    <div class="d-flex gap-2">
-                                                        {action}
-														{filter_button}
-                                                    </div>
-                                                </div>
-												{filter}
-                                            </div>
-										</div>
-                                        <div class="row mt-4">
-                                            <div class="col-md-12">
-                                                {data_table}
-                                            </div>
-                                        </div>       
-                                    </div>
-                                </div>
-                            </div>
-                        </div>', 'TL-27');
-INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '2');
-INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '3');
-INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '4');
-INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '5');
-INSERT INTO technical_submenu (MENU_ID, SUBMENU_ID) VALUES ('1', '6');
-INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES ('1', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('1', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('2', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('3', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('4', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('5', '1');
-INSERT INTO technical_menu_access_rights (MENU_ID, ROLE_ID) VALUES ('6', '1');
-INSERT INTO global_role_user_account (ROLE_ID, USERNAME) VALUES ('1', 'ADMIN');
-INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('1', 'Max Length', null, '<script src="assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>');
-INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('2', 'Sweet Alert', '<link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">', '<script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>');
-INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('3', 'Data Table (Basic)', '<link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script><script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script><script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script><script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>');
-INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('4', 'JQuery Validation', null, '<script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>');
-INSERT INTO technical_plugin (PLUGIN_ID, PLUGIN_NAME, CSS_CODE, JAVSCRIPT_CODE) VALUES ('5', 'Select2', '<link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />', '<script src="assets/libs/select2/js/select2.min.js"></script>');
-INSERT INTO technical_menu_view (MENU_ID, VIEW_ID) VALUES ('4', '1');
-INSERT INTO technical_view_plugin (VIEW_ID, PLUGIN_ID) VALUES ('1', '3');
-
-INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('1', '1');
-INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1');
-INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('3', '1');
-INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '1');
-INSERT INTO technical_view_action (VIEW_ID, ACTION_ID) VALUES ('1', '3');
-
-
-

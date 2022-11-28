@@ -2,37 +2,39 @@
     'use strict';
 
     $(function() {
-        if($('#menu-item-datatable').length){
-            initialize_menu_item_table('#menu-item-datatable');
+        if($('#modules-datatable').length){
+            initialize_modules_table('#modules-datatable');
         }
 
         initialize_click_events();
     });
 })(jQuery);
 
-function initialize_menu_item_table(datatable_name, buttons = false, show_all = false){
+function initialize_modules_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
     var username = $('#username').text();
-    var type = 'menu item table';
+    var type = 'modules table';
+    var filter_start_date = $('#filter_start_date').val();
+    var filter_end_date = $('#filter_end_date').val();
+    var filter_module_category = $('#filter_module_category').val();
+    var filter_is_installable = $('#filter_is_installable').val();
+    var filter_is_application = $('#filter_is_application').val();
+    var filter_is_installed = $('#filter_is_installed').val();
     var settings;
 
     var column = [ 
         { 'data' : 'CHECK_BOX' },
-        { 'data' : 'MENU' },
-        { 'data' : 'PARENT_MENU' },
-        { 'data' : 'MODULE' },
-        { 'data' : 'ORDER_SEQUENCE' },
+        { 'data' : 'MODULE_NAME' },
+        { 'data' : 'MODULE_CATEGORY' },
         { 'data' : 'ACTION' }
     ];
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
-        { 'width': '24%', 'aTargets': 1 },
-        { 'width': '25%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-        { 'width': '20%', 'aTargets': 4 },
-        { 'width': '10%','bSortable': false, 'aTargets': 5 },
+        { 'width': '49%', 'aTargets': 1 },
+        { 'width': '30%', 'aTargets': 2 },
+        { 'width': '20%','bSortable': false, 'aTargets': 4 },
     ];
 
     if(show_all){
@@ -48,7 +50,7 @@ function initialize_menu_item_table(datatable_name, buttons = false, show_all = 
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date, 'filter_module_category' : filter_module_category, 'filter_is_installable' : filter_is_installable, 'filter_is_application' : filter_is_application, 'filter_is_installed' : filter_is_installed},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -79,7 +81,7 @@ function initialize_menu_item_table(datatable_name, buttons = false, show_all = 
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date, 'filter_module_category' : filter_module_category, 'filter_is_installable' : filter_is_installable, 'filter_is_application' : filter_is_application, 'filter_is_installed' : filter_is_installed},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -109,29 +111,33 @@ function initialize_menu_item_table(datatable_name, buttons = false, show_all = 
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#add-system-code',function() {
-        generate_modal('system code form', 'System Code', 'R' , '1', '1', 'form', 'system-code-form', '1', username);
+    $(document).on('click','.view-public-holiday',function() {
+        var modules_id = $(this).data('public-holiday-id');
+
+        sessionStorage.setItem('modules_id', modules_id);
+
+        generate_modal('public holiday details', 'Public Holiday Details', 'LG' , '1', '0', 'element', '', '0', username);
     });
 
-    $(document).on('click','.update-system-code',function() {
-        var system_type = $(this).data('system-type');
-        var menu_item = $(this).data('system-code');
-
-        sessionStorage.setItem('system_type', system_type);
-        sessionStorage.setItem('menu_item', menu_item);
-
-        generate_modal('system code form', 'System Code', 'R' , '1', '1', 'form', 'system-code-form', '0', username);
+    $(document).on('click','#add-public-holiday',function() {
+        generate_modal('public holiday form', 'Public Holiday', 'R' , '0', '1', 'form', 'public-holiday-form', '1', username);
     });
 
-    $(document).on('click','.delete-system-code',function() {
-        var system_type = $(this).data('system-type');
-        var menu_item = $(this).data('system-code');
+    $(document).on('click','.update-public-holiday',function() {
+        var modules_id = $(this).data('public-holiday-id');
 
-        var transaction = 'delete system code';
+        sessionStorage.setItem('modules_id', modules_id);
+        
+        generate_modal('public holiday form', 'Public Holiday', 'R' , '0', '1', 'form', 'public-holiday-form', '0', username);
+    });
+    
+    $(document).on('click','.delete-public-holiday',function() {
+        var modules_id = $(this).data('public-holiday-id');
+        var transaction = 'delete public holiday';
 
         Swal.fire({
-            title: 'Delete System Code',
-            text: 'Are you sure you want to delete this system code?',
+            title: 'Delete Public Holiday',
+            text: 'Are you sure you want to delete this public holiday?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -144,20 +150,20 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, system_type : system_type, menu_item : menu_item, transaction : transaction},
+                    data: {username : username, modules_id : modules_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete System Code', 'The system code has been deleted.', 'success');
+                                show_alert('Delete Public Holiday', 'The public holiday has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete System Code', 'The system code does not exist.', 'info');
+                                show_alert('Delete Public Holiday', 'The public holiday does not exist.', 'info');
                             }
 
-                            reload_datatable('#system-code-datatable');
+                            reload_datatable('#public-holiday-datatable');
                         }
                         else{
-                          show_alert('Delete System Code', response, 'error');
+                          show_alert('Delete Public Holiday', response, 'error');
                         }
                     }
                 });
@@ -166,22 +172,20 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-system-code',function() {
-        var system_type = [];
-        var menu_item = [];
-        var transaction = 'delete multiple system code';
+    $(document).on('click','#delete-public-holiday',function() {
+        var modules_id = [];
+        var transaction = 'delete multiple public holiday';
 
         $('.datatable-checkbox-children').each(function(){
             if($(this).is(':checked')){  
-                system_type.push($(this).data('system-type'));  
-                menu_item.push($(this).data('system-code'));  
+                modules_id.push(this.value);  
             }
         });
 
-        if(system_type.length > 0 && menu_item.length > 0){
+        if(modules_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple System Codes',
-                text: 'Are you sure you want to delete these system codes?',
+                title: 'Delete Multiple Public Holidays',
+                text: 'Are you sure you want to delete these public holidays?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -195,20 +199,20 @@ function initialize_click_events(){
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
-                        data: {username : username, system_type : system_type, menu_item : menu_item, transaction : transaction},
+                        data: {username : username, modules_id : modules_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
                                 if(response === 'Deleted'){
-                                    show_alert('Delete Multiple System Codes', 'The system codes have been deleted.', 'success');
+                                    show_alert('Delete Multiple Public Holidays', 'The public holidays have been deleted.', 'success');
                                 }
                                 else{
-                                    show_alert('Delete Multiple System Codes', 'The system code does not exist.', 'info');
+                                    show_alert('Delete Multiple Public Holidays', 'The public holidays does not exist.', 'info');
                                 }
     
-                                reload_datatable('#system-code-datatable');
+                                reload_datatable('#public-holiday-datatable');
                             }
                             else{
-                                show_alert('Delete Multiple System Codes', response, 'error');
+                                show_alert('Delete Multiple Public Holidays', response, 'error');
                             }
                         }
                     });
@@ -218,8 +222,12 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple System Codes', 'Please select the system codes you want to delete.', 'error');
+            show_alert('Delete Multiple Public Holidays', 'Please select the public holidays you want to delete.', 'error');
         }
+    });
+
+    $(document).on('click','#apply-filter',function() {
+        initialize_modules_table('#public-holiday-datatable');
     });
 
 }
