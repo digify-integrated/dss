@@ -782,42 +782,65 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
     # Modules table
     else if($type == 'modules table'){
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare('SELECT MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPION, MODULE_CATEGORY FROM technical_module');
+        if(isset($_POST['filter_module_category'])){
+            if ($api->databaseConnection()) {
+                $filter_module_category = $_POST['filter_module_category'];
 
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $module_id = $row['MODULE_ID'];
-                    $module_name = $row['MODULE_NAME'];
-                    $module_version = $row['MODULE_VERSION'];
-                    $module_description = $row['MODULE_DESCRIPION'];
-                    $module_category = $row['MODULE_CATEGORY'];
+                $query = 'SELECT MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY FROM technical_module';
 
-                    $module_id_encrypted = $api->encrypt_data($module_id);
-
-                    $response[] = array(
-                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $menu_id .'">',
-                        'MENU' => $menu,
-                        'PARENT_MENU' => $parent_menu_name,
-                        'MODULE' => $module_name,
-                        'ORDER_SEQUENCE' => $order_sequence,
-                        'ACTION' => '<div class="d-flex gap-2">
-                                        <a href="" class="btn btn-primary waves-effect waves-light view-user-account" data-user-code="'. $username .'" title="View User Account">
-                                            <i class="bx bx-show font-size-16 align-middle"></i>
-                                        </a>
-                                    </div>'
-                    );
+                if(!empty($filter_module_category)){
+                    $query .= ' WHERE MODULE_CATEGORY = :filter_module_category';
                 }
+    
+                $sql = $api->db_connection->prepare($query);
 
-                echo json_encode($response);
-            }
-            else{
-                echo $sql->errorInfo()[2];
+                if(!empty($filter_module_category)){
+                    $sql->bindValue(':filter_module_category', $filter_module_category);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $module_id = $row['MODULE_ID'];
+                        $module_name = $row['MODULE_NAME'];
+                        $module_version = $row['MODULE_VERSION'];
+                        $module_description = $row['MODULE_DESCRIPTION'];
+                        $module_category = $row['MODULE_CATEGORY'];
+    
+                        $system_code_details = $api->get_system_code_details('MODULECAT', $module_category);
+                        $module_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                        $module_id_encrypted = $api->encrypt_data($module_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $module_id .'">',
+                            'MODULE_NAME' => $module_name . '<p class="text-muted mb-0">'. $module_description .'</p>' . '<p class="text-muted mb-0"> Version: '. $module_version .'</p>',
+                            'MODULE_CATEGORY' => $module_category_name,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                            <a href="module-form.php?id='. $module_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Module">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
             }
         }
+        else{
+            $response[] = array(
+                'CHECK_BOX' => null,
+                'MODULE_NAME' => null,
+                'MODULE_CATEGORY' => null,
+                'ACTION' => null
+            );
+        }
+        
     }
     # -------------------------------------------------------------
-
 }
 
 ?>

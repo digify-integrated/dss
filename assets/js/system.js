@@ -8017,9 +8017,11 @@ function check_table_check_box(){
 
     if(checked_value > 0){
         $('.multiple').removeClass('d-none');
+        $('.multiple-action').removeClass('d-none');
     }
     else{
         $('.multiple').addClass('d-none');
+        $('.multiple-action').addClass('d-none');
     }
 }
 

@@ -516,6 +516,56 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_system_parameter_exist
+    # Purpose    : Checks if the system parameter exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_system_parameter_exist($parameter_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_system_parameter_exist(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_module_exist
+    # Purpose    : Checks if the module exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_module_exist($module_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_module_exist(:module_id)');
+            $sql->bindValue(':module_id', $module_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -569,6 +619,263 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_system_parameter_value
+    # Purpose    : Updates system parameter value.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_system_parameter_value($parameter_number, $parameter_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL update_system_parameter_value(:parameter_id, :parameter_number, :record_log)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+            $sql->bindValue(':parameter_number', $parameter_number);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_system_parameter
+    # Purpose    : Updates system parameter.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_system_parameter($parameter_id, $parameter, $parameter_description, $extension, $parameter_number, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $system_parameter_details = $this->get_system_parameter_details($parameter_id);
+            
+            if(!empty($system_parameter_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $system_parameter_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_system_parameter(:parameter_id, :parameter, :parameter_description, :extension, :parameter_number, :transaction_log_id, :record_log)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+            $sql->bindValue(':parameter', $parameter);
+            $sql->bindValue(':parameter_description', $parameter_description);
+            $sql->bindValue(':extension', $extension);
+            $sql->bindValue(':parameter_number', $parameter_number);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($system_parameter_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system parameter.');
+                                        
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system parameter.');
+                                        
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_module
+    # Purpose    : Updates module.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $module_details = $this->get_module_details($module_id);
+            
+            if(!empty($module_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $module_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_module(:module_id, :module_name, :module_version, :module_description, :module_category, :transaction_log_id, :record_log)');
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':module_name', $module_name);
+            $sql->bindValue(':module_version', $module_version);
+            $sql->bindValue(':module_description', $module_description);
+            $sql->bindValue(':module_category', $module_category);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($module_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated module.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated module.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_module_icon
+    # Purpose    : Updates module icon.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_module_icon($module_icon_tmp_name, $module_icon_actual_ext, $module_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            if(!empty($module_icon_tmp_name)){ 
+                $file_name = $this->generate_file_name(10);
+                $file_new = $file_name . '.' . $module_icon_actual_ext;
+
+                $directory = './assets/images/module_icon/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/module_icon/' . $file_new;
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    $module_details = $this->get_module_details($module_id);
+                    $module_icon = $module_details[0]['MODULE_ICON'];
+                    $transaction_log_id = $module_details[0]['TRANSACTION_LOG_ID'];
+    
+                    if(file_exists($module_icon)){
+                        if (unlink($module_icon)) {
+                            if(move_uploaded_file($module_icon_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_module_icon(:module_id, :file_path)');
+                                $sql->bindValue(':module_id', $module_id);
+                                $sql->bindValue(':file_path', $file_path);
+                            
+                                if($sql->execute()){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated module icon.');
+                                        
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    return $sql->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your file.';
+                            }
+                        }
+                        else {
+                            return $module_icon . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($module_icon_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_module_icon(:module_id, :file_path)');
+                            $sql->bindValue(':module_id', $module_id);
+                            $sql->bindValue(':file_path', $file_path);
+                        
+                            if($sql->execute()){
+                                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated icon.');
+                                    
+                                if($insert_transaction_log){
+                                    return true;
+                                }
+                                else{
+                                    return $insert_transaction_log;
+                                }
+                            }
+                            else{
+                                return $sql->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -600,7 +907,235 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_system_parameter
+    # Purpose    : Insert system parameter.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_system_parameter($parameter, $parameter_description, $extension, $number, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(1, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_system_parameter(:id, :parameter, :parameter_description, :extension, :number, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':parameter', $parameter);
+            $sql->bindValue(':parameter_description', $parameter_description);
+            $sql->bindValue(':extension', $extension);
+            $sql->bindValue(':number', $number);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 1, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted system parameter.');
+                                        
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_module
+    # Purpose    : Insert module.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(3, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_module(:id, :module_name, :module_version, :module_description, :module_category, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':module_name', $module_name);
+            $sql->bindValue(':module_version', $module_version);
+            $sql->bindValue(':module_description', $module_description);
+            $sql->bindValue(':module_category', $module_category);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 3, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted module.');
+                                    
+                        if($insert_transaction_log){
+                            if(!empty($job_description_tmp_name) && !empty($job_description_actual_ext)){
+                                $update_module_icon = $this->update_module_icon($module_icon_tmp_name, $module_icon_actual_ext, $id, $username);
+        
+                                if($update_module_icon){
+                                    $response[] = array(
+                                        'RESPONSE' => true,
+                                        'MODULE_ID' => $id
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $update_module_icon,
+                                        'MODULE_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => true,
+                                    'MODULE_ID' => $id
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'MODULE_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'MODULE_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'MODULE_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'MODULE_ID' => null
+                );
+            }
+
+            return $reponse;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
+    # -------------------------------------------------------------
+    
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_system_parameter
+    # Purpose    : Delete system parameter.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_system_parameter($parameter_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_system_parameter(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_module
+    # Purpose    : Delete module.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_module($module_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_module(:module_id)');
+            $sql->bindValue(':module_id', $module_id);
+        
+            if($sql->execute()){ 
+                $module_details = $this->get_module_details($module_id);
+                $module_icon = $module_details[0]['MODULE_ICON'] ?? null;
+
+                if(!empty($module_icon)){
+                    if(file_exists($module_icon)){
+                        if (unlink($module_icon)) {
+                            return true;
+                        }
+                        else {
+                            return $module_icon . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        return true;
+                    }
+                }
+                else{
+                    return true;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
@@ -647,6 +1182,76 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : get_system_code_details
+    # Purpose    : Gets the system code details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_system_code_details($system_type, $system_code){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_system_code_details(:system_type, :system_code)');
+            $sql->bindValue(':system_type', $system_type);
+            $sql->bindValue(':system_code', $system_code);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'SYSTEM_DESCRIPTION' => $row['SYSTEM_DESCRIPTION'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_system_parameter_details
+    # Purpose    : Gets the system parameter details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_system_parameter_details($parameter_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_system_parameter_details(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'PARAMETER' => $row['PARAMETER'],
+                        'PARAMETER_DESCRIPTION' => $row['PARAMETER_DESCRIPTION'],
+                        'PARAMETER_EXTENSION' => $row['PARAMETER_EXTENSION'],
+                        'PARAMETER_NUMBER' => $row['PARAMETER_NUMBER'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : get_module_details
     # Purpose    : Gets the module details.
     #
@@ -665,13 +1270,9 @@ class Api{
                     $response[] = array(
                         'MODULE_NAME' => $row['MODULE_NAME'],
                         'MODULE_VERSION' => $row['MODULE_VERSION'],
-                        'MODULE_DESCRIPION' => $row['MODULE_DESCRIPION'],
+                        'MODULE_DESCRIPTION' => $row['MODULE_DESCRIPTION'],
                         'MODULE_ICON' => $row['MODULE_ICON'],
                         'MODULE_CATEGORY' => $row['MODULE_CATEGORY'],
-                        'IS_INSTALLABLE' => $row['IS_INSTALLABLE'],
-                        'IS_APPLICATION' => $row['IS_APPLICATION'],
-                        'IS_INSTALLED' => $row['IS_INSTALLED'],
-                        'INSTALLATION_DATE' => $row['INSTALLATION_DATE'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG'],
                         'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
@@ -722,6 +1323,73 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_upload_setting_details
+    # Purpose    : Gets the upload setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_upload_setting_details($upload_setting_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_upload_setting_details(:upload_setting_id)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'UPLOAD_SETTING' => $row['UPLOAD_SETTING'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'MAX_FILE_SIZE' => $row['MAX_FILE_SIZE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_upload_file_type_details
+    # Purpose    : Gets the upload file type details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_upload_file_type_details($upload_setting_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_upload_file_type_details(:upload_setting_id)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'FILE_TYPE' => $row['FILE_TYPE'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -744,6 +1412,39 @@ class Api{
                 $row = $sql->fetch();
 
                 return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_system_parameter
+    # Purpose    : Gets the system parameter.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_system_parameter($parameter_id, $add){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL get_system_parameter(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                $parameter_number = $row['PARAMETER_NUMBER'] + $add;
+                $parameter_extension = $row['PARAMETER_EXTENSION'];
+
+                $response[] = array(
+                    'PARAMETER_NUMBER' => $parameter_number,
+                    'ID' => $parameter_extension . $parameter_number
+                );
+
+                return $response;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -1000,6 +1701,26 @@ class Api{
 
     # -------------------------------------------------------------
     #   Generate methods
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_file_name
+    # Purpose    : generates random file name.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_file_name($length) {
+        $key = '';
+        $keys = array_merge(range(0, 9), range('a', 'z'));
+    
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $keys[array_rand($keys)];
+        }
+    
+        return $key;
+    }
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------

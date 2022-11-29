@@ -15,12 +15,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
     
     var username = $('#username').text();
     var type = 'modules table';
-    var filter_start_date = $('#filter_start_date').val();
-    var filter_end_date = $('#filter_end_date').val();
     var filter_module_category = $('#filter_module_category').val();
-    var filter_is_installable = $('#filter_is_installable').val();
-    var filter_is_application = $('#filter_is_application').val();
-    var filter_is_installed = $('#filter_is_installed').val();
     var settings;
 
     var column = [ 
@@ -32,9 +27,9 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
-        { 'width': '49%', 'aTargets': 1 },
-        { 'width': '30%', 'aTargets': 2 },
-        { 'width': '20%','bSortable': false, 'aTargets': 4 },
+        { 'width': '74%', 'aTargets': 1 },
+        { 'width': '15%', 'aTargets': 2 },
+        { 'width': '10%','bSortable': false, 'aTargets': 3 }
     ];
 
     if(show_all){
@@ -50,7 +45,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date, 'filter_module_category' : filter_module_category, 'filter_is_installable' : filter_is_installable, 'filter_is_application' : filter_is_application, 'filter_is_installed' : filter_is_installed},
+                'data': {'type' : type, 'username' : username, 'filter_module_category' : filter_module_category},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -81,7 +76,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date, 'filter_module_category' : filter_module_category, 'filter_is_installable' : filter_is_installable, 'filter_is_application' : filter_is_application, 'filter_is_installed' : filter_is_installed},
+                'data': {'type' : type, 'username' : username, 'filter_module_category' : filter_module_category},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -111,81 +106,20 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','.view-public-holiday',function() {
-        var modules_id = $(this).data('public-holiday-id');
-
-        sessionStorage.setItem('modules_id', modules_id);
-
-        generate_modal('public holiday details', 'Public Holiday Details', 'LG' , '1', '0', 'element', '', '0', username);
-    });
-
-    $(document).on('click','#add-public-holiday',function() {
-        generate_modal('public holiday form', 'Public Holiday', 'R' , '0', '1', 'form', 'public-holiday-form', '1', username);
-    });
-
-    $(document).on('click','.update-public-holiday',function() {
-        var modules_id = $(this).data('public-holiday-id');
-
-        sessionStorage.setItem('modules_id', modules_id);
-        
-        generate_modal('public holiday form', 'Public Holiday', 'R' , '0', '1', 'form', 'public-holiday-form', '0', username);
-    });
-    
-    $(document).on('click','.delete-public-holiday',function() {
-        var modules_id = $(this).data('public-holiday-id');
-        var transaction = 'delete public holiday';
-
-        Swal.fire({
-            title: 'Delete Public Holiday',
-            text: 'Are you sure you want to delete this public holiday?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, modules_id : modules_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert('Delete Public Holiday', 'The public holiday has been deleted.', 'success');
-                            }
-                            else{
-                                show_alert('Delete Public Holiday', 'The public holiday does not exist.', 'info');
-                            }
-
-                            reload_datatable('#public-holiday-datatable');
-                        }
-                        else{
-                          show_alert('Delete Public Holiday', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#delete-public-holiday',function() {
-        var modules_id = [];
-        var transaction = 'delete multiple public holiday';
+    $(document).on('click','#delete-module',function() {
+        var module_id = [];
+        var transaction = 'delete multiple module';
 
         $('.datatable-checkbox-children').each(function(){
             if($(this).is(':checked')){  
-                modules_id.push(this.value);  
+                module_id.push(this.value);  
             }
         });
 
-        if(modules_id.length > 0){
+        if(module_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Public Holidays',
-                text: 'Are you sure you want to delete these public holidays?',
+                title: 'Delete Multiple Modules',
+                text: 'Are you sure you want to delete these modules?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -199,20 +133,15 @@ function initialize_click_events(){
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
-                        data: {username : username, modules_id : modules_id, transaction : transaction},
+                        data: {username : username, module_id : module_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                if(response === 'Deleted'){
-                                    show_alert('Delete Multiple Public Holidays', 'The public holidays have been deleted.', 'success');
-                                }
-                                else{
-                                    show_alert('Delete Multiple Public Holidays', 'The public holidays does not exist.', 'info');
-                                }
+                                show_alert('Delete Multiple Modules', 'The modules have been deleted.', 'success');
     
-                                reload_datatable('#public-holiday-datatable');
+                                reload_datatable('#modules-datatable');
                             }
                             else{
-                                show_alert('Delete Multiple Public Holidays', response, 'error');
+                                show_alert('Delete Multiple Modules', response, 'error');
                             }
                         }
                     });
@@ -222,12 +151,12 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Public Holidays', 'Please select the public holidays you want to delete.', 'error');
+            show_alert('Delete Multiple Modules', 'Please select the modules you want to delete.', 'error');
         }
     });
 
     $(document).on('click','#apply-filter',function() {
-        initialize_modules_table('#public-holiday-datatable');
+        initialize_modules_table('#modules-datatable');
     });
 
 }
