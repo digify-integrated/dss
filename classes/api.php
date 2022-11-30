@@ -566,6 +566,32 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_module_access_exist
+    # Purpose    : Checks if the module access exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_module_access_exist($module_id, $role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_module_access_exist(:module_id, :role_id)');
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1020,7 +1046,7 @@ class Api{
                                 if($update_module_icon){
                                     $response[] = array(
                                         'RESPONSE' => true,
-                                        'MODULE_ID' => $id
+                                        'MODULE_ID' => $this->encrypt_data($id)
                                     );
                                 }
                                 else{
@@ -1033,7 +1059,7 @@ class Api{
                             else{
                                 $response[] = array(
                                     'RESPONSE' => true,
-                                    'MODULE_ID' => $id
+                                    'MODULE_ID' => $this->encrypt_data($id)
                                 );
                             }
                         }
@@ -1065,7 +1091,31 @@ class Api{
                 );
             }
 
-            return $reponse;
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_module_access
+    # Purpose    : Inserts module access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_module_access($module_id, $role, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_module_access(:module_id, :role)');
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':role', $role);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
         }
     }
     # -------------------------------------------------------------
@@ -1130,6 +1180,53 @@ class Api{
                 else{
                     return true;
                 }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_module_access
+    # Purpose    : Delete all module access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_module_access($module_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_module_access(:module_id)');
+            $sql->bindValue(':module_id', $module_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_module_access
+    # Purpose    : Delete module access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_module_access($module_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_module_access(:module_id, :role_id)');
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -1213,6 +1310,41 @@ class Api{
         }
     }
     # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_role_details
+    # Purpose    : Gets the role details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_role_details($role_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_role_details(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ROLE' => $row['ROLE'],
+                        'ROLE_DESCRIPTION' => $row['ROLE_DESCRIPTION'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 
     # -------------------------------------------------------------
     #
@@ -1751,6 +1883,76 @@ class Api{
                         $system_description = $row['SYSTEM_DESCRIPTION'];
     
                         $option .= "<option value='". $system_code ."'>". $system_description ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_role_options
+    # Purpose    : Generates role options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_role_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_role_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $option .= "<option value='". $role_id ."'>". $role ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_module_options
+    # Purpose    : Generates module options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_module_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_module_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $module_id = $row['MODULE_ID'];
+                        $module_name = $row['MODULE_NAME'];
+    
+                        $option .= "<option value='". $module_id ."'>". $module_name ."</option>";
                     }
     
                     return $option;

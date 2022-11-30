@@ -12,7 +12,7 @@ CREATE TABLE technical_module(
 );
 
 CREATE TABLE technical_module_access_rights(
-	MODULE_ID VARCHAR(100) PRIMARY KEY,
+	MODULE_ID VARCHAR(100) NOT NULL,
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
@@ -102,6 +102,62 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE check_module_access_exist(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @module_id = module_id;
+	SET @role_id = role_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = @module_id AND ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_module_access(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @module_id = module_id;
+	SET @role_id = role_id;
+
+	SET @query = 'INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES(@module_id, @role_id)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_module_access(IN module_id VARCHAR(100))
+BEGIN
+	SET @module_id = module_id;
+
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = @module_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_module_access(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @module_id = module_id;
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = @module_id AND ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_module_options()
+BEGIN
+	SET @query = 'SELECT MODULE_ID, MODULE_NAME FROM technical_module ORDER BY MODULE_NAME';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Technical Action */
 CREATE TABLE technical_action(
 	ACTION_ID VARCHAR(100) PRIMARY KEY,
@@ -122,12 +178,22 @@ INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('3', 'Delete Module', 'TL-9');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('4', 'Add Module Access Right', 'TL-12');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('5', 'Delete Module Access Right', 'TL-13');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('6', 'Add Page', 'TL-20');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('7', 'Update Page', 'TL-21');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('8', 'Delete Page', 'TL-22');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('9', 'Add Page Access Right', 'TL-23');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('10', 'Delete Page Access Right', 'TL-24');
 
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('1', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('3', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('4', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('5', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('6', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('7', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('8', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('9', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('10', '1');
 
 /* Technical Page */
 CREATE TABLE technical_page(
@@ -147,9 +213,13 @@ CREATE INDEX technical_page_index ON technical_page(PAGE_ID);
 
 INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('1', 'Modules', 1, 'TL-10');
 INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('2', 'Module Form', 1, 'TL-11');
+INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('3', 'Pages', 1, 'TL-18');
+INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('4', 'Page Form', 1, 'TL-19');
 
 INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('1', '1');
 INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('2', '1');
+INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('3', '1');
+INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('4', '1');
 
 CREATE PROCEDURE get_page_details(IN page_id VARCHAR(100))
 BEGIN
@@ -217,6 +287,26 @@ CREATE TABLE global_role_user_account(
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
 
 INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('1', 'Administrator', 'Administrator', 'TL-2');
+
+CREATE PROCEDURE get_role_details(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'SELECT ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_role WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_role_options()
+BEGIN
+	SET @query = 'SELECT ROLE_ID, ROLE FROM global_role ORDER BY ROLE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
 
 /* Global User Account */
 CREATE TABLE global_user_account(

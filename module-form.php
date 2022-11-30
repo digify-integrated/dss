@@ -89,7 +89,7 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="module-form" action="module.php">
+                                        <form id="module-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
@@ -103,12 +103,12 @@
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <ul class="dropdown-menu dropdown-menu-end">';
 
-                                                                    if($delete_module > 0 && !empty($module_id)){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" id="delete-module">Delete Module</button></li>';
-                                                                    }
-
                                                                     if($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0))){
                                                                         $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button></li>';
+                                                                    }
+
+                                                                    if($delete_module > 0 && !empty($module_id)){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-module-id="'. $module_id .'" id="delete-module">Delete Module</button></li>';
                                                                     }
 
                                                                     $dropdown_action .= '</ul></div>';
@@ -131,23 +131,23 @@
                                             <div class="row mt-4">
                                                 <div class="col-md-12">
                                                     <div class="row">
-                                                        <div class="col-sm-6">
+                                                        <div class="col-md-6">
                                                             <div class="row mb-4">
                                                                 <input type="hidden" id="module_id" name="module_id">
-                                                                <label for="module_name" class="col-sm-3 col-form-label">Module Name <span class="text-danger">*</span></label>
-                                                                <div class="col-sm-9">
+                                                                <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
+                                                                <div class="col-md-9">
                                                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_name" name="module_name" maxlength="200">
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-4">
-                                                                <label for="module_description" class="col-sm-3 col-form-label">Module Description <span class="text-danger">*</span></label>
-                                                                <div class="col-sm-9">
+                                                                <label for="module_description" class="col-md-3 col-form-label">Module Description <span class="text-danger">*</span></label>
+                                                                <div class="col-md-9">
                                                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_description" name="module_description" maxlength="500">
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-4">
-                                                                <label for="module_category" class="col-sm-3 col-form-label">Module Category <span class="text-danger">*</span></label>
-                                                                <div class="col-sm-9">
+                                                                <label for="module_category" class="col-md-3 col-form-label">Module Category <span class="text-danger">*</span></label>
+                                                                <div class="col-md-9">
                                                                     <select class="form-control select2" id="module_category" name="module_category">
                                                                         <option value=""></option>
                                                                         <?php echo $api->generate_system_code_options('MODULECAT'); ?>
@@ -155,16 +155,16 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6">
+                                                        <div class="col-md-6">
                                                             <div class="row mb-4">
-                                                                <label for="module_version" class="col-sm-3 col-form-label">Module Version <span class="text-danger">*</span></label>
-                                                                <div class="col-sm-9">
+                                                                <label for="module_version" class="col-md-3 col-form-label">Module Version <span class="text-danger">*</span></label>
+                                                                <div class="col-md-9">
                                                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_version" name="module_version" maxlength="20">
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-4">
-                                                                <label for="module_icon" class="col-sm-3 col-form-label">Module Icon</label>
-                                                                <div class="col-sm-9">
+                                                                <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
+                                                                <div class="col-md-9">
                                                                     <input class="form-control" type="file" name="module_icon" id="module_icon">
                                                                 </div>
                                                             </div>

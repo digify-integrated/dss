@@ -68,6 +68,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     # Submit module
     else if($transaction == 'submit module'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id']) && isset($_POST['module_name']) && !empty($_POST['module_name']) && isset($_POST['module_description']) && !empty($_POST['module_description']) && isset($_POST['module_category']) && !empty($_POST['module_category']) && isset($_POST['module_version']) && !empty($_POST['module_version'])){
+            $response = array();
             $file_type = '';
             $username = $_POST['username'];
             $module_id = $_POST['module_id'];
@@ -110,36 +111,60 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                     $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username);
 
                                     if($update_module){
-                                        echo 'Updated';
+                                        $response[] = array(
+                                            'RESPONSE' => 'Updated',
+                                            'MODULE_ID' => null
+                                        );
                                     }
                                     else{
-                                        echo $update_module;
+                                        $response[] = array(
+                                            'RESPONSE' => $update_module,
+                                            'MODULE_ID' => null
+                                        );
                                     }
                                 }
                                 else{
-                                    echo $update_module_icon;
+                                    $response[] = array(
+                                        'RESPONSE' => $update_module_icon,
+                                        'MODULE_ID' => null
+                                    );
                                 }
                             }
                             else{
-                                echo 'File Size';
+                                $response[] = array(
+                                    'RESPONSE' => 'File Size',
+                                    'MODULE_ID' => null
+                                );
                             }
                         }
                         else{
-                            echo 'There was an error uploading the file.';
+                            $response[] = array(
+                                'RESPONSE' => 'There was an error uploading the file.',
+                                'MODULE_ID' => null
+                            );
                         }
                     }
                     else{
-                        echo 'File Type';
+                        $response[] = array(
+                            'RESPONSE' => 'File Type',
+                            'MODULE_ID' => null
+                        );
                     }
                 }
                 else{
                     $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username);
 
                     if($update_module){
-                        echo 'Updated';
+                        $response[] = array(
+                            'RESPONSE' => 'Updated',
+                            'MODULE_ID' => null
+                        );
                     }
                     else{
-                        echo $update_module;
+                        $response[] = array(
+                            'RESPONSE' => $update_module,
+                            'MODULE_ID' => null
+                        );
                     }
                 }
             }
@@ -150,35 +175,89 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             if($module_icon_size < $file_max_size){
                                 $insert_module = $api->insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $username);
     
-                                if($insert_module){
-                                    echo 'Inserted';
+                                if($insert_module[0]['RESPONSE']){
+                                    $response[] = array(
+                                        'RESPONSE' => 'Inserted',
+                                        'MODULE_ID' => $insert_module[0]['MODULE_ID']
+                                    );
                                 }
                                 else{
-                                    echo $insert_module;
+                                    $response[] = array(
+                                        'RESPONSE' => $insert_module[0]['RESPONSE'],
+                                        'MODULE_ID' => null
+                                    );
                                 }
                             }
                             else{
-                                echo 'File Size';
+                                $response[] = array(
+                                    'RESPONSE' => 'File Size',
+                                    'MODULE_ID' => null
+                                );
                             }
                         }
                         else{
-                            echo 'There was an error uploading the file.';
+                            $response[] = array(
+                                'RESPONSE' => 'There was an error uploading the file.',
+                                'MODULE_ID' => null
+                            );
                         }
                     }
                     else{
-                        echo 'File Type';
+                        $response[] = array(
+                            'RESPONSE' => 'File Type',
+                            'MODULE_ID' => null
+                        );
                     }
                 }
                 else{
                     $insert_module = $api->insert_module(null, null, $module_name, $module_version, $module_description, $module_category, $username);
     
                     if($insert_module){
-                        echo 'Inserted';
+                        $response[] = array(
+                            'RESPONSE' => 'Inserted',
+                            'MODULE_ID' => $insert_module[0]['MODULE_ID']
+                        );
                     }
                     else{
-                        echo $insert_module;
+                        $response[] = array(
+                            'RESPONSE' => $insert_module[0]['RESPONSE'],
+                            'MODULE_ID' => null
+                        );
                     }
                 }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit module access
+    else if($transaction == 'submit module access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id']) && !empty($_POST['module_id']) && isset($_POST['role']) && !empty($_POST['role'])){
+            $error = '';
+            $username = $_POST['username'];
+            $module_id = $_POST['module_id'];
+            $roles = explode(',', $_POST['role']);
+
+            foreach($roles as $role){
+                $check_module_access_exist = $api->check_module_access_exist($module_id, $role);
+
+                if($check_module_access_exist == 0){
+                    $insert_module_access = $api->insert_module_access($module_id, $role, $username);
+
+                    if(!$insert_module_access){
+                        $error = $insert_module_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
             }
         }
     }
@@ -190,20 +269,27 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Delete module
     else if($transaction == 'delete module'){
-        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
             $username = $_POST['username'];
-            $job_position_id = $_POST['job_position_id'];
+            $module_id = $_POST['module_id'];
 
-            $check_module_exist = $api->check_module_exist($job_position_id);
+            $check_module_exist = $api->check_module_exist($module_id);
 
             if($check_module_exist > 0){
-                $delete_job_position = $api->delete_job_position($job_position_id, $username);
+                $delete_module = $api->delete_module($module_id, $username);
                                     
-                if($delete_job_position){
-                    echo 'Deleted';
+                if($delete_module){
+                    $delete_all_module_access = $api->delete_all_module_access($module_id, $username);
+
+                    if($delete_all_module_access){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_module_access;
+                    }
                 }
                 else{
-                    echo $delete_job_position;
+                    echo $delete_module;
                 }
             }
             else{
@@ -215,7 +301,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Delete multiple module
     else if($transaction == 'delete multiple module'){
-        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id'])){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
             $username = $_POST['username'];
             $module_ids = $_POST['module_id'];
 
@@ -225,7 +311,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 if($check_module_exist > 0){
                     $delete_module = $api->delete_module($module_id, $username);
                                     
-                    if(!$delete_module){
+                    if($delete_module){
+                        $delete_all_module_access = $api->delete_all_module_access($module_id, $username);
+
+                        if(!$delete_all_module_access){
+                            $error = $delete_all_module_access;
+                            break;
+                        }
+                    }
+                    else{
                         $error = $delete_module;
                         break;
                     }
@@ -241,6 +335,32 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             }
             else{
                 echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete module access
+    else if($transaction == 'delete module access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['module_id']) && !empty($_POST['module_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $module_id = $_POST['module_id'];
+            $role_id = $_POST['role_id'];
+
+            $check_module_access_exist = $api->check_module_access_exist($module_id, $role_id);
+
+            if($check_module_access_exist > 0){
+                $delete_module_access = $api->delete_module_access($module_id, $role_id, $username);
+                                    
+                if($delete_module_access){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_module_access;
+                }
+            }
+            else{
+                echo 'Not Found';
             }
         }
     }

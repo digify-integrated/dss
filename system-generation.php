@@ -54,6 +54,37 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         }
     }
     # -------------------------------------------------------------
+
+    # System form
+    else if($type == 'system form'){
+        if(isset($_POST['form_type']) && isset($_POST['form_id'])){
+            $form_type = $_POST['form_type'];
+            $form_id = $_POST['form_id'];
+
+            $form = '<form class="cmxform" id="'. $form_id .'" method="post" action="#">';
+
+            if($form_type == 'module access form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                                        <select class="form-control form-select2" multiple="multiple" id="role" name="role">
+                                            '. $api->generate_role_options() .'
+                                        </select>
+                                    </div>
+                                </div>
+                        </div>';
+            }
+
+            $form .= '</form>';
+
+            $response[] = array(
+                'FORM' => $form
+            );
+
+            echo json_encode($response);
+        }
+    }
     
     # System element
     else if($type == 'system element'){
@@ -830,15 +861,101 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        else{
-            $response[] = array(
-                'CHECK_BOX' => null,
-                'MODULE_NAME' => null,
-                'MODULE_CATEGORY' => null,
-                'ACTION' => null
-            );
+    }
+    # -------------------------------------------------------------
+
+    # Module access table
+    else if($type == 'module access table'){
+        if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
+            if ($api->databaseConnection()) {
+                $module_id = $_POST['module_id'];
+
+                $delete_module_access_right = $api->check_role_access_rights($username, '5', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM technical_module_access_rights WHERE MODULE_ID = :module_id');
+                $sql->bindValue(':module_id', $module_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+
+                        $role_details = $api->get_role_details($role_id);
+                        $role = $role_details[0]['ROLE'] ?? null;
+
+                        if($delete_module_access_right > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-module-access" data-module-id="'. $module_id .'" data-role-id="'. $role_id .'" title="Delete Module Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ROLE' => $role,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
         }
         
+    }
+    # -------------------------------------------------------------
+
+    # Pages table
+    else if($type == 'pages table'){
+        if(isset($_POST['filter_module'])){
+            if ($api->databaseConnection()) {
+                $filter_module = $_POST['filter_module'];
+
+                $query = 'SELECT PAGE_ID, PAGE_NAME, MODULE_ID FROM technical_page';
+
+                if(!empty($filter_module)){
+                    $query .= ' WHERE MODULE_ID = :filter_module';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_module)){
+                    $sql->bindValue(':filter_module', $filter_module);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $page_id = $row['PAGE_ID'];
+                        $page_name = $row['PAGE_NAME'];
+                        $module_id = $row['MODULE_ID'];
+    
+                        $module_details = $api->get_module_details($module_id);
+                        $module_name = $module_details[0]['MODULE_NAME'] ?? null;
+    
+                        $page_id_encrypted = $api->encrypt_data($page_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $page_id .'">',
+                            'PAGE_NAME' => $page_name,
+                            'MODULE' => $module_name,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                            <a href="page-form.php?id='. $page_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Page">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
     }
     # -------------------------------------------------------------
 }

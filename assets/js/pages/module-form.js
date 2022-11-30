@@ -22,9 +22,9 @@
             });
 
             
-            /*if($('#modules-datatable').length){
-                initialize_module_access_table('#modules-datatable');
-            }*/
+            if($('#module-access-datatable').length){
+                initialize_module_access_table('#module-access-datatable');
+            }
         }
 
         $('#module-form').validate({
@@ -40,6 +40,7 @@
                     type: 'POST',
                     url: 'controller.php',
                     data: formData,
+                    dataType: 'JSON',
                     processData: false,
                     contentType: false,
                     beforeSend: function(){
@@ -47,18 +48,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
-                            if(response === 'Inserted'){
-                                show_alert_event('Insert Module Success', 'The module has been inserted.', 'success', 'redirect');
+                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
+                            if(response[0]['RESPONSE'] === 'Inserted'){
+                                var redirect_link = window.location.href + '?id=' + response[0]['MODULE_ID'];
+
+                                show_alert_event('Insert Module Success', 'The module has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
                                 show_alert_event('Update Module Success', 'The module has been updated.', 'success', 'reload');
                             }
                         }
-                        else if(response === 'File Size'){
+                        else if(response[0]['RESPONSE'] === 'File Size'){
                             show_alert('Module Error', 'The file uploaded exceeds the maximum file size.', 'error');
                         }
-                        else if(response === 'File Type'){
+                        else if(response[0]['RESPONSE'] === 'File Type'){
                             show_alert('Module Error', 'The file uploaded is not supported.', 'error');
                         }
                         else{
@@ -67,7 +70,7 @@
                     },
                     complete: function(){
                         document.getElementById('submit-data').disabled = false;
-                        $('#submit-data').html('Submit');
+                        $('#submit-data').html('Save');
                     }
                 });
                 return false;
@@ -128,6 +131,7 @@
 
 function initialize_module_access_table(datatable_name, buttons = false, show_all = false){    
     var username = $('#username').text();
+    var module_id = $('#module-id').text();
     var type = 'module access table';
     var settings;
 
@@ -137,8 +141,8 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
     ];
 
     var column_definition = [
-        { 'width': '90%', 'aTargets': 1 },
-        { 'width': '10%','bSortable': false, 'aTargets': 2 }
+        { 'width': '90%', 'aTargets': 0 },
+        { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
 
     if(show_all){
@@ -154,7 +158,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -185,7 +189,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -215,62 +219,109 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-public-holiday',function() {
-        var modules_id = [];
-        var transaction = 'delete multiple public holiday';
-
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                modules_id.push(this.value);  
-            }
-        });
-
-        if(modules_id.length > 0){
-            Swal.fire({
-                title: 'Delete Multiple Public Holidays',
-                text: 'Are you sure you want to delete these public holidays?',
-                icon: 'warning',
-                showCancelButton: !0,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
-                confirmButtonClass: 'btn btn-danger mt-2',
-                cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-                buttonsStyling: !1
-            }).then(function(result) {
-                if (result.value) {
-                    
-                    $.ajax({
-                        type: 'POST',
-                        url: 'controller.php',
-                        data: {username : username, modules_id : modules_id, transaction : transaction},
-                        success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                if(response === 'Deleted'){
-                                    show_alert('Delete Multiple Public Holidays', 'The public holidays have been deleted.', 'success');
-                                }
-                                else{
-                                    show_alert('Delete Multiple Public Holidays', 'The public holidays does not exist.', 'info');
-                                }
-    
-                                reload_datatable('#public-holiday-datatable');
-                            }
-                            else{
-                                show_alert('Delete Multiple Public Holidays', response, 'error');
-                            }
-                        }
-                    });
-                    
-                    return false;
-                }
-            });
-        }
-        else{
-            show_alert('Delete Multiple Public Holidays', 'Please select the public holidays you want to delete.', 'error');
-        }
+    $(document).on('click','#add-module-access',function() {
+        generate_modal('module access form', 'Module Access', 'R' , '1', '1', 'form', 'module-access-form', '1', username);
     });
 
-    $(document).on('click','#apply-filter',function() {
-        initialize_modules_table('#modules-datatable');
+    $(document).on('click','.delete-module-access',function() {
+        var module_id = $(this).data('module-id');
+        var role_id = $(this).data('role-id');
+        var transaction = 'delete module access';
+
+        Swal.fire({
+            title: 'Delete Module Access',
+            text: 'Are you sure you want to delete this module access?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                            }
+                            else{
+                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                            }
+
+                            reload_datatable('#module-access-datatable');
+                        }
+                        else{
+                            show_alert('Delete Module Access', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#delete-module',function() {
+        var module_id = $(this).data('module-id');
+        var transaction = 'delete module';
+
+        Swal.fire({
+            title: 'Delete Module',
+            text: 'Are you sure you want to delete this module?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, module_id : module_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert_event('Delete Module', 'The module has been deleted.', 'success', 'redirect', 'modules.php');
+                            }
+                            else{
+                                show_alert_event('Delete Module', 'The module does not exist.', 'info', 'redirect', 'modules.php');
+                            }
+                        }
+                        else{
+                            show_alert('Delete Module', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#discard',function() {
+
+        Swal.fire({
+            title: 'Discard Changes',
+            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                window.location.href = 'modules.php';
+                return false;
+            }
+        });
     });
 
 }
