@@ -2,46 +2,38 @@
     'use strict';
 
     $(function() {
-        if($('#module-id').length){
-            var transaction = 'module details';
-            var module_id = $('#module-id').text();
+        if($('#page-id').length){
+            var transaction = 'page details';
+            var page_id = $('#page-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {module_id : module_id, transaction : transaction},
+                data: {page_id : page_id, transaction : transaction},
                 success: function(response) {
-                    $('#module_name').val(response[0].MODULE_NAME);
-                    $('#module_description').val(response[0].MODULE_DESCRIPTION);
-                    $('#module_version').val(response[0].MODULE_VERSION);
-                    $('#module_id').val(module_id);
+                    $('#page_name').val(response[0].PAGE_NAME);
+                    $('#page_id').val(page_id);
 
-                    check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
+                    check_empty(response[0].MODULE_ID, '#module_id', 'select');
                 }
             });
-
-            if($('#module-access-datatable').length){
-                initialize_module_access_table('#module-access-datatable');
+            
+            if($('#page-access-datatable').length){
+                initialize_page_access_table('#page-access-datatable');
             }
         }
 
-        $('#module-form').validate({
+        $('#page-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit module';
+                var transaction = 'submit page';
                 var username = $('#username').text();
-                
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
 
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -49,22 +41,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['MODULE_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['PAGE_ID'];
 
-                                show_alert_event('Insert Module Success', 'The module has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Page Success', 'The page has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Module Success', 'The module has been updated.', 'success', 'reload');
+                                show_alert_event('Update Page Success', 'The page has been updated.', 'success', 'reload');
                             }
                         }
-                        else if(response[0]['RESPONSE'] === 'File Size'){
-                            show_alert('Module Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                        }
-                        else if(response[0]['RESPONSE'] === 'File Type'){
-                            show_alert('Module Error', 'The file uploaded is not supported.', 'error');
-                        }
                         else{
-                            show_alert('Module Error', response, 'error');
+                            show_alert('Page Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -75,32 +61,20 @@
                 return false;
             },
             rules: {
-                module_name: {
+                page_name: {
                     required: true
                 },
-                module_description: {
+                module_id: {
                     required: true
                 },
-                module_category: {
-                    required: true
-                },
-                module_version: {
-                    required: true
-                }
             },
             messages: {
-                module_name: {
-                    required: 'Please enter the module name',
+                page_name: {
+                    required: 'Please enter the page name',
                 },
-                module_description: {
-                    required: 'Please enter the module description',
+                module_id: {
+                    required: 'Please choose the module',
                 },
-                module_category: {
-                    required: 'Please choose the module category',
-                },
-                module_version: {
-                    required: 'Please enter the module version',
-                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -128,10 +102,10 @@
     });
 })(jQuery);
 
-function initialize_module_access_table(datatable_name, buttons = false, show_all = false){    
+function initialize_page_access_table(datatable_name, buttons = false, show_all = false){    
     var username = $('#username').text();
-    var module_id = $('#module-id').text();
-    var type = 'module access table';
+    var page_id = $('#page-id').text();
+    var type = 'page access table';
     var settings;
 
     var column = [ 
@@ -157,7 +131,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
+                'data': {'type' : type, 'username' : username, 'page_id' : page_id},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -188,7 +162,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
+                'data': {'type' : type, 'username' : username, 'page_id' : page_id},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -218,18 +192,18 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#add-module-access',function() {
-        generate_modal('module access form', 'Module Access', 'R' , '1', '1', 'form', 'module-access-form', '1', username);
+    $(document).on('click','#add-page-access',function() {
+        generate_modal('page access form', 'Page Access', 'R' , '1', '1', 'form', 'page-access-form', '1', username);
     });
 
-    $(document).on('click','.delete-module-access',function() {
-        var module_id = $(this).data('module-id');
+    $(document).on('click','.delete-page-access',function() {
+        var page_id = $(this).data('page-id');
         var role_id = $(this).data('role-id');
-        var transaction = 'delete module access';
+        var transaction = 'delete page access';
 
         Swal.fire({
-            title: 'Delete Module Access',
-            text: 'Are you sure you want to delete this module access?',
+            title: 'Delete Page Access',
+            text: 'Are you sure you want to delete this page access?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -242,20 +216,20 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
+                    data: {username : username, page_id : page_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                                show_alert('Delete Page Access', 'The page access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                                show_alert('Delete Page Access', 'The page access does not exist.', 'info');
                             }
 
-                            reload_datatable('#module-access-datatable');
+                            reload_datatable('#page-access-datatable');
                         }
                         else{
-                            show_alert('Delete Module Access', response, 'error');
+                            show_alert('Delete Page Access', response, 'error');
                         }
                     }
                 });
@@ -264,13 +238,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-module',function() {
-        var module_id = $(this).data('module-id');
-        var transaction = 'delete module';
+    $(document).on('click','#delete-page',function() {
+        var page_id = $(this).data('page-id');
+        var transaction = 'delete page';
 
         Swal.fire({
-            title: 'Delete Module',
-            text: 'Are you sure you want to delete this module?',
+            title: 'Delete Page',
+            text: 'Are you sure you want to delete this page?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -283,18 +257,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, module_id : module_id, transaction : transaction},
+                    data: {username : username, page_id : page_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Module', 'The module has been deleted.', 'success', 'redirect', 'modules.php');
+                                show_alert_event('Delete Page', 'The page has been deleted.', 'success', 'redirect', 'pages.php');
                             }
                             else{
-                                show_alert_event('Delete Module', 'The module does not exist.', 'info', 'redirect', 'modules.php');
+                                show_alert_event('Delete Page', 'The page does not exist.', 'info', 'redirect', 'pages.php');
                             }
                         }
                         else{
-                            show_alert('Delete Module', response, 'error');
+                            show_alert('Delete Page', response, 'error');
                         }
                     }
                 });
@@ -317,7 +291,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'modules.php';
+                window.location.href = 'pages.php';
                 return false;
             }
         });

@@ -22,7 +22,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'MODULE_NAME' },
         { 'data' : 'MODULE_CATEGORY' },
-        { 'data' : 'ACTION' }
+        { 'data' : 'VIEW' }
     ];
 
     var column_definition = [

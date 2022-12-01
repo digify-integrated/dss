@@ -252,6 +252,71 @@ function initialize_form_validation(form_type){
             }
         });
     }
+    else if(form_type == 'page access form'){
+        $('#page-access-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit page access';
+                var role = $('#role').val();
+                var page_id = $('#page_id').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&page_id=' + page_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Page Access Success', 'The page access has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#page-access-datatable');
+                        }
+                        else{
+                            show_alert('Page Access Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                role: {
+                    required: true
+                }
+            },
+            messages: {
+                role: {
+                    required: 'Please choose at least one (1) role',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
 }
 
 // Display functions

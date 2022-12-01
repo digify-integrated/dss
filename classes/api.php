@@ -592,6 +592,109 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_page_exist
+    # Purpose    : Checks if the page exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_page_exist($page_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_page_exist(:page_id)');
+            $sql->bindValue(':page_id', $page_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_page_access_exist
+    # Purpose    : Checks if the page access exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_page_access_exist($page_id, $role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_page_access_exist(:page_id, :role_id)');
+            $sql->bindValue(':page_id', $page_id);
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_action_exist
+    # Purpose    : Checks if the action exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_action_exist($action_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_action_exist(:action_id)');
+            $sql->bindValue(':action_id', $action_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_action_access_exist
+    # Purpose    : Checks if the action access exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_action_access_exist($action_id, $role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_action_access_exist(:action_id, :role_id)');
+            $sql->bindValue(':action_id', $action_id);
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -902,6 +1005,139 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_page
+    # Purpose    : Updates page.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_page($page_id, $page_name, $module_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $page_details = $this->get_page_details($page_id);
+            
+            if(!empty($page_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $page_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_page(:page_id, :page_name, :module_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':page_id', $page_id);
+            $sql->bindValue(':page_name', $page_name);
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($page_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated page.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated page.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_action
+    # Purpose    : Updates action.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_action($action_id, $action_name, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $action_details = $this->get_action_details($action_id);
+            
+            if(!empty($action_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $action_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_action(:action_id, :action_name, :transaction_log_id, :record_log)');
+            $sql->bindValue(':action_id', $action_id);
+            $sql->bindValue(':action_name', $action_name);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($action_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated action.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated action.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -1121,6 +1357,213 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_page
+    # Purpose    : Insert page.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_page($page_name, $module_id, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(4, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_page(:id, :page_name, :module_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':page_name', $page_name);
+            $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 4, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted page.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'PAGE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'PAGE_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'PAGE_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'PAGE_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'PAGE_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_page_access
+    # Purpose    : Inserts page access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_page_access($page_id, $role, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_page_access(:page_id, :role)');
+            $sql->bindValue(':page_id', $page_id);
+            $sql->bindValue(':role', $role);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_action
+    # Purpose    : Insert action.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_action($action_name, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(5, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_action(:id, :action_name, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':action_name', $action_name);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 5, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted action.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'PAGE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'PAGE_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'PAGE_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'PAGE_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'PAGE_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_action_access
+    # Purpose    : Inserts action access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_action_access($action_id, $role, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_action_access(:action_id, :role)');
+            $sql->bindValue(':action_id', $action_id);
+            $sql->bindValue(':role', $role);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -1223,6 +1666,146 @@ class Api{
         if ($this->databaseConnection()) {
             $sql = $this->db_connection->prepare('CALL delete_module_access(:module_id, :role_id)');
             $sql->bindValue(':module_id', $module_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_page
+    # Purpose    : Delete page.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_page($page_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_page(:page_id)');
+            $sql->bindValue(':page_id', $page_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_page_access
+    # Purpose    : Delete all page access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_page_access($page_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_page_access(:page_id)');
+            $sql->bindValue(':page_id', $page_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_page_access
+    # Purpose    : Delete page access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_page_access($page_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_page_access(:page_id, :role_id)');
+            $sql->bindValue(':page_id', $page_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_action
+    # Purpose    : Delete action.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_action($action_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_action(:action_id)');
+            $sql->bindValue(':action_id', $action_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_action_access
+    # Purpose    : Delete all action access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_action_access($action_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_action_access(:action_id)');
+            $sql->bindValue(':action_id', $action_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_action_access
+    # Purpose    : Delete action access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_action_access($action_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_action_access(:action_id, :role_id)');
+            $sql->bindValue(':action_id', $action_id);
             $sql->bindValue(':role_id', $role_id);
         
             if($sql->execute()){ 
@@ -1440,6 +2023,39 @@ class Api{
                     $response[] = array(
                         'PAGE_NAME' => $row['PAGE_NAME'],
                         'MODULE_ID' => $row['MODULE_ID'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_action_details
+    # Purpose    : Gets the action details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_action_details($action_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_action_details(:action_id)');
+            $sql->bindValue(':action_id', $action_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ACTION_NAME' => $row['ACTION_NAME'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );

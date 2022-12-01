@@ -183,6 +183,11 @@ INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('8', 'Delete Page', 'TL-22');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('9', 'Add Page Access Right', 'TL-23');
 INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('10', 'Delete Page Access Right', 'TL-24');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('11', 'Add Action', 'TL-28');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('12', 'Update Action', 'TL-29');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('13', 'Delete Action', 'TL-30');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('14', 'Add Action Access Right', 'TL-31');
+INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID) VALUES ('15', 'Delete Action Access Right', 'TL-32');
 
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('1', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('2', '1');
@@ -194,6 +199,119 @@ INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('7', '1'
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('8', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('9', '1');
 INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('10', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('11', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('12', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('13', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('14', '1');
+INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('15', '1');
+
+CREATE PROCEDURE get_action_details(IN action_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+
+	SET @query = 'SELECT ACTION_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_action WHERE ACTION_ID = @action_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_action_exist(IN action_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action WHERE ACTION_ID = @action_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_action(IN action_id VARCHAR(100), IN action_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+	SET @action_name = action_name;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE technical_action SET PAGE_NAME = @action_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ACTION_ID = @action_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_action(IN action_id VARCHAR(100), IN action_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+	SET @action_name = action_name;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO technical_action (PAGE_ID, PAGE_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@action_id, @action_name, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_action(IN action_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+
+	SET @query = 'DELETE FROM technical_action WHERE ACTION_ID = @action_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_action_access_exist(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+	SET @role_id = role_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = @action_id AND ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_action_access(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+	SET @role_id = role_id;
+
+	SET @query = 'INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES(@action_id, @role_id)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_action_access(IN action_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = @action_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_action_access(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @action_id = action_id;
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = @action_id AND ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
 
 /* Technical Page */
 CREATE TABLE technical_page(
@@ -226,6 +344,105 @@ BEGIN
 	SET @page_id = page_id;
 
 	SET @query = 'SELECT PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_page WHERE PAGE_ID = @page_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_page_exist(IN page_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page WHERE PAGE_ID = @page_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_page(IN page_id VARCHAR(100), IN page_name VARCHAR(200), IN module_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+	SET @page_name = page_name;
+	SET @module_id= module_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE technical_page SET PAGE_NAME = @page_name, MODULE_ID = @module_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE PAGE_ID = @page_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_page(IN page_id VARCHAR(100), IN page_name VARCHAR(200), IN module_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+	SET @page_name = page_name;
+	SET @module_id= module_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@page_id, @page_name, @module_id, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_page(IN page_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+
+	SET @query = 'DELETE FROM technical_page WHERE PAGE_ID = @page_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_page_access_exist(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+	SET @role_id = role_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = @page_id AND ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_page_access(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+	SET @role_id = role_id;
+
+	SET @query = 'INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES(@page_id, @role_id)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_page_access(IN page_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = @page_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_page_access(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
+BEGIN
+	SET @page_id = page_id;
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = @page_id AND ROLE_ID = @role_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -478,6 +695,8 @@ CREATE INDEX global_system_parameter_index ON global_system_parameters(PARAMETER
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('1', 'System Parameter', 'Parameter for system parameters.', '', 3, 'TL-15');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('2', 'Transaction Log', 'Parameter for transaction logs.', 'TL-', 17, 'TL-16');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('3', 'Module', 'Parameter for modules.', '', 0, 'TL-17');
+INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('4', 'Page', 'Parameter for pages.', '', 4, 'TL-25');
+INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('5', 'Action', 'Parameter for actions.', '', 15, 'TL-33');
 
 CREATE PROCEDURE update_system_parameter_value(IN parameter_id INT, IN parameter_number INT, IN record_log VARCHAR(100))
 BEGIN

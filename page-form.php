@@ -8,11 +8,11 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(2);
+        $page_details = $api->get_page_details(4);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, '2', 'page');
+        $page_access_right = $api->check_role_access_rights($username, '4', 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -21,18 +21,18 @@
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
-                $module_id = $api->decrypt_data($id);
+                $page_id = $api->decrypt_data($id);
             }
             else{
-                $module_id = null;
+                $page_id = null;
             }
 
-            $add_module = $api->check_role_access_rights($username, '1', 'action');
-            $update_module = $api->check_role_access_rights($username, '2', 'action');
-            $delete_module = $api->check_role_access_rights($username, '3', 'action');
-            $add_module_access_right = $api->check_role_access_rights($username, '4', 'action');
+            $add_page = $api->check_role_access_rights($username, '6', 'action');
+            $update_page = $api->check_role_access_rights($username, '7', 'action');
+            $delete_page = $api->check_role_access_rights($username, '8', 'action');
+            $add_page_access_right = $api->check_role_access_rights($username, '9', 'action');
 
-            if($update_module > 0){
+            if($update_page > 0){
                 $disabled = null;
             }
             else{
@@ -74,16 +74,16 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Module Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Page Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="modules.php">Modules</a></li>
+                                            <li class="breadcrumb-item"><a href="pages.php">Pages</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
-                                                if(!empty($module_id)){
-                                                    echo '<li class="breadcrumb-item" id="module-id"><a href="javascript: void(0);">'. $module_id .'</a></li>';
+                                                if(!empty($page_id)){
+                                                    echo '<li class="breadcrumb-item" id="page-id"><a href="javascript: void(0);">'. $page_id .'</a></li>';
                                                 }
                                             ?>
                                         </ol>
@@ -96,38 +96,38 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="module-form" method="post" action="#">
+                                        <form id="page-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Module Form</h4>
+                                                            <h4 class="card-title">Page Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($delete_module > 0 && !empty($module_id)) || ($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0)))){
+                                                            if(($delete_page > 0 && !empty($page_id)) || ($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0)))){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <ul class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0))){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button></li>';
+                                                                if($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0))){
+                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button></li>';
                                                                 }
 
-                                                                if($delete_module > 0 && !empty($module_id)){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" data-module-id="'. $module_id .'" id="delete-module">Delete Module</button></li>';
+                                                                if($delete_page > 0 && !empty($page_id)){
+                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" data-page-id="'. $page_id .'" id="delete-page">Delete Page</button></li>';
                                                                 }
 
                                                                 $dropdown_action .= '</ul></div>';
 
                                                                 echo $dropdown_action;
                                                             }
-                                                        ?>
+                                                            ?>
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($module_id) && $update_module > 0) || (empty($module_id) && $add_module > 0)){
-                                                                    echo '<button type="submit" for="module-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
+                                                                if((!empty($page_id) && $update_page > 0) || (empty($page_id) && $add_page > 0)){
+                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
                                                             <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
@@ -138,61 +138,43 @@
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="module_id" name="module_id">
-                                                        <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
+                                                         <input type="hidden" id="page_id" name="page_id">
+                                                        <label for="page_name" class="col-md-3 col-form-label">Page Name <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_name" name="module_name" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_description" class="col-md-3 col-form-label">Module Description <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_description" name="module_description" maxlength="500" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_category" class="col-md-3 col-form-label">Module Category <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <select class="form-control select2" id="module_category" name="module_category" <?php echo $disabled; ?>>
-                                                                <option value="">--</option>
-                                                                <?php echo $api->generate_system_code_options('MODULECAT'); ?>
-                                                            </select>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="page_name" name="page_name" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="module_version" class="col-md-3 col-form-label">Module Version <span class="text-danger">*</span></label>
+                                                        <label for="module_id" class="col-md-3 col-form-label">Module <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_version" name="module_version" maxlength="20" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="module_icon" id="module_icon" <?php echo $disabled; ?>>
+                                                            <select class="form-control select2" id="module_id" name="module_id" <?php echo $disabled; ?>>
+                                                                <option value="">--</option>
+                                                                <?php echo $api->generate_module_options(); ?>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
                                         <?php
-                                            if(!empty($module_id)){
+                                            if(!empty($page_id)){
                                                 echo ' <div class="row mt-4">
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#module-access" role="tab">
+                                                                <a class="nav-link active" data-bs-toggle="tab" href="#page-access" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                                                    <span class="d-none d-sm-block">Module Access</span>    
+                                                                    <span class="d-none d-sm-block">Page Access</span>    
                                                                 </a>
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="module-access" role="tabpanel">
+                                                            <div class="tab-pane active" id="page-access" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="module-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="page-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
@@ -231,6 +213,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/module-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/page-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

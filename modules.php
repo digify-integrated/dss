@@ -140,7 +140,7 @@
                                                             </th>
                                                             <th class="all">Module</th>
                                                             <th class="all">Category</th>
-                                                            <th class="all">Action</th>
+                                                            <th class="all">View</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>

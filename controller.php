@@ -263,6 +263,168 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit page
+    else if($transaction == 'submit page'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && isset($_POST['page_name']) && !empty($_POST['page_name']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $page_id = $_POST['page_id'];
+            $page_name = $_POST['page_name'];
+            $module_id = $_POST['module_id'];
+
+            $check_page_exist = $api->check_page_exist($page_id);
+ 
+            if($check_page_exist > 0){
+                $update_page = $api->update_page($page_id, $page_name, $module_id, $username);
+
+                if($update_page){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'PAGE_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_page,
+                        'PAGE_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_page = $api->insert_page($page_name, $module_id, $username);
+    
+                if($insert_page){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'PAGE_ID' => $insert_page[0]['PAGE_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_page[0]['RESPONSE'],
+                        'PAGE_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit page access
+    else if($transaction == 'submit page access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role']) && !empty($_POST['role'])){
+            $error = '';
+            $username = $_POST['username'];
+            $page_id = $_POST['page_id'];
+            $roles = explode(',', $_POST['role']);
+
+            foreach($roles as $role){
+                $check_page_access_exist = $api->check_page_access_exist($page_id, $role);
+
+                if($check_page_access_exist == 0){
+                    $insert_page_access = $api->insert_page_access($page_id, $role, $username);
+
+                    if(!$insert_page_access){
+                        $error = $insert_page_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit action
+    else if($transaction == 'submit action'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && isset($_POST['action_name']) && !empty($_POST['action_name'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $action_id = $_POST['action_id'];
+            $action_name = $_POST['action_name'];
+
+            $check_action_exist = $api->check_action_exist($action_id);
+ 
+            if($check_action_exist > 0){
+                $update_action = $api->update_action($action_id, $action_name, $username);
+
+                if($update_action){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'ACTION_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_action,
+                        'ACTION_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_action = $api->insert_action($action_name, $username);
+    
+                if($insert_action){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'ACTION_ID' => $insert_action[0]['ACTION_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_action[0]['RESPONSE'],
+                        'ACTION_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit action access
+    else if($transaction == 'submit action access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && !empty($_POST['action_id']) && isset($_POST['role']) && !empty($_POST['role'])){
+            $error = '';
+            $username = $_POST['username'];
+            $action_id = $_POST['action_id'];
+            $roles = explode(',', $_POST['role']);
+
+            foreach($roles as $role){
+                $check_action_access_exist = $api->check_action_access_exist($action_id, $role);
+
+                if($check_action_access_exist == 0){
+                    $insert_action_access = $api->insert_action_access($action_id, $role, $username);
+
+                    if(!$insert_action_access){
+                        $error = $insert_action_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -366,6 +528,204 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete page
+    else if($transaction == 'delete page'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            $username = $_POST['username'];
+            $page_id = $_POST['page_id'];
+
+            $check_page_exist = $api->check_page_exist($page_id);
+
+            if($check_page_exist > 0){
+                $delete_page = $api->delete_page($page_id, $username);
+                                    
+                if($delete_page){
+                    $delete_all_page_access = $api->delete_all_page_access($page_id, $username);
+
+                    if($delete_all_page_access){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_page_access;
+                    }
+                }
+                else{
+                    echo $delete_page;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple page
+    else if($transaction == 'delete multiple page'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            $username = $_POST['username'];
+            $page_ids = $_POST['page_id'];
+
+            foreach($page_ids as $page_id){
+                $check_page_exist = $api->check_page_exist($page_id);
+
+                if($check_page_exist > 0){
+                    $delete_page = $api->delete_page($page_id, $username);
+                                    
+                    if($delete_page){
+                        $delete_all_page_access = $api->delete_all_page_access($page_id, $username);
+
+                        if(!$delete_all_page_access){
+                            $error = $delete_all_page_access;
+                            break;
+                        }
+                    }
+                    else{
+                        $error = $delete_page;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete page access
+    else if($transaction == 'delete page access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $page_id = $_POST['page_id'];
+            $role_id = $_POST['role_id'];
+
+            $check_page_access_exist = $api->check_page_access_exist($page_id, $role_id);
+
+            if($check_page_access_exist > 0){
+                $delete_page_access = $api->delete_page_access($page_id, $role_id, $username);
+                                    
+                if($delete_page_access){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_page_access;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete action
+    else if($transaction == 'delete action'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            $username = $_POST['username'];
+            $action_id = $_POST['action_id'];
+
+            $check_action_exist = $api->check_action_exist($action_id);
+
+            if($check_action_exist > 0){
+                $delete_action = $api->delete_action($action_id, $username);
+                                    
+                if($delete_action){
+                    $delete_all_action_access = $api->delete_all_action_access($action_id, $username);
+
+                    if($delete_all_action_access){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_action_access;
+                    }
+                }
+                else{
+                    echo $delete_action;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple action
+    else if($transaction == 'delete multiple action'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            $username = $_POST['username'];
+            $action_ids = $_POST['action_id'];
+
+            foreach($action_ids as $action_id){
+                $check_action_exist = $api->check_action_exist($action_id);
+
+                if($check_action_exist > 0){
+                    $delete_action = $api->delete_action($action_id, $username);
+                                    
+                    if($delete_action){
+                        $delete_all_action_access = $api->delete_all_action_access($action_id, $username);
+
+                        if(!$delete_all_action_access){
+                            $error = $delete_all_action_access;
+                            break;
+                        }
+                    }
+                    else{
+                        $error = $delete_action;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete action access
+    else if($transaction == 'delete action access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && !empty($_POST['action_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $action_id = $_POST['action_id'];
+            $role_id = $_POST['role_id'];
+
+            $check_action_access_exist = $api->check_action_access_exist($action_id, $role_id);
+
+            if($check_action_access_exist > 0){
+                $delete_action_access = $api->delete_action_access($action_id, $role_id, $username);
+                                    
+                if($delete_action_access){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_action_access;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -446,6 +806,38 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             echo json_encode($response);
         }
     }
+    # -------------------------------------------------------------
+
+    # Page details
+    else if($transaction == 'page details'){
+        if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            $page_id = $_POST['page_id'];
+            $page_details = $api->get_page_details($page_id);
+
+            $response[] = array(
+                'PAGE_NAME' => $page_details[0]['PAGE_NAME'],
+                'MODULE_ID' => $page_details[0]['MODULE_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Action details
+    else if($transaction == 'action details'){
+        if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            $action_id = $_POST['action_id'];
+            $action_details = $api->get_action_details($action_id);
+
+            $response[] = array(
+                'ACTION_NAME' => $action_details[0]['ACTION_NAME']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
 
 }
 

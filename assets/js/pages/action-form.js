@@ -2,46 +2,36 @@
     'use strict';
 
     $(function() {
-        if($('#module-id').length){
-            var transaction = 'module details';
-            var module_id = $('#module-id').text();
+        if($('#action-id').length){
+            var transaction = 'action details';
+            var action_id = $('#action-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {module_id : module_id, transaction : transaction},
+                data: {action_id : action_id, transaction : transaction},
                 success: function(response) {
-                    $('#module_name').val(response[0].MODULE_NAME);
-                    $('#module_description').val(response[0].MODULE_DESCRIPTION);
-                    $('#module_version').val(response[0].MODULE_VERSION);
-                    $('#module_id').val(module_id);
-
-                    check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
+                    $('#action_name').val(response[0].ACTION_NAME);
+                    $('#action_id').val(action_id);
                 }
             });
-
-            if($('#module-access-datatable').length){
-                initialize_module_access_table('#module-access-datatable');
+            
+            if($('#action-access-datatable').length){
+                initialize_action_access_table('#action-access-datatable');
             }
         }
 
-        $('#module-form').validate({
+        $('#action-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit module';
+                var transaction = 'submit action';
                 var username = $('#username').text();
-                
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
 
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -49,22 +39,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['MODULE_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['ACTION_ID'];
 
-                                show_alert_event('Insert Module Success', 'The module has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Action Success', 'The action has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Module Success', 'The module has been updated.', 'success', 'reload');
+                                show_alert_event('Update Action Success', 'The action has been updated.', 'success', 'reload');
                             }
                         }
-                        else if(response[0]['RESPONSE'] === 'File Size'){
-                            show_alert('Module Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                        }
-                        else if(response[0]['RESPONSE'] === 'File Type'){
-                            show_alert('Module Error', 'The file uploaded is not supported.', 'error');
-                        }
                         else{
-                            show_alert('Module Error', response, 'error');
+                            show_alert('Action Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -75,32 +59,14 @@
                 return false;
             },
             rules: {
-                module_name: {
+                action_name: {
                     required: true
                 },
-                module_description: {
-                    required: true
-                },
-                module_category: {
-                    required: true
-                },
-                module_version: {
-                    required: true
-                }
             },
             messages: {
-                module_name: {
-                    required: 'Please enter the module name',
+                action_name: {
+                    required: 'Please enter the action name',
                 },
-                module_description: {
-                    required: 'Please enter the module description',
-                },
-                module_category: {
-                    required: 'Please choose the module category',
-                },
-                module_version: {
-                    required: 'Please enter the module version',
-                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -128,10 +94,10 @@
     });
 })(jQuery);
 
-function initialize_module_access_table(datatable_name, buttons = false, show_all = false){    
+function initialize_action_access_table(datatable_name, buttons = false, show_all = false){    
     var username = $('#username').text();
-    var module_id = $('#module-id').text();
-    var type = 'module access table';
+    var action_id = $('#action-id').text();
+    var type = 'action access table';
     var settings;
 
     var column = [ 
@@ -157,7 +123,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
+                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -188,7 +154,7 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'module_id' : module_id},
+                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -218,18 +184,18 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#add-module-access',function() {
-        generate_modal('module access form', 'Module Access', 'R' , '1', '1', 'form', 'module-access-form', '1', username);
+    $(document).on('click','#add-action-access',function() {
+        generate_modal('action access form', 'Action Access', 'R' , '1', '1', 'form', 'action-access-form', '1', username);
     });
 
-    $(document).on('click','.delete-module-access',function() {
-        var module_id = $(this).data('module-id');
+    $(document).on('click','.delete-action-access',function() {
+        var action_id = $(this).data('action-id');
         var role_id = $(this).data('role-id');
-        var transaction = 'delete module access';
+        var transaction = 'delete action access';
 
         Swal.fire({
-            title: 'Delete Module Access',
-            text: 'Are you sure you want to delete this module access?',
+            title: 'Delete Action Access',
+            text: 'Are you sure you want to delete this action access?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -242,20 +208,20 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
+                    data: {username : username, action_id : action_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                                show_alert('Delete Action Access', 'The action access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                                show_alert('Delete Action Access', 'The action access does not exist.', 'info');
                             }
 
-                            reload_datatable('#module-access-datatable');
+                            reload_datatable('#action-access-datatable');
                         }
                         else{
-                            show_alert('Delete Module Access', response, 'error');
+                            show_alert('Delete Action Access', response, 'error');
                         }
                     }
                 });
@@ -264,13 +230,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-module',function() {
-        var module_id = $(this).data('module-id');
-        var transaction = 'delete module';
+    $(document).on('click','#delete-action',function() {
+        var action_id = $(this).data('action-id');
+        var transaction = 'delete action';
 
         Swal.fire({
-            title: 'Delete Module',
-            text: 'Are you sure you want to delete this module?',
+            title: 'Delete Action',
+            text: 'Are you sure you want to delete this action?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -283,18 +249,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, module_id : module_id, transaction : transaction},
+                    data: {username : username, action_id : action_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Module', 'The module has been deleted.', 'success', 'redirect', 'modules.php');
+                                show_alert_event('Delete Action', 'The action has been deleted.', 'success', 'redirect', 'actions.php');
                             }
                             else{
-                                show_alert_event('Delete Module', 'The module does not exist.', 'info', 'redirect', 'modules.php');
+                                show_alert_event('Delete Action', 'The action does not exist.', 'info', 'redirect', 'actions.php');
                             }
                         }
                         else{
-                            show_alert('Delete Module', response, 'error');
+                            show_alert('Delete Action', response, 'error');
                         }
                     }
                 });
@@ -317,7 +283,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'modules.php';
+                window.location.href = 'actions.php';
                 return false;
             }
         });

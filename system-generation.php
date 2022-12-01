@@ -63,7 +63,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
             $form = '<form class="cmxform" id="'. $form_id .'" method="post" action="#">';
 
-            if($form_type == 'module access form'){
+            if($form_type == 'module access form' || $form_type == 'page access form'){
                 $form .= '<div class="row">
                             <div class="col-md-12">
                                     <div class="mb-3">
@@ -846,7 +846,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $module_id .'">',
                             'MODULE_NAME' => $module_name . '<p class="text-muted mb-0">'. $module_description .'</p>' . '<p class="text-muted mb-0"> Version: '. $module_version .'</p>',
                             'MODULE_CATEGORY' => $module_category_name,
-                            'ACTION' => '<div class="d-flex gap-2">
+                            'VIEW' => '<div class="d-flex gap-2">
                                             <a href="module-form.php?id='. $module_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Module">
                                                 <i class="bx bx-show font-size-16 align-middle"></i>
                                             </a>
@@ -870,6 +870,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             if ($api->databaseConnection()) {
                 $module_id = $_POST['module_id'];
 
+                $update_module = $api->check_role_access_rights($username, '2', 'action');
                 $delete_module_access_right = $api->check_role_access_rights($username, '5', 'action');
     
                 $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM technical_module_access_rights WHERE MODULE_ID = :module_id');
@@ -882,7 +883,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $role_details = $api->get_role_details($role_id);
                         $role = $role_details[0]['ROLE'] ?? null;
 
-                        if($delete_module_access_right > 0){
+                        if($delete_module_access_right > 0 && $update_module > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-module-access" data-module-id="'. $module_id .'" data-role-id="'. $role_id .'" title="Delete Module Access">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
                             </button>';
@@ -941,7 +942,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $page_id .'">',
                             'PAGE_NAME' => $page_name,
                             'MODULE' => $module_name,
-                            'ACTION' => '<div class="d-flex gap-2">
+                            'VIEW' => '<div class="d-flex gap-2">
                                             <a href="page-form.php?id='. $page_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Page">
                                                 <i class="bx bx-show font-size-16 align-middle"></i>
                                             </a>
@@ -956,6 +957,129 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
+    }
+    # -------------------------------------------------------------
+
+    # Page access table
+    else if($type == 'page access table'){
+        if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            if ($api->databaseConnection()) {
+                $page_id = $_POST['page_id'];
+
+                $update_page = $api->check_role_access_rights($username, '7', 'action');
+                $delete_page_access_right = $api->check_role_access_rights($username, '10', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM technical_page_access_rights WHERE PAGE_ID = :page_id');
+                $sql->bindValue(':page_id', $page_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+
+                        $role_details = $api->get_role_details($role_id);
+                        $role = $role_details[0]['ROLE'] ?? null;
+
+                        if($delete_page_access_right > 0 && $update_page > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-page-access" data-page-id="'. $page_id .'" data-role-id="'. $role_id .'" title="Delete Page Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ROLE' => $role,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Actions table
+    else if($type == 'actions table'){
+        if ($api->databaseConnection()) {
+
+            $sql = $api->db_connection->prepare('SELECT ACTION_ID, ACTION_NAME FROM technical_action');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $action_id = $row['ACTION_ID'];
+                    $action_name = $row['ACTION_NAME'];
+
+                    $action_id_encrypted = $api->encrypt_data($action_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $action_id .'">',
+                        'ACTION_NAME' => $action_name,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="action-form.php?id='. $action_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Action">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Action access table
+    else if($type == 'action access table'){
+        if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            if ($api->databaseConnection()) {
+                $action_id = $_POST['action_id'];
+
+                $update_action = $api->check_role_access_rights($username, '12', 'action');
+                $delete_action_access_right = $api->check_role_access_rights($username, '15', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM technical_action_access_rights WHERE ACTION_ID = :action_id');
+                $sql->bindValue(':action_id', $action_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+
+                        $role_details = $api->get_role_details($role_id);
+                        $role = $role_details[0]['ROLE'] ?? null;
+
+                        if($delete_action_access_right > 0 && $update_action > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-action-access" data-action-id="'. $action_id .'" data-role-id="'. $role_id .'" title="Delete Action Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ROLE' => $role,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
     }
     # -------------------------------------------------------------
 }
