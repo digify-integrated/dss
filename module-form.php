@@ -105,20 +105,27 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($delete_module > 0 && !empty($module_id)) || ($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0)))){
+                                                            if(($add_module > 0 && !empty($module_id)) || ($delete_module > 0 && !empty($module_id)) || ($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0)))){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <ul class="dropdown-menu dropdown-menu-end">';
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0))){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button></li>';
+                                                                if($add_module > 0 && !empty($module_id)){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="module-form.php">Add Module</a>';
                                                                 }
 
                                                                 if($delete_module > 0 && !empty($module_id)){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" data-module-id="'. $module_id .'" id="delete-module">Delete Module</button></li>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-module-id="'. $module_id .'" id="delete-module">Delete Module</button>';
                                                                 }
 
-                                                                $dropdown_action .= '</ul></div>';
+                                                                if($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0))){
+                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
+                                                                }
+
+                                                               
+
+                                                                $dropdown_action .= '</div></div>';
 
                                                                 echo $dropdown_action;
                                                             }
@@ -139,6 +146,7 @@
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
                                                         <input type="hidden" id="module_id" name="module_id">
+                                                        <input type="hidden" id="transaction_log_id">
                                                         <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                             <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_name" name="module_name" maxlength="200" <?php echo $disabled; ?>>
@@ -187,6 +195,12 @@
                                                                     <span class="d-none d-sm-block">Module Access</span>    
                                                                 </a>
                                                             </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
+                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="module-access" role="tabpanel">
@@ -197,6 +211,23 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody></tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-md-12">
+                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th class="all">Log Type</th>
+                                                                                    <th class="all">Log</th>
+                                                                                    <th class="all">Log Date</th>
+                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

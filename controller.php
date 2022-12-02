@@ -267,7 +267,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     else if($transaction == 'submit page'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['page_id']) && isset($_POST['page_name']) && !empty($_POST['page_name']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
             $response = array();
-            $file_type = '';
             $username = $_POST['username'];
             $page_id = $_POST['page_id'];
             $page_name = $_POST['page_name'];
@@ -348,7 +347,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     else if($transaction == 'submit action'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['action_id']) && isset($_POST['action_name']) && !empty($_POST['action_name'])){
             $response = array();
-            $file_type = '';
             $username = $_POST['username'];
             $action_id = $_POST['action_id'];
             $action_name = $_POST['action_name'];
@@ -424,6 +422,56 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit system parameter
+    else if($transaction == 'submit system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && isset($_POST['parameter']) && !empty($_POST['parameter']) && isset($_POST['parameter_description']) && !empty($_POST['parameter_description']) && isset($_POST['parameter_extension']) && isset($_POST['parameter_number'])){
+            $response = array();
+            $username = $_POST['username'];
+            $parameter_id = $_POST['parameter_id'];
+            $parameter = $_POST['parameter'];
+            $parameter_description = $_POST['parameter_description'];
+            $parameter_extension = $_POST['parameter_extension'];
+            $parameter_number = $_POST['parameter_number'] ?? 0;
+
+            $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+ 
+            if($check_system_parameter_exist > 0){
+                $update_system_parameter = $api->update_system_parameter($parameter_id, $parameter, $parameter_description, $parameter_extension, $parameter_number, $username);
+
+                if($update_system_parameter){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'PARAMETER_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter,
+                        'PARAMETER_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_system_parameter = $api->insert_system_parameter($parameter, $parameter_description, $parameter_extension, $parameter_number, $username);
+    
+                if($insert_system_parameter){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'PARAMETER_ID' => $insert_system_parameter[0]['PARAMETER_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_system_parameter[0]['RESPONSE'],
+                        'PARAMETER_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
 
     # -------------------------------------------------------------
     #   Delete transactions
@@ -726,6 +774,64 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete system parameter
+    else if($transaction == 'delete system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
+            $username = $_POST['username'];
+            $parameter_id = $_POST['parameter_id'];
+
+            $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+
+            if($check_system_parameter_exist > 0){
+                $delete_system_parameter = $api->delete_system_parameter($parameter_id, $username);
+                                    
+                if($delete_system_parameter){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_system_parameter;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple system parameter
+    else if($transaction == 'delete multiple system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
+            $username = $_POST['username'];
+            $parameter_ids = $_POST['parameter_id'];
+
+            foreach($parameter_ids as $parameter_id){
+                $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+
+                if($check_system_parameter_exist > 0){
+                    $delete_system_parameter = $api->delete_system_parameter($parameter_id, $username);
+                                    
+                    if(!$delete_system_parameter){
+                        $error = $delete_system_parameter;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -800,7 +906,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'MODULE_NAME' => $module_details[0]['MODULE_NAME'],
                 'MODULE_VERSION' => $module_details[0]['MODULE_VERSION'],
                 'MODULE_DESCRIPTION' => $module_details[0]['MODULE_DESCRIPTION'],
-                'MODULE_CATEGORY' => $module_details[0]['MODULE_CATEGORY']
+                'MODULE_CATEGORY' => $module_details[0]['MODULE_CATEGORY'],
+                'TRANSACTION_LOG_ID' => $module_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);
@@ -816,7 +923,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             $response[] = array(
                 'PAGE_NAME' => $page_details[0]['PAGE_NAME'],
-                'MODULE_ID' => $page_details[0]['MODULE_ID']
+                'MODULE_ID' => $page_details[0]['MODULE_ID'],
+                'TRANSACTION_LOG_ID' => $page_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);
@@ -831,7 +939,27 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $action_details = $api->get_action_details($action_id);
 
             $response[] = array(
-                'ACTION_NAME' => $action_details[0]['ACTION_NAME']
+                'ACTION_NAME' => $action_details[0]['ACTION_NAME'],
+                'TRANSACTION_LOG_ID' => $action_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System parameter details
+    else if($transaction == 'system parameter details'){
+        if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
+            $parameter_id = $_POST['parameter_id'];
+            $system_parameter_details = $api->get_system_parameter_details($parameter_id);
+
+            $response[] = array(
+                'PARAMETER' => $system_parameter_details[0]['PARAMETER'],
+                'PARAMETER_DESCRIPTION' => $system_parameter_details[0]['PARAMETER_DESCRIPTION'],
+                'PARAMETER_EXTENSION' => $system_parameter_details[0]['PARAMETER_EXTENSION'],
+                'PARAMETER_NUMBER' => $system_parameter_details[0]['PARAMETER_NUMBER'],
+                'TRANSACTION_LOG_ID' => $system_parameter_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

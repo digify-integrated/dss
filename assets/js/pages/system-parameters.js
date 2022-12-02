@@ -2,33 +2,37 @@
     'use strict';
 
     $(function() {
-        if($('#actions-datatable').length){
-            initialize_actions_table('#actions-datatable');
+        if($('#system-parameters-datatable').length){
+            initialize_system_parameters_table('#system-parameters-datatable');
         }
 
         initialize_click_events();
     });
 })(jQuery);
 
-function initialize_actions_table(datatable_name, buttons = false, show_all = false){
+function initialize_system_parameters_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
     var username = $('#username').text();
-    var type = 'actions table';
+    var type = 'system parameters table';
     var settings;
 
     var column = [ 
         { 'data' : 'CHECK_BOX' },
-        { 'data' : 'ACTION_ID' },
-        { 'data' : 'ACTION_NAME' },
+        { 'data' : 'PARAMETER_ID' },
+        { 'data' : 'PARAMETER' },
+        { 'data' : 'PARAMETER_EXTENSION' },
+        { 'data' : 'PARAMETER_NUMBER' },
         { 'data' : 'VIEW' }
     ];
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
-        { 'width': '79%', 'aTargets': 2 },
-        { 'width': '10%','bSortable': false, 'aTargets': 3 }
+        { 'width': '59%', 'aTargets': 2 },
+        { 'width': '10%', 'aTargets': 3 },
+        { 'width': '10%', 'aTargets': 4 },
+        { 'width': '10%','bSortable': false, 'aTargets': 5 }
     ];
 
     if(show_all){
@@ -105,20 +109,20 @@ function initialize_actions_table(datatable_name, buttons = false, show_all = fa
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-action',function() {
-        var action_id = [];
-        var transaction = 'delete multiple action';
+    $(document).on('click','#delete-system-parameter',function() {
+        var system_parameter_id = [];
+        var transaction = 'delete multiple system parameter';
 
         $('.datatable-checkbox-children').each(function(){
             if($(this).is(':checked')){  
-                action_id.push(this.value);  
+                system_parameter_id.push(this.value);  
             }
         });
 
-        if(action_id.length > 0){
+        if(system_parameter_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Actions',
-                text: 'Are you sure you want to delete these actions?',
+                title: 'Delete Multiple System Parameters',
+                text: 'Are you sure you want to delete these system parameters?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -132,15 +136,15 @@ function initialize_click_events(){
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
-                        data: {username : username, action_id : action_id, transaction : transaction},
+                        data: {username : username, system_parameter_id : system_parameter_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Actions', 'The actions have been deleted.', 'success');
+                                show_alert('Delete Multiple System Parameters', 'The system parameters have been deleted.', 'success');
     
-                                reload_datatable('#actions-datatable');
+                                reload_datatable('#system-parameters-datatable');
                             }
                             else{
-                                show_alert('Delete Multiple Actions', response, 'error');
+                                show_alert('Delete Multiple System Parameters', response, 'error');
                             }
                         }
                     });
@@ -150,12 +154,12 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Actions', 'Please select the actions you want to delete.', 'error');
+            show_alert('Delete Multiple System Parameters', 'Please select the system parameters you want to delete.', 'error');
         }
     });
 
     $(document).on('click','#apply-filter',function() {
-        initialize_actions_table('#actions-datatable');
+        initialize_system_parameters_table('#system-parameters-datatable');
     });
 
 }

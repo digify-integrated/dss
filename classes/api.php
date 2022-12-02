@@ -517,31 +517,6 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : check_system_parameter_exist
-    # Purpose    : Checks if the system parameter exists.
-    #
-    # Returns    : Number
-    #
-    # -------------------------------------------------------------
-    public function check_system_parameter_exist($parameter_id){
-        if ($this->databaseConnection()) {
-            $sql = $this->db_connection->prepare('CALL check_system_parameter_exist(:parameter_id)');
-            $sql->bindValue(':parameter_id', $parameter_id);
-
-            if($sql->execute()){
-                $row = $sql->fetch();
-
-                return $row['TOTAL'];
-            }
-            else{
-                return $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
     # Name       : check_module_exist
     # Purpose    : Checks if the module exists.
     #
@@ -693,6 +668,30 @@ class Api{
     }
     # -------------------------------------------------------------
 
+    # -------------------------------------------------------------
+    #
+    # Name       : check_system_parameter_exist
+    # Purpose    : Checks if the system parameter exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_system_parameter_exist($parameter_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_system_parameter_exist(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
 
     # -------------------------------------------------------------
     #   Update methods
@@ -782,7 +781,7 @@ class Api{
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function update_system_parameter($parameter_id, $parameter, $parameter_description, $extension, $parameter_number, $username){
+    public function update_system_parameter($parameter_id, $parameter, $parameter_description, $parameter_extension, $parameter_number, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
             $system_parameter_details = $this->get_system_parameter_details($parameter_id);
@@ -797,11 +796,11 @@ class Api{
                 $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
             }
 
-            $sql = $this->db_connection->prepare('CALL update_system_parameter(:parameter_id, :parameter, :parameter_description, :extension, :parameter_number, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL update_system_parameter(:parameter_id, :parameter, :parameter_description, :parameter_extension, :parameter_number, :transaction_log_id, :record_log)');
             $sql->bindValue(':parameter_id', $parameter_id);
             $sql->bindValue(':parameter', $parameter);
             $sql->bindValue(':parameter_description', $parameter_description);
-            $sql->bindValue(':extension', $extension);
+            $sql->bindValue(':parameter_extension', $parameter_extension);
             $sql->bindValue(':parameter_number', $parameter_number);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log);
@@ -1176,8 +1175,9 @@ class Api{
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function insert_system_parameter($parameter, $parameter_description, $extension, $number, $username){
+    public function insert_system_parameter($parameter, $parameter_description, $parameter_extension, $number, $username){
         if ($this->databaseConnection()) {
+            $response = array();
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
 
             # Get system parameter id
@@ -1190,11 +1190,11 @@ class Api{
             $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
             $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
 
-            $sql = $this->db_connection->prepare('CALL insert_system_parameter(:id, :parameter, :parameter_description, :extension, :number, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL insert_system_parameter(:id, :parameter, :parameter_description, :parameter_extension, :number, :transaction_log_id, :record_log)');
             $sql->bindValue(':id', $id);
             $sql->bindValue(':parameter', $parameter);
             $sql->bindValue(':parameter_description', $parameter_description);
-            $sql->bindValue(':extension', $extension);
+            $sql->bindValue(':parameter_extension', $parameter_extension);
             $sql->bindValue(':number', $number);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log); 
@@ -1211,23 +1211,40 @@ class Api{
                         $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted system parameter.');
                                         
                         if($insert_transaction_log){
-                            return true;
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'PARAMETER_ID' => $this->encrypt_data($id)
+                            );
                         }
                         else{
-                            return $insert_transaction_log;
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'PARAMETER_ID' => $this->encrypt_data($id)
+                            );
                         }
                     }
                     else{
-                        return $update_system_parameter_value;
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'PARAMETER_ID' => $this->encrypt_data($id)
+                        );
                     }
                 }
                 else{
-                    return $update_system_parameter_value;
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'PARAMETER_ID' => $this->encrypt_data($id)
+                    );
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'PARAMETER_ID' => $this->encrypt_data($id)
+                );
             }
+
+            return $response;
         }
     }
     # -------------------------------------------------------------
@@ -1503,27 +1520,27 @@ class Api{
                         if($insert_transaction_log){
                             $response[] = array(
                                 'RESPONSE' => true,
-                                'PAGE_ID' => $this->encrypt_data($id)
+                                'ACTION_ID' => $this->encrypt_data($id)
                             );
                         }
                         else{
                             $response[] = array(
                                 'RESPONSE' => $insert_transaction_log,
-                                'PAGE_ID' => null
+                                'ACTION_ID' => null
                             );
                         }
                     }
                     else{
                         $response[] = array(
                             'RESPONSE' => $update_system_parameter_value,
-                            'PAGE_ID' => null
+                            'ACTION_ID' => null
                         );
                     }
                 }
                 else{
                     $response[] = array(
                         'RESPONSE' => $update_system_parameter_value,
-                        'PAGE_ID' => null
+                        'ACTION_ID' => null
                     );
                 }
             }

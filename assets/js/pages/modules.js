@@ -20,6 +20,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
 
     var column = [ 
         { 'data' : 'CHECK_BOX' },
+        { 'data' : 'MODULE_ID' },
         { 'data' : 'MODULE_NAME' },
         { 'data' : 'MODULE_CATEGORY' },
         { 'data' : 'VIEW' }
@@ -27,9 +28,10 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
-        { 'width': '74%', 'aTargets': 1 },
-        { 'width': '15%', 'aTargets': 2 },
-        { 'width': '10%','bSortable': false, 'aTargets': 3 }
+        { 'width': '10%', 'aTargets': 1 },
+        { 'width': '64%', 'aTargets': 2 },
+        { 'width': '15%', 'aTargets': 3 },
+        { 'width': '10%','bSortable': false, 'aTargets': 4 }
     ];
 
     if(show_all){

@@ -85,13 +85,13 @@
                                                             if($delete_page > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                    <ul class="dropdown-menu dropdown-menu-end">';
+                                                                    <div class="dropdown-menu dropdown-menu-end">';
                                                                     
                                                                 if($delete_page > 0){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item d-none multiple" type="button" id="delete-page">Delete Page</button></li>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-page">Delete Page</button>';
                                                                 }
 
-                                                                $dropdown_action .= '</ul></div>';
+                                                                $dropdown_action .= '</div></div>';
 
                                                                 echo $dropdown_action;
                                                             }
@@ -138,6 +138,7 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
+                                                            <th class="all">Page ID</th>
                                                             <th class="all">Page</th>
                                                             <th class="all">Module</th>
                                                             <th class="all">View</th>

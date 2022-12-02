@@ -15,15 +15,21 @@
                     $('#module_name').val(response[0].MODULE_NAME);
                     $('#module_description').val(response[0].MODULE_DESCRIPTION);
                     $('#module_version').val(response[0].MODULE_VERSION);
+                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
                     $('#module_id').val(module_id);
 
                     check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
+                },
+                complete: function(){
+                    if($('#module-access-datatable').length){
+                        initialize_module_access_table('#module-access-datatable');
+                    }
+        
+                    if($('#transaction-log-datatable').length){
+                        initialize_transaction_log_table('#transaction-log-datatable');
+                    }
                 }
             });
-
-            if($('#module-access-datatable').length){
-                initialize_module_access_table('#module-access-datatable');
-            }
         }
 
         $('#module-form').validate({
@@ -210,6 +216,97 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
         };
     }
 
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
+    var username = $('#username').text();
+    var transaction_log_id = $('#transaction_log_id').val();
+    var type = 'transaction log table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'LOG_TYPE' },
+        { 'data' : 'LOG' },
+        { 'data' : 'LOG_DATE' },
+        { 'data' : 'LOG_BY' }
+    ];
+
+    var column_definition = [
+        { 'width': '15%', 'aTargets': 0 },
+        { 'width': '45%', 'aTargets': 1 },
+        { 'width': '20%', 'aTargets': 2 },
+        { 'width': '20%', 'aTargets': 3 },
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 2, 'desc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 2, 'desc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    
     destroy_datatable(datatable_name);
     
     $(datatable_name).dataTable(settings);

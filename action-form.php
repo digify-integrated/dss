@@ -27,10 +27,10 @@
                 $action_id = null;
             }
 
-            $add_action = $api->check_role_access_rights($username, '6', 'action');
-            $update_action = $api->check_role_access_rights($username, '7', 'action');
-            $delete_action = $api->check_role_access_rights($username, '8', 'action');
-            $add_action_access_right = $api->check_role_access_rights($username, '9', 'action');
+            $add_action = $api->check_role_access_rights($username, '11', 'action');
+            $update_action = $api->check_role_access_rights($username, '12', 'action');
+            $delete_action = $api->check_role_access_rights($username, '13', 'action');
+            $add_action_access_right = $api->check_role_access_rights($username, '14', 'action');
 
             if($update_action > 0){
                 $disabled = null;
@@ -79,7 +79,7 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="pages.php">Actions</a></li>
+                                            <li class="breadcrumb-item"><a href="actions.php">Actions</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
                                                 if(!empty($action_id)){
@@ -96,7 +96,7 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="page-form" method="post" action="#">
+                                        <form id="action-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
@@ -105,20 +105,26 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($delete_action > 0 && !empty($action_id)) || ($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0)))){
+                                                            if(($add_action > 0 && !empty($action_id)) || ($delete_action > 0 && !empty($action_id)) || ($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0)))){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <ul class="dropdown-menu dropdown-menu-end">';
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0))){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button></li>';
+                                                                if($add_action > 0 && !empty($action_id)){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="action-form.php">Add Action</a>';
                                                                 }
 
                                                                 if($delete_action > 0 && !empty($action_id)){
-                                                                    $dropdown_action .= '<li><button class="dropdown-item" type="button" data-action-id="'. $action_id .'" id="delete-action">Delete Action</button></li>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-action-id="'. $action_id .'" id="delete-action">Delete Action</button>';
                                                                 }
 
-                                                                $dropdown_action .= '</ul></div>';
+                                                                if($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0))){
+                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
+                                                                }
+
+                                                                $dropdown_action .= '</div>
+                                                                </div>';
 
                                                                 echo $dropdown_action;
                                                             }
@@ -138,7 +144,8 @@
                                             <div class="row mt-4">
                                                 <div class="col-md-12">
                                                     <div class="row mb-4">
-                                                         <input type="hidden" id="action_id" name="action_id">
+                                                        <input type="hidden" id="action_id" name="action_id">
+                                                        <input type="hidden" id="transaction_log_id" name="transaction_log_id">
                                                         <label for="action_name" class="col-md-3 col-form-label">Action Name <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                             <input type="text" class="form-control form-maxlength" autocomplete="off" id="action_name" name="action_name" maxlength="200" <?php echo $disabled; ?>>
@@ -158,6 +165,12 @@
                                                                     <span class="d-none d-sm-block">Action Access</span>    
                                                                 </a>
                                                             </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
+                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="action-access" role="tabpanel">
@@ -168,6 +181,23 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody></tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-md-12">
+                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th class="all">Log Type</th>
+                                                                                    <th class="all">Log</th>
+                                                                                    <th class="all">Log Date</th>
+                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

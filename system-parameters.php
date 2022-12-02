@@ -8,19 +8,19 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(1);
+        $page_details = $api->get_page_details(7);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, '1', 'page');
+        $page_access_right = $api->check_role_access_rights($username, 7, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
         }
         else{
-            $add_module = $api->check_role_access_rights($username, '1', 'action');
-            $delete_module = $api->check_role_access_rights($username, '3', 'action');
+            $add_system_parameter = $api->check_role_access_rights($username, '17', 'action');
+            $delete_system_parameter = $api->check_role_access_rights($username, '19', 'action');
 
             require('views/_interface_settings.php');
         }
@@ -58,7 +58,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Modules</h4>
+                                    <h4 class="mb-sm-0 font-size-18">System Parameters</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
@@ -78,17 +78,17 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Module List</h4>
+                                                        <h4 class="card-title">System Parameter List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_module > 0){
+                                                            if($delete_system_parameter > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_module > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-module">Delete Module</button>';
+                                                                if($delete_system_parameter > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-system-parameter">Delete System Parameter</button>';
                                                                 }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -99,38 +99,17 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                             if($add_module > 0){
-                                                                echo '<a href="module-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                            if($add_system_parameter > 0){
+                                                                echo '<a href="system-parameter-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
-                                                    </div>
-                                                </div>
-
-                                                <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                    <div class="offcanvas-header">
-                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="offcanvas-body">
-                                                        <div class="mb-3">
-                                                            <p class="text-muted">Module Category</p>
-
-                                                            <select class="form-control filter-select2" id="filter_module_category">
-                                                                <option value="">All</option>
-                                                                <?php echo $api->generate_system_code_options('MODULECAT'); ?>
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="modules-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="system-parameters-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -138,9 +117,10 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Module ID</th>
-                                                            <th class="all">Module</th>
-                                                            <th class="all">Category</th>
+                                                            <th class="all">Parameter ID</th>
+                                                            <th class="all">Parameter</th>
+                                                            <th class="all">Parameter Extension</th>
+                                                            <th class="all">Parameter Number</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>
@@ -170,6 +150,6 @@
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/modules.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/system-parameters.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

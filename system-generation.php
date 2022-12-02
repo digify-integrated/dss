@@ -63,7 +63,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
             $form = '<form class="cmxform" id="'. $form_id .'" method="post" action="#">';
 
-            if($form_type == 'module access form' || $form_type == 'page access form'){
+            if($form_type == 'module access form' || $form_type == 'page access form' || $form_type == 'action access form'){
                 $form .= '<div class="row">
                             <div class="col-md-12">
                                     <div class="mb-3">
@@ -811,6 +811,40 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     #   Generate table functions
     # -------------------------------------------------------------
 
+    # Transaction log table
+    else if($type == 'transaction log table'){
+        if(isset($_POST['transaction_log_id']) && !empty($_POST['transaction_log_id'])){
+            if ($api->databaseConnection()) {
+                $transaction_log_id = $_POST['transaction_log_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME, LOG_TYPE, LOG_DATE, LOG FROM global_transaction_log WHERE TRANSACTION_LOG_ID = :transaction_log_id');
+                $sql->bindValue(':transaction_log_id', $transaction_log_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+                        $log_type = $row['LOG_TYPE'];
+                        $log = $row['LOG'];
+                        $log_date = $api->check_date('empty', $row['LOG_DATE'], '', 'm/d/Y h:i:s a', '', '', '');
+    
+                        $response[] = array(
+                            'LOG_TYPE' => $log_type,
+                            'LOG' => $log,
+                            'LOG_DATE' => $log_date,
+                            'LOG_BY' => $username
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # Modules table
     else if($type == 'modules table'){
         if(isset($_POST['filter_module_category'])){
@@ -844,6 +878,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     
                         $response[] = array(
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $module_id .'">',
+                            'MODULE_ID' => $module_id,
                             'MODULE_NAME' => $module_name . '<p class="text-muted mb-0">'. $module_description .'</p>' . '<p class="text-muted mb-0"> Version: '. $module_version .'</p>',
                             'MODULE_CATEGORY' => $module_category_name,
                             'VIEW' => '<div class="d-flex gap-2">
@@ -940,6 +975,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     
                         $response[] = array(
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $page_id .'">',
+                            'PAGE_ID' => $page_id,
                             'PAGE_NAME' => $page_name,
                             'MODULE' => $module_name,
                             'VIEW' => '<div class="d-flex gap-2">
@@ -1020,6 +1056,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
                     $response[] = array(
                         'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $action_id .'">',
+                        'ACTION_ID' => $action_id,
                         'ACTION_NAME' => $action_name,
                         'VIEW' => '<div class="d-flex gap-2">
                                         <a href="action-form.php?id='. $action_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Action">
@@ -1082,6 +1119,46 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         
     }
     # -------------------------------------------------------------
+
+    # System parameter table
+    else if($type == 'system parameters table'){
+        if ($api->databaseConnection()) {
+
+            $sql = $api->db_connection->prepare('SELECT PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER FROM global_system_parameters');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $parameter_id = $row['PARAMETER_ID'];
+                    $parameter = $row['PARAMETER'];
+                    $parameter_description = $row['PARAMETER_DESCRIPTION'];
+                    $parameter_extension = $row['PARAMETER_EXTENSION'];
+                    $parameter_number = $row['PARAMETER_NUMBER'];
+
+                    $parameter_id_encrypted = $api->encrypt_data($parameter_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $parameter_id .'">',
+                        'PARAMETER_ID' => $parameter_id,
+                        'PARAMETER' => $parameter . '<p class="text-muted mb-0">'. $parameter_description .'</p>',
+                        'PARAMETER_EXTENSION' => $parameter_extension,
+                        'PARAMETER_NUMBER' => $parameter_number,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="system-parameter-form.php?id='. $parameter_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Action">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>
