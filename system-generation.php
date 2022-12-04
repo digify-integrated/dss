@@ -1143,7 +1143,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         'PARAMETER_EXTENSION' => $parameter_extension,
                         'PARAMETER_NUMBER' => $parameter_number,
                         'VIEW' => '<div class="d-flex gap-2">
-                                        <a href="system-parameter-form.php?id='. $parameter_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Action">
+                                        <a href="system-parameter-form.php?id='. $parameter_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View System Parameter">
                                             <i class="bx bx-show font-size-16 align-middle"></i>
                                         </a>
                                     </div>'
@@ -1154,6 +1154,58 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
             else{
                 echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Role table
+    else if($type == 'roles table'){
+        if(isset($_POST['filter_assignable'])){
+            if ($api->databaseConnection()) {
+                $filter_assignable = $_POST['filter_assignable'];
+
+                $query = 'SELECT ROLE_ID, ROLE, ROLE_DESCRIPTION, ASSIGNABLE FROM global_role';
+
+                if(!empty($filter_assignable)){
+                    $query .= ' WHERE ASSIGNABLE = :filter_assignable';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_assignable)){
+                    $sql->bindValue(':filter_assignable', $filter_assignable);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+                        $role_description = $row['ROLE_DESCRIPTION'];
+                        $assignable = $row['ASSIGNABLE'];
+    
+                        $assignable_status = $api->get_roles_assignable_status($assignable)[0]['BADGE'];
+    
+                        $role_id_encrypted = $api->encrypt_data($role_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE_ID' => $role_id,
+                            'ROLE' => $role . '<p class="text-muted mb-0">'. $role_description .'</p>',
+                            'ASSIGNABLE' => $assignable_status,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="role-form.php?id='. $role_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Role">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
             }
         }
     }

@@ -8,19 +8,19 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(5);
+        $page_details = $api->get_page_details(9);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 5, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 9, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
         }
         else{
-            $add_action = $api->check_role_access_rights($username, '11', 'action');
-            $delete_action = $api->check_role_access_rights($username, '13', 'action');
+            $add_role = $api->check_role_access_rights($username, '20', 'action');
+            $delete_role = $api->check_role_access_rights($username, '22', 'action');
 
             require('views/_interface_settings.php');
         }
@@ -58,12 +58,11 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Actions</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Roles</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
                                     </div>
@@ -79,17 +78,17 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Action List</h4>
+                                                        <h4 class="card-title">Role List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_action > 0){
+                                                            if($delete_role > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_action > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-action">Delete Action</button>';
+                                                                if($delete_role > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-role">Delete Role</button>';
                                                                 }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -100,17 +99,39 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                            if($add_action > 0){
-                                                                echo '<a href="action-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                            if($add_role > 0){
+                                                                echo '<a href="role-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
+                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
+                                                    </div>
+
+                                                    <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                        <div class="offcanvas-header">
+                                                            <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="offcanvas-body">
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Assignable</p>
+
+                                                                <select class="form-control filter-select2" id="filter_assignable">
+                                                                    <option value="">All</option>
+                                                                    <option value="1">True</option>
+                                                                    <option value="2">False</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="actions-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="roles-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -118,8 +139,9 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Action ID</th>
-                                                            <th class="all">Action</th>
+                                                            <th class="all">Role ID</th>
+                                                            <th class="all">Role</th>
+                                                            <th class="all">Assignable</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>
@@ -149,6 +171,6 @@
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/actions.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/roles.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

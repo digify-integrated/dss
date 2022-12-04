@@ -2,37 +2,36 @@
     'use strict';
 
     $(function() {
-        if($('#system-parameters-datatable').length){
-            initialize_system_parameters_table('#system-parameters-datatable');
+        if($('#roles-datatable').length){
+            initialize_roles_table('#roles-datatable');
         }
 
         initialize_click_events();
     });
 })(jQuery);
 
-function initialize_system_parameters_table(datatable_name, buttons = false, show_all = false){
+function initialize_roles_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
     var username = $('#username').text();
-    var type = 'system parameters table';
+    var filter_assignable = $('#filter_assignable').val();
+    var type = 'roles table';
     var settings;
 
     var column = [ 
         { 'data' : 'CHECK_BOX' },
-        { 'data' : 'PARAMETER_ID' },
-        { 'data' : 'PARAMETER' },
-        { 'data' : 'PARAMETER_EXTENSION' },
-        { 'data' : 'PARAMETER_NUMBER' },
+        { 'data' : 'ROLE_ID' },
+        { 'data' : 'ROLE' },
+        { 'data' : 'ASSIGNABLE' },
         { 'data' : 'VIEW' }
     ];
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
-        { 'width': '59%', 'aTargets': 2 },
+        { 'width': '69%', 'aTargets': 2 },
         { 'width': '10%', 'aTargets': 3 },
-        { 'width': '10%', 'aTargets': 4 },
-        { 'width': '10%','bSortable': false, 'aTargets': 5 }
+        { 'width': '10%','bSortable': false, 'aTargets': 4 }
     ];
 
     if(show_all){
@@ -48,7 +47,7 @@ function initialize_system_parameters_table(datatable_name, buttons = false, sho
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'filter_assignable' : filter_assignable},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -79,7 +78,7 @@ function initialize_system_parameters_table(datatable_name, buttons = false, sho
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username},
+                'data': {'type' : type, 'username' : username, 'filter_assignable' : filter_assignable},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -109,20 +108,20 @@ function initialize_system_parameters_table(datatable_name, buttons = false, sho
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-system-parameter',function() {
-        var parameter_id = [];
-        var transaction = 'delete multiple system parameter';
+    $(document).on('click','#delete-role',function() {
+        var role_id = [];
+        var transaction = 'delete multiple role';
 
         $('.datatable-checkbox-children').each(function(){
             if($(this).is(':checked')){  
-                parameter_id.push(this.value);  
+                role_id.push(this.value);  
             }
         });
 
-        if(parameter_id.length > 0){
+        if(role_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple System Parameters',
-                text: 'Are you sure you want to delete these system parameters?',
+                title: 'Delete Multiple Roles',
+                text: 'Are you sure you want to delete these roles?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -136,15 +135,15 @@ function initialize_click_events(){
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
-                        data: {username : username, parameter_id : parameter_id, transaction : transaction},
+                        data: {username : username, role_id : role_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple System Parameters', 'The system parameters have been deleted.', 'success');
+                                show_alert('Delete Multiple Roles', 'The roles have been deleted.', 'success');
     
-                                reload_datatable('#system-parameters-datatable');
+                                reload_datatable('#roles-datatable');
                             }
                             else{
-                                show_alert('Delete Multiple System Parameters', response, 'error');
+                                show_alert('Delete Multiple Roles', response, 'error');
                             }
                         }
                     });
@@ -154,12 +153,12 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple System Parameters', 'Please select the system parameters you want to delete.', 'error');
+            show_alert('Delete Multiple Roles', 'Please select the roles you want to delete.', 'error');
         }
     });
 
     $(document).on('click','#apply-filter',function() {
-        initialize_system_parameters_table('#system-parameters-datatable');
+        initialize_roles_table('#roles-datatable');
     });
 
 }

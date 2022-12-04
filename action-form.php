@@ -79,6 +79,7 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
                                             <li class="breadcrumb-item"><a href="actions.php">Actions</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php

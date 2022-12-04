@@ -1931,6 +1931,7 @@ class Api{
                     $response[] = array(
                         'ROLE' => $row['ROLE'],
                         'ROLE_DESCRIPTION' => $row['ROLE_DESCRIPTION'],
+                        'ASSIGNABLE' => $row['ASSIGNABLE'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );
@@ -2215,6 +2216,36 @@ class Api{
                 return $sql->errorInfo()[2];
             }
         }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_roles_assignable_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_roles_assignable_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'True';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'False';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
     }
     # -------------------------------------------------------------
 
