@@ -1859,11 +1859,11 @@ function generate_form(form_type, form_id, add, username){
                 display_form_details(form_type);
             }
             else{
-                /*if(form_type == 'module access form'){
-                    var module_id = $('#module-id').text();
-
-                    $('#module_id').val(module_id);
-                }*/
+                if(form_type == 'role module access form'){
+                    if($('#module-access-assignment-datatable').length){
+                        initialize_role_module_access_assignment_table('#module-access-assignment-datatable');
+                    }
+                }
             }
 
             initialize_elements();

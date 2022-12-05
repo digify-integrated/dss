@@ -274,7 +274,7 @@
                                                             <div class="tab-pane" id="user-accounts" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="action-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="user-account-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">User Account</th>

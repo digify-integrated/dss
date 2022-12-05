@@ -212,7 +212,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 else{
                     $insert_module = $api->insert_module(null, null, $module_name, $module_version, $module_description, $module_category, $username);
     
-                    if($insert_module){
+                    if($insert_module[0]['RESPONSE']){
                         $response[] = array(
                             'RESPONSE' => 'Inserted',
                             'MODULE_ID' => $insert_module[0]['MODULE_ID']
@@ -293,7 +293,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             else{
                 $insert_page = $api->insert_page($page_name, $module_id, $username);
     
-                if($insert_page){
+                if($insert_page[0]['RESPONSE']){
                     $response[] = array(
                         'RESPONSE' => 'Inserted',
                         'PAGE_ID' => $insert_page[0]['PAGE_ID']
@@ -372,7 +372,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             else{
                 $insert_action = $api->insert_action($action_name, $username);
     
-                if($insert_action){
+                if($insert_action[0]['RESPONSE']){
                     $response[] = array(
                         'RESPONSE' => 'Inserted',
                         'ACTION_ID' => $insert_action[0]['ACTION_ID']
@@ -454,7 +454,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             else{
                 $insert_system_parameter = $api->insert_system_parameter($parameter, $parameter_description, $parameter_extension, $parameter_number, $username);
     
-                if($insert_system_parameter){
+                if($insert_system_parameter[0]['RESPONSE']){
                     $response[] = array(
                         'RESPONSE' => 'Inserted',
                         'PARAMETER_ID' => $insert_system_parameter[0]['PARAMETER_ID']
@@ -469,6 +469,180 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             }
 
             echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit role
+    else if($transaction == 'submit role'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && isset($_POST['role']) && !empty($_POST['role']) && isset($_POST['role_description']) && !empty($_POST['role_description']) && isset($_POST['assignable']) && !empty($_POST['assignable'])){
+            $response = array();
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+            $role = $_POST['role'];
+            $role_description = $_POST['role_description'];
+            $assignable = $_POST['assignable'];
+
+            $check_role_exist = $api->check_role_exist($role_id);
+ 
+            if($check_role_exist > 0){
+                $update_role = $api->update_role($role_id, $role, $role_description, $assignable, $username);
+
+                if($update_role){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'ROLE_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_role,
+                        'ROLE_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_role = $api->insert_role($role, $role_description, $assignable, $username);
+    
+                if($insert_role[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'ROLE_ID' => $insert_role[0]['ROLE_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_role[0]['RESPONSE'],
+                        'ROLE_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit role module access
+    else if($transaction == 'submit role module access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
+            $error = '';
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+            $module_ids = explode(',', $_POST['module_id']);
+
+            foreach($module_ids as $module_id){
+                $check_module_access_exist = $api->check_module_access_exist($module_id, $role_id);
+
+                if($check_module_access_exist == 0){
+                    $insert_module_access = $api->insert_module_access($module_id, $role_id, $username);
+
+                    if(!$insert_module_access){
+                        $error = $insert_module_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit role page access
+    else if($transaction == 'submit role page access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            $error = '';
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+            $page_ids = explode(',', $_POST['page_id']);
+
+            foreach($page_ids as $page_id){
+                $check_page_access_exist = $api->check_page_access_exist($page_id, $role_id);
+
+                if($check_page_access_exist == 0){
+                    $insert_page_access = $api->insert_page_access($page_id, $role_id, $username);
+
+                    if(!$insert_page_access){
+                        $error = $insert_page_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit role action access
+    else if($transaction == 'submit role action access'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            $error = '';
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+            $action_ids = explode(',', $_POST['action_id']);
+
+            foreach($action_ids as $action_id){
+                $check_action_access_exist = $api->check_action_access_exist($action_id, $role_id);
+
+                if($check_action_access_exist == 0){
+                    $insert_action_access = $api->insert_action_access($action_id, $role_id, $username);
+
+                    if(!$insert_action_access){
+                        $error = $insert_action_access;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit role user account
+    else if($transaction == 'submit role user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $error = '';
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+            $user_ids = explode(',', $_POST['user_id']);
+
+            foreach($user_ids as $user_id){
+                $check_role_user_account_exist = $api->check_role_user_account_exist($role_id, $user_id);
+
+                if($check_role_user_account_exist == 0){
+                    $insert_role_user_account = $api->insert_role_user_account($role_id, $user_id, $username);
+
+                    if(!$insert_role_user_account){
+                        $error = $insert_role_user_account;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
         }
     }
     # -------------------------------------------------------------
@@ -832,6 +1006,150 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete role
+    else if($transaction == 'delete role'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $role_id = $_POST['role_id'];
+
+            $check_role_exist = $api->check_role_exist($role_id);
+
+            if($check_role_exist > 0){
+                $delete_role = $api->delete_role($role_id, $username);
+                                    
+                if($delete_role){
+                    $delete_role_module_access = $api->delete_role_module_access($role_id, $username);
+                                    
+                    if($delete_role_module_access){
+                        $delete_role_page_access = $api->delete_role_page_access($role_id, $username);
+                                    
+                        if($delete_role_page_access){
+                            $delete_role_action_access = $api->delete_role_action_access($role_id, $username);
+                                    
+                            if($delete_role_action_access){
+                                $delete_all_role_user_account = $api->delete_all_role_user_account($role_id, $username);
+                                    
+                                if($delete_all_role_user_account){
+                                    echo 'Deleted';
+                                }
+                                else{
+                                    echo $delete_all_role_user_account;
+                                }
+                            }
+                            else{
+                                echo $delete_role_action_access;
+                            }
+                        }
+                        else{
+                            echo $delete_role_page_access;
+                        }
+                    }
+                    else{
+                        echo $delete_role_module_access;
+                    }
+                }
+                else{
+                    echo $delete_role;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple role
+    else if($transaction == 'delete multiple role'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $role_ids = $_POST['role_id'];
+
+            foreach($role_ids as $role_id){
+                $check_role_exist = $api->check_role_exist($role_id);
+
+                if($check_role_exist > 0){
+                    $delete_role = $api->delete_role($role_id, $username);
+
+                    if($delete_role){
+                        $delete_role_module_access = $api->delete_role_module_access($role_id, $username);
+                                        
+                        if($delete_role_module_access){
+                            $delete_role_page_access = $api->delete_role_page_access($role_id, $username);
+                                        
+                            if($delete_role_page_access){
+                                $delete_role_action_access = $api->delete_role_action_access($role_id, $username);
+                                        
+                                if($delete_role_action_access){
+                                    $delete_role_user_account = $api->delete_role_user_account($role_id, $username);
+                                        
+                                    if(!$delete_role_user_account){
+                                        $error = $delete_role_user_account;
+                                        break;
+                                    }
+                                }
+                                else{
+                                    $error = $delete_role_action_access;
+                                    break;
+                                }
+                            }
+                            else{
+                                $error = $delete_role_page_access;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = $delete_role_module_access;
+                            break;
+                        }
+                    }
+                    else{
+                        $error = $delete_role;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete role user account
+    else if($transaction == 'delete role user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $username = $_POST['username'];
+            $user_id = $_POST['user_id'];
+            $role_id = $_POST['role_id'];
+
+            $check_role_user_account_exist = $api->check_role_user_account_exist($user_id, $role_id);
+
+            if($check_role_user_account_exist > 0){
+                $delete_role_user_account_exist = $api->delete_role_user_account_exist($user_id, $role_id, $username);
+
+                if($delete_role_user_account_exist){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_role_user_account_exist;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -960,6 +1278,24 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'PARAMETER_EXTENSION' => $system_parameter_details[0]['PARAMETER_EXTENSION'],
                 'PARAMETER_NUMBER' => $system_parameter_details[0]['PARAMETER_NUMBER'],
                 'TRANSACTION_LOG_ID' => $system_parameter_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Role details
+    else if($transaction == 'role details'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            $role_id = $_POST['role_id'];
+            $role_details = $api->get_role_details($role_id);
+
+            $response[] = array(
+                'ROLE' => $role_details[0]['ROLE'],
+                'ROLE_DESCRIPTION' => $role_details[0]['ROLE_DESCRIPTION'],
+                'ASSIGNABLE' => $role_details[0]['ASSIGNABLE'],
+                'TRANSACTION_LOG_ID' => $role_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

@@ -694,6 +694,57 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_role_exist
+    # Purpose    : Checks if the role exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_role_exist($role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_role_exist(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_role_user_account_exist
+    # Purpose    : Checks if the role user account exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_role_user_account_exist($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_role_user_account_exist(:role_id, :username)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':username', $username);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1137,6 +1188,74 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_role
+    # Purpose    : Updates role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_role($role_id, $role, $role_description, $assignable, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $role_details = $this->get_role_details($role_id);
+            
+            if(!empty($role_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $role_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_role(:role_id, :role, :role_description, :assignable, :transaction_log_id, :record_log)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':role', $role);
+            $sql->bindValue(':role_description', $role_description);
+            $sql->bindValue(':assignable', $assignable);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($role_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated role.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated role.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -1547,7 +1666,7 @@ class Api{
             else{
                 $response[] = array(
                     'RESPONSE' => $sql->errorInfo()[2],
-                    'PAGE_ID' => null
+                    'ACTION_ID' => null
                 );
             }
 
@@ -1569,6 +1688,111 @@ class Api{
             $sql = $this->db_connection->prepare('CALL insert_action_access(:action_id, :role)');
             $sql->bindValue(':action_id', $action_id);
             $sql->bindValue(':role', $role);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_role
+    # Purpose    : Insert role.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_role($role, $role_description, $assignable, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(6, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_role(:id, :role, :role_description, :assignable, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':role', $role);
+            $sql->bindValue(':role_description', $role_description);
+            $sql->bindValue(':assignable', $assignable);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 6, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted role.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'ROLE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'ROLE_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'ROLE_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'ROLE_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'ROLE_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_role_user_account
+    # Purpose    : Inserts role user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_role_user_account($role_id, $user_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_role_user_account(:role_id, :user_id)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':user_id', $user_id);
 
             if($sql->execute()){
                 return true;
@@ -1823,6 +2047,144 @@ class Api{
         if ($this->databaseConnection()) {
             $sql = $this->db_connection->prepare('CALL delete_action_access(:action_id, :role_id)');
             $sql->bindValue(':action_id', $action_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role
+    # Purpose    : Delete role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role_module_access
+    # Purpose    : Delete role module access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role_module_access($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role_module_access(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role_page_access
+    # Purpose    : Delete role page access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role_page_access($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role_page_access(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role_action_access
+    # Purpose    : Delete role action access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role_action_access($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role_action_access(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role_user_account
+    # Purpose    : Delete role user account access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role_user_account($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role_user_account(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_role_user_account
+    # Purpose    : Delete all role user account access.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_role_user_account($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_role_user_account(:role_id)');
             $sql->bindValue(':role_id', $role_id);
         
             if($sql->execute()){ 

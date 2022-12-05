@@ -75,6 +75,82 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                         </div>';
             }
+            else if($form_type == 'role module access form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="module-access-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Module Access</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'role page access form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="page-access-assignment" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Page Access</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'role action access form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="action-access-assignment" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Action Access</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'role user account form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="user-account-assignment" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">User Account</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
 
             $form .= '</form>';
 
@@ -1210,6 +1286,215 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         }
     }
     # -------------------------------------------------------------
+
+    # Role module access table
+    else if($type == 'role module access table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+
+                $update_role = $api->check_role_access_rights($username, '21', 'action');
+                $delete_role_module_access = $api->check_role_access_rights($username, '24', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT MODULE_ID FROM technical_module_access_rights WHERE ROLE_ID = :role_id');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $module_id = $row['MODULE_ID'];
+
+                        $module_details = $api->get_module_details($module_id);
+                        $module_name = $module_details[0]['MODULE_NAME'] ?? null;
+
+                        if($delete_role_module_access > 0 && $update_role > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-module-access" data-module-id="'. $module_id .'" data-role-id="'. $role_id .'" title="Delete Module Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'MODULE_NAME' => $module_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role page access table
+    else if($type == 'role page access table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+
+                $update_role = $api->check_role_access_rights($username, '21', 'action');
+                $delete_role_page_access = $api->check_role_access_rights($username, '26', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT PAGE_ID FROM technical_page_access_rights WHERE ROLE_ID = :role_id');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $page_id = $row['PAGE_ID'];
+
+                        $page_details = $api->get_page_details($page_id);
+                        $page_name = $page_details[0]['PAGE_NAME'] ?? null;
+
+                        if($delete_role_page_access > 0 && $update_role > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-page-access" data-page-id="'. $page_id .'" data-role-id="'. $role_id .'" title="Delete Page Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'PAGE_NAME' => $page_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role action access table
+    else if($type == 'role action access table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+
+                $update_role = $api->check_role_access_rights($username, '21', 'action');
+                $delete_role_action_access = $api->check_role_access_rights($username, '26', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ACTION_ID FROM technical_action_access_rights WHERE ROLE_ID = :role_id');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $action_id = $row['ACTION_ID'];
+
+                        $action_details = $api->get_action_details($action_id);
+                        $action_name = $action_details[0]['ACTION_NAME'] ?? null;
+
+                        if($delete_role_action_access > 0 && $update_role > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-action-access" data-action-id="'. $action_id .'" data-role-id="'. $role_id .'" title="Delete Action Access">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ACTION_NAME' => $action_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role user account table
+    else if($type == 'role user account table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+
+                $update_role = $api->check_role_access_rights($username, '21', 'action');
+                $delete_role_user_account = $api->check_role_access_rights($username, '30', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME FROM global_role_user_account WHERE ROLE_ID = :role_id');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+
+                        if($delete_role_user_account > 0 && $update_role > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-user-account" data-user-id="'. $username .'" data-role-id="'. $role_id .'" title="Delete User Account">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'USERNAME' => $username,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role module access assignment table
+    else if($type == 'role module access assignment table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT MODULE_ID, MODULE_NAME FROM technical_module WHERE MODULE_ID NOT IN (SELECT MODULE_ID FROM technical_module_access_rights WHERE ROLE_ID = :role_id)');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $module_id = $row['MODULE_ID'];
+                        $module_name = $row['MODULE_NAME'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $module_id .'">',
+                            'MODULE_NAME' => $module_name
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
 
 }
 

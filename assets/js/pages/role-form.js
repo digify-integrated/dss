@@ -19,9 +19,25 @@
 
                     check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
                 },
-                complete: function(){                    
+                complete: function(){
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
+                    }
+
+                    if($('#module-access-datatable').length){
+                        initialize_role_module_access_table('#module-access-datatable');
+                    }
+
+                    if($('#page-access-datatable').length){
+                        initialize_role_page_access_table('#page-access-datatable');
+                    }
+
+                    if($('#action-access-datatable').length){
+                        initialize_role_action_access_table('#action-access-datatable');
+                    }
+
+                    if($('#user-account-datatable').length){
+                        initialize_role_user_account_table('#user-account-datatable');
                     }
                 }
             });
@@ -105,7 +121,355 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
+function initialize_role_module_access_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role module access table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'MODULE_NAME' },
+        { 'data' : 'ACTION' }
+    ];
+
+    var column_definition = [
+        { 'width': '90%', 'aTargets': 0 },
+        { 'width': '10%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_page_access_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role page access table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'PAGE_NAME' },
+        { 'data' : 'ACTION' }
+    ];
+
+    var column_definition = [
+        { 'width': '90%', 'aTargets': 0 },
+        { 'width': '10%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_action_access_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role action access table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'ACTION_NAME' },
+        { 'data' : 'ACTION' }
+    ];
+
+    var column_definition = [
+        { 'width': '90%', 'aTargets': 0 },
+        { 'width': '10%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_user_account_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role user account table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'USERNAME' },
+        { 'data' : 'ACTION' }
+    ];
+
+    var column_definition = [
+        { 'width': '90%', 'aTargets': 0 },
+        { 'width': '10%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 0, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
     var username = $('#username').text();
     var transaction_log_id = $('#transaction_log_id').val();
     var type = 'transaction log table';
@@ -196,6 +560,93 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
     $(datatable_name).dataTable(settings);
 }
 
+function initialize_role_module_access_assignment_table(datatable_name, buttons = false, show_all = false){    
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role module access assignment table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'CHECK_BOX' },
+        { 'data' : 'MODULE_NAME' }
+    ];
+
+    var column_definition = [
+        { 'width': '1%','bSortable': false, 'aTargets': 0 },
+        { 'width': '99%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
 function initialize_click_events(){
     var username = $('#username').text();
 
@@ -258,4 +709,15 @@ function initialize_click_events(){
         });
     });
 
+    $(document).on('click','#add-module-access',function() {
+        generate_modal('role module access form', 'Module Access', 'LG' , '1', '1', 'form', 'role-module-access-form', '1', username);
+    });
+
+    $(document).on('click','#add-page-access',function() {
+        generate_modal('role page access form', 'Page Access', 'LG' , '1', '1', 'form', 'role-page-access-form', '1', username);
+    });
+
+    $(document).on('click','#add-user-account',function() {
+        generate_modal('role user account form', 'User Account', 'LG' , '1', '1', 'form', 'role-user-account-form', '1', username);
+    });
 }
