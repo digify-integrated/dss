@@ -149,6 +149,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE delete_role_module_access(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 CREATE PROCEDURE generate_module_options()
 BEGIN
 	SET @query = 'SELECT MODULE_ID, MODULE_NAME FROM technical_module ORDER BY MODULE_NAME';
@@ -313,6 +324,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE delete_role_action_access(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Technical Page */
 CREATE TABLE technical_page(
 	PAGE_ID VARCHAR(100) PRIMARY KEY,
@@ -449,6 +471,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE delete_role_page_access(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Global System Code */
 CREATE TABLE global_system_code(
 	SYSTEM_TYPE VARCHAR(20) NOT NULL,
@@ -520,6 +553,95 @@ END //
 CREATE PROCEDURE generate_role_options()
 BEGIN
 	SET @query = 'SELECT ROLE_ID, ROLE FROM global_role ORDER BY ROLE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_role_exist(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_role_user_account_exist(IN role_id VARCHAR(100), IN username VARCHAR(50))
+BEGIN
+	SET @role_id = role_id;
+	SET @username = username;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role_user_account WHERE ROLE_ID = @role_id AND USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(200), IN assignable TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+	SET @role = role;
+	SET @role_description = role_description;
+	SET @assignable = assignable;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_role SET ROLE = @role, ROLE_DESCRIPTION = @role_description, ASSIGNABLE = @assignable, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(200), IN assignable TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+	SET @role = role;
+	SET @role_description = role_description;
+	SET @assignable = assignable;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, ASSIGNABLE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@role_id, @role, @role_description, @assignable, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_role(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM global_role WHERE ROLE_ID = @role_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_role_user_account(IN role_id VARCHAR(100), IN username VARCHAR(50))
+BEGIN
+	SET @role_id = role_id;
+	SET @username = username;
+
+	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = @role_id AND USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_role_user_account(IN role_id VARCHAR(100))
+BEGIN
+	SET @role_id = role_id;
+
+	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = @role_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -780,7 +902,7 @@ BEGIN
 END //
 
 /* Global Stored Procedure */
-CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(50), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
+CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
 BEGIN
 	SET @role_id = role_id;
 	SET @access_right_id = access_right_id;
