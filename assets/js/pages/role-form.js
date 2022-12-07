@@ -560,7 +560,7 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
     $(datatable_name).dataTable(settings);
 }
 
-function initialize_role_module_access_assignment_table(datatable_name, buttons = false, show_all = false){    
+function initialize_role_module_access_assignment_table(datatable_name, buttons = false, show_all = false){
     var username = $('#username').text();
     var role_id = $('#role-id').text();
     var type = 'role module access assignment table';
@@ -580,7 +580,268 @@ function initialize_role_module_access_assignment_table(datatable_name, buttons 
         length_menu = [ [-1], ['All'] ];
     }
     else{
-        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+        length_menu = [ [20, 50, 100, -1], [20, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_page_access_assignment_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role page access assignment table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'CHECK_BOX' },
+        { 'data' : 'PAGE_NAME' }
+    ];
+
+    var column_definition = [
+        { 'width': '1%','bSortable': false, 'aTargets': 0 },
+        { 'width': '99%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [20, 50, 100, -1], [20, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_action_access_assignment_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role action access assignment table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'CHECK_BOX' },
+        { 'data' : 'ACTION_NAME' }
+    ];
+
+    var column_definition = [
+        { 'width': '1%','bSortable': false, 'aTargets': 0 },
+        { 'width': '99%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [20, 50, 100, -1], [20, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'role_id' : role_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
+function initialize_role_user_account_assignment_table(datatable_name, buttons = false, show_all = false){
+    var username = $('#username').text();
+    var role_id = $('#role-id').text();
+    var type = 'role user account assignment table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'CHECK_BOX' },
+        { 'data' : 'FILE_AS' }
+    ];
+
+    var column_definition = [
+        { 'width': '1%','bSortable': false, 'aTargets': 0 },
+        { 'width': '99%','bSortable': false, 'aTargets': 1 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [20, 50, 100, -1], [20, 50, 100, 'All'] ];
     }
 
     if(buttons){
@@ -717,7 +978,179 @@ function initialize_click_events(){
         generate_modal('role page access form', 'Page Access', 'LG' , '1', '1', 'form', 'role-page-access-form', '1', username);
     });
 
+    $(document).on('click','#add-action-access',function() {
+        generate_modal('role action access form', 'Action Access', 'LG' , '1', '1', 'form', 'role-action-access-form', '1', username);
+    });
+
     $(document).on('click','#add-user-account',function() {
         generate_modal('role user account form', 'User Account', 'LG' , '1', '1', 'form', 'role-user-account-form', '1', username);
+    });
+
+    $(document).on('click','.delete-module-access',function() {
+        var module_id = $(this).data('module-id');
+        var role_id = $(this).data('role-id');
+        var transaction = 'delete module access';
+
+        Swal.fire({
+            title: 'Delete Module Access',
+            text: 'Are you sure you want to delete this module access?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                            }
+                            else{
+                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                            }
+
+                            reload_datatable('#module-access-datatable');
+                        }
+                        else{
+                            show_alert('Delete Module Access', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','.delete-page-access',function() {
+        var page_id = $(this).data('page-id');
+        var role_id = $(this).data('role-id');
+        var transaction = 'delete page access';
+
+        Swal.fire({
+            title: 'Delete Page Access',
+            text: 'Are you sure you want to delete this page access?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, page_id : page_id, role_id : role_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert('Delete Page Access', 'The page access has been deleted.', 'success');
+                            }
+                            else{
+                                show_alert('Delete Page Access', 'The page access does not exist.', 'info');
+                            }
+
+                            reload_datatable('#page-access-datatable');
+                        }
+                        else{
+                            show_alert('Delete Page Access', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','.delete-action-access',function() {
+        var action_id = $(this).data('action-id');
+        var role_id = $(this).data('role-id');
+        var transaction = 'delete action access';
+
+        Swal.fire({
+            title: 'Delete Action Access',
+            text: 'Are you sure you want to delete this action access?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, action_id : action_id, role_id : role_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert('Delete Action Access', 'The action access has been deleted.', 'success');
+                            }
+                            else{
+                                show_alert('Delete Action Access', 'The action access does not exist.', 'info');
+                            }
+
+                            reload_datatable('#action-access-datatable');
+                        }
+                        else{
+                            show_alert('Delete Action Access', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','.delete-user-account',function() {
+        var user_id = $(this).data('user-id');
+        var role_id = $(this).data('role-id');
+        var transaction = 'delete role user account';
+
+        Swal.fire({
+            title: 'Delete User Account',
+            text: 'Are you sure you want to delete this role user account?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, user_id : user_id, role_id : role_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted' || response === 'Not Found'){
+                            if(response === 'Deleted'){
+                                show_alert('Delete User Account', 'The user account has been deleted.', 'success');
+                            }
+                            else{
+                                show_alert('Delete User Account', 'The user account does not exist.', 'info');
+                            }
+
+                            reload_datatable('#user-account-datatable');
+                        }
+                        else{
+                            show_alert('Delete User Account', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
     });
 }

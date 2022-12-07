@@ -2,15 +2,15 @@
     'use strict';
 
     $(function() {
-        if($('#parameter-id').length){
-            var transaction = 'system parameter details';
-            var parameter_id = $('#parameter-id').text();
+        if($('#company-id').length){
+            var transaction = 'company details';
+            var company_id = $('#company-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {parameter_id : parameter_id, transaction : transaction},
+                data: {company_id : company_id, transaction : transaction},
                 success: function(response) {
                     $('#parameter').val(response[0].PARAMETER);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
@@ -18,7 +18,7 @@
                     $('#extension').val(response[0].PARAMETER_EXTENSION);
                     $('#parameter_number').val(response[0].PARAMETER_NUMBER);
 
-                    $('#parameter_id').val(parameter_id);
+                    $('#company_id').val(company_id);
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
@@ -28,16 +28,22 @@
             });
         }
 
-        $('#system-parameter-form').validate({
+        $('#company-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit system parameter';
+                var transaction = 'submit company';
                 var username = $('#username').text();
+
+                var formData = new FormData(form);
+                formData.append('username', username);
+                formData.append('transaction', transaction);
 
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                    data: formData,
                     dataType: 'JSON',
+                    processData: false,
+                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -45,16 +51,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['PARAMETER_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['COMPANY_ID'];
 
-                                show_alert_event('Insert System Parameter Success', 'The system parameter has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Company Success', 'The company has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update System Parameter Success', 'The system parameter has been updated.', 'success', 'reload');
+                                show_alert_event('Update Company Success', 'The company has been updated.', 'success', 'reload');
                             }
                         }
                         else{
-                            show_alert('System Parameter Error', response, 'error');
+                            show_alert('Company Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -65,19 +71,13 @@
                 return false;
             },
             rules: {
-                parameter: {
-                    required: true
-                },
-                parameter_description: {
+                company_name: {
                     required: true
                 }
             },
             messages: {
-                parameter: {
-                    required: 'Please enter the parameter',
-                },
-                parameter_description: {
-                    required: 'Please enter the parameter description',
+                company_name: {
+                    required: 'Please enter the company name',
                 }
             },
             errorPlacement: function(label, element) {
@@ -200,13 +200,13 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-system-parameter',function() {
-        var parameter_id = $(this).data('parameter-id');
-        var transaction = 'delete system parameter';
+    $(document).on('click','#delete-company',function() {
+        var company_id = $(this).data('company-id');
+        var transaction = 'delete company';
 
         Swal.fire({
-            title: 'Delete System Parameter',
-            text: 'Are you sure you want to delete this system parameter?',
+            title: 'Delete Company',
+            text: 'Are you sure you want to delete this company?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -219,18 +219,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, parameter_id : parameter_id, transaction : transaction},
+                    data: {username : username, company_id : company_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete System Parameter', 'The system parameter has been deleted.', 'success', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete Company', 'The company has been deleted.', 'success', 'redirect', 'company.php');
                             }
                             else{
-                                show_alert_event('Delete System Parameter', 'The system parameter does not exist.', 'info', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete Company', 'The company does not exist.', 'info', 'redirect', 'company.php');
                             }
                         }
                         else{
-                            show_alert('Delete System Parameter', response, 'error');
+                            show_alert('Delete Company', response, 'error');
                         }
                     }
                 });
@@ -253,7 +253,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'system-parameters.php';
+                window.location.href = 'company.php';
                 return false;
             }
         });

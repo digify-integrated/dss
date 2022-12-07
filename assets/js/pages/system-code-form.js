@@ -2,23 +2,23 @@
     'use strict';
 
     $(function() {
-        if($('#parameter-id').length){
-            var transaction = 'system parameter details';
-            var parameter_id = $('#parameter-id').text();
+        if($('#system-code-id').length){
+            var transaction = 'system code details';
+            var system_code_id = $('#system-code-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {parameter_id : parameter_id, transaction : transaction},
+                data: {system_code_id : system_code_id, transaction : transaction},
                 success: function(response) {
-                    $('#parameter').val(response[0].PARAMETER);
+                    $('#system_description').val(response[0].SYSTEM_DESCRIPTION);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#parameter_description').val(response[0].PARAMETER_DESCRIPTION);
-                    $('#extension').val(response[0].PARAMETER_EXTENSION);
-                    $('#parameter_number').val(response[0].PARAMETER_NUMBER);
+                    $('#system_code').val(response[0].SYSTEM_CODE);
 
-                    $('#parameter_id').val(parameter_id);
+                    $('#system_code_id').val(system_code_id);
+
+                    check_empty(response[0].SYSTEM_TYPE, '#system_type', 'select');
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
@@ -28,9 +28,9 @@
             });
         }
 
-        $('#system-parameter-form').validate({
+        $('#system-code-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit system parameter';
+                var transaction = 'submit system code';
                 var username = $('#username').text();
 
                 $.ajax({
@@ -45,16 +45,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['PARAMETER_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['SYSTEM_CODE_ID'];
 
-                                show_alert_event('Insert System Parameter Success', 'The system parameter has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert System Code Success', 'The system code has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update System Parameter Success', 'The system parameter has been updated.', 'success', 'reload');
+                                show_alert_event('Update System Code Success', 'The system code has been updated.', 'success', 'reload');
                             }
                         }
                         else{
-                            show_alert('System Parameter Error', response, 'error');
+                            show_alert('System Code Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -65,19 +65,25 @@
                 return false;
             },
             rules: {
-                parameter: {
+                system_type: {
                     required: true
                 },
-                parameter_description: {
+                system_description: {
                     required: true
-                }
+                },
+                system_code: {
+                    required: true
+                },
             },
             messages: {
-                parameter: {
-                    required: 'Please enter the parameter',
+                system_type: {
+                    required: 'Please choose the system type',
                 },
-                parameter_description: {
-                    required: 'Please enter the parameter description',
+                system_description: {
+                    required: 'Please enter the system code description',
+                },
+                system_code: {
+                    required: 'Please enter the system code',
                 }
             },
             errorPlacement: function(label, element) {
@@ -200,13 +206,13 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-system-parameter',function() {
-        var parameter_id = $(this).data('parameter-id');
-        var transaction = 'delete system parameter';
+    $(document).on('click','#delete-system-code',function() {
+        var system_code_id = $(this).data('system-code-id');
+        var transaction = 'delete system code';
 
         Swal.fire({
-            title: 'Delete System Parameter',
-            text: 'Are you sure you want to delete this system parameter?',
+            title: 'Delete System Code',
+            text: 'Are you sure you want to delete this system code?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -219,18 +225,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, parameter_id : parameter_id, transaction : transaction},
+                    data: {username : username, system_code_id : system_code_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete System Parameter', 'The system parameter has been deleted.', 'success', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete System Code', 'The system code has been deleted.', 'success', 'redirect', 'system-codes.php');
                             }
                             else{
-                                show_alert_event('Delete System Parameter', 'The system parameter does not exist.', 'info', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete System Code', 'The system code does not exist.', 'info', 'redirect', 'system-codes.php');
                             }
                         }
                         else{
-                            show_alert('Delete System Parameter', response, 'error');
+                            show_alert('Delete System Code', response, 'error');
                         }
                     }
                 });
@@ -253,7 +259,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'system-parameters.php';
+                window.location.href = 'system-codes.php';
                 return false;
             }
         });

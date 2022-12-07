@@ -2,25 +2,28 @@
     'use strict';
 
     $(function() {
-        if($('#action-id').length){
-            var transaction = 'action details';
-            var action_id = $('#action-id').text();
+        if($('#upload-setting-id').length){
+            var transaction = 'upload setting details';
+            var upload_setting_id = $('#upload-setting-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {action_id : action_id, transaction : transaction},
+                data: {upload_setting_id : upload_setting_id, transaction : transaction},
                 success: function(response) {
-                    $('#action_name').val(response[0].ACTION_NAME);
+                    $('#upload_setting').val(response[0].UPLOAD_SETTING);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#action_id').val(action_id);
+                    $('#description').val(response[0].DESCRIPTION);
+                    $('#max_file_size').val(response[0].MAX_FILE_SIZE);
+
+                    $('#upload_setting_id').val(upload_setting_id);
                 },
                 complete: function(){
-                    if($('#action-access-datatable').length){
-                        initialize_action_access_table('#action-access-datatable');
+                    if($('#upload-setting-file-type-datable').length){
+                        initialize_upload_setting_file_type_table('#upload-setting-file-type-datable');
                     }
-                    
+
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
                     }
@@ -28,9 +31,9 @@
             });
         }
 
-        $('#action-form').validate({
+        $('#upload-setting-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit action';
+                var transaction = 'submit upload setting';
                 var username = $('#username').text();
 
                 $.ajax({
@@ -45,16 +48,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['ACTION_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['UPLOAD_SETTING_ID'];
 
-                                show_alert_event('Insert Action Success', 'The action has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Upload Setting Success', 'The upload setting has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Action Success', 'The action has been updated.', 'success', 'reload');
+                                show_alert_event('Update Upload Setting Success', 'The upload setting has been updated.', 'success', 'reload');
                             }
                         }
                         else{
-                            show_alert('Action Error', response, 'error');
+                            show_alert('Upload Setting Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -65,14 +68,20 @@
                 return false;
             },
             rules: {
-                action_name: {
+                upload_setting: {
                     required: true
                 },
+                description: {
+                    required: true
+                }
             },
             messages: {
-                action_name: {
-                    required: 'Please enter the action name',
+                upload_setting: {
+                    required: 'Please enter the upload setting',
                 },
+                description: {
+                    required: 'Please enter the upload setting description',
+                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -100,14 +109,14 @@
     });
 })(jQuery);
 
-function initialize_action_access_table(datatable_name, buttons = false, show_all = false){
+function initialize_upload_setting_file_type_table(datatable_name, buttons = false, show_all = false){
     var username = $('#username').text();
-    var action_id = $('#action-id').text();
-    var type = 'action access table';
+    var upload_setting_id = $('#upload-setting-id').text();
+    var type = 'upload setting file type table';
     var settings;
 
     var column = [ 
-        { 'data' : 'ROLE' },
+        { 'data' : 'FILE_TYPE' },
         { 'data' : 'ACTION' }
     ];
 
@@ -129,7 +138,7 @@ function initialize_action_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
+                'data': {'type' : type, 'username' : username, 'upload_setting_id' : upload_setting_id},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -160,7 +169,7 @@ function initialize_action_access_table(datatable_name, buttons = false, show_al
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
+                'data': {'type' : type, 'username' : username, 'upload_setting_id' : upload_setting_id},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -278,15 +287,15 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
     $(datatable_name).dataTable(settings);
 }
 
-function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
+function initialize_upload_file_type_assignment_table(datatable_name, buttons = false, show_all = false){
     var username = $('#username').text();
-    var action_id = $('#action-id').text();
-    var type = 'action role assignment table';
+    var upload_setting_id = $('#upload-setting-id').text();
+    var type = 'file type assignment table';
     var settings;
 
     var column = [ 
         { 'data' : 'CHECK_BOX' },
-        { 'data' : 'ROLE' }
+        { 'data' : 'SYSTEM_DESCRIPTION' }
     ];
 
     var column_definition = [
@@ -307,7 +316,7 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
+                'data': {'type' : type, 'username' : username, 'upload_setting_id' : upload_setting_id},
                 'dataSrc' : ''
             },
             dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -338,7 +347,7 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
                 'url' : 'system-generation.php',
                 'method' : 'POST',
                 'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'action_id' : action_id},
+                'data': {'type' : type, 'username' : username, 'upload_setting_id' : upload_setting_id},
                 'dataSrc' : ''
             },
             'order': [[ 1, 'asc' ]],
@@ -368,18 +377,18 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#add-action-access',function() {
-        generate_modal('action access form', 'Action Access', 'LG' , '1', '1', 'form', 'action-access-form', '1', username);
+    $(document).on('click','#add-upload-setting-file-type',function() {
+        generate_modal('upload setting file type form', 'Allowed File Type', 'LG' , '1', '1', 'form', 'upload-setting-file-type-form', '1', username);
     });
 
-    $(document).on('click','.delete-action-access',function() {
-        var action_id = $(this).data('action-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete action access';
+    $(document).on('click','.delete-upload-setting-file-type',function() {
+        var upload_setting_id = $(this).data('upload-setting-id');
+        var file_type = $(this).data('file-type');
+        var transaction = 'delete upload setting file type';
 
         Swal.fire({
-            title: 'Delete Action Access',
-            text: 'Are you sure you want to delete this action access?',
+            title: 'Delete Upload Setting File Type',
+            text: 'Are you sure you want to delete this upload setting file type?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -392,20 +401,20 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, action_id : action_id, role_id : role_id, transaction : transaction},
+                    data: {username : username, upload_setting_id : upload_setting_id, file_type : file_type, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Action Access', 'The action access has been deleted.', 'success');
+                                show_alert('Delete Upload Setting File Type', 'The file type has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Action Access', 'The action access does not exist.', 'info');
+                                show_alert('Delete Upload Setting File Type', 'The file type does not exist.', 'info');
                             }
 
-                            reload_datatable('#action-access-datatable');
+                            reload_datatable('#upload-setting-file-type-datable');
                         }
                         else{
-                            show_alert('Delete Action Access', response, 'error');
+                            show_alert('Delete Upload Setting File Type', response, 'error');
                         }
                     }
                 });
@@ -414,13 +423,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-action',function() {
-        var action_id = $(this).data('action-id');
-        var transaction = 'delete action';
+    $(document).on('click','#delete-upload-setting',function() {
+        var upload_setting_id = $(this).data('upload-setting-id');
+        var transaction = 'delete upload setting';
 
         Swal.fire({
-            title: 'Delete Action',
-            text: 'Are you sure you want to delete this action?',
+            title: 'Delete Upload Setting',
+            text: 'Are you sure you want to delete this upload setting?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -433,18 +442,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, action_id : action_id, transaction : transaction},
+                    data: {username : username, upload_setting_id : upload_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Action', 'The action has been deleted.', 'success', 'redirect', 'actions.php');
+                                show_alert_event('Delete Upload Setting', 'The upload setting has been deleted.', 'success', 'redirect', 'upload-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Action', 'The action does not exist.', 'info', 'redirect', 'actions.php');
+                                show_alert_event('Delete Upload Setting', 'The upload setting does not exist.', 'info', 'redirect', 'upload-settings.php');
                             }
                         }
                         else{
-                            show_alert('Delete Action', response, 'error');
+                            show_alert('Delete Upload Setting', response, 'error');
                         }
                     }
                 });
@@ -467,7 +476,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'actions.php';
+                window.location.href = 'upload-settings.php';
                 return false;
             }
         });

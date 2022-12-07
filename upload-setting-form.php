@@ -8,11 +8,11 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(4);
+        $page_details = $api->get_page_details(12);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, '4', 'page');
+        $page_access_right = $api->check_role_access_rights($username, 12, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -21,18 +21,18 @@
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
-                $page_id = $api->decrypt_data($id);
+                $upload_setting_id = $api->decrypt_data($id);
             }
             else{
-                $page_id = null;
+                $upload_setting_id = null;
             }
 
-            $add_page = $api->check_role_access_rights($username, '6', 'action');
-            $update_page = $api->check_role_access_rights($username, '7', 'action');
-            $delete_page = $api->check_role_access_rights($username, '8', 'action');
-            $add_page_access_right = $api->check_role_access_rights($username, '9', 'action');
+            $add_upload_setting = $api->check_role_access_rights($username, '31', 'action');
+            $update_upload_setting = $api->check_role_access_rights($username, '32', 'action');
+            $delete_upload_setting = $api->check_role_access_rights($username, '33', 'action');
+            $add_upload_setting_file_type = $api->check_role_access_rights($username, '37', 'action');
 
-            if($update_page > 0){
+            if($update_upload_setting > 0){
                 $disabled = null;
             }
             else{
@@ -74,17 +74,17 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Page Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Upload Setting Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
-                                            <li class="breadcrumb-item"><a href="pages.php">Pages</a></li>
+                                            <li class="breadcrumb-item"><a href="upload-settings.php">Upload Settings</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
-                                                if(!empty($page_id)){
-                                                    echo '<li class="breadcrumb-item" id="page-id"><a href="javascript: void(0);">'. $page_id .'</a></li>';
+                                                if(!empty($upload_setting_id)){
+                                                    echo '<li class="breadcrumb-item" id="upload-setting-id"><a href="javascript: void(0);">'. $upload_setting_id .'</a></li>';
                                                 }
                                             ?>
                                         </ol>
@@ -97,34 +97,35 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="page-form" method="post" action="#">
+                                        <form id="upload-setting-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Page Form</h4>
+                                                            <h4 class="card-title">Upload Setting Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_page > 0 && !empty($page_id)) || ($delete_page > 0 && !empty($page_id)) || ($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0)))){
+                                                            if(($add_upload_setting > 0 && !empty($upload_setting_id)) || ($delete_upload_setting > 0 && !empty($upload_setting_id)) || ($add_upload_setting_file_type > 0 && ((!empty($upload_setting_id) && $update_upload_setting > 0)))){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_page > 0 && !empty($page_id)){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="page-form.php">Add Module</a>';
+                                                                if($add_upload_setting > 0 && !empty($upload_setting_id)){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="upload-setting-form.php">Add Upload Setting</a>';
                                                                 }
 
-                                                                if($delete_page > 0 && !empty($page_id)){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-page-id="'. $page_id .'" id="delete-page">Delete Page</button>';
+                                                                if($delete_upload_setting > 0 && !empty($upload_setting_id)){
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-upload-setting-id="'. $upload_setting_id .'" id="delete-upload-setting">Delete Upload Setting</button>';
                                                                 }
 
-                                                                if($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0))){
+                                                                if($add_upload_setting_file_type > 0 && ((!empty($upload_setting_id) && $update_upload_setting > 0))){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-upload-setting-file-type">Add File Type</button>';
                                                                 }
 
-                                                                $dropdown_action .= '</div></div>';
+                                                                $dropdown_action .= '</div>
+                                                                </div>';
 
                                                                 echo $dropdown_action;
                                                             }
@@ -132,7 +133,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($page_id) && $update_page > 0) || (empty($page_id) && $add_page > 0)){
+                                                                if((!empty($upload_setting_id) && $update_upload_setting > 0) || (empty($upload_setting_id) && $add_upload_setting > 0)){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
@@ -144,36 +145,42 @@
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="page_id" name="page_id">
-                                                        <input type="hidden" id="transaction_log_id" name="transaction_log_id">
-                                                        <label for="page_name" class="col-md-3 col-form-label">Page Name <span class="text-danger">*</span></label>
+                                                        <input type="hidden" id="upload_setting_id" name="upload_setting_id">
+                                                        <input type="hidden" id="transaction_log_id">
+                                                        <label for="upload_setting" class="col-md-3 col-form-label">Upload Setting <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="page_name" name="page_name" maxlength="200" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="upload_setting" name="upload_setting" maxlength="200" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <label for="description" class="col-md-3 col-form-label">Upload Setting Description <span class="text-danger">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="description" name="description" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="module_id" class="col-md-3 col-form-label">Module <span class="text-danger">*</span></label>
+                                                        <label for="max_file_size" class="col-md-3 col-form-label">Max File Size</label>
                                                         <div class="col-md-9">
-                                                            <select class="form-control select2" id="module_id" name="module_id" <?php echo $disabled; ?>>
-                                                                <option value="">--</option>
-                                                                <?php echo $api->generate_module_options(); ?>
-                                                            </select>
+                                                            <div class="input-group">
+                                                                <input id="max_file_size" name="max_file_size" class="form-control" type="number" min="1" value="1" <?php echo $disabled; ?>>
+                                                                <div class="input-group-text">mb</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
                                         <?php
-                                            if(!empty($page_id)){
+                                            if(!empty($upload_setting_id)){
                                                 echo ' <div class="row mt-4">
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#page-access" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-window-maximize"></i></span>
-                                                                    <span class="d-none d-sm-block">Page Access</span>    
+                                                                <a class="nav-link active" data-bs-toggle="tab" href="#file-type" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-file"></i></span>
+                                                                    <span class="d-none d-sm-block">Allowed File Type</span>    
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
@@ -184,13 +191,13 @@
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="page-access" role="tabpanel">
+                                                            <div class="tab-pane active" id="file-type" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="page-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="upload-setting-file-type-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th class="all">Role</th>
+                                                                                    <th class="all">File Type</th>
                                                                                     <th class="all">Action</th>
                                                                                 </tr>
                                                                             </thead>
@@ -243,6 +250,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/page-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/upload-setting-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

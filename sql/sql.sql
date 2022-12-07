@@ -484,6 +484,7 @@ END //
 
 /* Global System Code */
 CREATE TABLE global_system_code(
+	SYSTEM_CODE_ID VARCHAR(100) PRIMARY KEY,
 	SYSTEM_TYPE VARCHAR(20) NOT NULL,
 	SYSTEM_CODE VARCHAR(20) NOT NULL,
 	SYSTEM_DESCRIPTION VARCHAR(100) NOT NULL,
@@ -493,16 +494,77 @@ CREATE TABLE global_system_code(
 
 CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
 
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'SYSTYPE', 'System Code', 'TL-4');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'MODULECAT', 'Module Category', 'TL-5');
-INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('MODULECAT', 'TECHNICAL', 'Technical', 'TL-6');
+CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_CODE_ID);
 
-CREATE PROCEDURE get_system_code_details(IN system_type VARCHAR(100), IN system_code VARCHAR(100))
+INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('1', 'SYSTYPE', 'SYSTYPE', 'System Code', 'TL-4');
+INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('2', 'SYSTYPE', 'MODULECAT', 'Module Category', 'TL-5');
+INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('3', 'MODULECAT', 'TECHNICAL', 'Technical', 'TL-6');
+
+CREATE PROCEDURE check_system_code_exist(IN system_code_id VARCHAR(100))
 BEGIN
+	SET @system_code_id = system_code_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_system_code(IN system_code_id VARCHAR(100), IN system_type VARCHAR(20), IN system_code VARCHAR(20), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @system_code_id = system_code_id;
+	SET @system_type = system_type;
+	SET @system_code= system_code;
+	SET @system_description= system_description;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_system_code SET SYSTEM_TYPE = @system_type, SYSTEM_CODE = @system_code, SYSTEM_DESCRIPTION = @system_description, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE SYSTEM_CODE_ID = @system_code_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_system_code(IN system_code_id VARCHAR(100), IN system_type VARCHAR(20), IN system_code VARCHAR(20), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @system_code_id = system_code_id;
+	SET @system_type = system_type;
+	SET @system_code= system_code;
+	SET @system_description= system_description;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@system_code_id, @system_type, @system_code, @system_description, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_system_code(IN system_code_id VARCHAR(100))
+BEGIN
+	SET @system_code_id = system_code_id;
+
+	SET @query = 'DELETE FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_system_code_details(IN system_code_id VARCHAR(100), IN system_type VARCHAR(100), IN system_code VARCHAR(100))
+BEGIN
+	SET @system_code_id = system_code_id;
 	SET @system_type = system_type;
 	SET @system_code = system_code;
 
-	SET @query = 'SELECT SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+	IF @system_code_id IS NULL OR @system_code_id = '' THEN
+		SET @query = 'SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+	ELSE
+		SET @query = 'SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
+    END IF;	
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -648,6 +710,18 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE insert_role_user_account(IN role_id VARCHAR(100), IN username VARCHAR(50))
+BEGIN
+	SET @role_id = role_id;
+	SET @username = username;
+
+	SET @query = 'INSERT INTO global_role_user_account (ROLE_ID, USERNAME) VALUES(@role_id, @username)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Global User Account */
 CREATE TABLE global_user_account(
 	USERNAME VARCHAR(50) PRIMARY KEY,
@@ -768,8 +842,7 @@ CREATE TABLE global_upload_setting(
 
 CREATE TABLE global_upload_file_type(
 	UPLOAD_SETTING_ID INT(50),
-	FILE_TYPE VARCHAR(50) NOT NULL,
-	RECORD_LOG VARCHAR(100)
+	FILE_TYPE VARCHAR(50) NOT NULL
 );
 
 CREATE INDEX global_upload_setting_index ON global_upload_setting(UPLOAD_SETTING_ID);
@@ -779,6 +852,73 @@ INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES ('1', 
 INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES ('1', 'svg');
 INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES ('1', 'png');
 INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES ('1', 'jpg');
+
+CREATE PROCEDURE check_upload_setting_exist(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_upload_setting_file_type_exist(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @file_type = file_type;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id AND FILE_TYPE = @file_type';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(100), IN description VARCHAR(100), IN max_file_size VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @upload_setting = upload_setting;
+	SET @description = description;
+	SET @max_file_size = max_file_size;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_upload_setting SET UPLOAD_SETTING = @upload_setting, DESCRIPTION = @description, MAX_FILE_SIZE = @max_file_size, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(100), IN description VARCHAR(100), IN max_file_size VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @upload_setting = upload_setting;
+	SET @description = description;
+	SET @max_file_size = max_file_size;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_upload_setting (UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@upload_setting_id, @upload_setting, @description, @max_file_size, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_upload_setting_file_type(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @file_type = file_type;
+
+	SET @query = 'INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES(@upload_setting_id, @file_type)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
 
 CREATE PROCEDURE get_upload_setting_details(IN upload_setting_id INT(50))
 BEGIN
@@ -795,7 +935,41 @@ CREATE PROCEDURE get_upload_file_type_details(IN upload_setting_id INT(50))
 BEGIN
 	SET @upload_setting_id = upload_setting_id;
 
-	SET @query = 'SELECT FILE_TYPE, RECORD_LOG FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'SELECT FILE_TYPE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_upload_setting(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'DELETE FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_upload_setting_file_type(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_upload_setting_file_type(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @file_type = file_type;
+
+	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id AND FILE_TYPE = @file_type';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -895,6 +1069,109 @@ BEGIN
 	SET @parameter_id = parameter_id;
 
 	SET @query = 'DELETE FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+/* Global Company */
+CREATE TABLE global_company(
+	COMPANY_ID VARCHAR(50) PRIMARY KEY,
+	COMPANY_NAME VARCHAR(100) NOT NULL,
+	COMPANY_LOGO VARCHAR(500),
+	COMPANY_ADDRESS VARCHAR(500),
+	EMAIL VARCHAR(50),
+	TELEPHONE VARCHAR(20),
+	MOBILE VARCHAR(20),
+	WEBSITE VARCHAR(100),
+	TAX_ID VARCHAR(100),
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX global_company_index ON global_company(COMPANY_ID);
+
+CREATE PROCEDURE check_company_exist(IN company_id VARCHAR(50))
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_company WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN company_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_name = company_name;
+	SET @company_address = company_address;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @website = website;
+	SET @tax_id = tax_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_company SET COMPANY_NAME = @company_name, COMPANY_NAME = @company_name, COMPANY_ADDRESS = @company_address, EMAIL = @email, TELEPHONE = @telephone, MOBILE = @mobile, WEBSITE = @website, TAX_ID = @tax_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_company_logo(IN company_id VARCHAR(50), IN company_logo VARCHAR(500))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_logo = company_logo;
+
+	SET @query = 'UPDATE global_company SET COMPANY_LOGO = @company_logo WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN company_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_name = company_name;
+	SET @company_address = company_address;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @website = website;
+	SET @tax_id = tax_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+
+	SET @query = 'INSERT INTO global_company (COMPANY_ID, COMPANY_NAME, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@company_id, @company_name, @company_address, @email, @telephone, @mobile, @website, @tax_id, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_company_details(IN company_id VARCHAR(50))
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'SELECT COMPANY_NAME, COMPANY_LOGO, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_company WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_company(IN company_id VARCHAR(50))
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'DELETE FROM global_company WHERE COMPANY_ID = @company_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

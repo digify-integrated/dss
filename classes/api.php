@@ -745,6 +745,107 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_system_code_exist
+    # Purpose    : Checks if the system code exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_system_code_exist($system_code_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_system_code_exist(:system_code_id)');
+            $sql->bindValue(':system_code_id', $system_code_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_upload_setting_exist
+    # Purpose    : Checks if the upload setting exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_upload_setting_exist($upload_setting_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_upload_setting_exist(:upload_setting_id)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_upload_setting_file_type_exist
+    # Purpose    : Checks if the upload setting file type exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_upload_setting_file_type_exist($upload_setting_id, $file_type){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_upload_setting_file_type_exist(:upload_setting_id, :file_type)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+            $sql->bindValue(':file_type', $file_type);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_company_exist
+    # Purpose    : Checks if the upload setting exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_company_exist($company_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_company_exist(:company_id)');
+            $sql->bindValue(':company_id', $company_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1256,6 +1357,306 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_system_code
+    # Purpose    : Updates system code.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_system_code($system_code_id, $system_type, $system_code, $system_description, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $system_code_details = $this->get_system_code_details($parameter_id, null, null);
+            
+            if(!empty($system_code_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $system_code_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_system_code(:system_code_id, :system_type, :system_code, :system_description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':system_code_id', $system_code_id);
+            $sql->bindValue(':system_type', $system_type);
+            $sql->bindValue(':system_code', $system_code);
+            $sql->bindValue(':system_description', $system_description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($system_code_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system code.');
+                                        
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system code.');
+                                        
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_upload_setting
+    # Purpose    : Updates upload setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_upload_setting($upload_setting_id, $upload_setting, $description, $max_file_size, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $upload_setting_details = $this->get_upload_setting_details($parameter_id, null, null);
+            
+            if(!empty($upload_setting_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $upload_setting_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_upload_setting(:upload_setting_id, :upload_setting, :description, :max_file_size, :transaction_log_id, :record_log)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+            $sql->bindValue(':upload_setting', $upload_setting);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':max_file_size', $max_file_size);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($upload_setting_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated upload setting.');
+                                        
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated upload setting.');
+                                        
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_company
+    # Purpose    : Updates company.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_company($company_id, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $company_details = $this->get_company_details($company_id);
+            
+            if(!empty($company_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $company_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_company(:company_id, :company_name, :company_address, :email, :telephone, :mobile, :website, :tax_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':company_id', $company_id);
+            $sql->bindValue(':company_name', $company_name);
+            $sql->bindValue(':company_address', $company_address);
+            $sql->bindValue(':email', $email);
+            $sql->bindValue(':telephone', $telephone);
+            $sql->bindValue(':mobile', $mobile);
+            $sql->bindValue(':website', $website);
+            $sql->bindValue(':tax_id', $tax_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($company_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_company_logo
+    # Purpose    : Updates company logo.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_company_logo($company_logo_tmp_name, $company_logo_actual_ext, $company_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            if(!empty($company_logo_tmp_name)){ 
+                $file_name = $this->generate_file_name(10);
+                $file_new = $file_name . '.' . $company_logo_actual_ext;
+
+                $directory = './assets/images/company/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/company/' . $file_new;
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    $company_details = $this->get_company_details($company_id);
+                    $company_logo = $company_details[0]['COMPANY_LOGO'];
+                    $transaction_log_id = $company_details[0]['TRANSACTION_LOG_ID'];
+    
+                    if(file_exists($company_logo)){
+                        if (unlink($company_logo)) {
+                            if(move_uploaded_file($company_logo_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_company_logo(:company_id, :file_path)');
+                                $sql->bindValue(':company_id', $company_id);
+                                $sql->bindValue(':file_path', $file_path);
+                            
+                                if($sql->execute()){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company logo.');
+                                        
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    return $sql->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your file.';
+                            }
+                        }
+                        else {
+                            return $company_logo . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($company_logo_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_company_logo(:company_id, :file_path)');
+                            $sql->bindValue(':company_id', $company_id);
+                            $sql->bindValue(':file_path', $file_path);
+                        
+                            if($sql->execute()){
+                                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company logo.');
+                                    
+                                if($insert_transaction_log){
+                                    return true;
+                                }
+                                else{
+                                    return $insert_transaction_log;
+                                }
+                            }
+                            else{
+                                return $sql->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -1412,7 +1813,7 @@ class Api{
                         $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted module.');
                                     
                         if($insert_transaction_log){
-                            if(!empty($job_description_tmp_name) && !empty($job_description_actual_ext)){
+                            if(!empty($module_icon_tmp_name) && !empty($module_icon_actual_ext)){
                                 $update_module_icon = $this->update_module_icon($module_icon_tmp_name, $module_icon_actual_ext, $id, $username);
         
                                 if($update_module_icon){
@@ -1805,6 +2206,295 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_system_code
+    # Purpose    : Insert system code.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_system_code($system_type, $system_code, $system_description, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(8, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_system_code(:id, :system_type, :system_code, :system_description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':system_type', $system_type);
+            $sql->bindValue(':system_code', $system_code);
+            $sql->bindValue(':system_description', $system_description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 8, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted system code.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'SYSTEM_CODE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'SYSTEM_CODE_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'SYSTEM_CODE_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'SYSTEM_CODE_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'SYSTEM_CODE_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_upload_setting
+    # Purpose    : Insert upload setting.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_upload_setting($upload_setting, $description, $max_file_size, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(7, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_upload_setting(:id, :upload_setting, :description, :max_file_size, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':upload_setting', $upload_setting);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':max_file_size', $max_file_size);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 7, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted upload setting.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'UPLOAD_SETTING_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'UPLOAD_SETTING_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'UPLOAD_SETTING_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'UPLOAD_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'UPLOAD_SETTING_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_upload_setting_file_type
+    # Purpose    : Inserts upload setting file type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_upload_setting_file_type($upload_setting_id, $file_type, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_upload_setting_file_type(:upload_setting_id, :file_type)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+            $sql->bindValue(':file_type', $file_type);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_company
+    # Purpose    : Insert company.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_company($company_logo_tmp_name, $company_logo_actual_ext, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(9, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_company(:id, :company_name, :company_address, :email, :telephone, :mobile, :website, :tax_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':company_name', $company_name);
+            $sql->bindValue(':company_address', $company_address);
+            $sql->bindValue(':email', $email);
+            $sql->bindValue(':telephone', $telephone);
+            $sql->bindValue(':mobile', $mobile);
+            $sql->bindValue(':website', $website);
+            $sql->bindValue(':tax_id', $tax_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 9, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted company.');
+                                    
+                        if($insert_transaction_log){
+                            if(!empty($company_logo_tmp_name) && !empty($company_logo_actual_ext)){
+                                $update_company_logo = $this->update_company_logo($company_logo_tmp_name, $company_logo_actual_ext, $id, $username);
+        
+                                if($update_company_logo){
+                                    $response[] = array(
+                                        'RESPONSE' => true,
+                                        'COMPANY_ID' => $this->encrypt_data($id)
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $update_company_logo,
+                                        'COMPANY_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => true,
+                                    'COMPANY_ID' => $this->encrypt_data($id)
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'COMPANY_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'COMPANY_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'COMPANY_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'COMPANY_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -2159,10 +2849,11 @@ class Api{
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function delete_role_user_account($role_id, $username){
+    public function delete_role_user_account($role_id, $user_id, $username){
         if ($this->databaseConnection()) {
-            $sql = $this->db_connection->prepare('CALL delete_role_user_account(:role_id)');
+            $sql = $this->db_connection->prepare('CALL delete_role_user_account(:role_id, :user_id)');
             $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':user_id', $user_id);
         
             if($sql->execute()){ 
                 return true;
@@ -2189,6 +2880,140 @@ class Api{
         
             if($sql->execute()){ 
                 return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_system_code
+    # Purpose    : Delete system code.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_system_code($system_code_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_system_code(:system_code_id)');
+            $sql->bindValue(':system_code_id', $system_code_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_upload_setting
+    # Purpose    : Delete upload setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_upload_setting($upload_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_upload_setting(:upload_setting_id)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_upload_setting_file_type
+    # Purpose    : Delete all upload setting file type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_upload_setting_file_type($upload_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_upload_setting_file_type(:upload_setting_id)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_upload_setting_file_type
+    # Purpose    : Delete upload setting file type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_upload_setting_file_type($upload_setting_id, $file_type, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_upload_setting_file_type(:upload_setting_id, :file_type)');
+            $sql->bindValue(':upload_setting_id', $upload_setting_id);
+            $sql->bindValue(':file_type', $file_type);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_company
+    # Purpose    : Delete company.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_company($company_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_company(:company_id)');
+            $sql->bindValue(':company_id', $company_id);
+        
+            if($sql->execute()){ 
+                $company_details = $this->get_company_details($company_id);
+                $company_logo = $company_details[0]['COMPANY_LOGO'] ?? null;
+
+                if(!empty($company_logo)){
+                    if(file_exists($company_logo)){
+                        if (unlink($company_logo)) {
+                            return true;
+                        }
+                        else {
+                            return $company_logo . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        return true;
+                    }
+                }
+                else{
+                    return true;
+                }
             }
             else{
                 return $sql->errorInfo()[2];
@@ -2247,17 +3072,21 @@ class Api{
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function get_system_code_details($system_type, $system_code){
+    public function get_system_code_details($system_code_id, $system_type, $system_code){
         if ($this->databaseConnection()) {
             $response = array();
 
-            $sql = $this->db_connection->prepare('CALL get_system_code_details(:system_type, :system_code)');
+            $sql = $this->db_connection->prepare('CALL get_system_code_details(:system_code_id, :system_type, :system_code)');
+            $sql->bindValue(':system_code_id', $system_code_id);
             $sql->bindValue(':system_type', $system_type);
             $sql->bindValue(':system_code', $system_code);
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
                     $response[] = array(
+                        'SYSTEM_CODE_ID' => $row['SYSTEM_CODE_ID'],
+                        'SYSTEM_TYPE' => $row['SYSTEM_TYPE'],
+                        'SYSTEM_CODE' => $row['SYSTEM_CODE'],
                         'SYSTEM_DESCRIPTION' => $row['SYSTEM_DESCRIPTION'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
@@ -2307,7 +3136,6 @@ class Api{
         }
     }
     # -------------------------------------------------------------
-
 
     # -------------------------------------------------------------
     #
@@ -2503,7 +3331,46 @@ class Api{
             if($sql->execute()){
                 while($row = $sql->fetch()){
                     $response[] = array(
-                        'FILE_TYPE' => $row['FILE_TYPE'],
+                        'FILE_TYPE' => $row['FILE_TYPE']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_company_details
+    # Purpose    : Gets the company details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_company_details($company_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_company_details(:company_id)');
+            $sql->bindValue(':company_id', $company_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'COMPANY_NAME' => $row['COMPANY_NAME'],
+                        'COMPANY_LOGO' => $row['COMPANY_LOGO'],
+                        'COMPANY_ADDRESS' => $row['COMPANY_ADDRESS'],
+                        'EMAIL' => $row['EMAIL'],
+                        'TELEPHONE' => $row['TELEPHONE'],
+                        'MOBILE' => $row['MOBILE'],
+                        'WEBSITE' => $row['WEBSITE'],
+                        'TAX_ID' => $row['TAX_ID'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );
                 }

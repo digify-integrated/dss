@@ -647,6 +647,307 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit system code
+    else if($transaction == 'submit system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_code_id']) && isset($_POST['system_type']) && !empty($_POST['system_type']) && isset($_POST['system_code']) && !empty($_POST['system_code']) && isset($_POST['system_description']) && !empty($_POST['system_description'])){
+            $response = array();
+            $username = $_POST['username'];
+            $system_code_id = $_POST['system_code_id'];
+            $system_type = $_POST['system_type'];
+            $system_code = $_POST['system_code'];
+            $system_description = $_POST['system_description'];
+
+            $check_system_code_exist = $api->check_system_code_exist($system_code_id);
+ 
+            if($check_system_code_exist > 0){
+                $update_system_code = $api->update_system_code($system_code_id, $system_type, $system_code, $system_description, $username);
+
+                if($update_system_code){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'SYSTEM_CODE_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_code,
+                        'SYSTEM_CODE_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_system_code = $api->insert_system_code($system_type, $system_code, $system_description, $username);
+    
+                if($insert_system_code[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'SYSTEM_CODE_ID' => $insert_system_code[0]['SYSTEM_CODE_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_system_code[0]['RESPONSE'],
+                        'SYSTEM_CODE_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit upload setting
+    else if($transaction == 'submit upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && isset($_POST['upload_setting']) && !empty($_POST['upload_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['max_file_size']) && !empty($_POST['max_file_size'])){
+            $response = array();
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $upload_setting = $_POST['upload_setting'];
+            $description = $_POST['description'];
+            $max_file_size = $_POST['max_file_size'];
+
+            $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+ 
+            if($check_upload_setting_exist > 0){
+                $update_upload_setting = $api->update_upload_setting($upload_setting_id, $upload_setting, $description, $max_file_size, $username);
+
+                if($update_upload_setting){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'UPLOAD_SETTING_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_upload_setting,
+                        'UPLOAD_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_upload_setting = $api->insert_upload_setting($upload_setting, $description, $max_file_size, $username);
+    
+                if($insert_upload_setting[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'UPLOAD_SETTING_ID' => $insert_upload_setting[0]['UPLOAD_SETTING_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_upload_setting[0]['RESPONSE'],
+                        'UPLOAD_SETTING_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit upload setting file type
+    else if($transaction == 'submit upload setting file type'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
+            $error = '';
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $file_types = explode(',', $_POST['file_type']);
+
+            foreach($file_types as $file_type){
+                $check_upload_setting_file_type_exist = $api->check_upload_setting_file_type_exist($upload_setting_id, $file_type);
+
+                if($check_upload_setting_file_type_exist == 0){
+                    $insert_upload_setting_file_type = $api->insert_upload_setting_file_type($upload_setting_id, $file_type, $username);
+
+                    if(!$insert_upload_setting_file_type){
+                        $error = $insert_upload_setting_file_type;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($error)){
+                echo 'Inserted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit company
+    else if($transaction == 'submit company'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id']) && isset($_POST['company_name']) && !empty($_POST['company_name']) && isset($_POST['company_address']) && isset($_POST['tax_id']) && isset($_POST['email']) && isset($_POST['mobile']) && isset($_POST['telephone']) && isset($_POST['website'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $company_id = $_POST['company_id'];
+            $company_name = $_POST['company_name'];
+            $company_address = $_POST['company_address'];
+            $tax_id = $_POST['tax_id'];
+            $email = $_POST['email'];
+            $mobile = $_POST['mobile'];
+            $telephone = $_POST['telephone'];
+            $website = $_POST['website'];
+
+            $company_logo_name = $_FILES['company_logo']['name'];
+            $company_logo_size = $_FILES['company_logo']['size'];
+            $company_logo_error = $_FILES['company_logo']['error'];
+            $company_logo_tmp_name = $_FILES['company_logo']['tmp_name'];
+            $company_logo_ext = explode('.', $company_logo_name);
+            $company_logo_actual_ext = strtolower(end($company_logo_ext));
+
+            $upload_setting_details = $api->get_upload_setting_details(2);
+            $upload_file_type_details = $api->get_upload_file_type_details(2);
+            $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+
+            for($i = 0; $i < count($upload_file_type_details); $i++) {
+                $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+
+                if($i != (count($upload_file_type_details) - 1)){
+                    $file_type .= ',';
+                }
+            }
+
+            $allowed_ext = explode(',', $file_type);
+
+            $check_company_exist = $api->check_company_exist($company_id);
+ 
+            if($check_company_exist > 0){
+                if(!empty($company_logo_tmp_name)){
+                    if(in_array($company_logo_actual_ext, $allowed_ext)){
+                        if(!$company_logo_error){
+                            if($company_logo_size < $file_max_size){
+                                $update_company_logo = $api->update_company_logo($company_logo_tmp_name, $company_logo_actual_ext, $company_id, $username);
+        
+                                if($update_company_logo){
+                                    $update_company = $api->update_company($company_id, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username);
+
+                                    if($update_company){
+                                        $response[] = array(
+                                            'RESPONSE' => 'Updated',
+                                            'COMPANY_ID' => null
+                                        );
+                                    }
+                                    else{
+                                        $response[] = array(
+                                            'RESPONSE' => $update_company,
+                                            'COMPANY_ID' => null
+                                        );
+                                    }
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $update_company_logo,
+                                        'COMPANY_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => 'File Size',
+                                    'COMPANY_ID' => null
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => 'There was an error uploading the file.',
+                                'COMPANY_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => 'File Type',
+                            'COMPANY_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $update_company = $api->update_company($company_id, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username);
+
+                    if($update_company){
+                        $response[] = array(
+                            'RESPONSE' => 'Updated',
+                            'COMPANY_ID' => null
+                        );
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_company,
+                            'COMPANY_ID' => null
+                        );
+                    }
+                }
+            }
+            else{
+                if(!empty($company_logo_tmp_name)){
+                    if(in_array($company_logo_actual_ext, $allowed_ext)){
+                        if(!$company_logo_error){
+                            if($company_logo_size < $file_max_size){
+                                $insert_company = $api->insert_company($company_logo_tmp_name, $company_logo_actual_ext, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username);
+    
+                                if($insert_company[0]['RESPONSE']){
+                                    $response[] = array(
+                                        'RESPONSE' => 'Inserted',
+                                        'COMPANY_ID' => $insert_company[0]['COMPANY_ID']
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $insert_company[0]['RESPONSE'],
+                                        'COMPANY_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => 'File Size',
+                                    'COMPANY_ID' => null
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => 'There was an error uploading the file.',
+                                'COMPANY_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => 'File Type',
+                            'COMPANY_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $insert_company = $api->insert_company(null, null, $company_name, $company_address, $email, $telephone, $mobile, $website, $tax_id, $username);
+    
+                    if($insert_company[0]['RESPONSE']){
+                        $response[] = array(
+                            'RESPONSE' => 'Inserted',
+                            'COMPANY_ID' => $insert_company[0]['COMPANY_ID']
+                        );
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $insert_company[0]['RESPONSE'],
+                            'COMPANY_ID' => null
+                        );
+                    }
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -1131,20 +1432,235 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $user_id = $_POST['user_id'];
             $role_id = $_POST['role_id'];
 
-            $check_role_user_account_exist = $api->check_role_user_account_exist($user_id, $role_id);
+            $check_role_user_account_exist = $api->check_role_user_account_exist($role_id, $user_id);
 
             if($check_role_user_account_exist > 0){
-                $delete_role_user_account_exist = $api->delete_role_user_account_exist($user_id, $role_id, $username);
+                $delete_role_user_account = $api->delete_role_user_account($role_id, $user_id, $username);
 
-                if($delete_role_user_account_exist){
+                if($delete_role_user_account){
                     echo 'Deleted';
                 }
                 else{
-                    echo $delete_role_user_account_exist;
+                    echo $delete_role_user_account;
                 }
             }
             else{
                 echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete system code
+    else if($transaction == 'delete system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
+            $username = $_POST['username'];
+            $system_code_id = $_POST['system_code_id'];
+
+            $check_system_code_exist = $api->check_system_code_exist($system_code_id);
+
+            if($check_system_code_exist > 0){
+                $delete_system_code = $api->delete_system_code($system_code_id, $username);
+                                    
+                if($delete_system_code){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_system_code;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple system code
+    else if($transaction == 'delete multiple system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
+            $username = $_POST['username'];
+            $system_code_ids = $_POST['system_code_id'];
+
+            foreach($system_code_ids as $system_code_id){
+                $check_system_code_exist = $api->check_system_code_exist($system_code_id);
+
+                if($check_system_code_exist > 0){
+                    $delete_system_code = $api->delete_system_code($system_code_id, $username);
+                                    
+                    if(!$delete_system_code){
+                        $error = $delete_system_code;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete upload setting
+    else if($transaction == 'delete upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+
+            $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+
+            if($check_upload_setting_exist > 0){
+                $delete_upload_setting = $api->delete_upload_setting($upload_setting_id, $username);
+                                    
+                if($delete_upload_setting){
+                    $delete_all_upload_setting_file_type = $api->delete_all_upload_setting_file_type($upload_setting_id, $username);
+                                    
+                    if($delete_all_upload_setting_file_type){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_upload_setting_file_type;
+                    }
+                }
+                else{
+                    echo $delete_upload_setting;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple upload setting
+    else if($transaction == 'delete multiple upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            $username = $_POST['username'];
+            $upload_setting_ids = $_POST['upload_setting_id'];
+
+            foreach($upload_setting_ids as $upload_setting_id){
+                $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+
+                if($check_upload_setting_exist > 0){
+                    $delete_upload_setting = $api->delete_upload_setting($upload_setting_id, $username);
+                                    
+                    if($delete_upload_setting){
+                        $delete_all_upload_setting_file_type = $api->delete_all_upload_setting_file_type($upload_setting_id, $username);
+                                    
+                        if(!$delete_all_upload_setting_file_type){
+                            $error = $delete_all_upload_setting_file_type;
+                            break;
+                        }
+                    }
+                    else{
+                        $error = $delete_upload_setting;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete upload setting file type
+    else if($transaction == 'delete upload setting file type'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $file_type = $_POST['file_type'];
+
+            $check_upload_setting_file_type_exist = $api->check_upload_setting_file_type_exist($upload_setting_id, $file_type);
+
+            if($check_upload_setting_file_type_exist > 0){
+                $delete_upload_setting_file_type = $api->delete_upload_setting_file_type($upload_setting_id, $file_type, $username);
+
+                if($delete_upload_setting_file_type){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_upload_setting_file_type;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete company
+    else if($transaction == 'delete company'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id']) && !empty($_POST['company_id'])){
+            $username = $_POST['username'];
+            $company_id = $_POST['company_id'];
+
+            $check_company_exist = $api->check_company_exist($company_id);
+
+            if($check_company_exist > 0){
+                $delete_company = $api->delete_company($company_id, $username);
+                                    
+                if($delete_company){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_company;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple company
+    else if($transaction == 'delete multiple company'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id']) && !empty($_POST['company_id'])){
+            $username = $_POST['username'];
+            $company_ids = $_POST['company_id'];
+
+            foreach($company_ids as $company_id){
+                $check_company_exist = $api->check_company_exist($company_id);
+
+                if($check_company_exist > 0){
+                    $delete_company = $api->delete_company($company_id, $username);
+                                    
+                    if(!$delete_company){
+                        $error = $delete_all_company_access;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
             }
         }
     }
@@ -1296,6 +1812,70 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'ROLE_DESCRIPTION' => $role_details[0]['ROLE_DESCRIPTION'],
                 'ASSIGNABLE' => $role_details[0]['ASSIGNABLE'],
                 'TRANSACTION_LOG_ID' => $role_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System code details
+    else if($transaction == 'system code details'){
+        if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
+            $system_code_id = $_POST['system_code_id'];
+            $system_code_details = $api->get_system_code_details($system_code_id, null, null);
+
+            $response[] = array(
+                'SYSTEM_TYPE' => $system_code_details[0]['SYSTEM_TYPE'],
+                'SYSTEM_CODE' => $system_code_details[0]['SYSTEM_CODE'],
+                'SYSTEM_DESCRIPTION' => $system_code_details[0]['SYSTEM_DESCRIPTION'],
+                'TRANSACTION_LOG_ID' => $system_code_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Upload setting details
+    else if($transaction == 'upload setting details'){
+        if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $upload_setting_details = $api->get_upload_setting_details($upload_setting_id);
+
+            $response[] = array(
+                'UPLOAD_SETTING' => $upload_setting_details[0]['UPLOAD_SETTING'],
+                'DESCRIPTION' => $upload_setting_details[0]['DESCRIPTION'],
+                'MAX_FILE_SIZE' => $upload_setting_details[0]['MAX_FILE_SIZE'],
+                'TRANSACTION_LOG_ID' => $upload_setting_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Company details
+    else if($transaction == 'company details'){
+        if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
+            $company_id = $_POST['company_id'];
+            $company_details = $api->get_company_details($company_id);
+            $company_logo_file_path = $company_details[0]['COMPANY_LOGO'] ?? null;
+
+            if(empty($company_logo_file_path)){
+                $company_logo_file_path = $api->check_image($company_logo_file_path, 'company logo');
+            }
+
+            $response[] = array(
+                'COMPANY_NAME' => $company_details[0]['COMPANY_NAME'],
+                'COMPANY_LOGO' => '<img class="img-thumbnail" alt="company logo" width="200" src="'. $company_logo_file_path .'" data-holder-rendered="true">',
+                'COMPANY_ADDRESS' => $company_details[0]['COMPANY_ADDRESS'],
+                'EMAIL' => $company_details[0]['EMAIL'],
+                'TELEPHONE' => $company_details[0]['TELEPHONE'],
+                'MOBILE' => $company_details[0]['MOBILE'],
+                'WEBSITE' => $company_details[0]['WEBSITE'],
+                'TAX_ID' => $company_details[0]['TAX_ID'],
+                'TRANSACTION_LOG_ID' => $company_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

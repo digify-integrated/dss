@@ -162,7 +162,7 @@
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
                                                                 <a class="nav-link active" data-bs-toggle="tab" href="#action-access" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-hand-point-up"></i></span>
                                                                     <span class="d-none d-sm-block">Action Access</span>    
                                                                 </a>
                                                             </li>

@@ -66,12 +66,19 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             if($form_type == 'module access form' || $form_type == 'page access form' || $form_type == 'action access form'){
                 $form .= '<div class="row">
                             <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-                                        <select class="form-control form-select2" multiple="multiple" id="role" name="role">
-                                            '. $api->generate_role_options() .'
-                                        </select>
-                                    </div>
+                                    <table id="role-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Role</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
                                 </div>
                         </div>';
             }
@@ -144,6 +151,25 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                                     </div>
                                                 </th>
                                                 <th class="all">User Account</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'upload setting file type form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="file-type-assignment" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">File Type</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -947,7 +973,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $module_description = $row['MODULE_DESCRIPTION'];
                         $module_category = $row['MODULE_CATEGORY'];
     
-                        $system_code_details = $api->get_system_code_details('MODULECAT', $module_category);
+                        $system_code_details = $api->get_system_code_details(null, 'MODULECAT', $module_category);
                         $module_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
     
                         $module_id_encrypted = $api->encrypt_data($module_id);
@@ -1464,6 +1490,99 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Module role assignment table
+    else if($type == 'module role assignment table'){
+        if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
+            if ($api->databaseConnection()) {
+                $module_id = $_POST['module_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM technical_module_access_rights WHERE MODULE_ID = :module_id)');
+                $sql->bindValue(':module_id', $module_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE' => $role
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Page role assignment table
+    else if($type == 'page role assignment table'){
+        if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
+            if ($api->databaseConnection()) {
+                $page_id = $_POST['page_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM technical_page_access_rights WHERE PAGE_ID = :page_id)');
+                $sql->bindValue(':page_id', $page_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE' => $role
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Action role assignment table
+    else if($type == 'action role assignment table'){
+        if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
+            if ($api->databaseConnection()) {
+                $action_id = $_POST['action_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM technical_action_access_rights WHERE ACTION_ID = :action_id)');
+                $sql->bindValue(':action_id', $action_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE' => $role
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
     # Role module access assignment table
     else if($type == 'role module access assignment table'){
         if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
@@ -1492,6 +1611,299 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
         }
         
+    }
+    # -------------------------------------------------------------
+
+    # Role page access assignment table
+    else if($type == 'role page access assignment table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT PAGE_ID, PAGE_NAME FROM technical_page WHERE PAGE_ID NOT IN (SELECT PAGE_ID FROM technical_page_access_rights WHERE ROLE_ID = :role_id)');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $page_id = $row['PAGE_ID'];
+                        $page_name = $row['PAGE_NAME'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $page_id .'">',
+                            'PAGE_NAME' => $page_name
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role action access assignment table
+    else if($type == 'role action access assignment table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ACTION_ID, ACTION_NAME FROM technical_action WHERE ACTION_ID NOT IN (SELECT ACTION_ID FROM technical_action_access_rights WHERE ROLE_ID = :role_id)');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $action_id = $row['ACTION_ID'];
+                        $action_name = $row['ACTION_NAME'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $action_id .'">',
+                            'ACTION_NAME' => $action_name
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Role user account assignment table
+    else if($type == 'role user account assignment table'){
+        if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
+            if ($api->databaseConnection()) {
+                $role_id = $_POST['role_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME, FILE_AS FROM global_user_account WHERE USERNAME NOT IN (SELECT USERNAME FROM global_role_user_account WHERE ROLE_ID = :role_id)');
+                $sql->bindValue(':role_id', $role_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+                        $file_as = $row['FILE_AS'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $username .'">',
+                            'FILE_AS' => $file_as . '<p class="text-muted mb-0">'. $username .'</p>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # System code table
+    else if($type == 'system codes table'){
+        if ($api->databaseConnection()) {
+
+            $sql = $api->db_connection->prepare('SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $system_code_id = $row['SYSTEM_CODE_ID'];
+                    $system_type = $row['SYSTEM_TYPE'];
+                    $system_code = $row['SYSTEM_CODE'];
+                    $system_decription = $row['SYSTEM_DESCRIPTION'];
+
+                    $system_code_id_encrypted = $api->encrypt_data($system_code_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $system_code_id .'">',
+                        'SYSTEM_CODE_ID' => $system_code_id,
+                        'SYSTEM_TYPE' => $system_type,
+                        'SYSTEM_CODE' => $system_code,
+                        'SYSTEM_DESCRIPTION' => $system_decription,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="system-code-form.php?id='. $system_code_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View System Code">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Upload settings table
+    else if($type == 'upload settings table'){
+        if ($api->databaseConnection()) {
+
+            $sql = $api->db_connection->prepare('SELECT UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE FROM global_upload_setting');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $file_type = '';
+                    $upload_setting_id = $row['UPLOAD_SETTING_ID'];
+                    $upload_setting = $row['UPLOAD_SETTING'];
+                    $description = $row['DESCRIPTION'];
+                    $max_file_size = $row['MAX_FILE_SIZE'];
+
+                    $upload_setting_id_encrypted = $api->encrypt_data($upload_setting_id);
+
+                    $upload_file_type_details = $api->get_upload_file_type_details($upload_setting_id);
+
+                    for($i = 0; $i < count($upload_file_type_details); $i++) {
+                        $system_code_details = $api->get_system_code_details(null, 'FILETYPE', $upload_file_type_details[$i]['FILE_TYPE']);
+
+                        $file_type .= '<span class="badge bg-info font-size-11">'. $system_code_details[0]['SYSTEM_DESCRIPTION'] .'</span> ';
+
+                        if(($i + 1) % 4 == 0){
+                            $file_type .= '<br/>';
+                        }
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $upload_setting_id .'">',
+                        'UPLOAD_SETTING_ID' => $upload_setting_id,
+                        'UPLOAD_SETTING' => $upload_setting . '<p class="text-muted mb-0">'. $description .'</p>',
+                        'MAX_FILE_SIZE' => $max_file_size . ' mb',
+                        'FILE_TYPE' => $file_type,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="upload-setting-form.php?id='. $upload_setting_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Upload Setting">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Upload setting file type table
+    else if($type == 'upload setting file type table'){
+        if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            if ($api->databaseConnection()) {
+                $upload_setting_id = $_POST['upload_setting_id'];
+
+                $update_upload_setting = $api->check_role_access_rights($username, '32', 'action');
+                $delete_upload_setting_file_type = $api->check_role_access_rights($username, '38', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT FILE_TYPE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = :upload_setting_id');
+                $sql->bindValue(':upload_setting_id', $upload_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $file_type = $row['FILE_TYPE'];
+
+                        $system_code_details = $api->get_system_code_details(null, 'FILETYPE', $file_type);
+                        $file_type_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                        if($delete_upload_setting_file_type > 0 && $update_upload_setting > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-upload-setting-file-type" data-upload-setting-id="'. $upload_setting_id .'" data-file-type="'. $file_type
+                            .'" title="Delete Upload Setting File Type">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'FILE_TYPE' => $file_type_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # File type assignment table
+    else if($type == 'file type assignment table'){
+        if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            if ($api->databaseConnection()) {
+                $upload_setting_id = $_POST['upload_setting_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = :system_type AND SYSTEM_CODE NOT IN (SELECT FILE_TYPE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = :upload_setting_id)');
+                $sql->bindValue(':system_type', 'FILETYPE');
+                $sql->bindValue(':upload_setting_id', $upload_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $system_code = $row['SYSTEM_CODE'];
+                        $system_description = $row['SYSTEM_DESCRIPTION'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $system_code .'">',
+                            'SYSTEM_DESCRIPTION' => $system_description
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Company table
+    else if($type == 'company table'){
+        if ($api->databaseConnection()) {
+
+            $sql = $api->db_connection->prepare('SELECT COMPANY_ID, COMPANY_NAME FROM global_company');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $company_id = $row['COMPANY_ID'];
+                    $company_name = $row['COMPANY_NAME'];
+                    $company_id_encrypted = $api->encrypt_data($company_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $company_id .'">',
+                        'COMPANY_ID' => $company_id,
+                        'COMPANY_NAME' => $company_name,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="company-form.php?id='. $company_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Company">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
     }
     # -------------------------------------------------------------
 

@@ -15,6 +15,11 @@ function initialize_global_functions(){
         check_table_check_box();
         check_table_multiple_button();
     });
+
+    $(document).on('click','#form-datatable-checkbox',function() {
+        var status = $(this).is(':checked') ? true : false;
+        $('.datatable-checkbox-children').prop('checked',status);
+    });
     
     $(document).on('click','.datatable-checkbox-children',function() {
         check_table_check_box();
@@ -191,8 +196,14 @@ function initialize_form_validation(form_type){
         $('#module-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit module access';
-                var role = $('#role').val();
+                var role = [];
                 var module_id = $('#module_id').val();
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        role.push(this.value);  
+                    }
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -256,8 +267,14 @@ function initialize_form_validation(form_type){
         $('#page-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit page access';
-                var role = $('#role').val();
+                var role = [];
                 var page_id = $('#page_id').val();
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        role.push(this.value);  
+                    }
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -321,8 +338,14 @@ function initialize_form_validation(form_type){
         $('#action-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit action access';
-                var role = $('#role').val();
+                var role = [];
                 var action_id = $('#action_id').val();
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        role.push(this.value);  
+                    }
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -359,6 +382,311 @@ function initialize_form_validation(form_type){
                 role: {
                     required: 'Please choose at least one (1) role',
                 }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'role module access form'){
+        $('#role-module-access-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit role module access';
+                var role_id = $('#role-id').text();
+                var module_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        module_id.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&module_id=' + module_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Module Access Success', 'The module access has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#module-access-datatable');
+                        }
+                        else{
+                            show_alert('Module Access Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'role page access form'){
+        $('#role-page-access-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit role page access';
+                var role_id = $('#role-id').text();
+                var page_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        page_id.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&page_id=' + page_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Page Access Success', 'The page access has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#page-access-datatable');
+                        }
+                        else{
+                            show_alert('Page Access Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'role action access form'){
+        $('#role-action-access-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit role action access';
+                var role_id = $('#role-id').text();
+                var action_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        action_id.push(this.value);  
+                    }
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&action_id=' + action_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Action Access Success', 'The action access has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#action-access-datatable');
+                        }
+                        else{
+                            show_alert('Page Action Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'role user account form'){
+        $('#role-user-account-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit role user account';
+                var role_id = $('#role-id').text();
+                var user_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        user_id.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&user_id=' + user_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Role User Account Success', 'The user account has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#user-account-assignment');
+                        }
+                        else{
+                            show_alert('Role User Account Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'upload setting file type form'){
+        $('#upload-setting-file-type-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit upload setting file type';
+                var upload_setting_id = $('#upload-setting-id').text();
+                var file_type = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        file_type.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&upload_setting_id=' + upload_setting_id + '&file_type=' + file_type,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Upload Setting File Type Success', 'The file type has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#upload-setting-file-type-datable');
+                        }
+                        else{
+                            show_alert('Upload Setting File Type Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -1859,9 +2187,34 @@ function generate_form(form_type, form_id, add, username){
                 display_form_details(form_type);
             }
             else{
-                if(form_type == 'role module access form'){
+                if(form_type == 'module access form' || form_type == 'page access form' || form_type == 'action access form'){
+                    if($('#role-assignment-datatable').length){
+                        initialize_role_assignment_table('#role-assignment-datatable');
+                    }
+                }
+                else if(form_type == 'role module access form'){
                     if($('#module-access-assignment-datatable').length){
                         initialize_role_module_access_assignment_table('#module-access-assignment-datatable');
+                    }
+                }
+                else if(form_type == 'role page access form'){
+                    if($('#page-access-assignment').length){
+                        initialize_role_page_access_assignment_table('#page-access-assignment');
+                    }
+                }
+                else if(form_type == 'role action access form'){
+                    if($('#action-access-assignment').length){
+                        initialize_role_action_access_assignment_table('#action-access-assignment');
+                    }
+                }
+                else if(form_type == 'role user account form'){
+                    if($('#user-account-assignment').length){
+                        initialize_role_user_account_assignment_table('#user-account-assignment');
+                    }
+                }
+                else if(form_type == 'upload setting file type form'){
+                    if($('#file-type-assignment').length){
+                        initialize_upload_file_type_assignment_table('#file-type-assignment');
                     }
                 }
             }
