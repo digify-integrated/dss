@@ -823,7 +823,7 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : check_company_exist
-    # Purpose    : Checks if the upload setting exists.
+    # Purpose    : Checks if the company exists.
     #
     # Returns    : Number
     #
@@ -832,6 +832,31 @@ class Api{
         if ($this->databaseConnection()) {
             $sql = $this->db_connection->prepare('CALL check_company_exist(:company_id)');
             $sql->bindValue(':company_id', $company_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_interface_setting_exist
+    # Purpose    : Checks if the interface setting exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_interface_setting_exist($interface_setting_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_interface_setting_exist(:interface_setting_id)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
 
             if($sql->execute()){
                 $row = $sql->fetch();
@@ -1642,6 +1667,400 @@ class Api{
                         }
                         else{
                             return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_interface_setting
+    # Purpose    : Updates interface setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_interface_setting($interface_setting_id, $interface_setting_name, $description, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $interface_setting_details = $this->get_interface_setting_details($interface_setting_id);
+            
+            if(!empty($interface_setting_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $interface_setting_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_interface_setting(:interface_setting_id, :interface_setting_name, :description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+            $sql->bindValue(':interface_setting_name', $interface_setting_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($interface_setting_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated interface setting.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated interface setting.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_interface_setting_status
+    # Purpose    : Updates interface setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_interface_setting_status($interface_setting_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $interface_setting_details = $this->get_interface_setting_details($interface_setting_id);
+            $transaction_log_id = $interface_setting_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Activate';
+            }
+            else{
+                $log_status = 'Deactivate';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_interface_setting_status(:interface_setting_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated interface setting status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_other_interface_setting_status
+    # Purpose    : Updates the other interface settings to deactivated.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_other_interface_setting_status($interface_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $interface_setting_details = $this->get_interface_setting_details($interface_setting_id);
+            $transaction_log_id = $interface_setting_details[0]['TRANSACTION_LOG_ID'];
+
+            $sql = $this->db_connection->prepare('CALL update_other_interface_setting_status(:interface_setting_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Deactivate', 'User ' . $username . ' updated interface setting status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+     # -------------------------------------------------------------
+    #
+    # Name       : update_interface_settings_upload
+    # Purpose    : Checks the interface setting upload.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function update_interface_settings_upload($file, $request, $interface_setting_id, $username){
+        $file_type = '';
+        $file_name = $file['name'];
+        $file_size = $file['size'];
+        $file_error = $file['error'];
+        $file_tmp_name = $file['tmp_name'];
+        $file_ext = explode('.', $file_name);
+        $file_actual_ext = strtolower(end($file_ext));
+
+        if(!empty($file_name)){
+            switch ($request) {
+                case 'login background':
+                    $file_size_error = 'The file uploaded for login background exceeds the maximum file size.';
+                    $file_type_error = 'The file uploaded for login background is not supported.';
+                    $upload_setting_id = 3;
+                    break;
+                case 'login logo':
+                    $file_size_error = 'The file uploaded for login logo exceeds the maximum file size.';
+                    $file_type_error = 'The file uploaded for login logo is not supported.';
+                    $upload_setting_id = 4;
+                    break;
+                case 'menu logo':
+                    $file_size_error = 'The file uploaded for menu logo exceeds the maximum file size.';
+                    $file_type_error = 'The file uploaded for menu logo is not supported.';
+                    $upload_setting_id = 5;
+                    break;
+                default:
+                    $file_size_error = 'The file uploaded for favicon exceeds the maximum file size.';
+                    $file_type_error = 'The file uploaded for favicon is not supported.';
+                    $upload_setting_id = 6;
+            }
+
+            $upload_setting_details = $this->get_upload_setting_details($upload_setting_id);
+            $upload_file_type_details = $this->get_upload_file_type_details($upload_setting_id);
+            $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+
+            for($i = 0; $i < count($upload_file_type_details); $i++) {
+                $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+
+                if($i != (count($upload_file_type_details) - 1)){
+                    $file_type .= ',';
+                }
+            }
+
+            $allowed_ext = explode(',', $file_type);
+
+            if(in_array($file_actual_ext, $allowed_ext)){
+                if(!$file_error){
+                    if($file_size < $file_max_size){
+                        $update_interface_settings_images = $this->update_interface_settings_images($file_tmp_name, $file_actual_ext, $request, $interface_setting_id, $username);
+
+                        if($update_interface_settings_images){
+                            return true;
+                        }
+                        else{
+                            return $update_interface_settings_images;
+                        }
+                    }
+                    else{
+                        return $file_size_error;
+                    }
+                }
+                else{
+                    return 'There was an error uploading the file.';
+                }
+            }
+            else {
+                return $file_type_error;
+            }
+        }
+        else{
+            return true;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    # Name       : update_interface_settings_images
+    # Purpose    : Updates interface setting images
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function update_interface_settings_images($file_tmp_name, $file_actual_ext, $request_type, $interface_setting_id, $username){
+        if ($this->databaseConnection()) {
+            if(!empty($file_tmp_name)){
+                $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+                $interface_setting_details = $this->get_interface_setting_details($interface_setting_id);
+
+                if(!empty($interface_setting_details[0]['TRANSACTION_LOG_ID'])){
+                    $transaction_log_id = $interface_setting_details[0]['TRANSACTION_LOG_ID'];
+                }
+                else{
+                    # Get transaction log id
+                    $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                    $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                    $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+                }
+
+                switch ($request_type) {
+                    case 'login background':
+                        $file_new = 'login-bg.' . $file_actual_ext;
+                        $image = $interface_setting_details[0]['LOGIN_BACKGROUND'] ?? null;
+                        $log = 'User ' . $username . ' updated login background.';
+                        break;
+                    case 'login logo':
+                        $file_new = 'login-logo.' . $file_actual_ext;
+                        $image = $interface_setting_details[0]['LOGIN_LOGO'] ?? null;
+                        $log = 'User ' . $username . ' updated login logo.';
+                        break;
+                    case 'menu logo':
+                        $file_new = 'menu-logo.' . $file_actual_ext;
+                        $image = $interface_setting_details[0]['MENU_LOGO'] ?? null;
+                        $log = 'User ' . $username . ' updated menu logo.';
+                        break;
+                    default:
+                        $file_new = 'favicon.' . $file_actual_ext;
+                        $image = $interface_setting_details[0]['FAVICON'] ?? null;
+                        $log = 'User ' . $username . ' updated favicon.';
+                }
+
+                $directory = './assets/images/interface_setting/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/interface_setting/' . $file_new;
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    if(file_exists($image)){
+                        if (unlink($image)) {
+                            if(move_uploaded_file($file_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_interface_settings_images(:interface_setting_id, :file_path, :transaction_log_id, :record_log, :request_type)');
+                                $sql->bindValue(':interface_setting_id', $interface_setting_id);
+                                $sql->bindValue(':file_path', $file_path);
+                                $sql->bindValue(':transaction_log_id', $transaction_log_id);
+                                $sql->bindValue(':record_log', $record_log);
+                                $sql->bindValue(':request_type', $request_type);
+                            
+                                if($sql->execute()){
+                                    if(!empty($interface_setting_details[0]['TRANSACTION_LOG_ID'])){
+                                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', $log);
+                                    
+                                        if($insert_transaction_log){
+                                            return true;
+                                        }
+                                        else{
+                                            return $insert_transaction_log;
+                                        }
+                                    }
+                                    else{
+                                        # Update transaction log value
+                                        $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+                    
+                                        if($update_system_parameter_value){
+                                            $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', $log);
+                                    
+                                            if($insert_transaction_log){
+                                                return true;
+                                            }
+                                            else{
+                                                return $insert_transaction_log;
+                                            }
+                                        }
+                                        else{
+                                            return $update_system_parameter_value;
+                                        }
+                                    }
+                                }
+                                else{
+                                    return $sql->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your image.';
+                            }
+                        }
+                        else {
+                            return $profile_image . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($file_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_interface_settings_images(:interface_setting_id, :file_path, :transaction_log_id, :record_log, :request_type)');
+                            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+                            $sql->bindValue(':file_path', $file_path);
+                            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+                            $sql->bindValue(':record_log', $record_log);
+                            $sql->bindValue(':request_type', $request_type);
+                        
+                            if($sql->execute()){
+                                if(!empty($interface_setting_details[0]['TRANSACTION_LOG_ID'])){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', $log);
+                                
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    # Update transaction log value
+                                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+                
+                                    if($update_system_parameter_value){
+                                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', $log);
+                                
+                                        if($insert_transaction_log){
+                                            return true;
+                                        }
+                                        else{
+                                            return $insert_transaction_log;
+                                        }
+                                    }
+                                    else{
+                                        return $update_system_parameter_value;
+                                    }
+                                }
+                            }
+                            else{
+                                return $sql->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your image.';
                         }
                     }
                 }
@@ -2495,6 +2914,126 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_interface_setting
+    # Purpose    : Insert interface setting.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_interface_setting($login_background, $login_logo, $menu_logo, $favicon, $interface_setting_name, $description, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(10, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_interface_setting(:id, :interface_setting_name, :description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':interface_setting_name', $interface_setting_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 10, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted interface setting.');
+                                    
+                        if($insert_transaction_log){
+                            $login_background = $this->update_interface_settings_upload($login_background, 'login background', $id, $username);
+
+                            if($login_background){
+                                $login_logo = $this->update_interface_settings_upload($login_logo, 'login logo', $id, $username);
+        
+                                if($login_logo){
+                                    $menu_logo = $this->update_interface_settings_upload($menu_logo, 'menu logo', $id, $username);
+        
+                                    if($menu_logo){
+                                        $favicon = $this->update_interface_settings_upload($favicon, 'favicon', $id, $username);
+        
+                                        if($favicon){
+                                            $response[] = array(
+                                                'RESPONSE' => true,
+                                                'INTERFACE_SETTING_ID' => $this->encrypt_data($id)
+                                            );
+                                        }
+                                        else{
+                                            $response[] = array(
+                                                'RESPONSE' => $favicon,
+                                                'INTERFACE_SETTING_ID' => null
+                                            );
+                                        }
+                                    }
+                                    else{
+                                        $response[] = array(
+                                            'RESPONSE' => $menu_logo,
+                                            'INTERFACE_SETTING_ID' => null
+                                        );
+                                    }
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $login_logo,
+                                        'INTERFACE_SETTING_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $login_background,
+                                    'INTERFACE_SETTING_ID' => null
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'INTERFACE_SETTING_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'INTERFACE_SETTING_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'INTERFACE_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'INTERFACE_SETTING_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -2531,13 +3070,13 @@ class Api{
     # -------------------------------------------------------------
     public function delete_module($module_id, $username){
         if ($this->databaseConnection()) {
+            $module_details = $this->get_module_details($module_id);
+            $module_icon = $module_details[0]['MODULE_ICON'] ?? null;
+
             $sql = $this->db_connection->prepare('CALL delete_module(:module_id)');
             $sql->bindValue(':module_id', $module_id);
         
             if($sql->execute()){ 
-                $module_details = $this->get_module_details($module_id);
-                $module_icon = $module_details[0]['MODULE_ICON'] ?? null;
-
                 if(!empty($module_icon)){
                     if(file_exists($module_icon)){
                         if (unlink($module_icon)) {
@@ -2991,13 +3530,13 @@ class Api{
     # -------------------------------------------------------------
     public function delete_company($company_id, $username){
         if ($this->databaseConnection()) {
+            $company_details = $this->get_company_details($company_id);
+            $company_logo = $company_details[0]['COMPANY_LOGO'] ?? null;
+
             $sql = $this->db_connection->prepare('CALL delete_company(:company_id)');
             $sql->bindValue(':company_id', $company_id);
         
             if($sql->execute()){ 
-                $company_details = $this->get_company_details($company_id);
-                $company_logo = $company_details[0]['COMPANY_LOGO'] ?? null;
-
                 if(!empty($company_logo)){
                     if(file_exists($company_logo)){
                         if (unlink($company_logo)) {
@@ -3013,6 +3552,73 @@ class Api{
                 }
                 else{
                     return true;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_interface_setting
+    # Purpose    : Delete interface setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_interface_setting($interface_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $error = '';
+            $interface_setting_details = $this->get_interface_setting_details($interface_setting_id);
+            $login_background = $interface_setting_details[0]['LOGIN_BACKGROUND'] ?? null;
+            $login_logo = $interface_setting_details[0]['LOGIN_LOGO'] ?? null;
+            $menu_logo = $interface_setting_details[0]['MENU_LOGO'] ?? null;
+            $favicon = $interface_setting_details[0]['FAVICON'] ?? null;
+
+            $sql = $this->db_connection->prepare('CALL delete_interface_setting(:interface_setting_id)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+        
+            if($sql->execute()){ 
+                if(!empty($login_background)){
+                    if(file_exists($login_background)){
+                        if (!unlink($login_background)) {
+                            $error = $login_background . ' cannot be deleted due to an error.';
+                        }
+                    }
+                }
+
+                if(!empty($login_logo)){
+                    if(file_exists($login_logo)){
+                        if (!unlink($login_logo)) {
+                            $error = $login_logo . ' cannot be deleted due to an error.';
+                        }
+                    }
+                }
+
+                if(!empty($menu_logo)){
+                    if(file_exists($menu_logo)){
+                        if (!unlink($menu_logo)) {
+                            $error = $menu_logo . ' cannot be deleted due to an error.';
+                        }
+                    }
+                }
+
+                if(!empty($favicon)){
+                    if(file_exists($favicon)){
+                        if (!unlink($favicon)) {
+                            $error = $favicon . ' cannot be deleted due to an error.';
+                        }
+                    }
+                }
+
+                if(empty($error)){
+                    return true;
+                }
+                else{
+                    return $error;
                 }
             }
             else{
@@ -3385,6 +3991,84 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_interface_setting_details
+    # Purpose    : Gets the interface setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_interface_setting_details($interface_setting_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_interface_setting_details(:interface_setting_id)');
+            $sql->bindValue(':interface_setting_id', $interface_setting_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'INTERFACE_SETTING_NAME' => $row['INTERFACE_SETTING_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'STATUS' => $row['STATUS'],
+                        'LOGIN_BACKGROUND' => $row['LOGIN_BACKGROUND'],
+                        'LOGIN_LOGO' => $row['LOGIN_LOGO'],
+                        'MENU_LOGO' => $row['MENU_LOGO'],
+                        'FAVICON' => $row['FAVICON'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_activated_interface_setting_details
+    # Purpose    : Gets the activated interface setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_activated_interface_setting_details(){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_activated_interface_setting_details()');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'INTERFACE_SETTING_ID' => $row['INTERFACE_SETTING_ID'],
+                        'INTERFACE_SETTING_NAME' => $row['INTERFACE_SETTING_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'STATUS' => $row['STATUS'],
+                        'LOGIN_BACKGROUND' => $row['LOGIN_BACKGROUND'],
+                        'LOGIN_LOGO' => $row['LOGIN_LOGO'],
+                        'MENU_LOGO' => $row['MENU_LOGO'],
+                        'FAVICON' => $row['FAVICON'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -3466,6 +4150,36 @@ class Api{
                 break;
             default:
                 $status = 'False';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_interface_setting_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_interface_setting_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Active';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Deactivated';
                 $button_class = 'bg-danger';
         }
 
@@ -3650,9 +4364,6 @@ class Api{
                 break;
                 case 'menu logo':
                     return './assets/images/default/default-menu-logo.png';
-                break;
-                case 'menu icon':
-                    return './assets/images/default/default-menu-icon.png';
                 break;
                 case 'favicon':
                     return './assets/images/default/default-favicon.png';
