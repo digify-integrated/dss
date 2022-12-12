@@ -948,6 +948,96 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit interface setting
+    else if($transaction == 'submit interface setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['interface_setting_id']) && isset($_POST['interface_setting_name']) && !empty($_POST['interface_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) ){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $interface_setting_id = $_POST['interface_setting_id'];
+            $interface_setting_name = $_POST['interface_setting_name'];
+            $description = $_POST['description'];
+
+            $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
+ 
+            if($check_interface_setting_exist > 0){
+                $update_interface_setting = $api->update_interface_setting($interface_setting_id, $interface_setting_name, $description, $username);
+
+                if($update_interface_setting){
+                    $login_background = $api->update_interface_settings_upload($_FILES['login_background'], 'login background', $interface_setting_id, $username);
+
+                    if($login_background){
+                        $login_logo = $api->update_interface_settings_upload($_FILES['login_logo'], 'login logo', $interface_setting_id, $username);
+
+                        if($login_logo){
+                            $menu_logo = $api->update_interface_settings_upload($_FILES['menu_logo'], 'menu logo', $interface_setting_id, $username);
+
+                            if($menu_logo){
+                                $favicon = $api->update_interface_settings_upload($_FILES['favicon'], 'favicon', $interface_setting_id, $username);
+
+                                if($menu_logo){
+                                    $response[] = array(
+                                        'RESPONSE' => 'Updated',
+                                        'INTERFACE_SETTING_ID' => null
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $favicon,
+                                        'INTERFACE_SETTING_ID' => null
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $menu_logo,
+                                    'INTERFACE_SETTING_ID' => null
+                                );
+                            }
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $login_logo,
+                                'INTERFACE_SETTING_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $login_background,
+                            'INTERFACE_SETTING_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_interface_setting,
+                        'INTERFACE_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_interface_setting = $api->insert_interface_setting($_FILES['login_background'], $_FILES['login_logo'], $_FILES['menu_logo'], $_FILES['favicon'], $interface_setting_name, $description, $username);
+    
+                if($insert_interface_setting[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'INTERFACE_SETTING_ID' => $insert_interface_setting[0]['INTERFACE_SETTING_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_interface_setting[0]['RESPONSE'],
+                        'INTERFACE_SETTING_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -1646,7 +1736,65 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     $delete_company = $api->delete_company($company_id, $username);
                                     
                     if(!$delete_company){
-                        $error = $delete_all_company_access;
+                        $error = $delete_company;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete interface setting
+    else if($transaction == 'delete interface setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
+            $username = $_POST['username'];
+            $interface_setting_id = $_POST['interface_setting_id'];
+
+            $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
+
+            if($check_interface_setting_exist > 0){
+                $delete_interface_setting = $api->delete_interface_setting($interface_setting_id, $username);
+                                    
+                if($delete_interface_setting){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_interface_setting;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple interface setting
+    else if($transaction == 'delete multiple interface setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
+            $username = $_POST['username'];
+            $interface_setting_ids = $_POST['interface_setting_id'];
+
+            foreach($interface_setting_ids as $interface_setting_id){
+                $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
+
+                if($check_interface_setting_exist > 0){
+                    $delete_interface_setting = $api->delete_interface_setting($interface_setting_id, $username);
+                                    
+                    if(!$delete_interface_setting){
+                        $error = $delete_interface_setting;
                         break;
                     }
                 }
@@ -1677,9 +1825,66 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     # -------------------------------------------------------------
     #   Activate transactions
     # -------------------------------------------------------------
+
+    # Activate interface setting
+    else if($transaction == 'activate interface setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
+            $username = $_POST['username'];
+            $interface_setting_id = $_POST['interface_setting_id'];
+
+            $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
+
+            if($check_interface_setting_exist > 0){
+                $update_interface_setting_status = $api->update_interface_setting_status($interface_setting_id, 1, $username);
+                                    
+                if($update_interface_setting_status){
+                    $update_other_interface_setting_status = $api->update_other_interface_setting_status($interface_setting_id, $username);
+                                    
+                    if($update_interface_setting_status){
+                        echo 'Activated';
+                    }
+                    else{
+                        echo $update_interface_setting_status;
+                    }
+                }
+                else{
+                    echo $update_interface_setting_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
      
     # -------------------------------------------------------------
     #   Deactivate transactions
+    # -------------------------------------------------------------
+
+    # Deactivate interface setting
+    else if($transaction == 'deactivate interface setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
+            $username = $_POST['username'];
+            $interface_setting_id = $_POST['interface_setting_id'];
+
+            $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
+
+            if($check_interface_setting_exist > 0){
+                $update_interface_setting_status = $api->update_interface_setting_status($interface_setting_id, 2, $username);
+                                    
+                if($update_interface_setting_status){
+                    echo 'Deactivated';
+                }
+                else{
+                    echo $update_interface_setting_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
@@ -1876,6 +2081,47 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'WEBSITE' => $company_details[0]['WEBSITE'],
                 'TAX_ID' => $company_details[0]['TAX_ID'],
                 'TRANSACTION_LOG_ID' => $company_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Interface setting details
+    else if($transaction == 'interface setting details'){
+        if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
+            $interface_setting_id = $_POST['interface_setting_id'];
+            $interface_setting_details = $api->get_interface_setting_details($interface_setting_id);
+            $login_background_file_path = $interface_setting_details[0]['LOGIN_BACKGROUND'] ?? null;
+            $login_logo_file_path = $interface_setting_details[0]['LOGIN_LOGO'] ?? null;
+            $menu_logo_file_path = $interface_setting_details[0]['MENU_LOGO'] ?? null;
+            $favicon_file_path = $interface_setting_details[0]['FAVICON'] ?? null;
+
+            if(empty($login_background_file_path)){
+                $login_background_file_path = $api->check_image($login_background_file_path, 'login background');
+            }
+
+            if(empty($login_logo_file_path)){
+                $login_logo_file_path = $api->check_image($login_logo_file_path, 'login logo');
+            }
+
+            if(empty($menu_logo_file_path)){
+                $menu_logo_file_path = $api->check_image($menu_logo_file_path, 'menu logo');
+            }
+
+            if(empty($favicon_file_path)){
+                $favicon_file_path = $api->check_image($favicon_file_path, 'favicon');
+            }
+
+            $response[] = array(
+                'INTERFACE_SETTING_NAME' => $interface_setting_details[0]['INTERFACE_SETTING_NAME'],
+                'DESCRIPTION' => $interface_setting_details[0]['DESCRIPTION'],
+                'TRANSACTION_LOG_ID' => $interface_setting_details[0]['TRANSACTION_LOG_ID'],
+                'LOGIN_BACKGROUND' => '<img class="img-thumbnail" alt="login background" width="200" src="'. $login_background_file_path .'" data-holder-rendered="true">',
+                'LOGIN_LOGO' => '<img class="img-thumbnail" alt="login logo" width="200" src="'. $login_logo_file_path .'" data-holder-rendered="true">',
+                'MENU_LOGO' => '<img class="img-thumbnail" alt="menu logo" width="200" src="'. $menu_logo_file_path .'" data-holder-rendered="true">',
+                'FAVICON' => '<img class="img-thumbnail" alt="favicon" width="200" src="'. $favicon_file_path .'" data-holder-rendered="true">',
             );
 
             echo json_encode($response);

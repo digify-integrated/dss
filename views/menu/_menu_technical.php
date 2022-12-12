@@ -9,11 +9,12 @@
     $upload_settings_page = $api->check_role_access_rights($username, '11', 'page');
     $system_codes_page = $api->check_role_access_rights($username, '13', 'page');
     $company_page = $api->check_role_access_rights($username, '15', 'page');
+    $interface_settings_page = $api->check_role_access_rights($username, '17', 'page');
 
-    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0){
+    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0 || $system_interface_page > 0 || $interface_settings_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-settings" role="button">
-                        <i class="bx bx-cog me-2"></i><span key="t-settings">Configurations</span> <div class="arrow-down"></div>
+                        </i><span key="t-settings">Configurations</span> <div class="arrow-down"></div>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="topnav-settings">';
 
@@ -37,6 +38,10 @@
             $menu .= '<a href="system-codes.php" class="dropdown-item" key="t-actions">System Codes</a>';
         }
 
+        if($interface_settings_page > 0){
+            $menu .= '<a href="interface-settings.php" class="dropdown-item" key="t-actions">Interface Settings</a>';
+        }
+
         if($upload_settings_page > 0){
             $menu .= '<a href="upload-settings.php" class="dropdown-item" key="t-actions">Upload Settings</a>';
         }
@@ -45,12 +50,12 @@
         </li>';
     }
 
-    if($company_page > 0){
-        $menu .= '<li class="nav-item dropdown"><a href="company.php" class="nav-link">Company</a></li>';
-    }
-
     if($roles_page > 0){
         $menu .= '<li class="nav-item dropdown"><a href="roles.php" class="nav-link">Roles</a></li>';
+    }
+
+    if($company_page > 0){
+        $menu .= '<li class="nav-item dropdown"><a href="company.php" class="nav-link">Company</a></li>';
     }
 ?>
 

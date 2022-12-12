@@ -2,28 +2,26 @@
     'use strict';
 
     $(function() {
-        if($('#company-id').length){
-            var transaction = 'company details';
-            var company_id = $('#company-id').text();
+        if($('#interface-setting-id').length){
+            var transaction = 'interface setting details';
+            var interface_setting_id = $('#interface-setting-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {company_id : company_id, transaction : transaction},
+                data: {interface_setting_id : interface_setting_id, transaction : transaction},
                 success: function(response) {
-                    $('#company_name').val(response[0].COMPANY_NAME);
+                    $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#company_address').val(response[0].COMPANY_ADDRESS);
-                    $('#tax_id').val(response[0].TAX_ID);
-                    $('#email').val(response[0].EMAIL);
-                    $('#mobile').val(response[0].MOBILE);
-                    $('#telephone').val(response[0].TELEPHONE);
-                    $('#website').val(response[0].WEBSITE);
+                    $('#description').val(response[0].DESCRIPTION);
                     
-                    document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
+                    document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
+                    document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
+                    document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
+                    document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
 
-                    $('#company_id').val(company_id);
+                    $('#interface_setting_id').val(interface_setting_id);
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
@@ -33,9 +31,9 @@
             });
         }
 
-        $('#company-form').validate({
+        $('#interface-setting-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit company';
+                var transaction = 'submit interface setting';
                 var username = $('#username').text();
 
                 var formData = new FormData(form);
@@ -56,16 +54,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['COMPANY_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
 
-                                show_alert_event('Insert Company Success', 'The company has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Interface Setting Success', 'The interface setting has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Company Success', 'The company has been updated.', 'success', 'reload');
+                                show_alert_event('Update Interface Setting Success', 'The interface setting has been updated.', 'success', 'reload');
                             }
                         }
                         else{
-                            show_alert('Company Error', response, 'error');
+                            show_alert('Interface Setting Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -76,13 +74,19 @@
                 return false;
             },
             rules: {
-                company_name: {
+                interface_setting_name: {
                     required: true
-                }
+                },
+                description: {
+                    required: true
+                },
             },
             messages: {
-                company_name: {
-                    required: 'Please enter the company name',
+                interface_setting_name: {
+                    required: 'Please enter the interface setting name',
+                },
+                description: {
+                    required: 'Please enter the description',
                 }
             },
             errorPlacement: function(label, element) {
@@ -205,13 +209,91 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#delete-company',function() {
-        var company_id = $(this).data('company-id');
-        var transaction = 'delete company';
+    $(document).on('click','#activate-interface-setting',function() {
+        var interface_setting_id = $(this).data('interface-setting-id');
+        var transaction = 'activate interface setting';
 
         Swal.fire({
-            title: 'Delete Company',
-            text: 'Are you sure you want to delete this company?',
+            title: 'Activate Interface Setting',
+            text: 'Are you sure you want to activate this interface setting?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Activate',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-success mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Activated' || response === 'Not Found'){
+                            if(response === 'Activated'){
+                                show_alert_event('Activate Interface Setting', 'The interface setting has been activated.', 'success', 'reload');
+                            }
+                            else{
+                                show_alert_event('Activate Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
+                            }
+                        }
+                        else{
+                            show_alert('Activate Interface Setting', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#deactivate-interface-setting',function() {
+        var interface_setting_id = $(this).data('interface-setting-id');
+        var transaction = 'deactivate interface setting';
+
+        Swal.fire({
+            title: 'Deactivate Interface Setting',
+            text: 'Are you sure you want to deactivate this interface setting?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Deactivate',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deactivated' || response === 'Not Found'){
+                            if(response === 'Deactivated'){
+                                show_alert_event('Deactivate Interface Setting', 'The interface setting has been deactivated.', 'success', 'reload');
+                            }
+                            else{
+                                show_alert_event('Deactivate Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
+                            }
+                        }
+                        else{
+                            show_alert('Deactivate Interface Setting', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#delete-interface-setting',function() {
+        var interface_setting_id = $(this).data('interface-setting-id');
+        var transaction = 'delete interface setting';
+
+        Swal.fire({
+            title: 'Delete Interface Setting',
+            text: 'Are you sure you want to delete this interface setting?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -224,18 +306,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, company_id : company_id, transaction : transaction},
+                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Company', 'The company has been deleted.', 'success', 'redirect', 'company.php');
+                                show_alert_event('Delete Interface Setting', 'The interface setting has been deleted.', 'success', 'redirect', 'interface-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Company', 'The company does not exist.', 'info', 'redirect', 'company.php');
+                                show_alert_event('Delete Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
                             }
                         }
                         else{
-                            show_alert('Delete Company', response, 'error');
+                            show_alert('Delete Interface Setting', response, 'error');
                         }
                     }
                 });
@@ -258,7 +340,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'company.php';
+                window.location.href = 'interface-settings.php';
                 return false;
             }
         });

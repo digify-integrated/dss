@@ -1907,6 +1907,57 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Interface settings table
+    else if($type == 'interface settings table'){
+        if(isset($_POST['filter_status'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+
+                $query = 'SELECT INTERFACE_SETTING_ID, INTERFACE_SETTING_NAME, DESCRIPTION, STATUS FROM global_interface_setting';
+
+                if(!empty($filter_status)){
+                    $query .= ' WHERE STATUS = :filter_status';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $interface_setting_id = $row['INTERFACE_SETTING_ID'];
+                        $interface_setting_name = $row['INTERFACE_SETTING_NAME'];
+                        $description = $row['DESCRIPTION'];
+                        $status = $row['STATUS'];
+    
+                        $interface_setting_status = $api->get_interface_setting_status($status)[0]['BADGE'];
+    
+                        $interface_setting_id_encrypted = $api->encrypt_data($interface_setting_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $interface_setting_id .'">',
+                            'INTERFACE_SETTING_ID' => $interface_setting_id,
+                            'INTERFACE_SETTING_NAME' => $interface_setting_name . '<p class="text-muted mb-0">'. $description .'</p>',
+                            'STATUS' => $interface_setting_status,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="interface-setting-form.php?id='. $interface_setting_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Interface Setting">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
 
 }
 
