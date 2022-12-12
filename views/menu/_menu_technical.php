@@ -10,8 +10,9 @@
     $system_codes_page = $api->check_role_access_rights($username, '13', 'page');
     $company_page = $api->check_role_access_rights($username, '15', 'page');
     $interface_settings_page = $api->check_role_access_rights($username, '17', 'page');
+    $email_settings_page = $api->check_role_access_rights($username, '19', 'page');
 
-    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0 || $system_interface_page > 0 || $interface_settings_page > 0){
+    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0 || $system_interface_page > 0 || $interface_settings_page > 0 || $email_settings_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-settings" role="button">
                         </i><span key="t-settings">Configurations</span> <div class="arrow-down"></div>
@@ -36,6 +37,10 @@
 
         if($system_codes_page > 0){
             $menu .= '<a href="system-codes.php" class="dropdown-item" key="t-actions">System Codes</a>';
+        }
+
+        if($email_settings_page > 0){
+            $menu .= '<a href="email-settings.php" class="dropdown-item" key="t-actions">Email Settings</a>';
         }
 
         if($interface_settings_page > 0){

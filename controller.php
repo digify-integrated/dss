@@ -1038,6 +1038,65 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit email setting
+    else if($transaction == 'submit email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && isset($_POST['email_setting_name']) && !empty($_POST['email_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['mail_host']) && !empty($_POST['mail_host']) && isset($_POST['port']) && isset($_POST['smtp_auth']) && isset($_POST['smtp_auto_tls']) && isset($_POST['mail_username']) && !empty($_POST['mail_username']) && isset($_POST['mail_password']) && !empty($_POST['mail_password']) && isset($_POST['mail_encryption']) && !empty($_POST['mail_encryption']) && isset($_POST['mail_from_name']) && !empty($_POST['mail_from_name']) && isset($_POST['mail_from_email']) && !empty($_POST['mail_from_email'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $email_setting_id = $_POST['email_setting_id'];
+            $email_setting_name = $_POST['email_setting_name'];
+            $description = $_POST['description'];
+            $mail_host = $_POST['mail_host'];
+            $port = $_POST['port'] ?? 0;
+            $smtp_auth = $_POST['smtp_auth'];
+            $smtp_auto_tls = $_POST['smtp_auto_tls'];
+            $mail_username = $_POST['mail_username'];
+            $mail_password = $_POST['mail_password'];
+            $mail_encryption = $_POST['mail_encryption'];
+            $mail_from_name = $_POST['mail_from_name'];
+            $mail_from_email = $_POST['mail_from_email'];
+
+            $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+ 
+            if($check_email_setting_exist > 0){
+                $update_email_setting = $api->update_email_setting($email_setting_id, $email_setting_name, $description, $mail_host, $port, $smtp_auth, $smtp_auto_tls, $mail_username, $mail_password, $mail_encryption, $mail_from_name, $mail_from_email, $username);
+
+                if($update_email_setting){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'EMAIL_SETTING_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_email_setting,
+                        'EMAIL_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_email_setting = $api->insert_email_setting($email_setting_name, $description, $mail_host, $port, $smtp_auth, $smtp_auto_tls, $mail_username, $mail_password, $mail_encryption, $mail_from_name, $mail_from_email, $username);
+    
+                if($insert_email_setting[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'EMAIL_SETTING_ID' => $insert_email_setting[0]['EMAIL_SETTING_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_email_setting[0]['RESPONSE'],
+                        'EMAIL_SETTING_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -1814,6 +1873,64 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete email setting
+    else if($transaction == 'delete email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_id = $_POST['email_setting_id'];
+
+            $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+            if($check_email_setting_exist > 0){
+                $delete_email_setting = $api->delete_email_setting($email_setting_id, $username);
+                                    
+                if($delete_email_setting){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_email_setting;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple email setting
+    else if($transaction == 'delete multiple email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_ids = $_POST['email_setting_id'];
+
+            foreach($email_setting_ids as $email_setting_id){
+                $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+                if($check_email_setting_exist > 0){
+                    $delete_email_setting = $api->delete_email_setting($email_setting_id, $username);
+                                    
+                    if(!$delete_email_setting){
+                        $error = $delete_email_setting;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -1857,6 +1974,38 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         }
     }
     # -------------------------------------------------------------
+
+    # Activate email setting
+    else if($transaction == 'activate email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_id = $_POST['email_setting_id'];
+
+            $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+            if($check_email_setting_exist > 0){
+                $update_email_setting_status = $api->update_email_setting_status($email_setting_id, 1, $username);
+                                    
+                if($update_email_setting_status){
+                    $update_other_email_setting_status = $api->update_other_email_setting_status($email_setting_id, $username);
+                                    
+                    if($update_email_setting_status){
+                        echo 'Activated';
+                    }
+                    else{
+                        echo $update_email_setting_status;
+                    }
+                }
+                else{
+                    echo $update_email_setting_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
      
     # -------------------------------------------------------------
     #   Deactivate transactions
@@ -1878,6 +2027,31 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 }
                 else{
                     echo $update_interface_setting_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Deactivate email setting
+    else if($transaction == 'deactivate email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_id = $_POST['email_setting_id'];
+
+            $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+            if($check_email_setting_exist > 0){
+                $update_email_setting_status = $api->update_email_setting_status($email_setting_id, 2, $username);
+                                    
+                if($update_email_setting_status){
+                    echo 'Deactivated';
+                }
+                else{
+                    echo $update_email_setting_status;
                 }
             }
             else{
@@ -2122,6 +2296,32 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'LOGIN_LOGO' => '<img class="img-thumbnail" alt="login logo" width="200" src="'. $login_logo_file_path .'" data-holder-rendered="true">',
                 'MENU_LOGO' => '<img class="img-thumbnail" alt="menu logo" width="200" src="'. $menu_logo_file_path .'" data-holder-rendered="true">',
                 'FAVICON' => '<img class="img-thumbnail" alt="favicon" width="200" src="'. $favicon_file_path .'" data-holder-rendered="true">',
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Email setting details
+    else if($transaction == 'email setting details'){
+        if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $email_setting_id = $_POST['email_setting_id'];
+            $email_setting_details = $api->get_email_setting_details($email_setting_id);
+
+            $response[] = array(
+                'EMAIL_SETTING_NAME' => $email_setting_details[0]['EMAIL_SETTING_NAME'],
+                'DESCRIPTION' => $email_setting_details[0]['DESCRIPTION'],
+                'MAIL_HOST' => $email_setting_details[0]['MAIL_HOST'],
+                'PORT' => $email_setting_details[0]['PORT'],
+                'SMTP_AUTH' => $email_setting_details[0]['SMTP_AUTH'],
+                'SMTP_AUTO_TLS' => $email_setting_details[0]['SMTP_AUTO_TLS'],
+                'MAIL_USERNAME' => $email_setting_details[0]['MAIL_USERNAME'],
+                'MAIL_PASSWORD' => $email_setting_details[0]['MAIL_PASSWORD'],
+                'MAIL_ENCRYPTION' => $email_setting_details[0]['MAIL_ENCRYPTION'],
+                'MAIL_FROM_NAME' => $email_setting_details[0]['MAIL_FROM_NAME'],
+                'MAIL_FROM_EMAIL' => $email_setting_details[0]['MAIL_FROM_EMAIL'],
+                'TRANSACTION_LOG_ID' => $email_setting_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

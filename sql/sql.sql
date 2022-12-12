@@ -1316,6 +1316,144 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+/* Global Email Setting */
+CREATE TABLE global_email_setting(
+	EMAIL_SETTING_ID INT(50) PRIMARY KEY,
+	EMAIL_SETTING_NAME VARCHAR(100) NOT NULL,
+	DESCRIPTION VARCHAR(200) NOT NULL,
+	STATUS TINYINT(1) NOT NULL,
+	MAIL_HOST VARCHAR(100) NOT NULL,
+	PORT INT NOT NULL,
+	SMTP_AUTH INT(1) NOT NULL,
+	SMTP_AUTO_TLS INT(1) NOT NULL,
+	MAIL_USERNAME VARCHAR(200) NOT NULL,
+	MAIL_PASSWORD VARCHAR(200) NOT NULL,
+	MAIL_ENCRYPTION VARCHAR(20),
+	MAIL_FROM_NAME VARCHAR(200),
+	MAIL_FROM_EMAIL VARCHAR(200),
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX global_email_setting_index ON global_email_setting(EMAIL_SETTING_ID);
+
+CREATE PROCEDURE check_email_setting_exist(IN email_setting_id INT(50))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_email_setting(IN email_setting_id INT(50), IN email_setting_name VARCHAR(100), IN description VARCHAR(200), IN mail_host VARCHAR(100), IN port INT, IN smtp_auth INT(1), IN smtp_auto_tls INT(1), IN mail_username VARCHAR(200), IN mail_password VARCHAR(200), IN mail_encryption VARCHAR(20), IN mail_from_name VARCHAR(200), IN mail_from_email VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+	SET @email_setting_name = email_setting_name;
+	SET @description = description;
+	SET @mail_host = mail_host;
+	SET @port = port;
+	SET @smtp_auth = smtp_auth;
+	SET @smtp_auto_tls = smtp_auto_tls;
+	SET @mail_username = mail_username;
+	SET @mail_password = mail_password;
+	SET @mail_encryption = mail_encryption;
+	SET @mail_from_name = mail_from_name;
+	SET @mail_from_email = mail_from_email;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_email_setting SET EMAIL_SETTING_NAME = @email_setting_name, DESCRIPTION = @description, MAIL_HOST = @mail_host, PORT = @port, SMTP_AUTH = @smtp_auth, SMTP_AUTO_TLS = @smtp_auto_tls, MAIL_USERNAME = @mail_username, MAIL_PASSWORD = @mail_password, MAIL_ENCRYPTION = @mail_encryption, MAIL_FROM_NAME = @mail_from_name, MAIL_FROM_EMAIL = @mail_from_email, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID = @interface_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_email_setting_status(IN email_setting_id INT(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+	SET @status = status;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_email_setting SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID = @email_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_other_email_setting_status(IN email_setting_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_email_setting SET STATUS = 2, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID != @email_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_email_setting(IN email_setting_id INT(50), IN email_setting_name VARCHAR(100), IN description VARCHAR(200), IN mail_host VARCHAR(100), IN port INT, IN smtp_auth INT(1), IN smtp_auto_tls INT(1), IN mail_username VARCHAR(200), IN mail_password VARCHAR(200), IN mail_encryption VARCHAR(20), IN mail_from_name VARCHAR(200), IN mail_from_email VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+	SET @email_setting_name = email_setting_name;
+	SET @description = description;
+	SET @mail_host = mail_host;
+	SET @port = port;
+	SET @smtp_auth = smtp_auth;
+	SET @smtp_auto_tls = smtp_auto_tls;
+	SET @mail_username = mail_username;
+	SET @mail_password = mail_password;
+	SET @mail_encryption = mail_encryption;
+	SET @mail_from_name = mail_from_name;
+	SET @mail_from_email = mail_from_email;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_email_setting (EMAIL_SETTING_ID, EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@email_setting_id, @email_setting_name, @description, "2", @mail_host, @port, @smtp_auth, @smtp_auto_tls, @mail_username, @mail_password, @mail_encryption, @mail_from_name, @mail_from_email, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_email_setting_details(IN email_setting_id INT(50))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+
+	SET @query = 'SELECT EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_activated_email_setting_details()
+BEGIN
+	SET @query = 'SELECT EMAIL_SETTING_ID, EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG FROM global_email_setting WHERE STATUS = 1';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_email_setting(IN email_setting_id INT(50))
+BEGIN
+	SET @email_setting_id = email_setting_id;
+
+	SET @query = 'DELETE FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
 BEGIN

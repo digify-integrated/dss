@@ -142,6 +142,10 @@ function initialize_click_events(){
                             else{
                                 show_alert('Delete Multiple Actions', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     

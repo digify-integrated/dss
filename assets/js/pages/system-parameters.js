@@ -146,6 +146,10 @@ function initialize_click_events(){
                             else{
                                 show_alert('Delete Multiple System Parameters', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     

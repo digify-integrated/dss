@@ -871,6 +871,31 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_email_setting_exist
+    # Purpose    : Checks if the email setting exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_email_setting_exist($email_setting_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_email_setting_exist(:email_setting_id)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1828,7 +1853,7 @@ class Api{
     }
     # -------------------------------------------------------------
 
-     # -------------------------------------------------------------
+    # -------------------------------------------------------------
     #
     # Name       : update_interface_settings_upload
     # Purpose    : Checks the interface setting upload.
@@ -2070,6 +2095,162 @@ class Api{
             }
             else{
                 return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_email_setting
+    # Purpose    : Updates email setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_email_setting($email_setting_id, $email_setting_name, $description, $mail_host, $port, $smtp_auth, $smtp_auto_tls, $mail_username, $mail_password, $mail_encryption, $mail_from_name, $mail_from_email, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $email_setting_details = $this->get_email_setting_details($email_setting_id);
+            
+            if(!empty($email_setting_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $email_setting_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_email_setting(:email_setting_id, :email_setting_name, :description, :mail_host, :port, :smtp_auth, :smtp_auto_tls, :mail_username, :mail_password, :mail_encryption, :mail_from_name, :mail_from_email, :transaction_log_id, :record_log)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+            $sql->bindValue(':email_setting_name', $email_setting_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':mail_host', $mail_host);
+            $sql->bindValue(':port', $port);
+            $sql->bindValue(':smtp_auth', $smtp_auth);
+            $sql->bindValue(':smtp_auto_tls', $smtp_auto_tls);
+            $sql->bindValue(':mail_username', $mail_username);
+            $sql->bindValue(':mail_password', $mail_password);
+            $sql->bindValue(':mail_encryption', $mail_encryption);
+            $sql->bindValue(':mail_from_name', $mail_from_name);
+            $sql->bindValue(':mail_from_email', $mail_from_email);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($email_setting_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated email setting.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated email setting.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_email_setting_status
+    # Purpose    : Updates interface setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_email_setting_status($email_setting_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $email_setting_details = $this->get_email_setting_details($email_setting_id);
+            $transaction_log_id = $email_setting_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Activate';
+            }
+            else{
+                $log_status = 'Deactivate';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_email_setting_status(:email_setting_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated email setting status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_other_email_setting_status
+    # Purpose    : Updates the other email settings to deactivated.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_other_email_setting_status($email_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $email_setting_details = $this->get_email_setting_details($email_setting_id);
+            $transaction_log_id = $email_setting_details[0]['TRANSACTION_LOG_ID'];
+
+            $sql = $this->db_connection->prepare('CALL update_other_email_setting_status(:email_setting_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Deactivate', 'User ' . $username . ' updated email setting status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
             }
         }
     }
@@ -3034,6 +3215,95 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_email_setting
+    # Purpose    : Insert email setting.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_email_setting($email_setting_name, $description, $mail_host, $port, $smtp_auth, $smtp_auto_tls, $mail_username, $mail_password, $mail_encryption, $mail_from_name, $mail_from_email, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(11, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_email_setting(:id, :email_setting_name, :description, :mail_host, :port, :smtp_auth, :smtp_auto_tls, :mail_username, :mail_password, :mail_encryption, :mail_from_name, :mail_from_email, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':email_setting_name', $email_setting_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':mail_host', $mail_host);
+            $sql->bindValue(':port', $port);
+            $sql->bindValue(':smtp_auth', $smtp_auth);
+            $sql->bindValue(':smtp_auto_tls', $smtp_auto_tls);
+            $sql->bindValue(':mail_username', $mail_username);
+            $sql->bindValue(':mail_password', $mail_password);
+            $sql->bindValue(':mail_encryption', $mail_encryption);
+            $sql->bindValue(':mail_from_name', $mail_from_name);
+            $sql->bindValue(':mail_from_email', $mail_from_email);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 11, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted email setting.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'EMAIL_SETTING_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'EMAIL_SETTING_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'EMAIL_SETTING_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'EMAIL_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'EMAIL_SETTING_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -3629,6 +3899,29 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_email_setting
+    # Purpose    : Delete email setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_email_setting($email_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_email_setting(:email_setting_id)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -4069,6 +4362,94 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_email_setting_details
+    # Purpose    : Gets the email setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_email_setting_details($email_setting_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_email_setting_details(:email_setting_id)');
+            $sql->bindValue(':email_setting_id', $email_setting_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'EMAIL_SETTING_NAME' => $row['EMAIL_SETTING_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'STATUS' => $row['STATUS'],
+                        'MAIL_HOST' => $row['MAIL_HOST'],
+                        'PORT' => $row['PORT'],
+                        'SMTP_AUTH' => $row['SMTP_AUTH'],
+                        'SMTP_AUTO_TLS' => $row['SMTP_AUTO_TLS'],
+                        'MAIL_USERNAME' => $row['MAIL_USERNAME'],
+                        'MAIL_PASSWORD' => $row['MAIL_PASSWORD'],
+                        'MAIL_ENCRYPTION' => $row['MAIL_ENCRYPTION'],
+                        'MAIL_FROM_NAME' => $row['MAIL_FROM_NAME'],
+                        'MAIL_FROM_EMAIL' => $row['MAIL_FROM_EMAIL'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_activated_email_setting_details
+    # Purpose    : Gets the activated email setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_activated_email_setting_details(){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_activated_email_setting_details()');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'EMAIL_SETTING_ID' => $row['EMAIL_SETTING_ID'],
+                        'EMAIL_SETTING_NAME' => $row['EMAIL_SETTING_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'STATUS' => $row['STATUS'],
+                        'MAIL_HOST' => $row['MAIL_HOST'],
+                        'PORT' => $row['PORT'],
+                        'SMTP_AUTH' => $row['SMTP_AUTH'],
+                        'SMTP_AUTO_TLS' => $row['SMTP_AUTO_TLS'],
+                        'MAIL_USERNAME' => $row['MAIL_USERNAME'],
+                        'MAIL_PASSWORD' => $row['MAIL_PASSWORD'],
+                        'MAIL_ENCRYPTION' => $row['MAIL_ENCRYPTION'],
+                        'MAIL_FROM_NAME' => $row['MAIL_FROM_NAME'],
+                        'MAIL_FROM_EMAIL' => $row['MAIL_FROM_EMAIL'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -4171,6 +4552,36 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_interface_setting_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Active';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Deactivated';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_email_setting_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_email_setting_status($stat){
         $response = array();
 
         switch ($stat) {

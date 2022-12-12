@@ -1959,6 +1959,58 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Email settings table
+    else if($type == 'email settings table'){
+        if(isset($_POST['filter_status'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+
+                $query = 'SELECT EMAIL_SETTING_ID, EMAIL_SETTING_NAME, DESCRIPTION, STATUS FROM global_email_setting';
+
+                if(!empty($filter_status)){
+                    $query .= ' WHERE STATUS = :filter_status';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $email_setting_id = $row['EMAIL_SETTING_ID'];
+                        $email_setting_name = $row['EMAIL_SETTING_NAME'];
+                        $description = $row['DESCRIPTION'];
+                        $status = $row['STATUS'];
+    
+                        $email_setting_status = $api->get_email_setting_status($status)[0]['BADGE'];
+    
+                        $email_setting_id_encrypted = $api->encrypt_data($email_setting_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $email_setting_id .'">',
+                            'EMAIL_SETTING_ID' => $email_setting_id,
+                            'EMAIL_SETTING_NAME' => $email_setting_name . '<p class="text-muted mb-0">'. $description .'</p>',
+                            'STATUS' => $email_setting_status,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="email-setting-form.php?id='. $email_setting_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Email Setting">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>
