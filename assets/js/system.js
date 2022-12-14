@@ -710,6 +710,189 @@ function initialize_form_validation(form_type){
             }
         });
     }
+    else if(form_type == 'notification role recipient form'){
+        $('#notification-role-recipient-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit notification role recipient';
+                var notification_setting_id = $('#notification-setting-id').text();
+                var role_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        role_id.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&role_id=' + role_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Notification Role Recipient Success', 'The notification role recipient has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#notification-role-recipients-datable');
+                        }
+                        else{
+                            show_alert('Notification Role Recipient Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'notification user account recipient form'){
+        $('#notification-user-account-recipient-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit notification user account recipient';
+                var notification_setting_id = $('#notification-setting-id').text();
+                var user_id = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        user_id.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&user_id=' + user_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Notification User Account Recipient Success', 'The notification user account recipient has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#notification-user-account-recipients-datable');
+                        }
+                        else{
+                            show_alert('Notification User Account Recipient Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'notification channel form'){
+        $('#notification-channel-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit notification channel';
+                var notification_setting_id = $('#notification-setting-id').text();
+                var channel = [];
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        channel.push(this.value);  
+                    }
+                });        
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&channel=' + channel,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert Notification Channel Success', 'The notification channel has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#notification-channel-datatable');
+                        }
+                        else{
+                            show_alert('Notification Channel Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
 }
 
 // Display functions
@@ -2215,6 +2398,21 @@ function generate_form(form_type, form_id, add, username){
                 else if(form_type == 'upload setting file type form'){
                     if($('#file-type-assignment').length){
                         initialize_upload_file_type_assignment_table('#file-type-assignment');
+                    }
+                }
+                else if(form_type == 'notification role recipient form'){
+                    if($('#notification-role-recipient-assignment-datatable').length){
+                        initialize_notification_role_recipient_assignment_table('#notification-role-recipient-assignment-datatable');
+                    }
+                }
+                else if(form_type == 'notification user account recipient form'){
+                    if($('#notification-user-account-recipient-assignment-datatable').length){
+                        initialize_notification_user_account_recipient_assignment_table('#notification-user-account-recipient-assignment-datatable');
+                    }
+                }
+                else if(form_type == 'notification channel form'){
+                    if($('#notification-role-recipient-assignment-datatable').length){
+                        initialize_notification_channel_assignment_table('#notification-role-recipient-assignment-datatable');
                     }
                 }
             }
