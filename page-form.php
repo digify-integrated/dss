@@ -106,20 +106,20 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_page > 0 && !empty($page_id)) || ($delete_page > 0 && !empty($page_id)) || ($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0)))){
+                                                            if(!empty($page_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_page > 0 && !empty($page_id)){
+                                                                if($add_page > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="page-form.php">Add Module</a>';
                                                                 }
 
-                                                                if($delete_page > 0 && !empty($page_id)){
+                                                                if($delete_page > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-page-id="'. $page_id .'" id="delete-page">Delete Page</button>';
                                                                 }
 
-                                                                if($add_page_access_right > 0 && ((!empty($page_id) && $update_page > 0))){
+                                                                if($add_page_access_right > 0 && $update_page > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
                                                                 }
@@ -132,7 +132,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($page_id) && $update_page > 0) || (empty($page_id) && $add_page > 0)){
+                                                                if(($add_page > 0 || ($update_page > 0 && !empty($page_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

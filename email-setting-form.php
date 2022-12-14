@@ -109,24 +109,24 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_email_setting > 0 && !empty($email_setting_id)) || ($delete_email_setting > 0 && !empty($email_setting_id)) || ($activate_email_setting > 0 && !empty($email_setting_id) && $email_setting_status == 2) || ($deactivate_email_setting > 0 && !empty($email_setting_id) && $email_setting_status == 1)){
+                                                            if(!empty($email_setting_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_email_setting > 0 && !empty($email_setting_id)){
+                                                                if($add_email_setting > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="email-setting-form.php">Add Email Setting</a>';
                                                                 }
 
-                                                                if($activate_email_setting > 0 && !empty($email_setting_id) && $email_setting_status == 2){
+                                                                if($activate_email_setting > 0 && $email_setting_status == 2){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="activate-email-setting">Activate Email Setting</button>';
                                                                 }
 
-                                                                if($activate_email_setting > 0 && !empty($email_setting_id) && $email_setting_status == 1){
+                                                                if($activate_email_setting > 0 && $email_setting_status == 1){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="deactivate-email-setting">Deactivate Email Setting</button>';
                                                                 }
 
-                                                                if($delete_email_setting > 0 && !empty($email_setting_id)){
+                                                                if($delete_email_setting > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="delete-email-setting">Delete Email Setting</button>';
                                                                 }
 
@@ -139,7 +139,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($email_setting_id) && $update_email_setting > 0) || (empty($email_setting_id) && $add_email_setting > 0)){
+                                                                if(($add_email_setting > 0 || ($update_email_setting > 0 && !empty($email_setting_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

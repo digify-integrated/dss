@@ -896,6 +896,109 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_notification_setting_exist
+    # Purpose    : Checks if the notification setting exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_notification_setting_exist($notification_setting_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_notification_setting_exist(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_notification_user_account_recipient_exist
+    # Purpose    : Checks if the notification user account recipient exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_notification_user_account_recipient_exist($notification_setting_id, $user_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_notification_user_account_recipient_exist(:notification_setting_id, :user_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':user_id', $user_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_notification_role_recipient_exist
+    # Purpose    : Checks if the notification role recipient exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_notification_role_recipient_exist($notification_setting_id, $role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_notification_role_recipient_exist(:notification_setting_id, :role_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_notification_channel_exist
+    # Purpose    : Checks if the notification channel exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_notification_channel_exist($notification_setting_id, $channel){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_notification_channel_exist(:notification_setting_id, :channel)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':channel', $channel);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -2257,6 +2360,77 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_notification_setting
+    # Purpose    : Updates notification setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_notification_setting($notification_setting_id, $notification_setting, $description, $notification_title, $notification_message, $system_link, $email_link, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $notification_setting_details = $this->get_notification_setting_details($notification_setting_id);
+            
+            if(!empty($notification_setting_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $notification_setting_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_notification_setting(:notification_setting_id, :notification_setting, :description, :notification_title, :notification_message, :system_link, :email_link, :transaction_log_id, :record_log)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':notification_setting', $notification_setting);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':notification_title', $notification_title);
+            $sql->bindValue(':notification_message', $notification_message);
+            $sql->bindValue(':system_link', $system_link);
+            $sql->bindValue(':email_link', $email_link);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($notification_setting_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated notification setting.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated notification setting.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -3304,6 +3478,162 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_notification_setting
+    # Purpose    : Insert notification setting.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_notification_setting($notification_setting, $description, $notification_title, $notification_message, $system_link, $email_link, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(12, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_notification_setting(:id, :notification_setting, :description, :notification_title, :notification_message, :system_link, :email_link, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':notification_setting', $notification_setting);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':notification_title', $notification_title);
+            $sql->bindValue(':notification_message', $notification_message);
+            $sql->bindValue(':system_link', $system_link);
+            $sql->bindValue(':email_link', $email_link);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 12, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted notification setting.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'NOTIFICATION_SETTING_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'NOTIFICATION_SETTING_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'NOTIFICATION_SETTING_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'NOTIFICATION_SETTING_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'NOTIFICATION_SETTING_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_notification_user_account_recipient
+    # Purpose    : Inserts notification user account recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_notification_user_account_recipient($notification_setting_id, $user_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_notification_user_account_recipient(:notification_setting_id, :user_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':user_id', $user_id);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_notification_role_recipient
+    # Purpose    : Inserts notification role recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_notification_role_recipient($notification_setting_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_notification_role_recipient(:notification_setting_id, :role_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_notification_channel
+    # Purpose    : Inserts notification channel.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_notification_channel($notification_setting_id, $channel, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_notification_channel(:notification_setting_id, :channel)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':channel', $channel);
+
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -3922,6 +4252,170 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_notification_setting
+    # Purpose    : Delete notification setting.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_notification_setting($notification_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_notification_setting(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_notification_user_account_recipient
+    # Purpose    : Delete notification user account recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_notification_user_account_recipient($notification_setting_id, $user_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_notification_setting(:notification_setting_id, :user_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':user_id', $user_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_notification_role_recipient
+    # Purpose    : Delete notification role recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_notification_role_recipient($notification_setting_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_notification_role_recipient(:notification_setting_id, :role_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_notification_channel
+    # Purpose    : Delete notification channel.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_notification_channel($notification_setting_id, $channel, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_notification_channel(:notification_setting_id, :channel)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+            $sql->bindValue(':channel', $channel);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_notification_role_recipient
+    # Purpose    : Delete all notification role recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_notification_role_recipient($notification_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_notification_role_recipient(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_notification_user_account_recipient
+    # Purpose    : Delete all notification user account recipient.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_notification_user_account_recipient($notification_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_notification_user_account_recipient(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_notification_channel
+    # Purpose    : Delete all notification channel.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_notification_channel($notification_setting_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_notification_channel(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -4435,6 +4929,44 @@ class Api{
                         'MAIL_ENCRYPTION' => $row['MAIL_ENCRYPTION'],
                         'MAIL_FROM_NAME' => $row['MAIL_FROM_NAME'],
                         'MAIL_FROM_EMAIL' => $row['MAIL_FROM_EMAIL'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_notification_setting_details
+    # Purpose    : Gets the notification setting details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_notification_setting_details($notification_setting_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_notification_setting_details(:notification_setting_id)');
+            $sql->bindValue(':notification_setting_id', $notification_setting_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'NOTIFICATION_SETTING' => $row['NOTIFICATION_SETTING'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'NOTIFICATION_TITLE' => $row['NOTIFICATION_TITLE'],
+                        'NOTIFICATION_MESSAGE' => $row['NOTIFICATION_MESSAGE'],
+                        'SYSTEM_LINK' => $row['SYSTEM_LINK'],
+                        'EMAIL_LINK' => $row['EMAIL_LINK'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );

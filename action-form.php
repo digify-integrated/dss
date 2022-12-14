@@ -106,20 +106,20 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_action > 0 && !empty($action_id)) || ($delete_action > 0 && !empty($action_id)) || ($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0)))){
+                                                            if(!empty($action_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_action > 0 && !empty($action_id)){
+                                                                if($add_action > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="action-form.php">Add Action</a>';
                                                                 }
 
-                                                                if($delete_action > 0 && !empty($action_id)){
+                                                                if($delete_action > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-action-id="'. $action_id .'" id="delete-action">Delete Action</button>';
                                                                 }
 
-                                                                if($add_action_access_right > 0 && ((!empty($action_id) && $update_action > 0))){
+                                                                if($add_action_access_right > 0 && $update_action > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
                                                                 }
@@ -133,7 +133,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($action_id) && $update_action > 0) || (empty($action_id) && $add_action > 0)){
+                                                                if(($add_action > 0 || ($update_action > 0 && !empty($action_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

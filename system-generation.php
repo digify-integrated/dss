@@ -177,6 +177,63 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                         </div>';
             }
+            else if($form_type == 'notification role recipient form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="notification-role-recipient-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Role</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'notification user account recipient form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="notification-user-account-recipient-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">User Account</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
+            else if($form_type == 'notification channel form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                    <table id="notification-role-recipient-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" id="form-datatable-checkbox" type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th class="all">Channel</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                        </div>';
+            }
 
             $form .= '</form>';
 
@@ -2008,6 +2065,279 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
+    }
+    # -------------------------------------------------------------
+
+    # Notification settings table
+    else if($type == 'notification settings table'){
+        if(isset($_POST['filter_notification_channel'])){
+            if ($api->databaseConnection()) {
+                $filter_notification_channel = $_POST['filter_notification_channel'];
+
+                $query = 'SELECT NOTIFICATION_SETTING_ID, NOTIFICATION_SETTING, DESCRIPTION FROM global_notification_setting';
+
+                if(!empty($filter_notification_channel)){
+                    $query .= ' WHERE NOTIFICATION_SETTING_ID IN (SELECT NOTIFICATION_SETTING_ID FROM global_notification_channel WHERE CHANNEL = :filter_notification_channel)';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_notification_channel)){
+                    $sql->bindValue(':filter_notification_channel', $filter_notification_channel);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $notification_setting_id = $row['NOTIFICATION_SETTING_ID'];
+                        $notification_setting = $row['NOTIFICATION_SETTING'];
+                        $description = $row['DESCRIPTION'];
+        
+                        $notification_setting_id_encrypted = $api->encrypt_data($notification_setting_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $notification_setting_id .'">',
+                            'NOTIFICATION_SETTING_ID' => $notification_setting_id,
+                            'NOTIFICATION_SETTING' => $notification_setting . '<p class="text-muted mb-0">'. $description .'</p>',
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="notification-setting-form.php?id='. $notification_setting_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Notification Setting">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Notification role recipient table
+    else if($type == 'notification role recipient table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+
+                $update_notification_setting = $api->check_role_access_rights($username, '53', 'action');
+                $delete_notification_role_recipient = $api->check_role_access_rights($username, '56', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+
+                        $role_details = $api->get_role_details($role_id);
+                        $role = $role_details[0]['ROLE'] ?? null;
+
+                        if($delete_notification_role_recipient > 0 && $update_notification_setting > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-notification-role-recipient" data-notification-setting-id="'. $notification_setting_id .'" data-role-id="'. $role_id .'" title="Delete Role Recipient">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ROLE' => $role,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Notification user account recipient table
+    else if($type == 'notification user account recipient table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+
+                $update_notification_setting = $api->check_role_access_rights($username, '53', 'action');
+                $delete_notification_user_account_recipient = $api->check_role_access_rights($username, '58', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+
+                        if($delete_notification_user_account_recipient > 0 && $update_notification_setting > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-notification-user-account-recipient" data-notification-setting-id="'. $notification_setting_id .'" data-user-id="'. $username .'" title="Delete User Account Recipient">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'USERNAME' => $username,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Notification channel table
+    else if($type == 'notification channel table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+
+                $update_notification_setting = $api->check_role_access_rights($username, '53', 'action');
+                $delete_notification_channel = $api->check_role_access_rights($username, '60', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT CHANNEL FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = :notification_setting_id');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $channel = $row['CHANNEL'];
+
+                        $system_code_details = $api->get_system_code_details(null, 'NOTIFICATIONCHANNEL', $channel);
+                        $channel_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                        if($delete_notification_channel > 0 && $update_notification_setting > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-notification-channel" data-notification-setting-id="'. $notification_setting_id .'" data-channel="'. $channel .'" title="Delete Notification Channel">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'CHANNEL' => $channel_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Notification role recipient assignment table
+    else if($type == 'notification role recipient assignment table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id)');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE' => $role
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Notification user account recipient assignment table
+    else if($type == 'notification user account recipient assignment table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME FROM global_user_account WHERE USERNAME NOT IN (SELECT USERNAME FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id)');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $username .'">',
+                            'USERNAME' => $username
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Notification channel assignment table
+    else if($type == 'notification channel assignment table'){
+        if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
+            if ($api->databaseConnection()) {
+                $notification_setting_id = $_POST['notification_setting_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = :system_type AND SYSTEM_CODE NOT IN (SELECT CHANNEL FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = :notification_setting_id)');
+                $sql->bindValue(':system_type', 'NOTIFICATIONCHANNEL');
+                $sql->bindValue(':notification_setting_id', $notification_setting_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $system_code = $row['SYSTEM_CODE'];
+                        $system_description = $row['SYSTEM_DESCRIPTION'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $system_code .'">',
+                            'CHANNEL' => $system_description
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
     }
     # -------------------------------------------------------------
 

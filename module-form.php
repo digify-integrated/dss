@@ -106,25 +106,23 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_module > 0 && !empty($module_id)) || ($delete_module > 0 && !empty($module_id)) || ($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0)))){
+                                                            if(!empty($module_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_module > 0 && !empty($module_id)){
+                                                                if($add_module > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="module-form.php">Add Module</a>';
                                                                 }
 
-                                                                if($delete_module > 0 && !empty($module_id)){
+                                                                if($delete_module > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-module-id="'. $module_id .'" id="delete-module">Delete Module</button>';
                                                                 }
 
-                                                                if($add_module_access_right > 0 && ((!empty($module_id) && $update_module > 0))){
+                                                                if($add_module_access_right > 0 && $update_module > 0){   
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
                                                                 }
-
-                                                               
 
                                                                 $dropdown_action .= '</div></div>';
 
@@ -134,7 +132,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($module_id) && $update_module > 0) || (empty($module_id) && $add_module > 0)){
+                                                                if(($add_module > 0 || ($update_module > 0 && !empty($module_id)))){
                                                                     echo '<button type="submit" for="module-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

@@ -104,16 +104,16 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_company > 0 && !empty($company_id)) || ($delete_company > 0 && !empty($company_id))){
+                                                            if(!empty($company_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_company > 0 && !empty($company_id)){
+                                                                if($add_company > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="company-form.php">Add Company</a>';
                                                                 }
 
-                                                                if($delete_company > 0 && !empty($company_id)){
+                                                                if($delete_company > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-company-id="'. $company_id .'" id="delete-company">Delete Company</button>';
                                                                 }
 
@@ -122,11 +122,11 @@
 
                                                                 echo $dropdown_action;
                                                             }
-                                                            ?>
+                                                        ?>
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($company_id) && $update_company > 0) || (empty($company_id) && $add_company > 0)){
+                                                                if(($add_company > 0 || ($update_company > 0 && !empty($company_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

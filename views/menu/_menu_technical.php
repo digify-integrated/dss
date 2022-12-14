@@ -11,8 +11,9 @@
     $company_page = $api->check_role_access_rights($username, '15', 'page');
     $interface_settings_page = $api->check_role_access_rights($username, '17', 'page');
     $email_settings_page = $api->check_role_access_rights($username, '19', 'page');
+    $notification_settings_page = $api->check_role_access_rights($username, '21', 'page');
 
-    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0 || $system_interface_page > 0 || $interface_settings_page > 0 || $email_settings_page > 0){
+    if($module_page > 0 || $pages_page > 0 || $action_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $system_codes_page > 0 || $system_interface_page > 0 || $interface_settings_page > 0 || $email_settings_page > 0 || $notification_settings_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-settings" role="button">
                         </i><span key="t-settings">Configurations</span> <div class="arrow-down"></div>
@@ -32,23 +33,27 @@
         }
 
         if($system_parameters_page > 0){
-            $menu .= '<a href="system-parameters.php" class="dropdown-item" key="t-actions">System Parameters</a>';
+            $menu .= '<a href="system-parameters.php" class="dropdown-item" key="t-system-parameters">System Parameters</a>';
         }
 
         if($system_codes_page > 0){
-            $menu .= '<a href="system-codes.php" class="dropdown-item" key="t-actions">System Codes</a>';
+            $menu .= '<a href="system-codes.php" class="dropdown-item" key="t-system-codes">System Codes</a>';
         }
 
         if($email_settings_page > 0){
-            $menu .= '<a href="email-settings.php" class="dropdown-item" key="t-actions">Email Settings</a>';
+            $menu .= '<a href="email-settings.php" class="dropdown-item" key="t-email-settings">Email Settings</a>';
         }
 
         if($interface_settings_page > 0){
-            $menu .= '<a href="interface-settings.php" class="dropdown-item" key="t-actions">Interface Settings</a>';
+            $menu .= '<a href="interface-settings.php" class="dropdown-item" key="t-interface-settings">Interface Settings</a>';
         }
 
         if($upload_settings_page > 0){
-            $menu .= '<a href="upload-settings.php" class="dropdown-item" key="t-actions">Upload Settings</a>';
+            $menu .= '<a href="upload-settings.php" class="dropdown-item" key="t-upload-settings">Upload Settings</a>';
+        }
+
+        if($notification_settings_page > 0){
+            $menu .= '<a href="notification-settings.php" class="dropdown-item" key="t-notification-settings">Notification Settings</a>';
         }
 
         $menu .= '</div>

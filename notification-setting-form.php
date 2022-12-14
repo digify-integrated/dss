@@ -8,11 +8,11 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(10);
+        $page_details = $api->get_page_details(22);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 10, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 22, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -21,21 +21,20 @@
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
-                $role_id = $api->decrypt_data($id);
+                $notification_setting_id = $api->decrypt_data($id);
             }
             else{
-                $role_id = null;
+                $notification_setting_id = null;
             }
 
-            $add_role = $api->check_role_access_rights($username, '20', 'action');
-            $update_role = $api->check_role_access_rights($username, '21', 'action');
-            $delete_role = $api->check_role_access_rights($username, '22', 'action');
-            $add_role_module_access = $api->check_role_access_rights($username, '23', 'action');
-            $add_role_page_access = $api->check_role_access_rights($username, '25', 'action');
-            $add_role_action_access = $api->check_role_access_rights($username, '27', 'action');
-            $add_role_user_account = $api->check_role_access_rights($username, '29', 'action');
+            $add_notification_setting = $api->check_role_access_rights($username, '52', 'action');
+            $update_notification_setting = $api->check_role_access_rights($username, '53', 'action');
+            $delete_notification_setting = $api->check_role_access_rights($username, '54', 'action');
+            $add_notification_role_recipient = $api->check_role_access_rights($username, '55', 'action');
+            $add_notification_user_account_recipient = $api->check_role_access_rights($username, '57', 'action');
+            $add_notification_channel = $api->check_role_access_rights($username, '59', 'action');
 
-            if($update_role > 0){
+            if($update_notification_setting > 0){
                 $disabled = null;
             }
             else{
@@ -77,16 +76,17 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Role Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Notification Setting Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="roles.php">Roles</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
+                                            <li class="breadcrumb-item"><a href="notification-settings.php">Notification Settings</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
-                                                if(!empty($role_id)){
-                                                    echo '<li class="breadcrumb-item" id="role-id"><a href="javascript: void(0);">'. $role_id .'</a></li>';
+                                                if(!empty($notification_setting_id)){
+                                                    echo '<li class="breadcrumb-item" id="notification-setting-id"><a href="javascript: void(0);">'. $notification_setting_id .'</a></li>';
                                                 }
                                             ?>
                                         </ol>
@@ -99,46 +99,42 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="role-form" method="post" action="#">
+                                        <form id="notification-setting-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Role Form</h4>
+                                                            <h4 class="card-title">Notification Setting Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(!empty($role_id)){
+                                                            if(!empty($notification_setting_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_role > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="role-form.php">Add Role</a>';
+                                                                if($add_notification_setting > 0){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="notification-setting-form.php">Add Notification Setting</a>';
                                                                 }
 
-                                                                if($delete_role > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-role-id="'. $role_id .'" id="delete-role">Delete Role</button>';
+                                                                if($delete_notification_setting > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-notification-setting-id="'. $notification_setting_id .'" id="delete-notification-setting">Delete Notification Setting</button>';
                                                                 }
 
-                                                                if(($add_role_module_access > 0 || $add_role_page_access > 0 || $add_role_action_access > 0 || $add_role_user_account > 0) && $update_role > 0){
+                                                                if(($add_notification_role_recipient > 0 || $add_notification_user_account_recipient > 0 || $add_notification_channel > 0) && $update_notification_setting > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
 
-                                                                    if($add_role_module_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
-                                                                    }                                                                    
+                                                                    if($add_notification_role_recipient > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-role-recipient">Add Role Recipient</button>';
+                                                                    }
 
-                                                                    if($add_role_page_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
-                                                                    }                                                                    
+                                                                    if($add_notification_user_account_recipient > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-user-account-recipient">Add User Account Recipient</button>';
+                                                                    }
 
-                                                                    if($add_role_action_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
-                                                                    }                                                                    
-
-                                                                    if($add_role_user_account > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-user-account">Add User Account</button>';
-                                                                    }                                                                    
+                                                                    if($add_notification_channel > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-channel">Add Notification Channel</button>';
+                                                                    }
                                                                 }
 
                                                                 $dropdown_action .= '</div>
@@ -150,7 +146,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_role > 0 || ($update_role > 0 && !empty($role_id)))){
+                                                                if(($add_notification_setting > 0 || ($update_notification_setting > 0 && !empty($notification_setting_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
@@ -162,60 +158,69 @@
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="role_id" name="role_id">
+                                                        <input type="hidden" id="notification_setting_id" name="notification_setting_id">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="role" class="col-md-3 col-form-label">Role <span class="text-danger">*</span></label>
+                                                        <label for="notification_setting" class="col-md-3 col-form-label">Notification Setting <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role" name="role" maxlength="100" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="notification_setting" name="notification_setting" maxlength="100" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
-                                                        <label for="role_description" class="col-md-3 col-form-label">Role Description <span class="text-danger">*</span></label>
+                                                        <label for="notification_title" class="col-md-3 col-form-label">Notification Title <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role_description" name="role_description" maxlength="200" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="notification_title" name="notification_title" maxlength="500" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <label for="system_link" class="col-md-3 col-form-label">System Link</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="system_link" name="system_link" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="parameter_extension" class="col-md-3 col-form-label">Assignable?</label>
+                                                        <label for="description" class="col-md-3 col-form-label">Description <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <select class="form-control select2" id="assignable" name="assignable" <?php echo $disabled; ?>>
-                                                                <option value="2">False</option>
-                                                                <option value="1">True</option>
-                                                            </select>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="description" name="description" maxlength="200" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <label for="notification_message" class="col-md-3 col-form-label">Notification Message <span class="text-danger">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="notification_message" name="notification_message" maxlength="500" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <label for="email_link" class="col-md-3 col-form-label">Email Link</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="email_link" name="email_link" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
                                         <?php
-                                            if(!empty($role_id)){
+                                            if(!empty($notification_setting_id)){
                                                 echo ' <div class="row mt-4">
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#module-access" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-cubes"></i></span>
-                                                                    <span class="d-none d-sm-block">Module Access</span>    
+                                                                <a class="nav-link active" data-bs-toggle="tab" href="#role-recipients" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-users-cog"></i></span>
+                                                                    <span class="d-none d-sm-block">Role Recipients</span>    
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#page-access" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-window-maximize"></i></span>
-                                                                    <span class="d-none d-sm-block">Page Access</span>    
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#user-account-recipients" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-user"></i></span>
+                                                                    <span class="d-none d-sm-block">User Account Recipients</span>    
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#action-access" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-hand-point-up"></i></span>
-                                                                    <span class="d-none d-sm-block">Action Access</span>    
-                                                                </a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#user-accounts" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-user-alt"></i></span>
-                                                                    <span class="d-none d-sm-block">User Accounts</span>    
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#notification-channel" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-bell"></i></span>
+                                                                    <span class="d-none d-sm-block">Notification Channel</span>    
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
@@ -226,10 +231,10 @@
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="module-access" role="tabpanel">
+                                                            <div class="tab-pane active" id="role-recipients" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="module-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="notification-role-recipients-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
@@ -241,43 +246,28 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="tab-pane" id="page-access" role="tabpanel">
+                                                            <div class="tab-pane" id="user-account-recipients" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="page-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Role</th>
-                                                                                    <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="action-access" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="action-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Role</th>
-                                                                                    <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="user-accounts" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="user-account-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="notification-user-account-recipients-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">User Account</th>
+                                                                                    <th class="all">Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody></tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="notification-channel" role="tabpanel">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-md-12">
+                                                                        <table id="notification-channel-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th class="all">Notification Channel</th>
                                                                                     <th class="all">Action</th>
                                                                                 </tr>
                                                                             </thead>
@@ -330,6 +320,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/role-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/notification-setting-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

@@ -105,16 +105,16 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_system_parameter > 0 && !empty($parameter_id)) || ($delete_system_parameter > 0 && !empty($parameter_id))){
+                                                            if(!empty($parameter_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_system_parameter > 0 && !empty($parameter_id)){
+                                                                if($add_system_parameter > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="system-parameter-form.php">Add System Parameter</a>';
                                                                 }
 
-                                                                if($delete_system_parameter > 0 && !empty($parameter_id)){
+                                                                if($delete_system_parameter > 0 ){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-parameter-id="'. $parameter_id .'" id="delete-system-parameter">Delete System Parameter</button>';
                                                                 }
 
@@ -127,7 +127,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($parameter_id) && $update_system_parameter > 0) || (empty($parameter_id) && $add_system_parameter > 0)){
+                                                                if(($add_system_parameter > 0 || ($update_system_parameter > 0 && !empty($parameter_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>

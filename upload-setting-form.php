@@ -106,20 +106,20 @@
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(($add_upload_setting > 0 && !empty($upload_setting_id)) || ($delete_upload_setting > 0 && !empty($upload_setting_id)) || ($add_upload_setting_file_type > 0 && ((!empty($upload_setting_id) && $update_upload_setting > 0)))){
+                                                            if(!empty($upload_setting_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_upload_setting > 0 && !empty($upload_setting_id)){
+                                                                if($add_upload_setting > 0){
                                                                     $dropdown_action .= '<a class="dropdown-item" href="upload-setting-form.php">Add Upload Setting</a>';
                                                                 }
 
-                                                                if($delete_upload_setting > 0 && !empty($upload_setting_id)){
+                                                                if($delete_upload_setting > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-upload-setting-id="'. $upload_setting_id .'" id="delete-upload-setting">Delete Upload Setting</button>';
                                                                 }
 
-                                                                if($add_upload_setting_file_type > 0 && ((!empty($upload_setting_id) && $update_upload_setting > 0))){
+                                                                if($add_upload_setting_file_type > 0 && $update_upload_setting > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" id="add-upload-setting-file-type">Add File Type</button>';
                                                                 }
@@ -133,7 +133,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if((!empty($upload_setting_id) && $update_upload_setting > 0) || (empty($upload_setting_id) && $add_upload_setting > 0)){
+                                                                if(($add_upload_setting > 0 || ($update_upload_setting > 0 && !empty($upload_setting_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
