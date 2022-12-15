@@ -26,16 +26,16 @@
                         initialize_transaction_log_table('#transaction-log-datatable');
                     }
 
-                    if($('#notification-role-recipients-datable').length){
-                        initialize_notification_role_recipient_table('#notification-role-recipients-datable');
+                    if($('#notification-role-recipients-datatable').length){
+                        initialize_notification_role_recipient_table('#notification-role-recipients-datatable');
                     }
 
-                    if($('#notification-user-account-recipients-datable').length){
-                        initialize_notification_user_account_recipient_table('#notification-user-account-recipients-datable');
+                    if($('#notification-user-account-recipients-datatable').length){
+                        initialize_notification_user_account_recipient_table('#notification-user-account-recipients-datatable');
                     }
 
-                    if($('#notification-channel-datable').length){
-                        initialize_notification_channel_table('#notification-channel-datable');
+                    if($('#notification-channel-datatable').length){
+                        initialize_notification_channel_table('#notification-channel-datatable');
                     }
                 }
             });
@@ -847,7 +847,7 @@ function initialize_click_events(){
                                 show_alert('Delete Notification Role Recipient', 'The notification role recipient does not exist.', 'info');
                             }
 
-                            reload_datatable('#notification-role-recipients-datable');
+                            reload_datatable('#notification-role-recipients-datatable');
                         }
                         else{
                             show_alert('Delete Notification Role Recipient', response, 'error');
@@ -862,7 +862,7 @@ function initialize_click_events(){
     $(document).on('click','.delete-notification-user-account-recipient',function() {
         var user_id = $(this).data('user-id');
         var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification user acount recipient';
+        var transaction = 'delete notification user account recipient';
 
         Swal.fire({
             title: 'Delete Notification User Account Recipient',
@@ -889,7 +889,7 @@ function initialize_click_events(){
                                 show_alert('Delete Notification User Account Recipient', 'The notification user account recipient does not exist.', 'info');
                             }
 
-                            reload_datatable('#notification-user-account-recipients-datable');
+                            reload_datatable('#notification-user-account-recipients-datatable');
                         }
                         else{
                             show_alert('Delete Notification User Account Recipient', response, 'error');
@@ -904,7 +904,7 @@ function initialize_click_events(){
     $(document).on('click','.delete-notification-channel',function() {
         var channel = $(this).data('channel');
         var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification channel recipient';
+        var transaction = 'delete notification channel';
 
         Swal.fire({
             title: 'Delete Notification Channel',
@@ -931,7 +931,7 @@ function initialize_click_events(){
                                 show_alert('Delete Notification Channel', 'The notification channel does not exist.', 'info');
                             }
 
-                            reload_datatable('#notification-channel-datable');
+                            reload_datatable('#notification-channel-datatable');
                         }
                         else{
                             show_alert('Delete Notification Channel', response, 'error');

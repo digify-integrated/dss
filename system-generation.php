@@ -234,6 +234,16 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                         </div>';
             }
+            else if($form_type == 'state form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="state_name" class="form-label">State <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="state_name" name="state_name" maxlength="200">
+                                </div>
+                            </div>
+                        </div>';
+            }
 
             $form .= '</form>';
 
@@ -2338,6 +2348,134 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
         }
         
+    }
+    # -------------------------------------------------------------
+
+    # Country table
+    else if($type == 'country table'){
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare('SELECT COUNTRY_ID, COUNTRY_NAME FROM global_country');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $country_id = $row['COUNTRY_ID'];
+                    $country_name = $row['COUNTRY_NAME'];
+
+                    $country_id_encrypted = $api->encrypt_data($country_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $country_id.'">',
+                        'COUNTRY_ID' => $country_id,
+                        'COUNTRY_NAME' => $country_name,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="country-form.php?id='. $country_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Country">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Country state table
+    else if($type == 'country state table'){
+        if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            if ($api->databaseConnection()) {
+                $country_id = $_POST['country_id'];
+
+                $update_country = $api->check_role_access_rights($username, '62', 'action');
+                $delete_state = $api->check_role_access_rights($username, '66', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT STATE_ID, STATE_NAME FROM global_state WHERE COUNTRY_ID = :country_id');
+                $sql->bindValue(':country_id', $country_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $state_id = $row['STATE_ID'];
+                        $state_name = $row['STATE_NAME'];
+
+                        if($delete_state > 0 && $update_country > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-state" data-country-id="'. $country_id .'" data-state-id="'. $state_id .'" title="Delete State">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'STATE_NAME' => $state_name,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # State table
+    else if($type == 'state table'){
+        if(isset($_POST['filter_country'])){
+            if ($api->databaseConnection()) {
+                $filter_country = $_POST['filter_country'];
+
+                $query = 'SELECT STATE_ID, STATE_NAME, COUNTRY_ID FROM global_state';
+
+                if(!empty($filter_country)){
+                    $query .= ' WHERE COUNTRY_ID = :filter_country';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_country)){
+                    $sql->bindValue(':filter_country', $filter_country);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $state_id = $row['STATE_ID'];
+                        $state_name = $row['STATE_NAME'];
+                        $country_id = $row['COUNTRY_ID'];
+
+                        $country_details = $api->get_country_details($country_id);
+                        $country_name = $country_details[0]['COUNTRY_NAME'] ?? null;
+    
+                        $state_id_encrypted = $api->encrypt_data($state_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $state_id.'">',
+                            'STATE_ID' => $state_id,
+                            'STATE_NAME' => $state_name,
+                            'COUNTRY' => $country_name,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="state-form.php?id='. $state_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View State">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
     }
     # -------------------------------------------------------------
 

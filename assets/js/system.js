@@ -675,7 +675,7 @@ function initialize_form_validation(form_type){
                             show_alert('Insert Upload Setting File Type Success', 'The file type has been inserted.', 'success');
                           
                             $('#System-Modal').modal('hide');
-                            reload_datatable('#upload-setting-file-type-datable');
+                            reload_datatable('#upload-setting-file-type-datatable');
                         }
                         else{
                             show_alert('Upload Setting File Type Error', response, 'error');
@@ -736,7 +736,7 @@ function initialize_form_validation(form_type){
                             show_alert('Insert Notification Role Recipient Success', 'The notification role recipient has been inserted.', 'success');
                           
                             $('#System-Modal').modal('hide');
-                            reload_datatable('#notification-role-recipients-datable');
+                            reload_datatable('#notification-role-recipients-datatable');
                         }
                         else{
                             show_alert('Notification Role Recipient Error', response, 'error');
@@ -797,7 +797,7 @@ function initialize_form_validation(form_type){
                             show_alert('Insert Notification User Account Recipient Success', 'The notification user account recipient has been inserted.', 'success');
                           
                             $('#System-Modal').modal('hide');
-                            reload_datatable('#notification-user-account-recipients-datable');
+                            reload_datatable('#notification-user-account-recipients-datatable');
                         }
                         else{
                             show_alert('Notification User Account Recipient Error', response, 'error');
@@ -870,6 +870,71 @@ function initialize_form_validation(form_type){
                     }
                 });
                 return false;
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'state form'){
+        $('#state-form').validate({
+            submitHandler: function (form) {
+                var country_id = $('#country-id').text();
+                transaction = 'submit country state'; 
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&country_id=' + country_id,
+                    dataType: 'JSON',
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            show_alert('Insert State Success', 'The state has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#state-datatable');
+                        }
+                        else{
+                            show_alert('State Error', response[0]['RESPONSE'], 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                state_name: {
+                    required: true
+                }
+            },
+            messages: {
+                state_name: {
+                    required: 'Please enter the state',
+                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {

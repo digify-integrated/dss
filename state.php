@@ -8,19 +8,19 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(21);
+        $page_details = $api->get_page_details(25);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 21, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 25, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
         }
         else{
-            $add_notification_setting = $api->check_role_access_rights($username, '52', 'action');
-            $delete_notification_setting = $api->check_role_access_rights($username, '54', 'action');
+            $add_state = $api->check_role_access_rights($username, '64', 'action');
+            $delete_state = $api->check_role_access_rights($username, '66', 'action');
 
             require('views/_interface_settings.php');
         }
@@ -58,7 +58,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Notification Settings</h4>
+                                    <h4 class="mb-sm-0 font-size-18">State</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
@@ -79,17 +79,17 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Notification Setting List</h4>
+                                                        <h4 class="card-title">State List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_notification_setting > 0){
+                                                            if($delete_state > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_notification_setting > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-notification-setting">Delete Notification Setting</button>';
+                                                                if($delete_state > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-state">Delete State</button>';
                                                                 }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -100,8 +100,8 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                            if($add_notification_setting > 0){
-                                                                echo '<a href="notification-setting-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                            if($add_state > 0){
+                                                                echo '<a href="state-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
                                                         <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
@@ -115,11 +115,11 @@
                                                     </div>
                                                     <div class="offcanvas-body">
                                                         <div class="mb-3">
-                                                            <p class="text-muted">Notification Channel</p>
+                                                            <p class="text-muted">Country</p>
 
-                                                            <select class="form-control filter-select2" id="filter_notification_channel">
+                                                            <select class="form-control filter-select2" id="filter_country">
                                                                 <option value="">All</option>
-                                                                <?php echo $api->generate_system_code_options('NOTIFICATIONCHANNEL'); ?>
+                                                                <?php echo $api->generate_country_options(); ?>
                                                             </select>
                                                         </div>
                                                         <div>
@@ -131,7 +131,7 @@
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="notification-settings-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="state-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -139,8 +139,9 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Notification Setting ID</th>
-                                                            <th class="all">Notification Setting</th>
+                                                            <th class="all">State ID</th>
+                                                            <th class="all">State</th>
+                                                            <th class="all">Country</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>
@@ -170,6 +171,6 @@
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/notification-settings.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/state.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

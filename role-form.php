@@ -178,7 +178,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="parameter_extension" class="col-md-3 col-form-label">Assignable?</label>
+                                                        <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
                                                         <div class="col-md-9">
                                                             <select class="form-control select2" id="assignable" name="assignable" <?php echo $disabled; ?>>
                                                                 <option value="2">False</option>

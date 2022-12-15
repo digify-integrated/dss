@@ -234,7 +234,7 @@
                                                             <div class="tab-pane active" id="role-recipients" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="notification-role-recipients-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="notification-role-recipients-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
@@ -249,7 +249,7 @@
                                                             <div class="tab-pane" id="user-account-recipients" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="notification-user-account-recipients-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="notification-user-account-recipients-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">User Account</th>

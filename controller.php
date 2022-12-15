@@ -1244,6 +1244,134 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit country
+    else if($transaction == 'submit country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id']) && isset($_POST['country_name']) && !empty($_POST['country_name'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $country_id = $_POST['country_id'];
+            $country_name = $_POST['country_name'];
+
+            $check_country_exist = $api->check_country_exist($country_id);
+ 
+            if($check_country_exist > 0){
+                $update_country = $api->update_country($country_id, $country_name, $username);
+
+                if($update_country){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'COUNTRY_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_country,
+                        'COUNTRY_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_country = $api->insert_country($country_name, $username);
+    
+                if($insert_country[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'COUNTRY_ID' => $insert_country[0]['COUNTRY_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_country[0]['RESPONSE'],
+                        'COUNTRY_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit country state
+    else if($transaction == 'submit country state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $state_name = $_POST['state_name'];
+            $country_id = $_POST['country_id'];
+
+            $insert_state = $api->insert_state($state_name, $country_id, $username);
+    
+            if($insert_state[0]['RESPONSE']){
+                $response[] = array(
+                    'RESPONSE' => 'Inserted',
+                    'STATE_ID' => $insert_state[0]['STATE_ID']
+                );
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $insert_state[0]['RESPONSE'],
+                    'STATE_ID' => null
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+    
+    # Submit state
+    else if($transaction == 'submit state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $state_id = $_POST['state_id'];
+            $state_name = $_POST['state_name'];
+            $country_id = $_POST['country_id'];
+
+            $check_state_exist = $api->check_state_exist($state_id);
+ 
+            if($check_state_exist > 0){
+                $update_state = $api->update_state($state_id, $state_name, $country_id, $username);
+
+                if($update_state){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'STATE_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_state,
+                        'STATE_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_state = $api->insert_state($state_name, $country_id, $username);
+    
+                if($insert_state[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'STATE_ID' => $insert_state[0]['STATE_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_state[0]['RESPONSE'],
+                        'STATE_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -2125,7 +2253,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Delete notification role recipient
     else if($transaction == 'delete notification role recipient'){
-        if(isset($_POST['user_id']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
             $username = $_POST['username'];
             $notification_setting_id = $_POST['notification_setting_id'];
             $role_id = $_POST['role_id'];
@@ -2154,7 +2282,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Delete notification user account recipient
     else if($transaction == 'delete notification user account recipient'){
-        if(isset($_POST['user_id']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['user_id']) && !empty($_POST['notification_setting_id'])){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['user_id']) && !empty($_POST['notification_setting_id'])){
             $username = $_POST['username'];
             $notification_setting_id = $_POST['notification_setting_id'];
             $user_id = $_POST['user_id'];
@@ -2180,7 +2308,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Delete notification channel
     else if($transaction == 'delete notification channel'){
-        if(isset($_POST['user_id']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['channel']) && !empty($_POST['channel'])){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['channel']) && !empty($_POST['channel'])){
             $username = $_POST['username'];
             $notification_setting_id = $_POST['notification_setting_id'];
             $channel = $_POST['channel'];
@@ -2199,6 +2327,137 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             }
             else{
                 echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete country
+    else if($transaction == 'delete country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $username = $_POST['username'];
+            $country_id = $_POST['country_id'];
+
+            $check_country_exist = $api->check_country_exist($country_id);
+
+            if($check_country_exist > 0){
+                $delete_country = $api->delete_country($country_id, $username);
+                                    
+                if($delete_country){
+                    $delete_all_state = $api->delete_all_state($country_id, $username);
+                                    
+                    if($delete_all_state){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_state;
+                    }
+                }
+                else{
+                    echo $delete_country;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple country
+    else if($transaction == 'delete multiple country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $username = $_POST['username'];
+            $country_ids = $_POST['country_id'];
+
+            foreach($country_ids as $country_id){
+                $check_country_exist = $api->check_country_exist($country_id);
+
+                if($check_country_exist > 0){
+                    $delete_country = $api->delete_country($country_id, $username);
+                                    
+                    if($delete_country){
+                        $delete_all_state = $api->delete_all_state($country_id, $username);
+                                    
+                        if(!$delete_all_state){
+                            $error = $delete_all_state;
+                            break;
+                        }
+                    }
+                    else{
+                        $error = $delete_country;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete state
+    else if($transaction == 'delete state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id']) && !empty($_POST['state_id'])){
+            $username = $_POST['username'];
+            $state_id = $_POST['state_id'];
+
+            $check_state_exist = $api->check_state_exist($state_id);
+
+            if($check_state_exist > 0){
+                $delete_state = $api->delete_state($state_id, $username);
+                                    
+                if($delete_state){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_state;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple state
+    else if($transaction == 'delete multiple state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id']) && !empty($_POST['state_id'])){
+            $username = $_POST['username'];
+            $state_ids = $_POST['state_id'];
+
+            foreach($state_ids as $state_id){
+                $check_state_exist = $api->check_state_exist($state_id);
+
+                if($check_state_exist > 0){
+                    $delete_state = $api->delete_state($state_id, $username);
+                                    
+                    if(!$delete_state){
+                        $error = $delete_state;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
             }
         }
     }
@@ -2616,6 +2875,39 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'SYSTEM_LINK' => $notification_setting_details[0]['SYSTEM_LINK'],
                 'EMAIL_LINK' => $notification_setting_details[0]['EMAIL_LINK'],
                 'TRANSACTION_LOG_ID' => $notification_setting_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Country details
+    else if($transaction == 'country details'){
+        if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $country_id = $_POST['country_id'];
+            $country_details = $api->get_country_details($country_id);
+
+            $response[] = array(
+                'COUNTRY_NAME' => $country_details[0]['COUNTRY_NAME'],
+                'TRANSACTION_LOG_ID' => $country_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # State details
+    else if($transaction == 'state details'){
+        if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
+            $state_id = $_POST['state_id'];
+            $state_details = $api->get_state_details($state_id);
+
+            $response[] = array(
+                'STATE_NAME' => $state_details[0]['STATE_NAME'],
+                'COUNTRY_ID' => $state_details[0]['COUNTRY_ID'],
+                'TRANSACTION_LOG_ID' => $state_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);
