@@ -81,7 +81,7 @@
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
                                             <li class="breadcrumb-item"><a href="email-settings.php">Email Settings</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
@@ -118,16 +118,20 @@
                                                                     $dropdown_action .= '<a class="dropdown-item" href="email-setting-form.php">Add Email Setting</a>';
                                                                 }
 
-                                                                if($activate_email_setting > 0 && $email_setting_status == 2){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="activate-email-setting">Activate Email Setting</button>';
-                                                                }
-
-                                                                if($activate_email_setting > 0 && $email_setting_status == 1){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="deactivate-email-setting">Deactivate Email Setting</button>';
-                                                                }
-
                                                                 if($delete_email_setting > 0){
                                                                     $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="delete-email-setting">Delete Email Setting</button>';
+                                                                }
+
+                                                                if(($activate_email_setting > 0 && $email_setting_status == 2) || ($deactivate_email_setting > 0 && $email_setting_status == 1)){
+                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
+                                                                    
+                                                                    if($activate_email_setting > 0 && $email_setting_status == 2){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="activate-email-setting">Activate Email Setting</button>';
+                                                                    }
+    
+                                                                    if($deactivate_email_setting > 0 && $email_setting_status == 1){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-email-setting-id="'. $email_setting_id .'" id="deactivate-email-setting">Deactivate Email Setting</button>';
+                                                                    }
                                                                 }
 
                                                                 $dropdown_action .= '</div>
@@ -135,7 +139,7 @@
 
                                                                 echo $dropdown_action;
                                                             }
-                                                            ?>
+                                                        ?>
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
@@ -148,6 +152,13 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <?php
+                                                if(!empty($email_setting_id)){
+                                                    echo '<div class="row">
+                                                            <div class="col-md-12" id="email_setting_status"></div>
+                                                        </div>';
+                                                }
+                                            ?>
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">

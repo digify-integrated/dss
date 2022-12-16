@@ -8,11 +8,11 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(18);
+        $page_details = $api->get_page_details(28);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 18, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 28, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -21,21 +21,21 @@
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
-                $interface_setting_id = $api->decrypt_data($id);
-                $interface_setting_details = $api->get_interface_setting_details($interface_setting_id);
-                $interface_setting_status = $interface_setting_details[0]['STATUS'];
+                $zoom_api_id = $api->decrypt_data($id);
+                $zoom_api_details = $api->get_zoom_api_details($zoom_api_id);
+                $zoom_api_status = $zoom_api_details[0]['STATUS'];
             }
             else{
-                $interface_setting_id = null;
+                $zoom_api_id = null;
             }
 
-            $add_interface_setting = $api->check_role_access_rights($username, '42', 'action');
-            $update_interface_setting = $api->check_role_access_rights($username, '43', 'action');
-            $delete_interface_setting = $api->check_role_access_rights($username, '44', 'action');
-            $activate_interface_setting = $api->check_role_access_rights($username, '45', 'action');
-            $deactivate_interface_setting = $api->check_role_access_rights($username, '46', 'action');
+            $add_zoom_api = $api->check_role_access_rights($username, '67', 'action');
+            $update_zoom_api = $api->check_role_access_rights($username, '68', 'action');
+            $delete_zoom_api = $api->check_role_access_rights($username, '69', 'action');
+            $activate_zoom_api = $api->check_role_access_rights($username, '70', 'action');
+            $deactivate_zoom_api = $api->check_role_access_rights($username, '71', 'action');
 
-            if($update_interface_setting > 0){
+            if($update_zoom_api > 0){
                 $disabled = null;
             }
             else{
@@ -77,17 +77,17 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Interface Setting Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Zoom API Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
-                                            <li class="breadcrumb-item"><a href="interface-settings.php">Interface Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="zoom-api.php">Zoom API</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
-                                                if(!empty($interface_setting_id)){
-                                                    echo '<li class="breadcrumb-item" id="interface-setting-id"><a href="javascript: void(0);">'. $interface_setting_id .'</a></li>';
+                                                if(!empty($zoom_api_id)){
+                                                    echo '<li class="breadcrumb-item" id="zoom-api-id"><a href="javascript: void(0);">'. $zoom_api_id .'</a></li>';
                                                 }
                                             ?>
                                         </ol>
@@ -100,37 +100,37 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="interface-setting-form" method="post" action="#">
+                                        <form id="zoom-api-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Interface Setting Form</h4>
+                                                            <h4 class="card-title">Zoom API Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(!empty($interface_setting_id)){
+                                                            if(!empty($zoom_api_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_interface_setting > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="interface-setting-form.php">Add Interface Setting</a>';
+                                                                if($add_zoom_api > 0){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="zoom-api-form.php">Add Zoom API</a>';
                                                                 }
 
-                                                                if($delete_interface_setting > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="delete-interface-setting">Delete Interface Setting</button>';
+                                                                if($delete_zoom_api > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-zoom-api-id="'. $zoom_api_id .'" id="delete-zoom-api">Delete Zoom API</button>';
                                                                 }
 
-                                                                if(($activate_interface_setting > 0 && $interface_setting_status == 2) || ($deactivate_interface_setting > 0 && $interface_setting_status == 1)){
+                                                                if(($activate_zoom_api > 0 && $zoom_api_status == 2) || ($deactivate_zoom_api > 0 && $zoom_api_status == 1)){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
 
-                                                                    if($activate_interface_setting > 0 && $interface_setting_status == 2){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="activate-interface-setting">Activate Interface Setting</button>';
+                                                                    if($activate_zoom_api > 0 && $zoom_api_status == 2){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-zoom-api-id="'. $zoom_api_id .'" id="activate-zoom-api">Activate Zoom API</button>';
                                                                     }
     
-                                                                    if($deactivate_interface_setting > 0 && $interface_setting_status == 1){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="deactivate-interface-setting">Deactivate Interface Setting</button>';
+                                                                    if($deactivate_zoom_api > 0 && $zoom_api_status == 1){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-zoom-api-id="'. $zoom_api_id .'" id="deactivate-zoom-api">Deactivate Zoom API</button>';
                                                                     }
                                                                 }
 
@@ -143,7 +143,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_interface_setting > 0 || ($update_interface_setting > 0 && !empty($interface_setting_id)))){
+                                                                if(($add_zoom_api > 0 || ($update_zoom_api > 0 && !empty($zoom_api_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
@@ -153,46 +153,26 @@
                                                 </div>
                                             </div>
                                             <?php
-                                                if(!empty($interface_setting_id)){
+                                                if(!empty($zoom_api_id)){
                                                     echo '<div class="row">
-                                                            <div class="col-md-12" id="interface_setting_status"></div>
+                                                            <div class="col-md-12" id="zoom_api_status"></div>
                                                         </div>';
                                                 }
                                             ?>
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="interface_setting_id" name="interface_setting_id">
+                                                        <input type="hidden" id="zoom_api_id" name="zoom_api_id">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="interface_setting_name" class="col-md-3 col-form-label">Interface Setting <span class="text-danger">*</span></label>
+                                                        <label for="zoom_api_name" class="col-md-3 col-form-label">Zoom API <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="interface_setting_name" name="interface_setting_name" maxlength="100" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="zoom_api_name" name="zoom_api_name" maxlength="100" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="login_background_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
                                                     <div class="row mb-4">
-                                                        <label for="login_background" class="col-md-3 col-form-label">Login Background</label>
+                                                        <label for="api_key" class="col-md-3 col-form-label">API Key <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_background" id="login_background">
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="login_logo_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
-                                                    <div class="row mb-4">
-                                                        <label for="login_logo" class="col-md-3 col-form-label">Login Logo</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_logo" id="login_logo">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="api_key" name="api_key" maxlength="1000" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -203,37 +183,17 @@
                                                             <input type="text" class="form-control form-maxlength" autocomplete="off" id="description" name="description" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="menu_logo_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
                                                     <div class="row mb-4">
-                                                        <label for="menu_logo" class="col-md-3 col-form-label">Menu Logo</label>
+                                                        <label for="api_secret" class="col-md-3 col-form-label">API Secret <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="menu_logo" id="menu_logo">
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="favicon_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
-                                                    <div class="row mb-4">
-                                                        <label for="favicon" class="col-md-3 col-form-label">Favicon</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="favicon" id="favicon">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="api_secret" name="api_secret" maxlength="1000" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
                                         <?php
-                                            if(!empty($interface_setting_id)){
+                                            if(!empty($zoom_api_id)){
                                                 echo ' <div class="row mt-4">
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
@@ -289,6 +249,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/interface-setting-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/zoom-api-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

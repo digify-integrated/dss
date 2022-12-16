@@ -2,33 +2,25 @@
     'use strict';
 
     $(function() {
-        if($('#email-setting-id').length){
-            var transaction = 'email setting details';
-            var email_setting_id = $('#email-setting-id').text();
+        if($('#zoom-api-id').length){
+            var transaction = 'zoom api details';
+            var zoom_api_id = $('#zoom-api-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {email_setting_id : email_setting_id, transaction : transaction},
+                data: {zoom_api_id : zoom_api_id, transaction : transaction},
                 success: function(response) {
-                    $('#email_setting_name').val(response[0].EMAIL_SETTING_NAME);
-                    $('#mail_host').val(response[0].MAIL_HOST);
+                    $('#zoom_api_name').val(response[0].ZOOM_API_NAME);
+                    $('#api_key').val(response[0].API_KEY);
+                    $('#api_secret').val(response[0].API_SECRET);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
                     $('#description').val(response[0].DESCRIPTION);
-                    $('#mail_username').val(response[0].MAIL_USERNAME);
-                    $('#mail_from_name').val(response[0].MAIL_FROM_NAME);
-                    $('#port').val(response[0].PORT);
-                    $('#mail_password').val(response[0].MAIL_PASSWORD);
-                    $('#mail_from_email').val(response[0].MAIL_FROM_EMAIL);
 
-                    document.getElementById('email_setting_status').innerHTML = response[0].STATUS;
+                    document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
 
-                    check_empty(response[0].MAIL_ENCRYPTION, '#mail_encryption', 'select');
-                    check_empty(response[0].SMTP_AUTH, '#smtp_auth', 'select');
-                    check_empty(response[0].SMTP_AUTO_TLS, '#smtp_auto_tls', 'select');
-
-                    $('#email_setting_id').val(email_setting_id);
+                    $('#zoom_api_id').val(zoom_api_id);
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
@@ -38,9 +30,9 @@
             });
         }
 
-        $('#email-setting-form').validate({
+        $('#zoom-api-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit email setting';
+                var transaction = 'submit zoom api';
                 var username = $('#username').text();
 
                 var formData = new FormData(form);
@@ -61,16 +53,16 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['EMAIL_SETTING_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['ZOOM_API_ID'];
 
-                                show_alert_event('Insert Email Setting Success', 'The email setting has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Zoom API Success', 'The zoom api has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Email Setting Success', 'The email setting has been updated.', 'success', 'reload');
+                                show_alert_event('Update Zoom API Success', 'The zoom api has been updated.', 'success', 'reload');
                             }
                         }
                         else{
-                            show_alert('Email Setting Error', response, 'error');
+                            show_alert('Zoom API Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -81,55 +73,31 @@
                 return false;
             },
             rules: {
-                email_setting_name: {
+                zoom_api_name: {
                     required: true
                 },
                 description: {
                     required: true
                 },
-                mail_host: {
+                api_key: {
                     required: true
                 },
-                mail_username: {
-                    required: true
-                },
-                mail_encryption: {
-                    required: true
-                },
-                mail_from_name: {
-                    required: true
-                },
-                mail_password: {
-                    required: true
-                },
-                mail_from_email: {
+                api_secret: {
                     required: true
                 }
             },
             messages: {
-                email_setting_name: {
-                    required: 'Please enter the email setting name',
+                zoom_api_name: {
+                    required: 'Please enter the zoom api name',
                 },
                 description: {
                     required: 'Please enter the description',
                 },
-                mail_host: {
-                    required: 'Please enter the mail host',
+                api_key: {
+                    required: 'Please enter the API Key',
                 },
-                mail_username: {
-                    required: 'Please enter the mail username',
-                },
-                mail_encryption: {
-                    required: 'Please choose the mail encryption',
-                },
-                mail_from_name: {
-                    required: 'Please enter the mail from name',
-                },
-                mail_password: {
-                    required: 'Please enter the mail password',
-                },
-                mail_from_email: {
-                    required: 'Please enter the mail from email',
+                api_secret: {
+                    required: 'Please enter the API Secret',
                 }
             },
             errorPlacement: function(label, element) {
@@ -252,13 +220,13 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#activate-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'activate email setting';
+    $(document).on('click','#activate-zoom-api',function() {
+        var zoom_api_id = $(this).data('zoom-api-id');
+        var transaction = 'activate zoom api';
 
         Swal.fire({
-            title: 'Activate Email Setting',
-            text: 'Are you sure you want to activate this email setting?',
+            title: 'Activate Zoom API',
+            text: 'Are you sure you want to activate this zoom api?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Activate',
@@ -271,18 +239,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
+                    data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Activated' || response === 'Not Found'){
                             if(response === 'Activated'){
-                                show_alert_event('Activate Email Setting', 'The email setting has been activated.', 'success', 'reload');
+                                show_alert_event('Activate Zoom API', 'The zoom api has been activated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Activate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Activate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else{
-                            show_alert('Activate Email Setting', response, 'error');
+                            show_alert('Activate Zoom API', response, 'error');
                         }
                     }
                 });
@@ -291,13 +259,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#deactivate-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'deactivate email setting';
+    $(document).on('click','#deactivate-zoom-api',function() {
+        var zoom_api_id = $(this).data('zoom-api-id');
+        var transaction = 'deactivate zoom api';
 
         Swal.fire({
-            title: 'Deactivate Email Setting',
-            text: 'Are you sure you want to deactivate this email setting?',
+            title: 'Deactivate Zoom API',
+            text: 'Are you sure you want to deactivate this zoom api?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Deactivate',
@@ -310,18 +278,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
+                    data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deactivated' || response === 'Not Found'){
                             if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Email Setting', 'The email setting has been deactivated.', 'success', 'reload');
+                                show_alert_event('Deactivate Zoom API', 'The zoom api has been deactivated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Deactivate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Deactivate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else{
-                            show_alert('Deactivate Email Setting', response, 'error');
+                            show_alert('Deactivate Zoom API', response, 'error');
                         }
                     }
                 });
@@ -330,13 +298,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'delete email setting';
+    $(document).on('click','#delete-zoom-api',function() {
+        var zoom_api_id = $(this).data('zoom-api-id');
+        var transaction = 'delete zoom api';
 
         Swal.fire({
-            title: 'Delete Email Setting',
-            text: 'Are you sure you want to delete this email setting?',
+            title: 'Delete Zoom API',
+            text: 'Are you sure you want to delete this zoom api?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -349,18 +317,18 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
+                    data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Email Setting', 'The email setting has been deleted.', 'success', 'redirect', 'email-settings.php');
+                                show_alert_event('Delete Zoom API', 'The zoom api has been deleted.', 'success', 'redirect', 'zoom-api.php');
                             }
                             else{
-                                show_alert_event('Delete Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Delete Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else{
-                            show_alert('Delete Email Setting', response, 'error');
+                            show_alert('Delete Zoom API', response, 'error');
                         }
                     }
                 });
@@ -383,7 +351,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'email-settings.php';
+                window.location.href = 'zoom-api.php';
                 return false;
             }
         });

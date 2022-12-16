@@ -81,8 +81,8 @@
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="roles.php">Roles</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Administration</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
                                                 if(!empty($role_id)){

@@ -1049,6 +1049,31 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_zoom_api_exist
+    # Purpose    : Checks if the zoom API exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_zoom_api_exist($zoom_api_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_zoom_api_exist(:zoom_api_id)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1990,14 +2015,7 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Deactivate', 'User ' . $username . ' updated interface setting status.');
-                                    
-                if($insert_transaction_log){
-                    return true;
-                }
-                else{
-                    return $insert_transaction_log;
-                }
+                return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -2332,7 +2350,7 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : update_email_setting_status
-    # Purpose    : Updates interface setting.
+    # Purpose    : Updates email setting status.
     #
     # Returns    : Number/String
     #
@@ -2393,14 +2411,7 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Deactivate', 'User ' . $username . ' updated email setting status.');
-                                    
-                if($insert_transaction_log){
-                    return true;
-                }
-                else{
-                    return $insert_transaction_log;
-                }
+                return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -2605,6 +2616,148 @@ class Api{
                         return $update_system_parameter_value;
                     }
                 }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+    
+    # -------------------------------------------------------------
+    #
+    # Name       : update_zoom_api
+    # Purpose    : Updates zoom API.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_zoom_api($zoom_api_id, $zoom_api_name, $description, $api_key, $api_secret, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $zoom_api_details = $this->get_zoom_api_details($zoom_api_id);
+            
+            if(!empty($zoom_api_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $zoom_api_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_zoom_api(:zoom_api_id, :zoom_api_name, :description, :api_key, :api_secret, :transaction_log_id, :record_log)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+            $sql->bindValue(':zoom_api_name', $zoom_api_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':api_key', $api_key);
+            $sql->bindValue(':api_secret', $api_secret);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($zoom_api_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated zoom API.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated zoom API.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_zoom_api_status
+    # Purpose    : Updates zoom API status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_zoom_api_status($zoom_api_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $zoom_api_details = $this->get_zoom_api_details($zoom_api_id);
+            $transaction_log_id = $zoom_api_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Activate';
+            }
+            else{
+                $log_status = 'Deactivate';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_zoom_api_status(:zoom_api_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated zoom API status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_other_zoom_api_status
+    # Purpose    : Updates the other zoom API to deactivated.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_other_zoom_api_status($zoom_api_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $zoom_api_details = $this->get_zoom_api_details($zoom_api_id);
+            $transaction_log_id = $zoom_api_details[0]['TRANSACTION_LOG_ID'];
+
+            $sql = $this->db_connection->prepare('CALL update_other_zoom_api_status(:zoom_api_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -3976,6 +4129,88 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_zoom_api
+    # Purpose    : Insert zoom api.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_zoom_api($zoom_api_name, $description, $api_key, $api_secret, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(15, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_zoom_api(:id, :zoom_api_name, :description, :api_key, :api_secret, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':zoom_api_name', $zoom_api_name);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':api_key', $api_key);
+            $sql->bindValue(':api_secret', $api_secret);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 15, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted zoom API.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'ZOOM_API_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log,
+                                'ZOOM_API_ID' => null
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value,
+                            'ZOOM_API_ID' => null
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value,
+                        'ZOOM_API_ID' => null
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2],
+                    'ZOOM_API_ID' => null
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -4827,6 +5062,29 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_zoom_api
+    # Purpose    : Delete zoom api.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_zoom_api($zoom_api_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_zoom_api(:zoom_api_id)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -5460,6 +5718,80 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_zoom_api_details
+    # Purpose    : Gets the zoom API details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_zoom_api_details($zoom_api_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_zoom_api_details(:zoom_api_id)');
+            $sql->bindValue(':zoom_api_id', $zoom_api_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ZOOM_API_NAME' => $row['ZOOM_API_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'API_KEY' => $row['API_KEY'],
+                        'API_SECRET' => $row['API_SECRET'],
+                        'STATUS' => $row['STATUS'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_activated_zoom_api_details
+    # Purpose    : Gets the activated zoom API details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_activated_zoom_api_details(){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_activated_zoom_api_details()');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ZOOM_API_ID' => $row['ZOOM_API_ID'],
+                        'ZOOM_API_NAME' => $row['ZOOM_API_NAME'],
+                        'DESCRIPTION' => $row['DESCRIPTION'],
+                        'API_KEY' => $row['API_KEY'],
+                        'API_SECRET' => $row['API_SECRET'],
+                        'STATUS' => $row['STATUS'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -5592,6 +5924,36 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_email_setting_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Active';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Deactivated';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+    
+    # -------------------------------------------------------------
+    #
+    # Name       : get_zoom_api_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_zoom_api_status($stat){
         $response = array();
 
         switch ($stat) {

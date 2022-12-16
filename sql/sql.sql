@@ -1864,6 +1864,8 @@ END //
 /* Global Zoom API */
 CREATE TABLE global_zoom_api(
 	ZOOM_API_ID INT(50) PRIMARY KEY,
+	ZOOM_API_NAME VARCHAR(100) NOT NULL,
+	DESCRIPTION VARCHAR(200) NOT NULL,
 	API_KEY VARCHAR(1000) NOT NULL,
 	API_SECRET VARCHAR(1000) NOT NULL,
 	STATUS TINYINT(1) NOT NULL,
@@ -1884,15 +1886,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_zoom_api(IN zoom_api_id INT(50), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_zoom_api(IN zoom_api_id INT(50), IN zoom_api_name VARCHAR(100), IN description VARCHAR(200), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @zoom_api_id = zoom_api_id;
+	SET @zoom_api_name = zoom_api_name;
+	SET @description = description;
 	SET @api_key = api_key;
 	SET @api_secret = api_secret;
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'UPDATE global_zoom_api SET API_KEY = @api_key, API_SECRET = @api_secret, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'UPDATE global_zoom_api SET ZOOM_API_NAME = @zoom_api_name, DESCRIPTION = @description, API_KEY = @api_key, API_SECRET = @api_secret, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ZOOM_API_ID = @zoom_api_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -1926,15 +1930,17 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE insert_zoom_api(IN zoom_api_id INT(50), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+CREATE PROCEDURE insert_zoom_api(IN zoom_api_id INT(50), IN zoom_api_name VARCHAR(100), IN description VARCHAR(200), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @zoom_api_id = zoom_api_id;
+	SET @zoom_api_name = zoom_api_name;
+	SET @description = description;
 	SET @api_key = api_key;
 	SET @api_secret = api_secret;
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'INSERT INTO global_zoom_api (ZOOM_API_ID, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@zoom_api_id, @api_key, @api_secret, "2", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_zoom_api (ZOOM_API_ID, ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@zoom_api_id, @zoom_api_name, @description, @api_key, @api_secret, "2", @transaction_log_id, @record_log)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -1945,7 +1951,7 @@ CREATE PROCEDURE get_zoom_api_details(IN zoom_api_id INT(50))
 BEGIN
 	SET @zoom_api_id = zoom_api_id;
 
-	SET @query = 'SELECT API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_zoom_api WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'SELECT ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_zoom_api WHERE ZOOM_API_ID = @zoom_api_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -1965,7 +1971,7 @@ END //
 
 CREATE PROCEDURE get_activated_zoom_api_details()
 BEGIN
-	SET @query = 'SELECT ZOOM_API_ID, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_email_setting WHERE STATUS = 1';
+	SET @query = 'SELECT ZOOM_API_ID, ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_zoom_api WHERE STATUS = 1';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

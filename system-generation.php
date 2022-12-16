@@ -2479,6 +2479,58 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Zoom API table
+    else if($type == 'zoom api table'){
+        if(isset($_POST['filter_status'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+
+                $query = 'SELECT ZOOM_API_ID, ZOOM_API_NAME, DESCRIPTION, STATUS FROM global_zoom_api';
+
+                if(!empty($filter_status)){
+                    $query .= ' WHERE STATUS = :filter_status';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $zoom_api_id = $row['ZOOM_API_ID'];
+                        $email_setting_name = $row['ZOOM_API_NAME'];
+                        $description = $row['DESCRIPTION'];
+                        $status = $row['STATUS'];
+    
+                        $zoom_api_status = $api->get_zoom_api_status($status)[0]['BADGE'];
+    
+                        $zoom_api_id_encrypted = $api->encrypt_data($zoom_api_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $zoom_api_id .'">',
+                            'ZOOM_API_ID' => $zoom_api_id,
+                            'ZOOM_API_NAME' => $email_setting_name . '<p class="text-muted mb-0">'. $description .'</p>',
+                            'STATUS' => $zoom_api_status,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="zoom-api-form.php?id='. $zoom_api_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Zoom API">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>

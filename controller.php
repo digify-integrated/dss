@@ -1372,6 +1372,58 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit zoom api
+    else if($transaction == 'submit zoom api'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['zoom_api_id']) && isset($_POST['zoom_api_name']) && !empty($_POST['zoom_api_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['api_key']) && !empty($_POST['api_key']) && isset($_POST['api_secret']) && !empty($_POST['api_secret'])){
+            $response = array();
+            $file_type = '';
+            $username = $_POST['username'];
+            $zoom_api_id = $_POST['zoom_api_id'];
+            $zoom_api_name = $_POST['zoom_api_name'];
+            $description = $_POST['description'];
+            $api_key = $_POST['api_key'];
+            $api_secret = $_POST['api_secret'];
+
+            $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
+ 
+            if($check_zoom_api_exist > 0){
+                $update_zoom_api = $api->update_zoom_api($zoom_api_id, $zoom_api_name, $description, $api_key, $api_secret, $username);
+
+                if($update_zoom_api){
+                    $response[] = array(
+                        'RESPONSE' => 'Updated',
+                        'ZOOM_API_ID' => null
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_zoom_api,
+                        'ZOOM_API_ID' => null
+                    );
+                }
+            }
+            else{
+                $insert_zoom_api = $api->insert_zoom_api($zoom_api_name, $description, $api_key, $api_secret, $username);
+    
+                if($insert_zoom_api[0]['RESPONSE']){
+                    $response[] = array(
+                        'RESPONSE' => 'Inserted',
+                        'ZOOM_API_ID' => $insert_zoom_api[0]['ZOOM_API_ID']
+                    );
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $insert_zoom_api[0]['RESPONSE'],
+                        'ZOOM_API_ID' => null
+                    );
+                }
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -2148,6 +2200,64 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete email setting
+    else if($transaction == 'delete email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_id = $_POST['email_setting_id'];
+
+            $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+            if($check_email_setting_exist > 0){
+                $delete_email_setting = $api->delete_email_setting($email_setting_id, $username);
+                                    
+                if($delete_email_setting){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_email_setting;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple email setting
+    else if($transaction == 'delete multiple email setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
+            $username = $_POST['username'];
+            $email_setting_ids = $_POST['email_setting_id'];
+
+            foreach($email_setting_ids as $email_setting_id){
+                $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
+
+                if($check_email_setting_exist > 0){
+                    $delete_email_setting = $api->delete_email_setting($email_setting_id, $username);
+                                    
+                    if(!$delete_email_setting){
+                        $error = $delete_email_setting;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # Delete notification setting
     else if($transaction == 'delete notification setting'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
@@ -2463,6 +2573,64 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete zoom api
+    else if($transaction == 'delete zoom api'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
+            $username = $_POST['username'];
+            $zoom_api_id = $_POST['zoom_api_id'];
+
+            $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
+
+            if($check_zoom_api_exist > 0){
+                $delete_zoom_api = $api->delete_zoom_api($zoom_api_id, $username);
+                                    
+                if($delete_zoom_api){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_zoom_api;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple zoom api
+    else if($transaction == 'delete multiple zoom api'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
+            $username = $_POST['username'];
+            $zoom_api_ids = $_POST['zoom_api_id'];
+
+            foreach($zoom_api_ids as $zoom_api_id){
+                $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
+
+                if($check_zoom_api_exist > 0){
+                    $delete_zoom_api = $api->delete_zoom_api($zoom_api_id, $username);
+                                    
+                    if(!$delete_zoom_api){
+                        $error = $delete_zoom_api;
+                        break;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                    break;
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -2538,6 +2706,38 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         }
     }
     # -------------------------------------------------------------
+
+    # Activate zoom api
+    else if($transaction == 'activate zoom api'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
+            $username = $_POST['username'];
+            $zoom_api_id = $_POST['zoom_api_id'];
+
+            $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
+
+            if($check_zoom_api_exist > 0){
+                $update_zoom_api_status = $api->update_zoom_api_status($zoom_api_id, 1, $username);
+                                    
+                if($update_zoom_api_status){
+                    $update_other_zoom_api_status = $api->update_other_zoom_api_status($zoom_api_id, $username);
+                                    
+                    if($update_zoom_api_status){
+                        echo 'Activated';
+                    }
+                    else{
+                        echo $update_zoom_api_status;
+                    }
+                }
+                else{
+                    echo $update_zoom_api_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
      
     # -------------------------------------------------------------
     #   Deactivate transactions
@@ -2584,6 +2784,31 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 }
                 else{
                     echo $update_email_setting_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Deactivate zoom api
+    else if($transaction == 'deactivate zoom api'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
+            $username = $_POST['username'];
+            $zoom_api_id = $_POST['zoom_api_id'];
+
+            $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
+
+            if($check_zoom_api_exist > 0){
+                $update_zoom_api_status = $api->update_zoom_api_status($zoom_api_id, 2, $username);
+                                    
+                if($update_zoom_api_status){
+                    echo 'Deactivated';
+                }
+                else{
+                    echo $update_zoom_api_status;
                 }
             }
             else{
@@ -2823,6 +3048,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $response[] = array(
                 'INTERFACE_SETTING_NAME' => $interface_setting_details[0]['INTERFACE_SETTING_NAME'],
                 'DESCRIPTION' => $interface_setting_details[0]['DESCRIPTION'],
+                'STATUS' => $api->get_email_setting_status($interface_setting_details[0]['STATUS'])[0]['BADGE'],
                 'TRANSACTION_LOG_ID' => $interface_setting_details[0]['TRANSACTION_LOG_ID'],
                 'LOGIN_BACKGROUND' => '<img class="img-thumbnail" alt="login background" width="200" src="'. $login_background_file_path .'" data-holder-rendered="true">',
                 'LOGIN_LOGO' => '<img class="img-thumbnail" alt="login logo" width="200" src="'. $login_logo_file_path .'" data-holder-rendered="true">',
@@ -2844,6 +3070,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $response[] = array(
                 'EMAIL_SETTING_NAME' => $email_setting_details[0]['EMAIL_SETTING_NAME'],
                 'DESCRIPTION' => $email_setting_details[0]['DESCRIPTION'],
+                'STATUS' => $api->get_email_setting_status($email_setting_details[0]['STATUS'])[0]['BADGE'],
                 'MAIL_HOST' => $email_setting_details[0]['MAIL_HOST'],
                 'PORT' => $email_setting_details[0]['PORT'],
                 'SMTP_AUTH' => $email_setting_details[0]['SMTP_AUTH'],
@@ -2908,6 +3135,26 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'STATE_NAME' => $state_details[0]['STATE_NAME'],
                 'COUNTRY_ID' => $state_details[0]['COUNTRY_ID'],
                 'TRANSACTION_LOG_ID' => $state_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Zoom API details
+    else if($transaction == 'zoom api details'){
+        if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
+            $zoom_api_id = $_POST['zoom_api_id'];
+            $zoom_api_details = $api->get_zoom_api_details($zoom_api_id);
+
+            $response[] = array(
+                'ZOOM_API_NAME' => $zoom_api_details[0]['ZOOM_API_NAME'],
+                'DESCRIPTION' => $zoom_api_details[0]['DESCRIPTION'],
+                'API_KEY' => $zoom_api_details[0]['API_KEY'],
+                'API_SECRET' => $zoom_api_details[0]['API_SECRET'],
+                'STATUS' =>  $api->get_zoom_api_status($zoom_api_details[0]['STATUS'])[0]['BADGE'],
+                'TRANSACTION_LOG_ID' => $zoom_api_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

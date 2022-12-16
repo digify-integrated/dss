@@ -8,12 +8,12 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(18);
+        $page_details = $api->get_page_details(10);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 18, 'page');
-        $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
+        $page_access_right = $api->check_user_account_access_rights($username, 10, 'page');
+        $module_access_right = $api->check_user_account_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
@@ -21,21 +21,21 @@
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
-                $interface_setting_id = $api->decrypt_data($id);
-                $interface_setting_details = $api->get_interface_setting_details($interface_setting_id);
-                $interface_setting_status = $interface_setting_details[0]['STATUS'];
+                $user_id = $api->decrypt_data($id);
             }
             else{
-                $interface_setting_id = null;
+                $user_id = null;
             }
 
-            $add_interface_setting = $api->check_role_access_rights($username, '42', 'action');
-            $update_interface_setting = $api->check_role_access_rights($username, '43', 'action');
-            $delete_interface_setting = $api->check_role_access_rights($username, '44', 'action');
-            $activate_interface_setting = $api->check_role_access_rights($username, '45', 'action');
-            $deactivate_interface_setting = $api->check_role_access_rights($username, '46', 'action');
+            $add_user_account = $api->check_user_account_access_rights($username, '20', 'action');
+            $update_user_account = $api->check_user_account_access_rights($username, '21', 'action');
+            $delete_user_account = $api->check_user_account_access_rights($username, '22', 'action');
+            $lock_user_account = $api->check_user_account_access_rights($username, '75', 'action');
+            $unlock_user_account = $api->check_user_account_access_rights($username, '76', 'action');
+            $activate_user_account = $api->check_user_account_access_rights($username, '77', 'action');
+            $deactivate_user_account = $api->check_user_account_access_rights($username, '78', 'action');
 
-            if($update_interface_setting > 0){
+            if($update_user_account > 0){
                 $disabled = null;
             }
             else{
@@ -77,17 +77,16 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Interface Setting Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">User Account Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Technical</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
-                                            <li class="breadcrumb-item"><a href="interface-settings.php">Interface Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Administration</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
-                                                if(!empty($interface_setting_id)){
-                                                    echo '<li class="breadcrumb-item" id="interface-setting-id"><a href="javascript: void(0);">'. $interface_setting_id .'</a></li>';
+                                                if(!empty($user_id)){
+                                                    echo '<li class="breadcrumb-item" id="user-id"><a href="javascript: void(0);">'. $user_id .'</a></li>';
                                                 }
                                             ?>
                                         </ol>
@@ -100,38 +99,46 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="interface-setting-form" method="post" action="#">
+                                        <form id="role-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Interface Setting Form</h4>
+                                                            <h4 class="card-title">User Account Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if(!empty($interface_setting_id)){
+                                                            if(!empty($user_id)){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
-                                                                if($add_interface_setting > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="interface-setting-form.php">Add Interface Setting</a>';
+                                                                if($add_user_account > 0){
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="role-form.php">Add User Account</a>';
                                                                 }
 
-                                                                if($delete_interface_setting > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="delete-interface-setting">Delete Interface Setting</button>';
+                                                                if($delete_user_account > 0){
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-role">Delete User Account</button>';
                                                                 }
 
-                                                                if(($activate_interface_setting > 0 && $interface_setting_status == 2) || ($deactivate_interface_setting > 0 && $interface_setting_status == 1)){
+                                                                if(($add_user_account_module_access > 0 || $add_user_account_page_access > 0 || $add_user_account_action_access > 0 || $add_user_account_user_account > 0) && $update_user_account > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
 
-                                                                    if($activate_interface_setting > 0 && $interface_setting_status == 2){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="activate-interface-setting">Activate Interface Setting</button>';
-                                                                    }
-    
-                                                                    if($deactivate_interface_setting > 0 && $interface_setting_status == 1){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="deactivate-interface-setting">Deactivate Interface Setting</button>';
-                                                                    }
+                                                                    if($add_user_account_module_access > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
+                                                                    }                                                                    
+
+                                                                    if($add_user_account_page_access > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
+                                                                    }                                                                    
+
+                                                                    if($add_user_account_action_access > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
+                                                                    }                                                                    
+
+                                                                    if($add_user_account_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-user-account">Add User Account</button>';
+                                                                    }                                                                    
                                                                 }
 
                                                                 $dropdown_action .= '</div>
@@ -143,7 +150,7 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_interface_setting > 0 || ($update_interface_setting > 0 && !empty($interface_setting_id)))){
+                                                                if(($add_user_account > 0 || ($update_user_account > 0 && !empty($user_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
@@ -152,100 +159,71 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <?php
-                                                if(!empty($interface_setting_id)){
-                                                    echo '<div class="row">
-                                                            <div class="col-md-12" id="interface_setting_status"></div>
-                                                        </div>';
-                                                }
-                                            ?>
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="interface_setting_id" name="interface_setting_id">
+                                                        <input type="hidden" id="user_id" name="user_id">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="interface_setting_name" class="col-md-3 col-form-label">Interface Setting <span class="text-danger">*</span></label>
+                                                        <label for="role" class="col-md-3 col-form-label">User Account <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="interface_setting_name" name="interface_setting_name" maxlength="100" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role" name="role" maxlength="100" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="login_background_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
                                                     <div class="row mb-4">
-                                                        <label for="login_background" class="col-md-3 col-form-label">Login Background</label>
+                                                        <label for="role_description" class="col-md-3 col-form-label">User Account Description <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_background" id="login_background">
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="login_logo_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
-                                                    <div class="row mb-4">
-                                                        <label for="login_logo" class="col-md-3 col-form-label">Login Logo</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_logo" id="login_logo">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role_description" name="role_description" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="description" class="col-md-3 col-form-label">Description <span class="text-danger">*</span></label>
+                                                        <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="description" name="description" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="menu_logo_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
-                                                    <div class="row mb-4">
-                                                        <label for="menu_logo" class="col-md-3 col-form-label">Menu Logo</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="menu_logo" id="menu_logo">
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                        if(!empty($interface_setting_id)){
-                                                            echo '<div class="row mt-4">
-                                                                    <div class="col-md-12" id="favicon_image"></div>
-                                                                </div>';
-                                                        }
-                                                    ?>
-                                                    <div class="row mb-4">
-                                                        <label for="favicon" class="col-md-3 col-form-label">Favicon</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="favicon" id="favicon">
+                                                            <select class="form-control select2" id="assignable" name="assignable" <?php echo $disabled; ?>>
+                                                                <option value="2">False</option>
+                                                                <option value="1">True</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
                                         <?php
-                                            if(!empty($interface_setting_id)){
+                                            if(!empty($user_id)){
                                                 echo ' <div class="row mt-4">
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#transaction-log" role="tab">
+                                                                <a class="nav-link active" data-bs-toggle="tab" href="#module-access" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-cubes"></i></span>
+                                                                    <span class="d-none d-sm-block">Module Access</span>    
+                                                                </a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
                                                                     <span class="d-none d-sm-block">Transaction Log</span>    
                                                                 </a>
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="transaction-log" role="tabpanel">
+                                                            <div class="tab-pane active" id="module-access" role="tabpanel">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-md-12">
+                                                                        <table id="module-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th class="all">Role</th>
+                                                                                    <th class="all">Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody></tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
                                                                         <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
@@ -289,6 +267,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/interface-setting-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/role-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

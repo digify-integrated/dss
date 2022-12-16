@@ -16,6 +16,7 @@
                     $('#module_description').val(response[0].MODULE_DESCRIPTION);
                     $('#module_version').val(response[0].MODULE_VERSION);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
+                    
                     $('#module_id').val(module_id);
 
                     check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');

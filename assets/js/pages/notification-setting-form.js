@@ -19,6 +19,7 @@
                     $('#description').val(response[0].DESCRIPTION);
                     $('#notification_message').val(response[0].NOTIFICATION_MESSAGE);
                     $('#email_link').val(response[0].EMAIL_LINK);
+                    
                     $('#notification_setting_id').val(notification_setting_id);
                 },
                 complete: function(){

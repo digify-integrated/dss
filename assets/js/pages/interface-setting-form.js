@@ -16,6 +16,7 @@
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
                     $('#description').val(response[0].DESCRIPTION);
                     
+                    document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
                     document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
                     document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
                     document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
