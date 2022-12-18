@@ -12,8 +12,8 @@
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_user_account_access_rights($username, 10, 'page');
-        $module_access_right = $api->check_user_account_access_rights($username, $module_id, 'module');
+        $page_access_right = $api->check_role_access_rights($username, 10, 'page');
+        $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
@@ -27,13 +27,13 @@
                 $user_id = null;
             }
 
-            $add_user_account = $api->check_user_account_access_rights($username, '20', 'action');
-            $update_user_account = $api->check_user_account_access_rights($username, '21', 'action');
-            $delete_user_account = $api->check_user_account_access_rights($username, '22', 'action');
-            $lock_user_account = $api->check_user_account_access_rights($username, '75', 'action');
-            $unlock_user_account = $api->check_user_account_access_rights($username, '76', 'action');
-            $activate_user_account = $api->check_user_account_access_rights($username, '77', 'action');
-            $deactivate_user_account = $api->check_user_account_access_rights($username, '78', 'action');
+            $add_user_account = $api->check_role_access_rights($username, '72', 'action');
+            $update_user_account = $api->check_role_access_rights($username, '73', 'action');
+            $delete_user_account = $api->check_role_access_rights($username, '74', 'action');
+            $lock_user_account = $api->check_role_access_rights($username, '75', 'action');
+            $unlock_user_account = $api->check_role_access_rights($username, '76', 'action');
+            $activate_user_account = $api->check_role_access_rights($username, '77', 'action');
+            $deactivate_user_account = $api->check_role_access_rights($username, '78', 'action');
 
             if($update_user_account > 0){
                 $disabled = null;
