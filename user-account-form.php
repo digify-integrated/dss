@@ -181,7 +181,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
+                                                        <label for="password" class="col-md-3 col-form-label">Password</label>
                                                         <div class="col-md-9">
                                                             <div class="input-group auth-pass-inputgroup">
                                                                 <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" <?php echo $disabled; ?>>
