@@ -12,8 +12,8 @@
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_user_account_access_rights($username, 10, 'page');
-        $module_access_right = $api->check_user_account_access_rights($username, $module_id, 'module');
+        $page_access_right = $api->check_role_access_rights($username, 10, 'page');
+        $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
@@ -27,13 +27,13 @@
                 $user_id = null;
             }
 
-            $add_user_account = $api->check_user_account_access_rights($username, '20', 'action');
-            $update_user_account = $api->check_user_account_access_rights($username, '21', 'action');
-            $delete_user_account = $api->check_user_account_access_rights($username, '22', 'action');
-            $lock_user_account = $api->check_user_account_access_rights($username, '75', 'action');
-            $unlock_user_account = $api->check_user_account_access_rights($username, '76', 'action');
-            $activate_user_account = $api->check_user_account_access_rights($username, '77', 'action');
-            $deactivate_user_account = $api->check_user_account_access_rights($username, '78', 'action');
+            $add_user_account = $api->check_role_access_rights($username, '20', 'action');
+            $update_user_account = $api->check_role_access_rights($username, '21', 'action');
+            $delete_user_account = $api->check_role_access_rights($username, '22', 'action');
+            $lock_user_account = $api->check_role_access_rights($username, '75', 'action');
+            $unlock_user_account = $api->check_role_access_rights($username, '76', 'action');
+            $activate_user_account = $api->check_role_access_rights($username, '77', 'action');
+            $deactivate_user_account = $api->check_role_access_rights($username, '78', 'action');
 
             if($update_user_account > 0){
                 $disabled = null;
@@ -160,30 +160,33 @@
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
+                                                <div class="col-md-12">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="user_id" name="user_id">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="role" class="col-md-3 col-form-label">User Account <span class="text-danger">*</span></label>
+                                                        <label for="role" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role" name="role" maxlength="100" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="file_as" name="file_as" maxlength="300" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="role_description" class="col-md-3 col-form-label">User Account Description <span class="text-danger">*</span></label>
+                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role_description" name="role_description" maxlength="200" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="5" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
+                                                        <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <select class="form-control select2" id="assignable" name="assignable" <?php echo $disabled; ?>>
-                                                                <option value="2">False</option>
-                                                                <option value="1">True</option>
-                                                            </select>
+                                                            <div class="input-group auth-pass-inputgroup">
+                                                                <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" <?php echo $disabled; ?>>
+                                                                <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -195,27 +198,42 @@
                                                     <div class="col-md-12">
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#module-access" role="tab">
+                                                                <a class="nav-link active" data-bs-toggle="tab" href="#user-account-details" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-cubes"></i></span>
-                                                                    <span class="d-none d-sm-block">Module Access</span>    
+                                                                    <span class="d-none d-sm-block">Details</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link" data-bs-toggle="tab" href="#user-account-role" role="tab">
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
+                                                                    <span class="d-none d-sm-block">Role</span>
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
                                                                 <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
+                                                                    <span class="d-none d-sm-block">Transaction Log</span>
                                                                 </a>
                                                             </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="module-access" role="tabpanel">
+                                                            <div class="tab-pane active" id="user-account-details" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="module-access-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="user-account-role" role="tabpanel">
+                                                                <div class="row mt-4">
+                                                                    <div class="col-md-12">
+                                                                        <table id="user-account-role-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th class="all">Role</th>
-                                                                                    <th class="all">Action</th>
+                                                                                    <th class="all">Log Type</th>
+                                                                                    <th class="all">Log</th>
+                                                                                    <th class="all">Log Date</th>
+                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>
