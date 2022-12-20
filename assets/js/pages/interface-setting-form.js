@@ -63,6 +63,9 @@
                                 show_alert_event('Update Interface Setting Success', 'The interface setting has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Interface Setting Error', response, 'error');
                         }
@@ -239,8 +242,11 @@ function initialize_click_events(){
                                 show_alert_event('Activate Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Activate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Activate Interface Setting', response, 'error');
+                            show_alert('Activate Interface Setting Error', response, 'error');
                         }
                     }
                 });
@@ -278,8 +284,11 @@ function initialize_click_events(){
                                 show_alert_event('Deactivate Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Deactivate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Deactivate Interface Setting', response, 'error');
+                            show_alert('Deactivate Interface Setting Error', response, 'error');
                         }
                     }
                 });
@@ -311,14 +320,17 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Interface Setting', 'The interface setting has been deleted.', 'success', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Interface Settings', 'The interface settings has been deleted.', 'success', 'redirect', 'interface-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Interface Setting', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Interface Settings', 'The interface settings does not exist.', 'info', 'redirect', 'interface-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Interface Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Interface Setting', response, 'error');
+                            show_alert('Delete Interface Settings Error', response, 'error');
                         }
                     }
                 });

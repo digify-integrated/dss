@@ -142,8 +142,11 @@ function initialize_click_events(){
     
                                 reload_datatable('#pages-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Pages Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Pages', response, 'error');
+                                show_alert('Delete Multiple Pages Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -157,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Pages', 'Please select the pages you want to delete.', 'error');
+            show_alert('Delete Multiple Pages Error', 'Please select the pages you want to delete.', 'error');
         }
     });
 

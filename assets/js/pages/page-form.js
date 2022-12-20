@@ -55,6 +55,9 @@
                                 show_alert_event('Update Page Success', 'The page has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Page Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Page Error', response, 'error');
                         }
@@ -412,8 +415,11 @@ function initialize_click_events(){
 
                             reload_datatable('#page-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Page Access', response, 'error');
+                            show_alert('Delete Page Access Error', response, 'error');
                         }
                     }
                 });
@@ -451,8 +457,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Page', 'The page does not exist.', 'info', 'redirect', 'pages.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Page Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Page', response, 'error');
+                            show_alert('Delete Page Error', response, 'error');
                         }
                     }
                 });

@@ -53,6 +53,9 @@
                                 show_alert_event('Update System Parameter Success', 'The system parameter has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('System Parameter Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('System Parameter Error', response, 'error');
                         }
@@ -229,8 +232,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete System Parameter', 'The system parameter does not exist.', 'info', 'redirect', 'system-parameters.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete System Parameter Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete System Parameter', response, 'error');
+                            show_alert('Delete System Parameter Error', response, 'error');
                         }
                     }
                 });

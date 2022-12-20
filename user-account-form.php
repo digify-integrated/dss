@@ -8,11 +8,11 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(10);
+        $page_details = $api->get_page_details(30);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 10, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 30, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -22,18 +22,25 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $user_id = $api->decrypt_data($id);
+
+                $user_account_details = $api->get_user_account_details($user_id);
+                $user_status = $user_account_details[0]['USER_STATUS'];
+                $failed_login = $user_account_details[0]['FAILED_LOGIN'];
+                $readonly = 'readonly';
             }
             else{
                 $user_id = null;
+                $readonly = null;
             }
 
-            $add_user_account = $api->check_role_access_rights($username, '20', 'action');
-            $update_user_account = $api->check_role_access_rights($username, '21', 'action');
-            $delete_user_account = $api->check_role_access_rights($username, '22', 'action');
+            $add_user_account = $api->check_role_access_rights($username, '72', 'action');
+            $update_user_account = $api->check_role_access_rights($username, '73', 'action');
+            $delete_user_account = $api->check_role_access_rights($username, '74', 'action');
             $lock_user_account = $api->check_role_access_rights($username, '75', 'action');
             $unlock_user_account = $api->check_role_access_rights($username, '76', 'action');
             $activate_user_account = $api->check_role_access_rights($username, '77', 'action');
             $deactivate_user_account = $api->check_role_access_rights($username, '78', 'action');
+            $add_user_account_role = $api->check_role_access_rights($username, '79', 'action');
 
             if($update_user_account > 0){
                 $disabled = null;
@@ -83,6 +90,7 @@
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Administration</a></li>
+                                            <li class="breadcrumb-item"><a href="user-accounts.php">User Accounts</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
                                                 if(!empty($user_id)){
@@ -99,7 +107,7 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="role-form" method="post" action="#">
+                                        <form id="user-account-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
@@ -114,31 +122,35 @@
                                                                         <div class="dropdown-menu dropdown-menu-end">';
 
                                                                 if($add_user_account > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="role-form.php">Add User Account</a>';
+                                                                    $dropdown_action .= '<a class="dropdown-item" href="user-account-form.php">Add User Account</a>';
                                                                 }
 
                                                                 if($delete_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-role">Delete User Account</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-user-account">Delete User Account</button>';
                                                                 }
 
-                                                                if(($add_user_account_module_access > 0 || $add_user_account_page_access > 0 || $add_user_account_action_access > 0 || $add_user_account_user_account > 0) && $update_user_account > 0){
+                                                                if(($add_user_account_role > 0 || ($activate_user_account > 0 && $user_status == 'Inactive') || ($deactivate_user_account > 0 && $user_status == 'Active') || ($lock_user_account > 0 && $failed_login < 5) || ($unlock_user_account > 0 && $failed_login >= 5)) && $update_user_account > 0){
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
 
-                                                                    if($add_user_account_module_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
-                                                                    }                                                                    
+                                                                    if($add_user_account_role > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="add-user-account-role">Add Role</button>';
+                                                                    }                                                              
 
-                                                                    if($add_user_account_page_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
-                                                                    }                                                                    
+                                                                    if($activate_user_account > 0 && $user_status == 'Inactive'){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="activate-user-account">Activate User Account</button>';
+                                                                    }
 
-                                                                    if($add_user_account_action_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
-                                                                    }                                                                    
+                                                                    if($deactivate_user_account > 0 && $user_status == 'Active'){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="deactivate-user-account">Deactivate User Account</button>';
+                                                                    }
 
-                                                                    if($add_user_account_user_account > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-user-account">Add User Account</button>';
-                                                                    }                                                                    
+                                                                    if($lock_user_account > 0 && $failed_login < 5){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="lock-user-account">Lock User Account</button>';
+                                                                    }
+
+                                                                    if($unlock_user_account > 0 && $failed_login >= 5){
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="unlock-user-account">Unlock User Account</button>';
+                                                                    }
                                                                 }
 
                                                                 $dropdown_action .= '</div>
@@ -160,33 +172,29 @@
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
                                                     <div class="row mb-4">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="role" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
+                                                        <label for="file_as" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                             <input type="text" class="form-control form-maxlength" autocomplete="off" id="file_as" name="file_as" maxlength="300" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="row mt-4">
-                                                <div class="col-md-6">
                                                     <div class="row mb-4">
-                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="5" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="password" class="col-md-3 col-form-label">Password</label>
+                                                        <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                             <div class="input-group auth-pass-inputgroup">
                                                                 <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" <?php echo $disabled; ?>>
                                                                 <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row mb-4">
+                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="<?php echo $user_id; ?>" <?php echo $disabled . ' ' . $readonly; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -199,14 +207,14 @@
                                                         <ul class="nav nav-tabs" role="tablist">
                                                             <li class="nav-item">
                                                                 <a class="nav-link active" data-bs-toggle="tab" href="#user-account-details" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-cubes"></i></span>
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-user"></i></span>
                                                                     <span class="d-none d-sm-block">Details</span>
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
                                                                 <a class="nav-link" data-bs-toggle="tab" href="#user-account-role" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Role</span>
+                                                                    <span class="d-block d-sm-none"><i class="fas fa-house-user"></i></span>
+                                                                    <span class="d-none d-sm-block">Roles</span>
                                                                 </a>
                                                             </li>
                                                             <li class="nav-item">
@@ -219,8 +227,29 @@
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="user-account-details" role="tabpanel">
                                                                 <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        
+                                                                    <div class="col-md-6">
+                                                                        <div class="row mb-4">
+                                                                            <label class="col-md-3 col-form-label">Last Connection Date</label>
+                                                                            <div class="col-md-9" id="last_connection_date"></div>
+                                                                        </div>
+                                                                        <div class="row mb-4">
+                                                                            <label class="col-md-3 col-form-label">Password Expiry Date</label>
+                                                                            <div class="col-md-9" id="password_expiry_date"></div>
+                                                                        </div>
+                                                                        <div class="row mb-4">
+                                                                            <label class="col-md-3 col-form-label">Last Failed Login Date</label>
+                                                                            <div class="col-md-9" id="last_failed_login_date"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="row mb-4">
+                                                                            <label class="col-md-3 col-form-label">User Status</label>
+                                                                            <div class="col-md-9" id="user_status"></div>
+                                                                        </div>
+                                                                        <div class="row mb-4">
+                                                                            <label class="col-md-3 col-form-label">Failed Login</label>
+                                                                            <div class="col-md-9" id="failed_login"></div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -230,10 +259,8 @@
                                                                         <table id="user-account-role-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
+                                                                                    <th class="all">Role</th>
+                                                                                    <th class="all">Action</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>
@@ -285,6 +312,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/role-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/user-account-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

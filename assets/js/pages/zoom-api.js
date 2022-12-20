@@ -120,8 +120,8 @@ function initialize_click_events(){
 
         if(zoom_api_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Zoom API',
-                text: 'Are you sure you want to delete these zoom api?',
+                title: 'Delete Multiple Zoom APIs',
+                text: 'Are you sure you want to delete these Zoom APIs?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -138,12 +138,15 @@ function initialize_click_events(){
                         data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Zoom API', 'The zoom api have been deleted.', 'success');
+                                show_alert('Delete Multiple Zoom APIs', 'The Zoom APIs have been deleted.', 'success');
     
                                 reload_datatable('#zoom-api-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Zoom APIs Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Zoom API', response, 'error');
+                                show_alert('Delete Multiple Zoom APIs Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -157,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Zoom API', 'Please select the zoom api you want to delete.', 'error');
+            show_alert('Delete Multiple Zoom APIs', 'Please select the Zoom APIs you want to delete.', 'error');
         }
     });
 

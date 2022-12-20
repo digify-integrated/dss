@@ -142,8 +142,11 @@ function initialize_click_events(){
     
                                 reload_datatable('#roles-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Roles Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Roles', response, 'error');
+                                show_alert('Delete Multiple Roles Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -157,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Roles', 'Please select the roles you want to delete.', 'error');
+            show_alert('Delete Multiple Roles Error', 'Please select the roles you want to delete.', 'error');
         }
     });
 

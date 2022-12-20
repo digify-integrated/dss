@@ -220,6 +220,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#module-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Module Access Error', response, 'error');
                         }
@@ -230,16 +233,6 @@ function initialize_form_validation(form_type){
                     }
                 });
                 return false;
-            },
-            rules: {
-                role: {
-                    required: true
-                }
-            },
-            messages: {
-                role: {
-                    required: 'Please choose at least one (1) role',
-                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -291,6 +284,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#page-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Page Access Error', response, 'error');
                         }
@@ -301,16 +297,6 @@ function initialize_form_validation(form_type){
                     }
                 });
                 return false;
-            },
-            rules: {
-                role: {
-                    required: true
-                }
-            },
-            messages: {
-                role: {
-                    required: 'Please choose at least one (1) role',
-                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -362,6 +348,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#action-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Action Access Error', response, 'error');
                         }
@@ -372,16 +361,6 @@ function initialize_form_validation(form_type){
                     }
                 });
                 return false;
-            },
-            rules: {
-                role: {
-                    required: true
-                }
-            },
-            messages: {
-                role: {
-                    required: 'Please choose at least one (1) role',
-                }
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -432,6 +411,9 @@ function initialize_form_validation(form_type){
                           
                             $('#System-Modal').modal('hide');
                             reload_datatable('#module-access-datatable');
+                        }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
                             show_alert('Module Access Error', response, 'error');
@@ -494,6 +476,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#page-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Page Access Error', response, 'error');
                         }
@@ -555,8 +540,11 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#action-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Page Action Error', response, 'error');
+                            show_alert('Action Access Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -615,6 +603,9 @@ function initialize_form_validation(form_type){
                           
                             $('#System-Modal').modal('hide');
                             reload_datatable('#user-account-assignment');
+                        }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Role User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
                             show_alert('Role User Account Error', response, 'error');
@@ -677,6 +668,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#upload-setting-file-type-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Upload setting File Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Upload Setting File Type Error', response, 'error');
                         }
@@ -737,6 +731,9 @@ function initialize_form_validation(form_type){
                           
                             $('#System-Modal').modal('hide');
                             reload_datatable('#notification-role-recipients-datatable');
+                        }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Notification Role Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
                             show_alert('Notification Role Recipient Error', response, 'error');
@@ -799,6 +796,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#notification-user-account-recipients-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Notification User Account Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Notification User Account Recipient Error', response, 'error');
                         }
@@ -860,6 +860,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#notification-channel-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Notification Channel Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Notification Channel Error', response, 'error');
                         }
@@ -915,6 +918,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#state-datatable');
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('State Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('State Error', response[0]['RESPONSE'], 'error');
                         }
@@ -935,6 +941,70 @@ function initialize_form_validation(form_type){
                 state_name: {
                     required: 'Please enter the state',
                 }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'user account role form'){
+        $('#user-account-role-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit user account role';
+                var role = [];
+                var user_id = $('#user_id').val();
+
+                $('.datatable-checkbox-children').each(function(){
+                    if($(this).is(':checked')){  
+                        role.push(this.value);  
+                    }
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&user_id=' + user_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Inserted'){
+                            show_alert('Insert User Account Role Success', 'The user account role has been inserted.', 'success');
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#user-account-role-datatable');
+                        }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('User Account Role Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
+                        else{
+                            show_alert('User Account Role Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
             },
             errorPlacement: function(label, element) {
                 if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
@@ -2435,7 +2505,7 @@ function generate_form(form_type, form_id, add, username){
                 display_form_details(form_type);
             }
             else{
-                if(form_type == 'module access form' || form_type == 'page access form' || form_type == 'action access form'){
+                if(form_type == 'module access form' || form_type == 'page access form' || form_type == 'action access form' || form_type == 'user account role form'){
                     if($('#role-assignment-datatable').length){
                         initialize_role_assignment_table('#role-assignment-datatable');
                     }

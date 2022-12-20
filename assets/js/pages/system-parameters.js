@@ -143,8 +143,11 @@ function initialize_click_events(){
     
                                 reload_datatable('#system-parameters-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple System Parameters Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple System Parameters', response, 'error');
+                                show_alert('Delete Multiple System Parameters Error', response, 'error');
                             }
                         },
                         complete: function(){

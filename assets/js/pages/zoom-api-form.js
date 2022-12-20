@@ -35,17 +35,11 @@
                 var transaction = 'submit zoom api';
                 var username = $('#username').text();
 
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
-
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -60,6 +54,9 @@
                             else{
                                 show_alert_event('Update Zoom API Success', 'The zoom api has been updated.', 'success', 'reload');
                             }
+                        }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Zoom API Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
                             show_alert('Zoom API Error', response, 'error');
@@ -249,8 +246,11 @@ function initialize_click_events(){
                                 show_alert_event('Activate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Activate Zoom API Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Activate Zoom API', response, 'error');
+                            show_alert('Activate Zoom API Error', response, 'error');
                         }
                     }
                 });
@@ -288,8 +288,11 @@ function initialize_click_events(){
                                 show_alert_event('Deactivate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Deactivate Zoom API Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Deactivate Zoom API', response, 'error');
+                            show_alert('Deactivate Zoom API Error', response, 'error');
                         }
                     }
                 });
@@ -327,8 +330,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Zoom API Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Zoom API', response, 'error');
+                            show_alert('Delete Zoom API Error', response, 'error');
                         }
                     }
                 });

@@ -56,6 +56,9 @@
                                 show_alert_event('Update Upload Setting Success', 'The upload setting has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Upload Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Upload Setting Error', response, 'error');
                         }
@@ -413,6 +416,9 @@ function initialize_click_events(){
 
                             reload_datatable('#upload-setting-file-type-datable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Upload Setting File Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Delete Upload Setting File Type', response, 'error');
                         }
@@ -452,8 +458,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Upload Setting', 'The upload setting does not exist.', 'info', 'redirect', 'upload-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Upload Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Upload Setting', response, 'error');
+                            show_alert('Delete Upload Setting Error', response, 'error');
                         }
                     }
                 });

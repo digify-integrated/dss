@@ -54,6 +54,9 @@
                                 show_alert_event('Update Country Success', 'The country has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Country Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Country Error', response, 'error');
                         }
@@ -311,8 +314,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Country', 'The country does not exist.', 'info', 'redirect', 'country.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Country Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Country', response, 'error');
+                            show_alert('Delete Country Error', response, 'error');
                         }
                     }
                 });
@@ -376,8 +382,11 @@ function initialize_click_events(){
 
                             reload_datatable('#state-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete State Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete State', response, 'error');
+                            show_alert('Delete State Error', response, 'error');
                         }
                     }
                 });

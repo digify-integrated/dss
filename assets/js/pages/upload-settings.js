@@ -143,8 +143,12 @@ function initialize_click_events(){
     
                                 reload_datatable('#upload-settings-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Upload Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
+    
                             else{
-                                show_alert('Delete Multiple Upload Settings', response, 'error');
+                                show_alert('Delete Multiple Upload Settings Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -158,7 +162,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Upload Settings', 'Please select the upload settings you want to delete.', 'error');
+            show_alert('Delete Multiple Upload Settings Error', 'Please select the upload settings you want to delete.', 'error');
         }
     });
 

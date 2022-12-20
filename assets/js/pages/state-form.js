@@ -52,6 +52,9 @@
                                 show_alert_event('Update State Success', 'The state has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('State Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('State Error', response, 'error');
                         }
@@ -228,8 +231,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete State', 'The state does not exist.', 'info', 'redirect', 'state.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete State Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete State', response, 'error');
+                            show_alert('Delete State Error', response, 'error');
                         }
                     }
                 });

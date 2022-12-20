@@ -63,7 +63,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
             $form = '<form class="cmxform" id="'. $form_id .'" method="post" action="#">';
 
-            if($form_type == 'module access form' || $form_type == 'page access form' || $form_type == 'action access form'){
+            if($form_type == 'module access form' || $form_type == 'page access form' || $form_type == 'action access form' || $form_type == 'user account role form'){
                 $form .= '<div class="row">
                             <div class="col-md-12">
                                     <table id="role-assignment-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
@@ -2528,6 +2528,196 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
+    }
+    # -------------------------------------------------------------
+    
+    # User accounts table
+    else if($type == 'user accounts table'){
+        if(isset($_POST['filter_user_account_lock_status']) && isset($_POST['filter_user_account_status']) && isset($_POST['filter_start_date']) && isset($_POST['filter_end_date']) && isset($_POST['filter_last_connection_start_date']) && isset($_POST['filter_last_connection_end_date'])){
+            if ($api->databaseConnection()) {
+                $filter_user_account_lock_status = $_POST['filter_user_account_lock_status'];
+                $filter_user_account_status = $_POST['filter_user_account_status'];
+                $filter_last_connection_start_date = $api->check_date('empty', $_POST['filter_last_connection_start_date'], '', 'Y-m-d', '', '', '');
+                $filter_last_connection_end_date = $api->check_date('empty', $_POST['filter_last_connection_end_date'], '', 'Y-m-d', '', '', '');
+                $filter_start_date = $api->check_date('empty', $_POST['filter_start_date'], '', 'Y-m-d', '', '', '');
+                $filter_end_date = $api->check_date('empty', $_POST['filter_end_date'], '', 'Y-m-d', '', '', '');
+
+                $query = 'SELECT USERNAME, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_CONNECTION_DATE, TRANSACTION_LOG_ID FROM global_user_account';
+
+                if((!empty($filter_start_date) && !empty($filter_end_date)) || (!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)) || $filter_user_account_status != '' || !empty($filter_user_account_lock_status)){
+                    $query .= ' WHERE ';
+
+                    if(!empty($filter_start_date) && !empty($filter_end_date)){
+                        $filter[] = 'PASSWORD_EXPIRY_DATE BETWEEN :filter_start_date AND :filter_end_date';
+                    }
+
+                    if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
+                        $filter[] = 'LAST_CONNECTION_DATE BETWEEN :filter_last_connection_start_date AND :filter_last_connection_end_date';
+                    }
+
+                    if($filter_user_account_lock_status == 'locked'){
+                        $filter[] = 'FAILED_LOGIN >= 5';
+                    }
+                    else {
+                        $filter[] = 'FAILED_LOGIN < 5';
+                    }
+
+                    if($filter_user_account_status != ''){
+                        $filter[] = 'USER_STATUS = :filter_user_account_status';
+                    }
+
+                    if(!empty($filter)){
+                        $query .= implode(' AND ', $filter);
+                    }
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if((!empty($filter_start_date) && !empty($filter_end_date)) || (!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)) || $filter_user_account_status != ''){
+
+                    if(!empty($filter_start_date) && !empty($filter_end_date)){
+                        $sql->bindValue(':filter_start_date', $filter_start_date);
+                        $sql->bindValue(':filter_end_date', $filter_end_date);
+                    }
+
+                    if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
+                        $sql->bindValue(':filter_last_connection_start_date', $filter_last_connection_start_date);
+                        $sql->bindValue(':filter_last_connection_end_date', $filter_last_connection_end_date);
+                    }
+
+                    if($filter_user_account_status != ''){
+                        $sql->bindValue(':filter_user_account_status', $filter_user_account_status);
+                    }
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+                        $file_as = $row['FILE_AS'];
+                        $user_status = $row['USER_STATUS'];
+                        $password_expiry_date = $api->check_date('empty', $row['PASSWORD_EXPIRY_DATE'], '', 'm/d/Y', '', '', '');
+                        $last_connection_date = $api->check_date('empty', $row['LAST_CONNECTION_DATE'], '', 'm/d/Y', '', '', '');
+                        $failed_login = $row['FAILED_LOGIN'];
+                        $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+                        $lock_status = $api->get_user_account_lock_status($failed_login)[0]['BADGE'];
+                        $account_status = $api->get_user_account_status($user_status)[0]['BADGE'];
+                        $password_expiry_date_difference = $api->get_date_difference($system_date, $password_expiry_date);
+                        $expiry_difference = 'Expiring in ' . $password_expiry_date_difference[0]['MONTHS'] . ' ' . $password_expiry_date_difference[0]['DAYS'];
+
+                        $user_id_encrypted = $api->encrypt_data($username);
+
+                        if($failed_login >= 5){    
+                            $data_lock = '1';
+                        }
+                        else{
+                            $data_lock = '0';
+                        }
+    
+                        if($user_status == 'Active'){    
+                            $data_active = '1';
+                        }
+                        else{    
+                            $data_active = '0';
+                        }
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" data-lock="'. $data_lock .'" data-active="'. $data_active .'" value="'. $username .'">',
+                            'USERNAME' =>  $file_as . '<p class="text-muted mb-0">'. $username .'</p>',
+                            'ACCOUNT_STATUS' => $account_status,
+                            'LOCK_STATUS' => $lock_status,
+                            'PASSWORD_EXPIRY_DATE' => $expiry_difference,
+                            'LAST_CONNECTION_DATE' => $last_connection_date,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="user-account-form.php?id='. $user_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View User Account">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # User account role table
+    else if($type == 'user account role table'){
+        if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
+            if ($api->databaseConnection()) {
+                $user_id = $_POST['user_id'];
+
+                $update_user_account = $api->check_role_access_rights($username, '73', 'action');
+                $delete_user_account_role = $api->check_role_access_rights($username, '80', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id');
+                $sql->bindValue(':user_id', $user_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+
+                        $role_details = $api->get_role_details($role_id);
+                        $role = $role_details[0]['ROLE'] ?? null;
+
+                        if($delete_user_account_role > 0 && $update_user_account > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-user-account-role" data-user-id="'. $user_id .'" data-role-id="'. $role_id .'" title="Delete User Account Role">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ROLE' => $role,
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # User account role assignment table
+    else if($type == 'user account role assignment table'){
+        if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
+            if ($api->databaseConnection()) {
+                $user_id = $_POST['user_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id)');
+                $sql->bindValue(':user_id', $user_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                            'ROLE' => $role
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
     }
     # -------------------------------------------------------------
 

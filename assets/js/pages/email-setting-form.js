@@ -43,17 +43,11 @@
                 var transaction = 'submit email setting';
                 var username = $('#username').text();
 
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
-
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -68,6 +62,9 @@
                             else{
                                 show_alert_event('Update Email Setting Success', 'The email setting has been updated.', 'success', 'reload');
                             }
+                        }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Email Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
                             show_alert('Email Setting Error', response, 'error');
@@ -281,8 +278,11 @@ function initialize_click_events(){
                                 show_alert_event('Activate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Activate Email Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Activate Email Setting', response, 'error');
+                            show_alert('Activate Email Setting Error', response, 'error');
                         }
                     }
                 });
@@ -320,8 +320,11 @@ function initialize_click_events(){
                                 show_alert_event('Deactivate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Deactivate Email Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Deactivate Email Setting', response, 'error');
+                            show_alert('Deactivate Email Setting Error', response, 'error');
                         }
                     }
                 });
@@ -359,8 +362,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Email Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Email Setting', response, 'error');
+                            show_alert('Delete Email Setting Error', response, 'error');
                         }
                     }
                 });

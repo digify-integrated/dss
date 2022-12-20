@@ -136,12 +136,15 @@ function initialize_click_events(){
                         data: {username : username, notification_setting_id : notification_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Notification Setting', 'The notification setting have been deleted.', 'success');
+                                show_alert('Delete Multiple Notification Settings', 'The notification settings have been deleted.', 'success');
     
                                 reload_datatable('#notification-settings-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Notification Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Notification Setting', response, 'error');
+                                show_alert('Delete Multiple Notification Settings Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -155,7 +158,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Notification Setting', 'Please select the notification setting you want to delete.', 'error');
+            show_alert('Delete Multiple Notification Settings', 'Please select the notification settings you want to delete.', 'error');
         }
     });
 

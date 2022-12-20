@@ -139,8 +139,11 @@ function initialize_click_events(){
     
                                 reload_datatable('#actions-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Actions Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Actions', response, 'error');
+                                show_alert('Delete Multiple Actions Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -154,7 +157,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Actions', 'Please select the actions you want to delete.', 'error');
+            show_alert('Delete Multiple Actions Error', 'Please select the actions you want to delete.', 'error');
         }
     });
 

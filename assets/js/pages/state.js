@@ -138,12 +138,15 @@ function initialize_click_events(){
                         data: {username : username, state_id : state_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple State', 'The state have been deleted.', 'success');
+                                show_alert('Delete Multiple States', 'The states have been deleted.', 'success');
     
                                 reload_datatable('#state-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple States Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple State', response, 'error');
+                                show_alert('Delete Multiple States Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -157,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple State', 'Please select the state you want to delete.', 'error');
+            show_alert('Delete Multiple States Error', 'Please select the states you want to delete.', 'error');
         }
     });
 

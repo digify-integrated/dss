@@ -2767,6 +2767,173 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_user_account
+    # Purpose    : Updates user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account($user_id, $password, $file_as, $password_expiry_date, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $user_account_details = $this->get_user_account_details($user_id);
+            $user_account_password_expiry_date = $this->check_date('empty', $user_account_details[0]['PASSWORD_EXPIRY_DATE'], '', 'Y-m-d', '', '', '');
+            $user_account_password = $user_account_details[0]['PASSWORD'];
+
+            if($password == $user_account_password){
+                $password_expiry_date = $user_account_password_expiry_date;
+            }
+            
+            if(!empty($user_account_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account(:user_id, :password, :file_as, :password_expiry_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':user_id', $user_id);
+            $sql->bindValue(':password', $password);
+            $sql->bindValue(':file_as', $file_as);
+            $sql->bindValue(':password_expiry_date', $password_expiry_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($user_account_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated user account.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated user account.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_user_account_lock_status
+    # Purpose    : Updates user account lock status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account_lock_status($user_id, $transaction_type, $system_date, $username){
+        if ($this->databaseConnection()) {
+            $user_account_details = $this->get_user_account_details($user_id);
+            $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+
+            if($transaction_type == 'unlock'){
+                $record_log = 'ULCK->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Unlock';
+                $log = 'User ' . $username . ' unlocked user account.';
+            }
+            else{
+                $record_log = 'LCK->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Lock';
+                $log = 'User ' . $username . ' locked user account.';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account_lock_status(:user_id, :transaction_type, :system_date, :record_log)');
+            $sql->bindValue(':user_id', $user_id);
+            $sql->bindValue(':transaction_type', $transaction_type);
+            $sql->bindValue(':system_date', $system_date);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_type, $log);
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_user_account_status
+    # Purpose    : Updates user account status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account_status($user_id, $user_status, $username){
+        if ($this->databaseConnection()) {
+            $user_account_details = $this->get_user_account_details($user_id);
+            $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+
+            if($user_status == 'Active'){
+                $record_log = 'ACT->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Activate';
+                $log = 'User ' . $username . ' activated user account.';
+            }
+            else{
+                $record_log = 'DACT->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Deactivated';
+                $log = 'User ' . $username . ' deactivated user account.';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account_status(:user_id, :user_status, :record_log)');
+            $sql->bindValue(':user_id', $user_id);
+            $sql->bindValue(':user_status', $user_status);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_type, $log);
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -4211,6 +4378,56 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_user_account
+    # Purpose    : Insert user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_user_account($user_id, $password, $file_as, $password_expiry_date, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_user_account(:user_id, :password, :file_as, :password_expiry_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':user_id', $user_id);
+            $sql->bindValue(':password', $password);
+            $sql->bindValue(':file_as', $file_as);
+            $sql->bindValue(':password_expiry_date', $password_expiry_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update transaction log value
+                $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                if($update_system_parameter_value){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted user account.');
+                                 
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+    
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
     
@@ -5075,6 +5292,76 @@ class Api{
             $sql->bindValue(':zoom_api_id', $zoom_api_id);
         
             if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_user_account
+    # Purpose    : Delete user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_user_account($user_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_user_account(:user_id)');
+            $sql->bindValue(':user_id', $user_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_user_account_role
+    # Purpose    : Delete all user account role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_user_account_role($user_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_user_account_role(:user_id)');
+            $sql->bindValue(':user_id', $user_id);
+        
+            if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_user_account_role
+    # Purpose    : Delete user account role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_user_account_role($user_id, $role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_user_account_role(:user_id, :role_id)');
+            $sql->bindValue(':user_id', $user_id);
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){ 
                 return true;
             }
             else{
@@ -5969,6 +6256,113 @@ class Api{
         $response[] = array(
             'STATUS' => $status,
             'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_user_account_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_user_account_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 'Active':
+                $status = 'Active';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Inactive';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_user_account_lock_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_user_account_lock_status($failed_login){
+        $response = array();
+
+        if ($failed_login >= 5) {
+            $status = 'Locked';
+            $button_class = 'bg-danger';
+        }
+        else{
+            $status = 'Unlocked';
+            $button_class = 'bg-success';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_date_difference
+    # Purpose    : Returns the year, month and days difference.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_date_difference($date_1, $date_2){
+        $response = array();
+
+        $diff = abs(strtotime($date_2) - strtotime($date_1));
+
+        $years = floor($diff / (365 * 60 * 60 * 24));
+        $months = floor(($diff - $years * 365 * 60 * 60 * 24) / (30 * 60 * 60 * 24));
+        $days = floor(($diff - $years * 365 * 60 * 60 * 24 - $months * 30 * 60 * 60 * 24)/ (60 * 60 * 24));
+
+        if($years > 1 || $years == 0){
+            $years = $years . ' Years';
+        }
+        else{
+            $years = $years . ' Year';
+        }
+
+        if($months > 1 || $months == 0){
+            $months = $months . ' Months';
+        }
+        else{
+            $months = $months . ' Month';
+        }
+
+        if($days > 1 || $days == 0){
+            $days = $days . ' Days';
+        }
+        else{
+            $days = $days . ' Day';
+        }
+
+        $response[] = array(
+            'YEARS' => $years,
+            'MONTHS' => $months,
+            'DAYS' => $days
         );
 
         return $response;

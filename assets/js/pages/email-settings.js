@@ -138,12 +138,15 @@ function initialize_click_events(){
                         data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Email Setting', 'The email setting have been deleted.', 'success');
+                                show_alert('Delete Multiple Email Settings', 'The email settings have been deleted.', 'success');
     
                                 reload_datatable('#email-settings-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Email Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Email Setting', response, 'error');
+                                show_alert('Delete Multiple Email Settings Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -157,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Email Setting', 'Please select the email setting you want to delete.', 'error');
+            show_alert('Delete Multiple Email Settings Error', 'Please select the email settings you want to delete.', 'error');
         }
     });
 

@@ -70,6 +70,9 @@
                         else if(response[0]['RESPONSE'] === 'File Type'){
                             show_alert('Module Error', 'The file uploaded is not supported.', 'error');
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Module Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Module Error', response, 'error');
                         }
@@ -439,8 +442,11 @@ function initialize_click_events(){
 
                             reload_datatable('#module-access-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Module Access', response, 'error');
+                            show_alert('Delete Module Access Error', response, 'error');
                         }
                     }
                 });
@@ -478,8 +484,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Module', 'The module does not exist.', 'info', 'redirect', 'modules.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Module Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Module', response, 'error');
+                            show_alert('Delete Module Error', response, 'error');
                         }
                     }
                 });

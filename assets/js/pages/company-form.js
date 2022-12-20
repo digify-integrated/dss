@@ -64,6 +64,9 @@
                                 show_alert_event('Update Company Success', 'The company has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Company Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Company Error', response, 'error');
                         }
@@ -234,8 +237,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Company', 'The company does not exist.', 'info', 'redirect', 'company.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Company Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Company', response, 'error');
+                            show_alert('Delete Company Error', response, 'error');
                         }
                     }
                 });

@@ -804,6 +804,95 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE update_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN file_as VARCHAR (300), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @password = password;
+	SET @file_as = file_as;
+	SET @password_expiry_date = password_expiry_date;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	IF @password IS NULL OR @password = '' THEN
+		SET @query = 'UPDATE global_user_account SET FILE_AS = @file_as, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	ELSE
+		SET @query = 'UPDATE global_user_account SET FILE_AS = @file_as, PASSWORD = @password, PASSWORD_EXPIRY_DATE = @password_expiry_date, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN file_as VARCHAR (300), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @password = password;
+	SET @file_as = file_as;
+	SET @password_expiry_date = password_expiry_date;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@username, @password, @file_as, "Inactive", @password_expiry_date, 0, null, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_user_account(IN username VARCHAR(50))
+BEGIN
+	SET @username = username;
+
+	SET @query = 'DELETE FROM global_user_account WHERE USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_user_account_role(IN username VARCHAR(50))
+BEGIN
+	SET @username = username;
+
+	SET @query = 'DELETE FROM global_role_user_account WHERE USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_user_account_lock_status(IN username VARCHAR(50), IN transaction_type VARCHAR(10), IN last_failed_login DATE, IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @transaction_type = transaction_type;
+	SET @last_failed_login = last_failed_login;
+	SET @record_log = record_log;
+
+	IF @transaction_type = 'unlock' THEN
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 0, LAST_FAILED_LOGIN = null, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	ELSE
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 5, LAST_FAILED_LOGIN = @last_failed_login, RECORD_LOG = @record_log WHERE USERNAME = @username';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_user_account_status(IN username VARCHAR(50), IN user_status VARCHAR(10), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @user_status = user_status;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_user_account SET USER_STATUS = @user_status, RECORD_LOG = @record_log WHERE USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Global Transaction Log */
 CREATE TABLE global_transaction_log(
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,

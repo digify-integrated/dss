@@ -53,6 +53,9 @@
                                 show_alert_event('Update System Code Success', 'The system code has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('System Code Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('System Code Error', response, 'error');
                         }
@@ -235,8 +238,12 @@ function initialize_click_events(){
                                 show_alert_event('Delete System Code', 'The system code does not exist.', 'info', 'redirect', 'system-codes.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete System Code Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
+
                         else{
-                            show_alert('Delete System Code', response, 'error');
+                            show_alert('Delete System Code Error', response, 'error');
                         }
                     }
                 });

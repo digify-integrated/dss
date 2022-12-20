@@ -135,12 +135,15 @@ function initialize_click_events(){
                         data: {username : username, company_id : company_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Company', 'The company have been deleted.', 'success');
+                                show_alert('Delete Multiple Companies', 'The companies have been deleted.', 'success');
     
                                 reload_datatable('#company-datatable');
                             }
+                            else if(response === 'Inactive User'){
+                                show_alert_event('Delete Multiple Companies Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            }
                             else{
-                                show_alert('Delete Multiple Company', response, 'error');
+                                show_alert('Delete Multiple Companies Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -154,7 +157,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Company', 'Please select the company you want to delete.', 'error');
+            show_alert('Delete Multiple Companies Error', 'Please select the companies you want to delete.', 'error');
         }
     });
 

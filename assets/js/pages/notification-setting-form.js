@@ -67,6 +67,9 @@
                                 show_alert_event('Update Notification Setting Success', 'The notification setting has been updated.', 'success', 'reload');
                             }
                         }
+                        else if(response[0]['RESPONSE'] === 'Inactive User'){
+                            show_alert_event('Notification Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
                             show_alert('Notification Setting Error', response, 'error');
                         }
@@ -777,8 +780,11 @@ function initialize_click_events(){
                                 show_alert_event('Delete Notification Setting', 'The notification setting does not exist.', 'info', 'redirect', 'notification-settings.php');
                             }
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Notification Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Notification Setting', response, 'error');
+                            show_alert('Delete Notification Setting Error', response, 'error');
                         }
                     }
                 });
@@ -850,8 +856,11 @@ function initialize_click_events(){
 
                             reload_datatable('#notification-role-recipients-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Notification Role Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Notification Role Recipient', response, 'error');
+                            show_alert('Delete Notification Role Recipient Error', response, 'error');
                         }
                     }
                 });
@@ -892,8 +901,11 @@ function initialize_click_events(){
 
                             reload_datatable('#notification-user-account-recipients-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Notification User Account Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Notification User Account Recipient', response, 'error');
+                            show_alert('Delete Notification User Account Recipient Error', response, 'error');
                         }
                     }
                 });
@@ -934,8 +946,11 @@ function initialize_click_events(){
 
                             reload_datatable('#notification-channel-datatable');
                         }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Delete Notification Channel Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
                         else{
-                            show_alert('Delete Notification Channel', response, 'error');
+                            show_alert('Delete Notification Channel Error', response, 'error');
                         }
                     }
                 });

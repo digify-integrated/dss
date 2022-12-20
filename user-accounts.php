@@ -93,7 +93,7 @@
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
                                                                 if($delete_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-role">Delete User Account</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-user-account">Delete User Account</button>';
                                                                 }
 
                                                                 if($lock_user_account > 0){
