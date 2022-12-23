@@ -135,7 +135,7 @@ function initialize_click_events(){
                         data: {username : username, country_id : country_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Countries', 'The countries have been deleted.', 'success');
+                                show_alert('Delete Multiple Countries Success', 'The countries have been deleted.', 'success');
     
                                 reload_datatable('#country-datatable');
                             }
@@ -143,7 +143,7 @@ function initialize_click_events(){
                                 show_alert_event('Delete Multiple Countries Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                             }
                             else{
-                                show_alert('Delete Multiple Countries error', response, 'error');
+                                show_alert('Delete Multiple Countries Error', response, 'error');
                             }
                         },
                         complete: function(){

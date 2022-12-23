@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, role_id : role_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Roles', 'The roles have been deleted.', 'success');
+                                show_alert('Delete Multiple Roles Success', 'The roles have been deleted.', 'success');
     
                                 reload_datatable('#roles-datatable');
                             }

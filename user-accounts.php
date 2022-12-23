@@ -224,7 +224,6 @@
         <script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
         <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
-        <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>

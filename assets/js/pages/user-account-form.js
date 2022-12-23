@@ -21,6 +21,7 @@
                     document.getElementById('last_failed_login_date').innerHTML = response[0].LAST_FAILED_LOGIN;
                     document.getElementById('user_status').innerHTML = response[0].USER_STATUS;
                     document.getElementById('failed_login').innerHTML = response[0].FAILED_LOGIN;
+                    document.getElementById('lock_status').innerHTML = response[0].LOCK_STATUS;
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
@@ -418,10 +419,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete User Account Role', 'The user account role has been deleted.', 'success');
+                                show_alert('Delete User Account Role Success', 'The user account role has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete User Account Role', 'The user account role does not exist.', 'info');
+                                show_alert('Delete User Account Role Error', 'The user account role does not exist.', 'info');
                             }
 
                             reload_datatable('#user-account-role-datatable');
@@ -462,10 +463,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Activated' || response === 'Not Found'){
                             if(response === 'Activated'){
-                                show_alert_event('Activate User Account', 'The user account has been activated.', 'success', 'reload');
+                                show_alert_event('Activate User Account Success', 'The user account has been activated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Activate User Account', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
+                                show_alert_event('Activate User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -504,10 +505,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deactivated' || response === 'Not Found'){
                             if(response === 'Deactivated'){
-                                show_alert_event('Deactivate User Account', 'The user account has been deactivated.', 'success', 'reload');
+                                show_alert_event('Deactivate User Account Success', 'The user account has been deactivated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Deactivate User Account', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
+                                show_alert_event('Deactivate User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -546,10 +547,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Unlocked' || response === 'Not Found'){
                             if(response === 'Unlocked'){
-                                show_alert_event('Unlock User Account', 'The user account has been unlocked.', 'success', 'reload');
+                                show_alert_event('Unlock User Account Success', 'The user account has been unlocked.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Unlock User Account', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
+                                show_alert_event('Unlock User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -588,10 +589,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Locked' || response === 'Not Found'){
                             if(response === 'Locked'){
-                                show_alert_event('Lock User Account', 'The user account has been locked.', 'success', 'reload');
+                                show_alert_event('Lock User Account Sucecess', 'The user account has been locked.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Lock User Account', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
+                                show_alert_event('Lock User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -630,10 +631,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete User Account', 'The user account has been deleted.', 'success', 'redirect', 'user-accounts.php');
+                                show_alert_event('Delete User Account Success', 'The user account has been deleted.', 'success', 'redirect', 'user-accounts.php');
                             }
                             else{
-                                show_alert_event('Delete User Account', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
+                                show_alert_event('Delete User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
                             }
                         }
                         else if(response === 'Inactive User'){

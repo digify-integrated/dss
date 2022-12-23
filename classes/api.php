@@ -1074,6 +1074,31 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_department_exist
+    # Purpose    : Checks if the department exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_department_exist($department_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_department_exist(:department_id)');
+            $sql->bindValue(':department_id', $department_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1230,7 +1255,7 @@ class Api{
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username){
+    public function update_module($module_id, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
             $module_details = $this->get_module_details($module_id);
@@ -1245,14 +1270,16 @@ class Api{
                 $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
             }
 
-            $sql = $this->db_connection->prepare('CALL update_module(:module_id, :module_name, :module_version, :module_description, :module_category, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL update_module(:module_id, :module_name, :module_version, :module_description, :module_category, :default_page, :transaction_log_id, :record_log, :order_sequence)');
             $sql->bindValue(':module_id', $module_id);
             $sql->bindValue(':module_name', $module_name);
             $sql->bindValue(':module_version', $module_version);
             $sql->bindValue(':module_description', $module_description);
             $sql->bindValue(':module_category', $module_category);
+            $sql->bindValue(':default_page', $default_page);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log);
+            $sql->bindValue(':order_sequence', $order_sequence);
         
             if($sql->execute()){
                 if(!empty($module_details[0]['TRANSACTION_LOG_ID'])){
@@ -2934,6 +2961,118 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_department
+    # Purpose    : Updates department.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_department($department_id, $department, $parent_department, $manager, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $department_details = $this->get_department_details($department_id);
+            
+            if(!empty($department_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $department_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_department(:department_id, :department, :parent_department, :manager, :transaction_log_id, :record_log)');
+            $sql->bindValue(':department_id', $department_id);
+            $sql->bindValue(':department', $department);
+            $sql->bindValue(':parent_department', $parent_department);
+            $sql->bindValue(':manager', $manager);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($department_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated department.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated department.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_department_status
+    # Purpose    : Updates department status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_department_status($department_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $department_details = $this->get_department_details($department_id);
+            $transaction_log_id = $department_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Unarchive';
+            }
+            else{
+                $log_status = 'Archive';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_department_status(:department_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':department_id', $department_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated department status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -3015,29 +3154,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'PARAMETER_ID' => $this->encrypt_data($id)
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'PARAMETER_ID' => $this->encrypt_data($id)
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'PARAMETER_ID' => $this->encrypt_data($id)
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'PARAMETER_ID' => $this->encrypt_data($id)
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3054,7 +3189,7 @@ class Api{
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $username){
+    public function insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username){
         if ($this->databaseConnection()) {
             $response = array();
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
@@ -3069,14 +3204,16 @@ class Api{
             $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
             $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
 
-            $sql = $this->db_connection->prepare('CALL insert_module(:id, :module_name, :module_version, :module_description, :module_category, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL insert_module(:id, :module_name, :module_version, :module_description, :module_category, :default_page, :transaction_log_id, :record_log, :order_sequence)');
             $sql->bindValue(':id', $id);
             $sql->bindValue(':module_name', $module_name);
             $sql->bindValue(':module_version', $module_version);
             $sql->bindValue(':module_description', $module_description);
             $sql->bindValue(':module_category', $module_category);
+            $sql->bindValue(':default_page', $default_page);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log); 
+            $sql->bindValue(':order_sequence', $order_sequence); 
         
             if($sql->execute()){
                 # Update system parameter value
@@ -3102,42 +3239,36 @@ class Api{
                                 else{
                                     $response[] = array(
                                         'RESPONSE' => $update_module_icon,
-                                        'MODULE_ID' => null
                                     );
                                 }
                             }
                             else{
                                 $response[] = array(
                                     'RESPONSE' => true,
-                                    'MODULE_ID' => $this->encrypt_data($id)
                                 );
                             }
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'MODULE_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'MODULE_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'MODULE_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'MODULE_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3219,29 +3350,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'PAGE_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'PAGE_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'PAGE_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'PAGE_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3322,29 +3449,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'ACTION_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'ACTION_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'ACTION_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'ACTION_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3427,29 +3550,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'ROLE_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'ROLE_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'ROLE_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'ROLE_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3532,29 +3651,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'SYSTEM_CODE_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'SYSTEM_CODE_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'SYSTEM_CODE_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'SYSTEM_CODE_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3613,29 +3728,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'UPLOAD_SETTING_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'UPLOAD_SETTING_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'UPLOAD_SETTING_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'UPLOAD_SETTING_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3726,8 +3837,7 @@ class Api{
                                 }
                                 else{
                                     $response[] = array(
-                                        'RESPONSE' => $update_company_logo,
-                                        'COMPANY_ID' => null
+                                        'RESPONSE' => $update_company_logo
                                     );
                                 }
                             }
@@ -3740,29 +3850,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'COMPANY_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'COMPANY_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'COMPANY_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'COMPANY_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3832,57 +3938,49 @@ class Api{
                                         }
                                         else{
                                             $response[] = array(
-                                                'RESPONSE' => $favicon,
-                                                'INTERFACE_SETTING_ID' => null
+                                                'RESPONSE' => $favicon
                                             );
                                         }
                                     }
                                     else{
                                         $response[] = array(
-                                            'RESPONSE' => $menu_logo,
-                                            'INTERFACE_SETTING_ID' => null
+                                            'RESPONSE' => $menu_logo
                                         );
                                     }
                                 }
                                 else{
                                     $response[] = array(
-                                        'RESPONSE' => $login_logo,
-                                        'INTERFACE_SETTING_ID' => null
+                                        'RESPONSE' => $login_logo
                                     );
                                 }
                             }
                             else{
                                 $response[] = array(
-                                    'RESPONSE' => $login_background,
-                                    'INTERFACE_SETTING_ID' => null
+                                    'RESPONSE' => $login_background
                                 );
                             }
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'INTERFACE_SETTING_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'INTERFACE_SETTING_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'INTERFACE_SETTING_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'INTERFACE_SETTING_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -3949,29 +4047,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'EMAIL_SETTING_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'EMAIL_SETTING_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'EMAIL_SETTING_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'EMAIL_SETTING_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -4033,29 +4127,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'NOTIFICATION_SETTING_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'NOTIFICATION_SETTING_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'NOTIFICATION_SETTING_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'NOTIFICATION_SETTING_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -4185,28 +4275,24 @@ class Api{
                         else{
                             $response[] = array(
                                 'RESPONSE' => $insert_transaction_log,
-                                'COUNTRY_ID' => null
                             );
                         }
                     }
                     else{
                         $response[] = array(
                             'RESPONSE' => $update_system_parameter_value,
-                            'COUNTRY_ID' => null
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'COUNTRY_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'COUNTRY_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -4264,29 +4350,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'STATE_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'STATE_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'STATE_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'STATE_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -4298,7 +4380,7 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : insert_zoom_api
-    # Purpose    : Insert zoom api.
+    # Purpose    : Insert zoom API.
     #
     # Returns    : Array
     #
@@ -4346,29 +4428,25 @@ class Api{
                         }
                         else{
                             $response[] = array(
-                                'RESPONSE' => $insert_transaction_log,
-                                'ZOOM_API_ID' => null
+                                'RESPONSE' => $insert_transaction_log
                             );
                         }
                     }
                     else{
                         $response[] = array(
-                            'RESPONSE' => $update_system_parameter_value,
-                            'ZOOM_API_ID' => null
+                            'RESPONSE' => $update_system_parameter_value
                         );
                     }
                 }
                 else{
                     $response[] = array(
-                        'RESPONSE' => $update_system_parameter_value,
-                        'ZOOM_API_ID' => null
+                        'RESPONSE' => $update_system_parameter_value
                     );
                 }
             }
             else{
                 $response[] = array(
-                    'RESPONSE' => $sql->errorInfo()[2],
-                    'ZOOM_API_ID' => null
+                    'RESPONSE' => $sql->errorInfo()[2]
                 );
             }
 
@@ -4423,6 +4501,83 @@ class Api{
             else{
                 return $sql->errorInfo()[2];
             }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_department
+    # Purpose    : Insert department.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_department($department, $parent_department, $manager, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(16, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_department(:id, :department, :parent_department, :manager, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':department', $department);
+            $sql->bindValue(':parent_department', $parent_department);
+            $sql->bindValue(':manager', $manager);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 16, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted department.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'DEPARTMENT_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
         }
     }
     # -------------------------------------------------------------
@@ -5281,7 +5436,7 @@ class Api{
     # -------------------------------------------------------------
     #
     # Name       : delete_zoom_api
-    # Purpose    : Delete zoom api.
+    # Purpose    : Delete zoom API.
     #
     # Returns    : Number/String
     #
@@ -5362,6 +5517,29 @@ class Api{
             $sql->bindValue(':role_id', $role_id);
         
             if($sql->execute()){ 
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_department
+    # Purpose    : Delete department.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_department($department_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_department(:department_id)');
+            $sql->bindValue(':department_id', $department_id);
+        
+            if($sql->execute()){
                 return true;
             }
             else{
@@ -5545,6 +5723,47 @@ class Api{
                         'MODULE_DESCRIPTION' => $row['MODULE_DESCRIPTION'],
                         'MODULE_ICON' => $row['MODULE_ICON'],
                         'MODULE_CATEGORY' => $row['MODULE_CATEGORY'],
+                        'DEFAULT_PAGE' => $row['DEFAULT_PAGE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG'],
+                        'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_all_accessible_module_details
+    # Purpose    : Gets the all accessible modules of the user.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_all_accessible_module_details($username){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_all_accessible_module_details(:username)');
+            $sql->bindValue(':username', $username);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'MODULE_ID' => $row['MODULE_ID'],
+                        'MODULE_NAME' => $row['MODULE_NAME'],
+                        'MODULE_VERSION' => $row['MODULE_VERSION'],
+                        'MODULE_DESCRIPTION' => $row['MODULE_DESCRIPTION'],
+                        'MODULE_ICON' => $row['MODULE_ICON'],
+                        'MODULE_CATEGORY' => $row['MODULE_CATEGORY'],
+                        'DEFAULT_PAGE' => $row['DEFAULT_PAGE'],
                         'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG'],
                         'ORDER_SEQUENCE' => $row['ORDER_SEQUENCE']
@@ -6079,6 +6298,42 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_department_details
+    # Purpose    : Gets the department details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_department_details($department_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_department_details(:department_id)');
+            $sql->bindValue(':department_id', $department_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'DEPARTMENT' => $row['DEPARTMENT'],
+                        'PARENT_DEPARTMENT' => $row['PARENT_DEPARTMENT'],
+                        'MANAGER' => $row['MANAGER'],
+                        'STATUS' => $row['STATUS'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -6370,6 +6625,36 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_department_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_department_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Unarchived';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Archived';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Check methods
     # -------------------------------------------------------------
 
@@ -6541,6 +6826,8 @@ class Api{
                 break;
                 case 'menu logo':
                     return './assets/images/default/default-menu-logo.png';
+                case 'module icon':
+                    return './assets/images/default/default-module-icon.svg';
                 break;
                 case 'favicon':
                     return './assets/images/default/default-favicon.png';
@@ -6769,6 +7056,42 @@ class Api{
                         $country_name = $row['COUNTRY_NAME'];
     
                         $option .= "<option value='". $country_id ."'>". $country_name ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_department_options
+    # Purpose    : Generates department options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_department_options($generation_type){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_department_options(:generation_type)');
+            $sql->bindValue(':generation_type', $generation_type);
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $department_id = $row['DEPARTMENT_ID'];
+                        $department = $row['DEPARTMENT'];
+    
+                        $option .= "<option value='". $department_id ."'>". $department ."</option>";
                     }
     
                     return $option;

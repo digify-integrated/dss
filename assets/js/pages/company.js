@@ -135,7 +135,7 @@ function initialize_click_events(){
                         data: {username : username, company_id : company_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Companies', 'The companies have been deleted.', 'success');
+                                show_alert('Delete Multiple Companies Success', 'The companies have been deleted.', 'success');
     
                                 reload_datatable('#company-datatable');
                             }

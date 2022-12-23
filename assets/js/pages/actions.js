@@ -135,7 +135,7 @@ function initialize_click_events(){
                         data: {username : username, action_id : action_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Actions', 'The actions have been deleted.', 'success');
+                                show_alert('Delete Multiple Actions Success', 'The actions have been deleted.', 'success');
     
                                 reload_datatable('#actions-datatable');
                             }

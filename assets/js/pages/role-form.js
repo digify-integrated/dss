@@ -937,10 +937,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Role', 'The role has been deleted.', 'success', 'redirect', 'roles.php');
+                                show_alert_event('Delete Role Success', 'The role has been deleted.', 'success', 'redirect', 'roles.php');
                             }
                             else{
-                                show_alert_event('Delete Role', 'The role does not exist.', 'info', 'redirect', 'roles.php');
+                                show_alert_event('Delete Role Error', 'The role does not exist.', 'info', 'redirect', 'roles.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -1016,10 +1016,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                                show_alert('Delete Module Access Success', 'The module access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                                show_alert('Delete Module Access Error', 'The module access does not exist.', 'info');
                             }
 
                             reload_datatable('#module-access-datatable');
@@ -1061,10 +1061,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Page Access', 'The page access has been deleted.', 'success');
+                                show_alert('Delete Page Access Success', 'The page access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Page Access', 'The page access does not exist.', 'info');
+                                show_alert('Delete Page Access Error', 'The page access does not exist.', 'info');
                             }
 
                             reload_datatable('#page-access-datatable');
@@ -1106,10 +1106,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Action Access', 'The action access has been deleted.', 'success');
+                                show_alert('Delete Action Access Success', 'The action access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Action Access', 'The action access does not exist.', 'info');
+                                show_alert('Delete Action Access Error', 'The action access does not exist.', 'info');
                             }
 
                             reload_datatable('#action-access-datatable');
@@ -1151,10 +1151,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete User Account', 'The user account has been deleted.', 'success');
+                                show_alert('Delete User Account Success', 'The user account has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete User Account', 'The user account does not exist.', 'info');
+                                show_alert('Delete User Account Error', 'The user account does not exist.', 'info');
                             }
 
                             reload_datatable('#user-account-datatable');

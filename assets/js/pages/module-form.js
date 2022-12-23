@@ -15,7 +15,11 @@
                     $('#module_name').val(response[0].MODULE_NAME);
                     $('#module_description').val(response[0].MODULE_DESCRIPTION);
                     $('#module_version').val(response[0].MODULE_VERSION);
+                    $('#default_page').val(response[0].DEFAULT_PAGE);
+                    $('#order_sequence').val(response[0].ORDER_SEQUENCE);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
+
+                    document.getElementById('module_icon_image').innerHTML = response[0].MODULE_ICON;
                     
                     $('#module_id').val(module_id);
 
@@ -94,6 +98,9 @@
                 module_category: {
                     required: true
                 },
+                default_page: {
+                    required: true
+                },
                 module_version: {
                     required: true
                 }
@@ -107,6 +114,9 @@
                 },
                 module_category: {
                     required: 'Please choose the module category',
+                },
+                default_page: {
+                    required: 'Please enter the default page',
                 },
                 module_version: {
                     required: 'Please enter the module version',
@@ -434,10 +444,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Module Access', 'The module access has been deleted.', 'success');
+                                show_alert('Delete Module Access Success', 'The module access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Module Access', 'The module access does not exist.', 'info');
+                                show_alert('Delete Module Access Error', 'The module access does not exist.', 'info');
                             }
 
                             reload_datatable('#module-access-datatable');
@@ -478,10 +488,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Module', 'The module has been deleted.', 'success', 'redirect', 'modules.php');
+                                show_alert_event('Delete Module Success', 'The module has been deleted.', 'success', 'redirect', 'modules.php');
                             }
                             else{
-                                show_alert_event('Delete Module', 'The module does not exist.', 'info', 'redirect', 'modules.php');
+                                show_alert_event('Delete Module Error', 'The module does not exist.', 'info', 'redirect', 'modules.php');
                             }
                         }
                         else if(response === 'Inactive User'){

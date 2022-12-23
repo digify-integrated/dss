@@ -231,10 +231,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Company', 'The company has been deleted.', 'success', 'redirect', 'company.php');
+                                show_alert_event('Delete Company Success', 'The company has been deleted.', 'success', 'redirect', 'company.php');
                             }
                             else{
-                                show_alert_event('Delete Company', 'The company does not exist.', 'info', 'redirect', 'company.php');
+                                show_alert_event('Delete Company Error', 'The company does not exist.', 'info', 'redirect', 'company.php');
                             }
                         }
                         else if(response === 'Inactive User'){

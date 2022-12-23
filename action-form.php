@@ -231,7 +231,6 @@
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
-        <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/pages/action-form.js?v=<?php echo rand(); ?>"></script>
     </body>

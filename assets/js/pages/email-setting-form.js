@@ -272,10 +272,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Activated' || response === 'Not Found'){
                             if(response === 'Activated'){
-                                show_alert_event('Activate Email Setting', 'The email setting has been activated.', 'success', 'reload');
+                                show_alert_event('Activate Email Setting Success', 'The email setting has been activated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Activate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Activate Email Setting Error', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -314,10 +314,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deactivated' || response === 'Not Found'){
                             if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Email Setting', 'The email setting has been deactivated.', 'success', 'reload');
+                                show_alert_event('Deactivate Email Setting Success', 'The email setting has been deactivated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Deactivate Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Deactivate Email Setting Error', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -356,10 +356,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Email Setting', 'The email setting has been deleted.', 'success', 'redirect', 'email-settings.php');
+                                show_alert_event('Delete Email Setting Success', 'The email setting has been deleted.', 'success', 'redirect', 'email-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Email Setting', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
+                                show_alert_event('Delete Email Setting Error', 'The email setting does not exist.', 'info', 'redirect', 'email-settings.php');
                             }
                         }
                         else if(response === 'Inactive User'){

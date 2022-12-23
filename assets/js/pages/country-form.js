@@ -308,10 +308,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Country', 'The country has been deleted.', 'success', 'redirect', 'country.php');
+                                show_alert_event('Delete Country Success', 'The country has been deleted.', 'success', 'redirect', 'country.php');
                             }
                             else{
-                                show_alert_event('Delete Country', 'The country does not exist.', 'info', 'redirect', 'country.php');
+                                show_alert_event('Delete Country Error', 'The country does not exist.', 'info', 'redirect', 'country.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -374,10 +374,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete State', 'The state has been deleted.', 'success');
+                                show_alert('Delete State Success', 'The state has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete State', 'The state does not exist.', 'info');
+                                show_alert('Delete State Error', 'The state does not exist.', 'info');
                             }
 
                             reload_datatable('#state-datatable');

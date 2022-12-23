@@ -20,8 +20,8 @@
                     $('#upload_setting_id').val(upload_setting_id);
                 },
                 complete: function(){
-                    if($('#upload-setting-file-type-datable').length){
-                        initialize_upload_setting_file_type_table('#upload-setting-file-type-datable');
+                    if($('#upload-setting-file-type-datatable').length){
+                        initialize_upload_setting_file_type_table('#upload-setting-file-type-datatable');
                     }
 
                     if($('#transaction-log-datatable').length){
@@ -408,19 +408,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Upload Setting File Type', 'The file type has been deleted.', 'success');
+                                show_alert('Delete Upload Setting File Type Success', 'The file type has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Upload Setting File Type', 'The file type does not exist.', 'info');
+                                show_alert('Delete Upload Setting File Type Error', 'The file type does not exist.', 'info');
                             }
 
-                            reload_datatable('#upload-setting-file-type-datable');
+                            reload_datatable('#upload-setting-file-type-datatable');
                         }
                         else if(response === 'Inactive User'){
                             show_alert_event('Delete Upload Setting File Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Delete Upload Setting File Type', response, 'error');
+                            show_alert('Delete Upload Setting File Type Error', response, 'error');
                         }
                     }
                 });
@@ -452,10 +452,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Upload Setting', 'The upload setting has been deleted.', 'success', 'redirect', 'upload-settings.php');
+                                show_alert_event('Delete Upload Setting Success', 'The upload setting has been deleted.', 'success', 'redirect', 'upload-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Upload Setting', 'The upload setting does not exist.', 'info', 'redirect', 'upload-settings.php');
+                                show_alert_event('Delete Upload Setting Error', 'The upload setting does not exist.', 'info', 'redirect', 'upload-settings.php');
                             }
                         }
                         else if(response === 'Inactive User'){

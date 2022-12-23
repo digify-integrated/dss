@@ -141,6 +141,13 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <?php
+                                                if(!empty($module_id)){
+                                                    echo '<div class="row">
+                                                            <div class="col-md-12" id="module_icon_image"></div>
+                                                        </div>';
+                                                }
+                                            ?>
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
@@ -166,6 +173,12 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                    <div class="row mb-4">
+                                                        <label for="order_sequence" class="col-md-3 col-form-label">Order Sequence</label>
+                                                        <div class="col-md-9">
+                                                            <input id="order_sequence" name="order_sequence" class="form-control" type="number" min="0" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
@@ -178,6 +191,12 @@
                                                         <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
                                                         <div class="col-md-9">
                                                             <input class="form-control" type="file" name="module_icon" id="module_icon" <?php echo $disabled; ?>>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <label for="default_page" class="col-md-3 col-form-label">Default Page <span class="text-danger">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="default_page" name="default_page" maxlength="100" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>

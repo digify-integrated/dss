@@ -225,10 +225,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete State', 'The state has been deleted.', 'success', 'redirect', 'state.php');
+                                show_alert_event('Delete State Success', 'The state has been deleted.', 'success', 'redirect', 'state.php');
                             }
                             else{
-                                show_alert_event('Delete State', 'The state does not exist.', 'info', 'redirect', 'state.php');
+                                show_alert_event('Delete State Error', 'The state does not exist.', 'info', 'redirect', 'state.php');
                             }
                         }
                         else if(response === 'Inactive User'){

@@ -49,10 +49,10 @@
                             if(response[0]['RESPONSE'] === 'Inserted'){
                                 var redirect_link = window.location.href + '?id=' + response[0]['ZOOM_API_ID'];
 
-                                show_alert_event('Insert Zoom API Success', 'The zoom api has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Zoom API Success', 'The Zoom API has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Zoom API Success', 'The zoom api has been updated.', 'success', 'reload');
+                                show_alert_event('Update Zoom API Success', 'The Zoom API has been updated.', 'success', 'reload');
                             }
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
@@ -223,7 +223,7 @@ function initialize_click_events(){
 
         Swal.fire({
             title: 'Activate Zoom API',
-            text: 'Are you sure you want to activate this zoom api?',
+            text: 'Are you sure you want to activate this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Activate',
@@ -240,10 +240,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Activated' || response === 'Not Found'){
                             if(response === 'Activated'){
-                                show_alert_event('Activate Zoom API', 'The zoom api has been activated.', 'success', 'reload');
+                                show_alert_event('Activate Zoom API Success', 'The Zoom API has been activated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Activate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
+                                show_alert_event('Activate Zoom API Error', 'The Zoom API does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -265,7 +265,7 @@ function initialize_click_events(){
 
         Swal.fire({
             title: 'Deactivate Zoom API',
-            text: 'Are you sure you want to deactivate this zoom api?',
+            text: 'Are you sure you want to deactivate this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Deactivate',
@@ -282,10 +282,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deactivated' || response === 'Not Found'){
                             if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Zoom API', 'The zoom api has been deactivated.', 'success', 'reload');
+                                show_alert_event('Deactivate Zoom API Success', 'The Zoom API has been deactivated.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Deactivate Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
+                                show_alert_event('Deactivate Zoom API Error', 'The Zoom API does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -307,7 +307,7 @@ function initialize_click_events(){
 
         Swal.fire({
             title: 'Delete Zoom API',
-            text: 'Are you sure you want to delete this zoom api?',
+            text: 'Are you sure you want to delete this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -324,10 +324,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Zoom API', 'The zoom api has been deleted.', 'success', 'redirect', 'zoom-api.php');
+                                show_alert_event('Delete Zoom API Success', 'The Zoom API has been deleted.', 'success', 'redirect', 'zoom-api.php');
                             }
                             else{
-                                show_alert_event('Delete Zoom API', 'The zoom api does not exist.', 'info', 'redirect', 'zoom-api.php');
+                                show_alert_event('Delete Zoom API Error', 'The Zoom API does not exist.', 'info', 'redirect', 'zoom-api.php');
                             }
                         }
                         else if(response === 'Inactive User'){

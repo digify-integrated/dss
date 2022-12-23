@@ -232,10 +232,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete System Code', 'The system code has been deleted.', 'success', 'redirect', 'system-codes.php');
+                                show_alert_event('Delete System Code Success', 'The system code has been deleted.', 'success', 'redirect', 'system-codes.php');
                             }
                             else{
-                                show_alert_event('Delete System Code', 'The system code does not exist.', 'info', 'redirect', 'system-codes.php');
+                                show_alert_event('Delete System Code Error', 'The system code does not exist.', 'info', 'redirect', 'system-codes.php');
                             }
                         }
                         else if(response === 'Inactive User'){

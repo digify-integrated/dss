@@ -399,10 +399,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Action Access', 'The action access has been deleted.', 'success');
+                                show_alert('Delete Action Access Success', 'The action access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Action Access', 'The action access does not exist.', 'info');
+                                show_alert('Delete Action Access Error', 'The action access does not exist.', 'info');
                             }
 
                             reload_datatable('#action-access-datatable');
@@ -443,10 +443,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Action', 'The action has been deleted.', 'success', 'redirect', 'actions.php');
+                                show_alert_event('Delete Action Success', 'The action has been deleted.', 'success', 'redirect', 'actions.php');
                             }
                             else{
-                                show_alert_event('Delete Action', 'The action does not exist.', 'info', 'redirect', 'actions.php');
+                                show_alert_event('Delete Action Error', 'The action does not exist.', 'info', 'redirect', 'actions.php');
                             }
                         }
                         else if(response === 'Inactive User'){

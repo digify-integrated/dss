@@ -407,10 +407,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Page Access', 'The page access has been deleted.', 'success');
+                                show_alert('Delete Page Access Success', 'The page access has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Page Access', 'The page access does not exist.', 'info');
+                                show_alert('Delete Page Access Error', 'The page access does not exist.', 'info');
                             }
 
                             reload_datatable('#page-access-datatable');
@@ -451,10 +451,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Page', 'The page has been deleted.', 'success', 'redirect', 'pages.php');
+                                show_alert_event('Delete Page Success', 'The page has been deleted.', 'success', 'redirect', 'pages.php');
                             }
                             else{
-                                show_alert_event('Delete Page', 'The page does not exist.', 'info', 'redirect', 'pages.php');
+                                show_alert_event('Delete Page Error', 'The page does not exist.', 'info', 'redirect', 'pages.php');
                             }
                         }
                         else if(response === 'Inactive User'){

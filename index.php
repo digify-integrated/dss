@@ -82,5 +82,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/pages/index.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/form-validation-rules.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

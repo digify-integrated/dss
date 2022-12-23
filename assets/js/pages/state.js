@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, state_id : state_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple States', 'The states have been deleted.', 'success');
+                                show_alert('Delete Multiple States Success', 'The states have been deleted.', 'success');
     
                                 reload_datatable('#state-datatable');
                             }

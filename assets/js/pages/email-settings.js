@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Email Settings', 'The email settings have been deleted.', 'success');
+                                show_alert('Delete Multiple Email Settings Success', 'The email settings have been deleted.', 'success');
     
                                 reload_datatable('#email-settings-datatable');
                             }

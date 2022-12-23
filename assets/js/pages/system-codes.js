@@ -139,7 +139,7 @@ function initialize_click_events(){
                         data: {username : username, system_code_id : system_code_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple System Codes', 'The system codes have been deleted.', 'success');
+                                show_alert('Delete Multiple System Codes Success', 'The system codes have been deleted.', 'success');
     
                                 reload_datatable('#system-codes-datatable');
                             }

@@ -774,10 +774,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Notification Setting', 'The notification setting has been deleted.', 'success', 'redirect', 'notification-settings.php');
+                                show_alert_event('Delete Notification Setting Success', 'The notification setting has been deleted.', 'success', 'redirect', 'notification-settings.php');
                             }
                             else{
-                                show_alert_event('Delete Notification Setting', 'The notification setting does not exist.', 'info', 'redirect', 'notification-settings.php');
+                                show_alert_event('Delete Notification Setting Error', 'The notification setting does not exist.', 'info', 'redirect', 'notification-settings.php');
                             }
                         }
                         else if(response === 'Inactive User'){
@@ -848,10 +848,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Notification Role Recipient', 'The notification role recipient has been deleted.', 'success');
+                                show_alert('Delete Notification Role Recipient Success', 'The notification role recipient has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Notification Role Recipient', 'The notification role recipient does not exist.', 'info');
+                                show_alert('Delete Notification Role Recipient Error', 'The notification role recipient does not exist.', 'info');
                             }
 
                             reload_datatable('#notification-role-recipients-datatable');
@@ -893,10 +893,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Notification User Account Recipient', 'The notification user account recipient has been deleted.', 'success');
+                                show_alert('Delete Notification User Account Recipient Success', 'The notification user account recipient has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Notification User Account Recipient', 'The notification user account recipient does not exist.', 'info');
+                                show_alert('Delete Notification User Account Recipient Error', 'The notification user account recipient does not exist.', 'info');
                             }
 
                             reload_datatable('#notification-user-account-recipients-datatable');
@@ -938,10 +938,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Notification Channel', 'The notification channel has been deleted.', 'success');
+                                show_alert('Delete Notification Channel Success', 'The notification channel has been deleted.', 'success');
                             }
                             else{
-                                show_alert('Delete Notification Channel', 'The notification channel does not exist.', 'info');
+                                show_alert('Delete Notification Channel Error', 'The notification channel does not exist.', 'info');
                             }
 
                             reload_datatable('#notification-channel-datatable');

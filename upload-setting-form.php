@@ -51,7 +51,6 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
-        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
         <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <?php require('views/_required_css.php'); ?>
@@ -194,7 +193,7 @@
                                                             <div class="tab-pane active" id="file-type" role="tabpanel">
                                                                 <div class="row mt-4">
                                                                     <div class="col-md-12">
-                                                                        <table id="upload-setting-file-type-datable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                        <table id="upload-setting-file-type-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">File Type</th>
@@ -248,7 +247,6 @@
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
-        <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/pages/upload-setting-form.js?v=<?php echo rand(); ?>"></script>
     </body>

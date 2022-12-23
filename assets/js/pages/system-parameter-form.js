@@ -226,10 +226,10 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete System Parameter', 'The system parameter has been deleted.', 'success', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete System Parameter Success', 'The system parameter has been deleted.', 'success', 'redirect', 'system-parameters.php');
                             }
                             else{
-                                show_alert_event('Delete System Parameter', 'The system parameter does not exist.', 'info', 'redirect', 'system-parameters.php');
+                                show_alert_event('Delete System Parameter Error', 'The system parameter does not exist.', 'info', 'redirect', 'system-parameters.php');
                             }
                         }
                         else if(response === 'Inactive User'){

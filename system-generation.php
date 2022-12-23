@@ -1531,6 +1531,9 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     while($row = $sql->fetch()){
                         $username = $row['USERNAME'];
 
+                        $user_account_details = $api->get_user_account_details($username);
+                        $file_as = $user_account_details[0]['FILE_AS'];
+
                         if($delete_role_user_account > 0 && $update_role > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-user-account" data-user-id="'. $username .'" data-role-id="'. $role_id .'" title="Delete User Account">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
@@ -1541,7 +1544,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         }
     
                         $response[] = array(
-                            'USERNAME' => $username,
+                            'USERNAME' => $file_as . '<p class="text-muted mb-0">'. $username .'</p>',
                             'ACTION' => $delete
                         );
                     }
@@ -1553,7 +1556,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1770,7 +1772,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2167,7 +2168,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2187,6 +2187,9 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     while($row = $sql->fetch()){
                         $username = $row['USERNAME'];
 
+                        $user_account_details = $api->get_user_account_details($username);
+                        $file_as = $user_account_details[0]['FILE_AS'];
+
                         if($delete_notification_user_account_recipient > 0 && $update_notification_setting > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-notification-user-account-recipient" data-notification-setting-id="'. $notification_setting_id .'" data-user-id="'. $username .'" title="Delete User Account Recipient">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
@@ -2197,7 +2200,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         }
     
                         $response[] = array(
-                            'USERNAME' => $username,
+                            'USERNAME' => $file_as . '<p class="text-muted mb-0">'. $username .'</p>',
                             'ACTION' => $delete
                         );
                     }
@@ -2209,7 +2212,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2295,16 +2297,17 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             if ($api->databaseConnection()) {
                 $notification_setting_id = $_POST['notification_setting_id'];
     
-                $sql = $api->db_connection->prepare('SELECT USERNAME FROM global_user_account WHERE USERNAME NOT IN (SELECT USERNAME FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id)');
+                $sql = $api->db_connection->prepare('SELECT USERNAME, FILE_AS FROM global_user_account WHERE USERNAME NOT IN (SELECT USERNAME FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = :notification_setting_id)');
                 $sql->bindValue(':notification_setting_id', $notification_setting_id);
     
                 if($sql->execute()){
                     while($row = $sql->fetch()){
                         $username = $row['USERNAME'];
+                        $file_as = $row['FILE_AS'];
     
                         $response[] = array(
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $username .'">',
-                            'USERNAME' => $username
+                            'USERNAME' => $file_as . '<p class="text-muted mb-0">'. $username .'</p>'
                         );
                     }
     
@@ -2315,7 +2318,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2596,7 +2598,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $file_as = $row['FILE_AS'];
                         $user_status = $row['USER_STATUS'];
                         $password_expiry_date = $api->check_date('empty', $row['PASSWORD_EXPIRY_DATE'], '', 'm/d/Y', '', '', '');
-                        $last_connection_date = $api->check_date('empty', $row['LAST_CONNECTION_DATE'], '', 'm/d/Y', '', '', '');
+                        $last_connection_date = $api->check_date('empty', $row['LAST_CONNECTION_DATE'], '', 'm/d/Y h:i:s a', '', '', '');
                         $failed_login = $row['FAILED_LOGIN'];
                         $transaction_log_id = $row['TRANSACTION_LOG_ID'];
                         $lock_status = $api->get_user_account_lock_status($failed_login)[0]['BADGE'];
@@ -2625,7 +2627,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'USERNAME' =>  $file_as . '<p class="text-muted mb-0">'. $username .'</p>',
                             'ACCOUNT_STATUS' => $account_status,
                             'LOCK_STATUS' => $lock_status,
-                            'PASSWORD_EXPIRY_DATE' => $expiry_difference,
+                            'PASSWORD_EXPIRY_DATE' => $password_expiry_date . '<p class="text-muted mb-0">'. $expiry_difference .'</p>',
                             'LAST_CONNECTION_DATE' => $last_connection_date,
                             'VIEW' => '<div class="d-flex gap-2">
                                             <a href="user-account-form.php?id='. $user_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View User Account">
@@ -2718,6 +2720,72 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
         }
         
+    }
+    # -------------------------------------------------------------
+
+    # Department table
+    else if($type == 'departments table'){
+        if(isset($_POST['filter_status'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+
+                $query = 'SELECT DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS FROM employee_department';
+
+                if(!empty($filter_status)){
+                    $query .= ' WHERE STATUS = :filter_status';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $department_id = $row['DEPARTMENT_ID'];
+                        $department = $row['DEPARTMENT'];
+                        $parent_department = $row['PARENT_DEPARTMENT'];
+                        $manager = $row['MANAGER'];
+                        $status = $row['STATUS'];
+
+                        if($status == '1'){
+                            $data_archive = '1';
+                        }
+                        else{
+                            $data_archive = '0';
+                        }
+    
+                        $department_status = $api->get_department_status($status)[0]['BADGE'];
+
+                        $department_details = $api->get_department_details($parent_department);
+                        $parent_department_name = $department_details[0]['DEPARTMENT'] ?? null;
+    
+                        $department_id_encrypted = $api->encrypt_data($department_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $department_id .'">',
+                            'DEPARTMENT_ID' => $department_id,
+                            'DEPARTMENT' => $department,
+                            'STATUS' => $department_status,
+                            'MANAGER' => $manager,
+                            'EMPLOYEES' => 0,
+                            'PARENT_DEPARTMENT' => $parent_department_name,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="department-form.php?id='. $department_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Department">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
     }
     # -------------------------------------------------------------
 

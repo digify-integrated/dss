@@ -139,7 +139,7 @@ function initialize_click_events(){
                         data: {username : username, upload_setting_id : upload_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Upload Settings', 'The upload settings have been deleted.', 'success');
+                                show_alert('Delete Multiple Upload Settings Success', 'The upload settings have been deleted.', 'success');
     
                                 reload_datatable('#upload-settings-datatable');
                             }

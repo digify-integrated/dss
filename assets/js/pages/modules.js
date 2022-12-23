@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, module_id : module_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Modules', 'The modules have been deleted.', 'success');
+                                show_alert('Delete Multiple Modules Success', 'The modules have been deleted.', 'success');
     
                                 reload_datatable('#modules-datatable');
                             }

@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Interface Settings', 'The interface settings have been deleted.', 'success');
+                                show_alert('Delete Multiple Interface Settings Success', 'The interface settings have been deleted.', 'success');
     
                                 reload_datatable('#interface-settings-datatable');
                             }

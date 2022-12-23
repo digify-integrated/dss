@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, page_id : page_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Pages', 'The pages have been deleted.', 'success');
+                                show_alert('Delete Multiple Pages Success', 'The pages have been deleted.', 'success');
     
                                 reload_datatable('#pages-datatable');
                             }

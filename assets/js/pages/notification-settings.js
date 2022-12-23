@@ -136,7 +136,7 @@ function initialize_click_events(){
                         data: {username : username, notification_setting_id : notification_setting_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Notification Settings', 'The notification settings have been deleted.', 'success');
+                                show_alert('Delete Multiple Notification Settings Success', 'The notification settings have been deleted.', 'success');
     
                                 reload_datatable('#notification-settings-datatable');
                             }
@@ -158,7 +158,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Notification Settings', 'Please select the notification settings you want to delete.', 'error');
+            show_alert('Delete Multiple Notification Settings Error', 'Please select the notification settings you want to delete.', 'error');
         }
     });
 

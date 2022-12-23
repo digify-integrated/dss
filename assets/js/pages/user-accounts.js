@@ -147,7 +147,7 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple User Accounts', 'The user accounts have been deleted.', 'success');
+                                show_alert('Delete Multiple User Accounts Success', 'The user accounts have been deleted.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
@@ -203,10 +203,10 @@ function initialize_click_events(){
                         success: function (response) {
                             if(response === 'Locked' || response === 'Not Found'){
                                 if(response === 'Locked'){
-                                    show_alert('Lock Multiple User Accounts', 'The user accounts have been locked.', 'success');
+                                    show_alert('Lock Multiple User Accounts Success', 'The user accounts have been locked.', 'success');
                                 }
                                 else{
-                                    show_alert('Lock Multiple User Accounts', 'The user account does not exist.', 'info');
+                                    show_alert('Lock Multiple User Accounts Error', 'The user account does not exist.', 'info');
                                 }
     
                                 reload_datatable('#user-accounts-datatable');
@@ -217,6 +217,10 @@ function initialize_click_events(){
                             else{
                               show_alert('Lock Multiple User Accounts Error', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     return false;
@@ -258,10 +262,10 @@ function initialize_click_events(){
                         success: function (response) {
                             if(response === 'Unlocked' || response === 'Not Found'){
                                 if(response === 'Unlocked'){
-                                    show_alert('Unlock Multiple User Accounts', 'The user accounts have been unlocked.', 'success');
+                                    show_alert('Unlock Multiple User Accounts Success', 'The user accounts have been unlocked.', 'success');
                                 }
                                 else{
-                                    show_alert('Unlock Multiple User Accounts', 'The user account does not exist.', 'info');
+                                    show_alert('Unlock Multiple User Accounts Error', 'The user account does not exist.', 'info');
                                 }
     
                                 reload_datatable('#user-accounts-datatable');
@@ -272,6 +276,10 @@ function initialize_click_events(){
                             else{
                               show_alert('Unlock Multiple User Accounts Error', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     return false;
@@ -313,10 +321,10 @@ function initialize_click_events(){
                         success: function (response) {
                             if(response === 'Activated' || response === 'Not Found'){
                                 if(response === 'Activated'){
-                                    show_alert('Activate Multiple User Accounts', 'The user accounts have been activated.', 'success');
+                                    show_alert('Activate Multiple User Accounts Success', 'The user accounts have been activated.', 'success');
                                 }
                                 else{
-                                    show_alert('Activate Multiple User Accounts', 'The user account does not exist.', 'info');
+                                    show_alert('Activate Multiple User Accounts Error', 'The user account does not exist.', 'info');
                                 }
     
                                 reload_datatable('#user-accounts-datatable');
@@ -327,6 +335,10 @@ function initialize_click_events(){
                             else{
                               show_alert('Activate Multiple User Accounts Error', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     return false;
@@ -368,10 +380,10 @@ function initialize_click_events(){
                         success: function (response) {
                             if(response === 'Deactivated' || response === 'Not Found'){
                                 if(response === 'Deactivated'){
-                                    show_alert('Deactivate Multiple User Accounts', 'The user accounts have been deactivated.', 'success');
+                                    show_alert('Deactivate Multiple User Accounts Success', 'The user accounts have been deactivated.', 'success');
                                 }
                                 else{
-                                    show_alert('Deactivate Multiple User Accounts', 'The user account does not exist.', 'info');
+                                    show_alert('Deactivate Multiple User Accounts Error', 'The user account does not exist.', 'info');
                                 }
     
                                 reload_datatable('#user-accounts-datatable');
@@ -382,6 +394,10 @@ function initialize_click_events(){
                             else{
                               show_alert('Deactivate Multiple User Accounts Error', response, 'error');
                             }
+                        },
+                        complete: function(){
+                            $('.multiple').addClass('d-none');
+                            $('.multiple-action').addClass('d-none');
                         }
                     });
                     return false;

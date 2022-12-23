@@ -2,52 +2,46 @@
     'use strict';
 
     $(function() {
-        if($('#interface-setting-id').length){
-            var transaction = 'interface setting details';
-            var interface_setting_id = $('#interface-setting-id').text();
+        if($('#department-id').length){
+            var transaction = 'department details';
+            var department_id = $('#department-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {interface_setting_id : interface_setting_id, transaction : transaction},
+                data: {department_id : department_id, transaction : transaction},
                 success: function(response) {
-                    $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
+                    $('#department').val(response[0].DEPARTMENT);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#description').val(response[0].DESCRIPTION);
-                    
-                    document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
-                    document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
-                    document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
-                    document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
-                    document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
 
-                    $('#interface_setting_id').val(interface_setting_id);
+                    document.getElementById('department_status').innerHTML = response[0].STATUS;
+
+                    check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
+                    check_empty(response[0].MANAGER, '#manager', 'select');
                 },
                 complete: function(){                    
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
                     }
+
+                    /*if($('#department-employee-datatable').length){
+                        initialize_department_employee_table('#department-employee-datatable');
+                    }*/
                 }
             });
         }
 
-        $('#interface-setting-form').validate({
+        $('#department-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit interface setting';
+                var transaction = 'submit department';
                 var username = $('#username').text();
-
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
 
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -55,19 +49,19 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
 
-                                show_alert_event('Insert Interface Setting Success', 'The interface setting has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Department Success', 'The department has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Interface Setting Success', 'The interface setting has been updated.', 'success', 'reload');
+                                show_alert_event('Update Department Success', 'The department has been updated.', 'success', 'reload');
                             }
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Interface Setting Error', response, 'error');
+                            show_alert('Department Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -78,19 +72,13 @@
                 return false;
             },
             rules: {
-                interface_setting_name: {
+                department: {
                     required: true
-                },
-                description: {
-                    required: true
-                },
+                }
             },
             messages: {
-                interface_setting_name: {
-                    required: 'Please enter the interface setting name',
-                },
-                description: {
-                    required: 'Please enter the description',
+                department: {
+                    required: 'Please enter the department',
                 }
             },
             errorPlacement: function(label, element) {
@@ -210,19 +198,104 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
     $(datatable_name).dataTable(settings);
 }
 
+function initialize_department_employee_table(datatable_name, buttons = false, show_all = false){    
+    var username = $('#username').text();
+    var department_id = $('#department_id').val();
+    var type = 'department role table';
+    var settings;
+
+    var column = [ 
+        { 'data' : 'EMPLOYEE' }
+    ];
+
+    var column_definition = [
+        { 'width': '100%', 'aTargets': 0 }
+    ];
+
+    if(show_all){
+        length_menu = [ [-1], ['All'] ];
+    }
+    else{
+        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
+    }
+
+    if(buttons){
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'department_id' : department_id},
+                'dataSrc' : ''
+            },
+            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+                'csv', 'excel', 'pdf'
+            ],
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+    else{
+        settings = {
+            'ajax': { 
+                'url' : 'system-generation.php',
+                'method' : 'POST',
+                'dataType': 'JSON',
+                'data': {'type' : type, 'username' : username, 'department_id' : department_id},
+                'dataSrc' : ''
+            },
+            'order': [[ 1, 'asc' ]],
+            'columns' : column,
+            'scrollY': false,
+            'scrollX': true,
+            'scrollCollapse': true,
+            'fnDrawCallback': function( oSettings ) {
+                readjust_datatable_column();
+            },
+            'aoColumnDefs': column_definition,
+            'lengthMenu': length_menu,
+            'language': {
+                'emptyTable': 'No data found',
+                'searchPlaceholder': 'Search...',
+                'search': '',
+                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            }
+        };
+    }
+
+    destroy_datatable(datatable_name);
+    
+    $(datatable_name).dataTable(settings);
+}
+
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#activate-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'activate interface setting';
+    $(document).on('click','#unarchive-department',function() {
+        var department_id = $(this).data('department-id');
+        var transaction = 'unarchive department';
 
         Swal.fire({
-            title: 'Activate Interface Setting',
-            text: 'Are you sure you want to activate this interface setting?',
+            title: 'Unarchive Department',
+            text: 'Are you sure you want to unarchive this department?',
             icon: 'warning',
             showCancelButton: !0,
-            confirmButtonText: 'Activate',
+            confirmButtonText: 'Unarchive',
             cancelButtonText: 'Cancel',
             confirmButtonClass: 'btn btn-success mt-2',
             cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
@@ -232,21 +305,21 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated' || response === 'Not Found'){
-                            if(response === 'Activated'){
-                                show_alert_event('Activate Interface Setting Success', 'The interface setting has been activated.', 'success', 'reload');
+                        if(response === 'Unarchived' || response === 'Not Found'){
+                            if(response === 'Unarchived'){
+                                show_alert_event('Unarchive Department Success', 'The department has been unarchived.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Activate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
+                                show_alert_event('Unarchive Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
                             }
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Activate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Unarchive Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Activate Interface Setting Error', response, 'error');
+                            show_alert('Unarchive Department Error', response, 'error');
                         }
                     }
                 });
@@ -255,16 +328,16 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#deactivate-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'deactivate interface setting';
+    $(document).on('click','#archive-department',function() {
+        var department_id = $(this).data('department-id');
+        var transaction = 'archive department';
 
         Swal.fire({
-            title: 'Deactivate Interface Setting',
-            text: 'Are you sure you want to deactivate this interface setting?',
+            title: 'Archive Department',
+            text: 'Are you sure you want to archive this department?',
             icon: 'warning',
             showCancelButton: !0,
-            confirmButtonText: 'Deactivate',
+            confirmButtonText: 'Archive',
             cancelButtonText: 'Cancel',
             confirmButtonClass: 'btn btn-danger mt-2',
             cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
@@ -274,21 +347,21 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated' || response === 'Not Found'){
-                            if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Interface Setting Success', 'The interface setting has been deactivated.', 'success', 'reload');
+                        if(response === 'Archived' || response === 'Not Found'){
+                            if(response === 'Archived'){
+                                show_alert_event('Archive Department Success', 'The department has been archived.', 'success', 'reload');
                             }
                             else{
-                                show_alert_event('Deactivate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
+                                show_alert_event('Archive Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
                             }
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Deactivate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Archive Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Deactivate Interface Setting Error', response, 'error');
+                            show_alert('Archive Department Error', response, 'error');
                         }
                     }
                 });
@@ -297,13 +370,13 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'delete interface setting';
+    $(document).on('click','#delete-department',function() {
+        var department_id = $(this).data('department-id');
+        var transaction = 'delete department';
 
         Swal.fire({
-            title: 'Delete Interface Setting',
-            text: 'Are you sure you want to delete this interface setting?',
+            title: 'Delete Department',
+            text: 'Are you sure you want to delete this department?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -316,21 +389,21 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Interface Settings Success', 'The interface settings has been deleted.', 'success', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Department Success', 'The department has been deleted.', 'success', 'redirect', 'departments.php');
                             }
                             else{
-                                show_alert_event('Delete Interface Settings Error', 'The interface settings does not exist.', 'info', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
                             }
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Interface Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Delete Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Delete Interface Settings Error', response, 'error');
+                            show_alert('Delete Department Error', response, 'error');
                         }
                     }
                 });
@@ -340,7 +413,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -353,7 +425,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'interface-settings.php';
+                window.location.href = 'departments.php';
                 return false;
             }
         });

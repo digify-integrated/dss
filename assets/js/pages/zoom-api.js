@@ -138,7 +138,7 @@ function initialize_click_events(){
                         data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Zoom APIs', 'The Zoom APIs have been deleted.', 'success');
+                                show_alert('Delete Multiple Zoom APIs Success', 'The Zoom APIs have been deleted.', 'success');
     
                                 reload_datatable('#zoom-api-datatable');
                             }

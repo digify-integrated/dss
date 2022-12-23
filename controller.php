@@ -73,13 +73,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $check_user_account_status = $api->check_user_account_status($username);
 
             if($check_user_account_status){
-                if(isset($_POST['module_id']) && isset($_POST['module_name']) && !empty($_POST['module_name']) && isset($_POST['module_description']) && !empty($_POST['module_description']) && isset($_POST['module_category']) && !empty($_POST['module_category']) && isset($_POST['module_version']) && !empty($_POST['module_version'])){
+                if(isset($_POST['module_id']) && isset($_POST['module_name']) && !empty($_POST['module_name']) && isset($_POST['module_description']) && !empty($_POST['module_description']) && isset($_POST['module_category']) && !empty($_POST['module_category']) && isset($_POST['default_page']) && !empty($_POST['default_page']) && isset($_POST['order_sequence']) && isset($_POST['module_version']) && !empty($_POST['module_version'])){
                     $file_type = '';
                     $module_id = $_POST['module_id'];
                     $module_name = $_POST['module_name'];
                     $module_description = $_POST['module_description'];
                     $module_category = $_POST['module_category'];
                     $module_version = $_POST['module_version'];
+                    $default_page = $_POST['default_page'];
+                    $order_sequence = $_POST['order_sequence'] ?? 0;
         
                     $module_icon_name = $_FILES['module_icon']['name'];
                     $module_icon_size = $_FILES['module_icon']['size'];
@@ -112,7 +114,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                         $update_module_icon = $api->update_module_icon($module_icon_tmp_name, $module_icon_actual_ext, $module_id, $username);
                 
                                         if($update_module_icon){
-                                            $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username);
+                                            $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username);
         
                                             if($update_module){
                                                 $response[] = array(
@@ -150,7 +152,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             }
                         }
                         else{
-                            $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $username);
+                            $update_module = $api->update_module($module_id, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username);
         
                             if($update_module){
                                 $response[] = array(
@@ -169,7 +171,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             if(in_array($module_icon_actual_ext, $allowed_ext)){
                                 if(!$module_icon_error){
                                     if($module_icon_size < $file_max_size){
-                                        $insert_module = $api->insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $username);
+                                        $insert_module = $api->insert_module($module_icon_tmp_name, $module_icon_actual_ext, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username);
             
                                         if($insert_module[0]['RESPONSE']){
                                             $response[] = array(
@@ -206,7 +208,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             }
                         }
                         else{
-                            $insert_module = $api->insert_module(null, null, $module_name, $module_version, $module_description, $module_category, $username);
+                            $insert_module = $api->insert_module(null, null, $module_name, $module_version, $module_description, $module_category, $default_page, $order_sequence, $username);
             
                             if($insert_module[0]['RESPONSE']){
                                 $response[] = array(
@@ -342,7 +344,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             if($check_user_account_status){
                 if(isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                     $error = '';
-                    $username = $_POST['username'];
                     $page_id = $_POST['page_id'];
                     $roles = explode(',', $_POST['role']);
         
@@ -439,7 +440,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             if($check_user_account_status){
                 if(isset($_POST['action_id']) && !empty($_POST['action_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                     $error = '';
-                    $username = $_POST['username'];
                     $action_id = $_POST['action_id'];
                     $roles = explode(',', $_POST['role']);
         
@@ -717,7 +717,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             if($check_user_account_status){
                 if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
                     $error = '';
-                    $username = $_POST['username'];
                     $role_id = $_POST['role_id'];
                     $user_ids = explode(',', $_POST['user_id']);
         
@@ -816,7 +815,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['upload_setting_id']) && isset($_POST['upload_setting']) && !empty($_POST['upload_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['max_file_size']) && !empty($_POST['max_file_size'])){
-                    $username = $_POST['username'];
                     $upload_setting_id = $_POST['upload_setting_id'];
                     $upload_setting = $_POST['upload_setting'];
                     $description = $_POST['description'];
@@ -875,7 +873,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             if($check_user_account_status){
                 if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
                     $error = '';
-                    $username = $_POST['username'];
                     $upload_setting_id = $_POST['upload_setting_id'];
                     $file_types = explode(',', $_POST['file_type']);
         
@@ -1084,7 +1081,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['interface_setting_id']) && isset($_POST['interface_setting_name']) && !empty($_POST['interface_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) ){
-                    $file_type = '';
                     $interface_setting_id = $_POST['interface_setting_id'];
                     $interface_setting_name = $_POST['interface_setting_name'];
                     $description = $_POST['description'];
@@ -1178,7 +1174,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['email_setting_id']) && isset($_POST['email_setting_name']) && !empty($_POST['email_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['mail_host']) && !empty($_POST['mail_host']) && isset($_POST['port']) && isset($_POST['smtp_auth']) && isset($_POST['smtp_auto_tls']) && isset($_POST['mail_username']) && !empty($_POST['mail_username']) && isset($_POST['mail_password']) && !empty($_POST['mail_password']) && isset($_POST['mail_encryption']) && !empty($_POST['mail_encryption']) && isset($_POST['mail_from_name']) && !empty($_POST['mail_from_name']) && isset($_POST['mail_from_email']) && !empty($_POST['mail_from_email'])){
-                    $file_type = '';
                     $email_setting_id = $_POST['email_setting_id'];
                     $email_setting_name = $_POST['email_setting_name'];
                     $description = $_POST['description'];
@@ -1245,7 +1240,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['notification_setting_id']) && isset($_POST['notification_setting']) && !empty($_POST['notification_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['notification_title']) && !empty($_POST['notification_title']) && isset($_POST['notification_message']) && !empty($_POST['notification_message']) && isset($_POST['system_link']) && isset($_POST['email_link'])){
-                    $file_type = '';
                     $notification_setting_id = $_POST['notification_setting_id'];
                     $notification_setting = $_POST['notification_setting'];
                     $description = $_POST['description'];
@@ -1427,7 +1421,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['country_id']) && isset($_POST['country_name']) && !empty($_POST['country_name'])){
-                    $file_type = '';
                     $country_id = $_POST['country_id'];
                     $country_name = $_POST['country_name'];
         
@@ -1484,7 +1477,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                    $file_type = '';
                     $state_name = $_POST['state_name'];
                     $country_id = $_POST['country_id'];
         
@@ -1523,7 +1515,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['state_id']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                    $file_type = '';
                     $state_id = $_POST['state_id'];
                     $state_name = $_POST['state_name'];
                     $country_id = $_POST['country_id'];
@@ -1581,7 +1572,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
             if($check_user_account_status){
                 if(isset($_POST['zoom_api_id']) && isset($_POST['zoom_api_name']) && !empty($_POST['zoom_api_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['api_key']) && !empty($_POST['api_key']) && isset($_POST['api_secret']) && !empty($_POST['api_secret'])){
-                    $file_type = '';
                     $zoom_api_id = $_POST['zoom_api_id'];
                     $zoom_api_name = $_POST['zoom_api_name'];
                     $description = $_POST['description'];
@@ -1726,6 +1716,64 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             else{
                 echo 'Inactive User';
         	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit department
+    else if($transaction == 'submit department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['parent_department']) && isset($_POST['manager'])){
+                    $department_id = $_POST['department_id'];
+                    $department = $_POST['department'];
+                    $parent_department = $_POST['parent_department'];
+                    $manager = $_POST['manager'];
+        
+                    $check_department_exist = $api->check_department_exist($department_id);
+         
+                    if($check_department_exist > 0){
+                        $update_department = $api->update_department($department_id, $department, $parent_department, $manager, $username);
+        
+                        if($update_department){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_department
+                            );
+                        }
+                    }
+                    else{
+                        $insert_department = $api->insert_department($department, $parent_department, $manager, $username);
+            
+                        if($insert_department[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'DEPARTMENT_ID' => $insert_department[0]['DEPARTMENT_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_department[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
         }
     }
     # -------------------------------------------------------------
@@ -3464,6 +3512,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete department
+    else if($transaction == 'delete department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_id = $_POST['department_id'];
+        
+                    $check_department_exist = $api->check_department_exist($department_id);
+        
+                    if($check_department_exist > 0){
+                        $delete_department = $api->delete_department($department_id, $username);
+                                            
+                        if($delete_department){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_department;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple department
+    else if($transaction == 'delete multiple department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_ids = $_POST['department_id'];
+        
+                    foreach($department_ids as $department_id){
+                        $check_department_exist = $api->check_department_exist($department_id);
+        
+                        if($check_department_exist > 0){
+                            $delete_department = $api->delete_department($department_id, $username);
+                                            
+                            if(!$delete_department){
+                                $error = $delete_department;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Lock transactions
     # -------------------------------------------------------------
@@ -3933,8 +4057,160 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     #   Archive transactions
     # -------------------------------------------------------------
 
+    # Archive department
+    else if($transaction == 'archive department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_id = $_POST['department_id'];
+        
+                    $check_department_exist = $api->check_department_exist($department_id);
+        
+                    if($check_department_exist > 0){
+                        $update_department_status = $api->update_department_status($department_id, '2', $username);
+            
+                        if($update_department_status){
+                            echo 'Archived';
+                        }
+                        else{
+                            echo $update_department_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Archive multiple department
+    else if($transaction == 'archive multiple department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_ids = $_POST['department_id'];
+        
+                    foreach($department_ids as $department_id){
+                        $check_department_exist = $api->check_department_exist($department_id);
+        
+                        if($check_department_exist > 0){
+                            $update_department_status = $api->update_department_status($department_id, '2', $username);
+                                            
+                            if(!$update_department_status){
+                                $error = $update_department_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Archived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unarchive transactions
+    # -------------------------------------------------------------
+
+    # Unarchive department
+    else if($transaction == 'unarchive department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_id = $_POST['department_id'];
+        
+                    $check_department_exist = $api->check_department_exist($department_id);
+        
+                    if($check_department_exist > 0){
+                        $update_department_status = $api->update_department_status($department_id, '1', $username);
+            
+                        if($update_department_status){
+                            echo 'Unarchived';
+                        }
+                        else{
+                            echo $update_department_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Unarchive multiple department
+    else if($transaction == 'unarchive multiple department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_ids = $_POST['department_id'];
+        
+                    foreach($department_ids as $department_id){
+                        $check_department_exist = $api->check_department_exist($department_id);
+        
+                        if($check_department_exist > 0){
+                            $update_department_status = $api->update_department_status($department_id, '1', $username);
+                                            
+                            if(!$update_department_status){
+                                $error = $update_department_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Unarchived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
@@ -3982,13 +4258,21 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
             $module_id = $_POST['module_id'];
             $module_details = $api->get_module_details($module_id);
+            $module_icon_file_path = $module_details[0]['MODULE_ICON'] ?? null;
+
+            if(empty($module_icon_file_path)){
+                $module_icon_file_path = $api->check_image($module_icon_file_path, 'module icon');
+            }
 
             $response[] = array(
                 'MODULE_NAME' => $module_details[0]['MODULE_NAME'],
                 'MODULE_VERSION' => $module_details[0]['MODULE_VERSION'],
                 'MODULE_DESCRIPTION' => $module_details[0]['MODULE_DESCRIPTION'],
                 'MODULE_CATEGORY' => $module_details[0]['MODULE_CATEGORY'],
-                'TRANSACTION_LOG_ID' => $module_details[0]['TRANSACTION_LOG_ID']
+                'MODULE_ICON' => '<img class="img-thumbnail" alt="module icon" width="200" src="'. $module_icon_file_path .'" data-holder-rendered="true">',
+                'DEFAULT_PAGE' => $module_details[0]['DEFAULT_PAGE'],
+                'TRANSACTION_LOG_ID' => $module_details[0]['TRANSACTION_LOG_ID'],
+                'ORDER_SEQUENCE' => $module_details[0]['ORDER_SEQUENCE']
             );
 
             echo json_encode($response);
@@ -4278,17 +4562,40 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
             $user_id = $_POST['user_id'];
             $user_account_details = $api->get_user_account_details($user_id);
+            $password_expiry_date = $user_account_details[0]['PASSWORD_EXPIRY_DATE'];
+
+            $password_expiry_date_difference = $api->get_date_difference($system_date, $password_expiry_date);
+            $expiry_difference = 'Expiring in ' . $password_expiry_date_difference[0]['MONTHS'] . ' ' . $password_expiry_date_difference[0]['DAYS'];
             
             $response[] = array(
                 'FILE_AS' => $user_account_details[0]['FILE_AS'],
                 'PASSWORD' => $api->decrypt_data($user_account_details[0]['PASSWORD']),
                 'FAILED_LOGIN' => $user_account_details[0]['FAILED_LOGIN'],
-                'PASSWORD_EXPIRY_DATE' => $api->check_date('empty', $user_account_details[0]['PASSWORD_EXPIRY_DATE'], '', 'm/d/Y', '', '', ''),
-                'LAST_CONNECTION_DATE' => $api->check_date('empty', $user_account_details[0]['LAST_CONNECTION_DATE'], '', 'm/d/Y h:i:s a', '', '', ''),
-                'LAST_FAILED_LOGIN' => $api->check_date('empty', $user_account_details[0]['LAST_FAILED_LOGIN'], '', 'm/d/Y h:i:s a', '', '', ''),
+                'PASSWORD_EXPIRY_DATE' => $api->check_date('summary', $password_expiry_date, '', 'F d, Y', '', '', '') . ' (<span class="text-muted mb-0">'. $expiry_difference .'</span>)',
+                'LAST_CONNECTION_DATE' => $api->check_date('summary', $user_account_details[0]['LAST_CONNECTION_DATE'], '', 'F d, Y h:i:s a', '', '', ''),
+                'LAST_FAILED_LOGIN' => $api->check_date('summary', $user_account_details[0]['LAST_FAILED_LOGIN'], '', 'F d, Y h:i:s a', '', '', ''),
                 'USER_STATUS' =>  $api->get_user_account_status($user_account_details[0]['USER_STATUS'])[0]['BADGE'],
-                'FAILED_LOGIN' =>  $api->get_user_account_lock_status($user_account_details[0]['FAILED_LOGIN'])[0]['BADGE'],
+                'LOCK_STATUS' =>  $api->get_user_account_lock_status($user_account_details[0]['FAILED_LOGIN'])[0]['BADGE'],
                 'TRANSACTION_LOG_ID' => $user_account_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Department details
+    else if($transaction == 'department details'){
+        if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+            $department_id = $_POST['department_id'];
+            $department_details = $api->get_department_details($department_id);
+
+            $response[] = array(
+                'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
+                'PARENT_DEPARTMENT' => $department_details[0]['PARENT_DEPARTMENT'],
+                'MANAGER' => $department_details[0]['MANAGER'],
+                'STATUS' =>  $api->get_department_status($department_details[0]['STATUS'])[0]['BADGE'],
+                'TRANSACTION_LOG_ID' => $department_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

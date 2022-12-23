@@ -61,7 +61,6 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
-        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
         <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <?php require('views/_required_css.php'); ?>
@@ -226,30 +225,30 @@
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="user-account-details" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-6">
-                                                                        <div class="row mb-4">
-                                                                            <label class="col-md-3 col-form-label">Last Connection Date</label>
-                                                                            <div class="col-md-9" id="last_connection_date"></div>
-                                                                        </div>
-                                                                        <div class="row mb-4">
-                                                                            <label class="col-md-3 col-form-label">Password Expiry Date</label>
-                                                                            <div class="col-md-9" id="password_expiry_date"></div>
-                                                                        </div>
-                                                                        <div class="row mb-4">
-                                                                            <label class="col-md-3 col-form-label">Last Failed Login Date</label>
-                                                                            <div class="col-md-9" id="last_failed_login_date"></div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="row mb-4">
-                                                                            <label class="col-md-3 col-form-label">User Status</label>
-                                                                            <div class="col-md-9" id="user_status"></div>
-                                                                        </div>
-                                                                        <div class="row mb-4">
-                                                                            <label class="col-md-3 col-form-label">Failed Login</label>
-                                                                            <div class="col-md-9" id="failed_login"></div>
-                                                                        </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <table class="table table-nowrap mb-0">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <th scope="row">Last Connection Date :</th>
+                                                                                    <td id="last_connection_date"></td>
+                                                                                    <th scope="row">Password Expiry Date :</th>
+                                                                                    <td id="password_expiry_date"></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th scope="row">Last Failed Login Date :</th>
+                                                                                    <td id="last_failed_login_date"></td>
+                                                                                    <th scope="row">Account Status :</th>
+                                                                                    <td id="user_status"></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th scope="row">Failed Login :</th>
+                                                                                    <td id="failed_login"></td>
+                                                                                    <th scope="row">Lock Status :</th>
+                                                                                    <td id="lock_status"></td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -310,8 +309,8 @@
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
-        <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/form-validation-rules.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/pages/user-account-form.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

@@ -6,6 +6,7 @@ CREATE TABLE technical_module(
 	MODULE_DESCRIPTION VARCHAR(500),
 	MODULE_ICON VARCHAR(500),
 	MODULE_CATEGORY VARCHAR(50),
+	DEFAULT_PAGE VARCHAR(100),
 	TRANSACTION_LOG_ID VARCHAR(100) NOT NULL,
 	RECORD_LOG VARCHAR(100) NOT NULL,
 	ORDER_SEQUENCE INT
@@ -27,7 +28,18 @@ CREATE PROCEDURE get_module_details(IN module_id VARCHAR(100))
 BEGIN
 	SET @module_id = module_id;
 
-	SET @query = 'SELECT MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID = @module_id';
+	SET @query = 'SELECT MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID = @module_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_all_accessible_module_details(IN username VARCHAR(50))
+BEGIN
+	SET @username = username;
+
+	SET @query = 'SELECT MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID IN (SELECT MODULE_ID FROM technical_module_access_rights WHERE ROLE_ID IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = @username)) ORDER BY ORDER_SEQUENCE';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -45,17 +57,19 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN default_page VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100), IN order_sequence INT)
 BEGIN
 	SET @module_id = module_id;
 	SET @module_name = module_name;
 	SET @module_version = module_version;
 	SET @module_description = module_description;
 	SET @module_category = module_category;
+	SET @default_page = default_page;
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
+	SET @order_sequence = order_sequence;
 
-	SET @query = 'UPDATE technical_module SET MODULE_NAME = @module_name, MODULE_VERSION = @module_version, MODULE_DESCRIPTION = @module_description, MODULE_CATEGORY = @module_category, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE MODULE_ID = @module_id';
+	SET @query = 'UPDATE technical_module SET MODULE_NAME = @module_name, MODULE_VERSION = @module_version, MODULE_DESCRIPTION = @module_description, MODULE_CATEGORY = @module_category, DEFAULT_PAGE = @default_page, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log, ORDER_SEQUENCE = @order_sequence WHERE MODULE_ID = @module_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -74,17 +88,18 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE insert_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+CREATE PROCEDURE insert_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN default_page VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100), IN order_sequence INT)
 BEGIN
 	SET @module_id = module_id;
 	SET @module_name = module_name;
 	SET @module_version = module_version;
 	SET @module_description = module_description;
 	SET @module_category = module_category;
+	SET @default_page = default_page;
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@module_id, @module_name, @module_version, @module_description, @module_category, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE) VALUES(@module_id, @module_name, @module_version, @module_description, @module_category, @default_page, @transaction_log_id, @record_log, @order_sequence)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -2066,6 +2081,141 @@ BEGIN
 	EXECUTE stmt;
 	DROP PREPARE stmt;
 END //
+
+/* Employee Department */
+CREATE TABLE employee_department(
+	DEPARTMENT_ID VARCHAR(50) PRIMARY KEY,
+	DEPARTMENT VARCHAR(100) NOT NULL,
+	PARENT_DEPARTMENT VARCHAR(50),
+	MANAGER VARCHAR(100),
+	STATUS TINYINT(1),
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_department_index ON employee_department(DEPARTMENT_ID);
+
+CREATE PROCEDURE check_department_exist(IN department_id VARCHAR(50))
+BEGIN
+	SET @department_id = department_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_department(IN department_id VARCHAR(50), IN department VARCHAR(100), IN parent_department VARCHAR(50), IN manager VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @department_id = department_id;
+	SET @department = department;
+	SET @parent_department = parent_department;
+	SET @manager = manager;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_department SET DEPARTMENT = @department, PARENT_DEPARTMENT = @parent_department, MANAGER = @manager, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTMENT_ID = @department_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_department_status(IN department_id VARCHAR(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @department_id = department_id;
+	SET @status = status;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_department SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTMENT_ID = @department_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_department(IN department_id VARCHAR(50), IN department VARCHAR(100), IN parent_department VARCHAR(50), IN manager VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @department_id = department_id;
+	SET @department = department;
+	SET @parent_department = parent_department;
+	SET @manager = manager;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_department (DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@department_id, @department, @parent_department, @manager, "1", @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_department_details(IN department_id VARCHAR(50))
+BEGIN
+	SET @department_id = department_id;
+
+	SET @query = 'SELECT DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_department(IN department_id VARCHAR(50))
+BEGIN
+	SET @department_id = department_id;
+
+	SET @query = 'DELETE FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_department_options(IN generation_type VARCHAR(10))
+BEGIN
+	IF @generation_type = 'active' THEN
+		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department WHERE STATUS = "2" ORDER BY DEPARTMENT';
+	ELSE
+		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department ORDER BY DEPARTMENT';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+/* Employee Job Position */
+CREATE TABLE employee_job_position(
+	JOB_POSITION_ID VARCHAR(100) PRIMARY KEY,
+	JOB_POSITION VARCHAR(100) NOT NULL,
+	DESCRIPTION VARCHAR(500) NOT NULL,
+	JOB_DESCRIPTION VARCHAR(500),
+	RECRUITMENT_STATUS TINYINT(1),
+	DEPARTMENT VARCHAR(50),
+	EXPECTED_NEW_EMPLOYEES INT(10),
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE employee_job_position_responsibility(
+	JOB_POSITION_ID VARCHAR(100) NOT NULL,
+	RESPONSIBILITY VARCHAR(500) NOT NULL
+);
+
+CREATE TABLE employee_job_position_requirement(
+	JOB_POSITION_ID VARCHAR(100) NOT NULL,
+	REQUIREMENT VARCHAR(500) NOT NULL
+);
+
+CREATE TABLE employee_job_position_qualitification(
+	JOB_POSITION_ID VARCHAR(100) NOT NULL,
+	QUALIFICATION VARCHAR(500) NOT NULL
+);
+
+CREATE INDEX employee_job_position_index ON employee_job_position(JOB_POSITION_ID);
 
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
