@@ -2789,6 +2789,91 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Department table
+    else if($type == 'departments table'){
+        if(isset($_POST['filter_status']) || isset($_POST['filter_department'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+                $filter_department = $_POST['filter_department'];
+
+                $query = 'SELECT JOB_POSITION_ID, JOB_POSITION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES FROM employee_job_position';
+
+                if(!empty($filter_status) || !empty($filter_department)){
+                    $query .= ' WHERE ';
+
+                    if(!empty($filter_status)){
+                        $filter[] = 'RECRUITMENT_STATUS = :filter_status';
+                    }
+
+                    if(!empty($filter_department)){
+                        $filter[] = 'DEPARTMENT = :filter_department';
+                    }
+
+                    if(!empty($filter)){
+                        $query .= implode(' AND ', $filter);
+                    }
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status) || !empty($filter_department)){
+                    if(!empty($filter_status)){
+                        $sql->bindValue(':filter_status', $filter_status);
+                    }
+
+                    if(!empty($filter_department)){
+                        $sql->bindValue(':filter_department', $filter_department);
+                    }
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $job_position_id = $row['JOB_POSITION_ID'];
+                        $job_position = $row['JOB_POSITION'];
+                        $recruitment_status = $row['RECRUITMENT_STATUS'];
+                        $department = $row['DEPARTMENT'];
+                        $expected_new_employees = $row['EXPECTED_NEW_EMPLOYEES'];
+
+                        if($recruitment_status == '1'){
+                            $data_start = '0';
+                        }
+                        else{
+                            $data_start = '1';
+                        }
+    
+                        $department_status = $api->get_department_status($status)[0]['BADGE'];
+
+                        $department_details = $api->get_department_details($parent_department);
+                        $parent_department_name = $department_details[0]['DEPARTMENT'] ?? null;
+    
+                        $job_position_id_encrypted = $api->encrypt_data($job_position_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-start="'. $data_start .'" type="checkbox" value="'. $job_position_id .'">',
+                            'JOB_POSITION_ID' => $job_position_id,
+                            'JOB_POSITION' => $job_position,
+                            'STATUS' => $department_status,
+                            'MANAGER' => $manager,
+                            'EMPLOYEES' => 0,
+                            'PARENT_DEPARTMENT' => $parent_department_name,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="job-position-form.php?id='. $job_position_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Job Position">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>

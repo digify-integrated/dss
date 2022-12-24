@@ -2200,26 +2200,399 @@ CREATE TABLE employee_job_position(
 );
 
 CREATE TABLE employee_job_position_responsibility(
+	RESPONSIBILITY_ID VARCHAR(100) PRIMARY KEY,
 	JOB_POSITION_ID VARCHAR(100) NOT NULL,
-	RESPONSIBILITY VARCHAR(500) NOT NULL
+	RESPONSIBILITY VARCHAR(500) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
 );
 
 CREATE TABLE employee_job_position_requirement(
+	REQUIREMENT_ID VARCHAR(100) PRIMARY KEY,
 	JOB_POSITION_ID VARCHAR(100) NOT NULL,
-	REQUIREMENT VARCHAR(500) NOT NULL
+	REQUIREMENT VARCHAR(500) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
 );
 
-CREATE TABLE employee_job_position_qualitification(
+CREATE TABLE employee_job_position_qualification(
+	QUALIFICATION_ID VARCHAR(100) PRIMARY KEY,
 	JOB_POSITION_ID VARCHAR(100) NOT NULL,
-	QUALIFICATION VARCHAR(500) NOT NULL
+	QUALIFICATION VARCHAR(500) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
 );
 
-CREATE TABLE employee_job_position_qualitification(
+CREATE TABLE employee_job_position_attachment(
+	ATTACHMENT_ID VARCHAR(100) PRIMARY KEY,
 	JOB_POSITION_ID VARCHAR(100) NOT NULL,
-	QUALIFICATION VARCHAR(500) NOT NULL
+	ATTACHMENT_NAME VARCHAR(100) NOT NULL,
+	ATTACHMENT VARCHAR(500) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
 );
+
+CREATE PROCEDURE check_job_position_exist(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_responsibility_exist(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @responsibility_id = responsibility_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_requirement_exist(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @requirement_id = requirement_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_qualification_exist(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @qualification_id = qualification_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_attachment_exist(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @attachment_id = attachment_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+	SET @job_position = job_position;
+	SET @description = description;
+	SET @department = department;
+	SET @expected_new_employees = expected_new_employees;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_job_position SET JOB_POSITION = @job_position, DESCRIPTION = @description, DEPARTMENT = @department, EXPECTED_NEW_EMPLOYEES = @expected_new_employees, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_recruitment_status(IN job_position_id VARCHAR(50), IN recruitment_status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+	SET @recruitment_status = recruitment_status;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	IF @recruitment_status = 2 THEN
+		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = @recruitment_status, EXPECTED_NEW_EMPLOYEES = 0, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
+	ELSE
+		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = @recruitment_status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @responsibility_id = responsibility_id;
+	SET @job_position_id = job_position_id;
+	SET @responsibility = responsibility;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_job_position_responsibility SET RESPONSIBILITY = @responsibility, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE RESPONSIBILITY_ID = @responsibility_id AND JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @requirement_id = requirement_id;
+	SET @job_position_id = job_position_id;
+	SET @requirement = requirement;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_job_position_requirement SET REQUIREMENT = @requirement, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE REQUIREMENT_ID = @requirement_id AND JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @qualification_id = qualification_id;
+	SET @job_position_id = job_position_id;
+	SET @qualification = qualification;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_job_position_qualification SET QUALIFICATION = @qualification, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE QUALIFICATION_ID = @qualification_id AND JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+	SET @job_position = job_position;
+	SET @description = description;
+	SET @department = department;
+	SET @expected_new_employees = expected_new_employees;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_job_position (JOB_POSITION_ID, JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@job_position_id, @job_position, @description, "2", @department, @expected_new_employees, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @responsibility_id = responsibility_id;
+	SET @job_position_id = job_position_id;
+	SET @responsibility = responsibility;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_job_position_responsibility (RESPONSIBILITY_ID, JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@responsibility_id, @job_position_id, @responsibility, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @requirement_id = requirement_id;
+	SET @job_position_id = job_position_id;
+	SET @requirement = requirement;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_job_position_requirement (REQUIREMENT_ID, JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@requirement_id, @job_position_id, @requirement, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @qualification_id = qualification_id;
+	SET @job_position_id = job_position_id;
+	SET @qualification = qualification;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_job_position_qualification (QUALIFICATION_ID, JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@qualification_id, @job_position_id, @qualification, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_attachment(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN attachment VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @attachment_id = attachment_id;
+	SET @job_position_id = job_position_id;
+	SET @attachment_name = attachment_name;
+	SET @attachment = attachment;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, ATTACHMENT, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name, @attachment, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_details(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'SELECT JOB_POSITION, DESCRIPTION, MANAGER, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_responsibility_details(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'SELECT RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_requirement_details(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @requirement_id = requirement_id;
+
+	SET @query = 'SELECT JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_qualification_details(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @qualification_id = qualification_id;
+
+	SET @query = 'SELECT JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_attachment_details(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @attachment_id = attachment_id;
+
+	SET @query = 'SELECT JOB_POSITION_ID, ATTACHMENT_NAME, ATTACHMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'DELETE FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_responsibility(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_requirement(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'DELETE FROM employee_job_position_requirement WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_qualification(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @job_position_id = job_position_id;
+
+	SET @query = 'DELETE FROM employee_job_position_qualification WHERE JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_responsibility(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @responsibility_id = responsibility_id;
+
+	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_requirement(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @requirement_id = requirement_id;
+
+	SET @query = 'DELETE FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_qualification(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @qualification_id = qualification_id;
+
+	SET @query = 'DELETE FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_attachment(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @attachment_id = attachment_id;
+
+	SET @query = 'DELETE FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
 
 CREATE INDEX employee_job_position_index ON employee_job_position(JOB_POSITION_ID);
+CREATE INDEX employee_job_position_attachment_index ON employee_job_position_attachment(ATTACHMENT_ID);
+CREATE INDEX employee_job_position_responsibility_index ON employee_job_position_responsibility(RESPONSIBILITY_ID);
+CREATE INDEX employee_job_position_requirement_index ON employee_job_position_requirement(REQUIREMENT_ID);
+CREATE INDEX employee_job_position_qualification_index ON employee_job_position_qualification(QUALIFICATION_ID);
 
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
