@@ -12,7 +12,7 @@
                     <div class="dropdown-menu" aria-labelledby="configurations-menu">';
 
         if($job_positions_page > 0){
-            $menu .= '<a href="job-positions.php" class="dropdown-item" key="t-job-positions">Job Position</a>';
+            $menu .= '<a href="job-positions.php" class="dropdown-item" key="t-job-positions">Job Positions</a>';
         }
 
         if($departments_page > 0){

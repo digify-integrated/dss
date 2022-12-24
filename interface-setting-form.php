@@ -178,7 +178,7 @@
                                                     <div class="row mb-4">
                                                         <label for="login_background" class="col-md-3 col-form-label">Login Background</label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_background" id="login_background">
+                                                            <input class="form-control" type="file" name="login_background" id="login_background" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                     <?php
@@ -191,7 +191,7 @@
                                                     <div class="row mb-4">
                                                         <label for="login_logo" class="col-md-3 col-form-label">Login Logo</label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="login_logo" id="login_logo">
+                                                            <input class="form-control" type="file" name="login_logo" id="login_logo" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -212,7 +212,7 @@
                                                     <div class="row mb-4">
                                                         <label for="menu_logo" class="col-md-3 col-form-label">Menu Logo</label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="menu_logo" id="menu_logo">
+                                                            <input class="form-control" type="file" name="menu_logo" id="menu_logo" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                     <?php
@@ -225,7 +225,7 @@
                                                     <div class="row mb-4">
                                                         <label for="favicon" class="col-md-3 col-form-label">Favicon</label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="favicon" id="favicon">
+                                                            <input class="form-control" type="file" name="favicon" id="favicon" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>

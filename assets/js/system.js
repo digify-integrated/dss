@@ -2879,6 +2879,7 @@ function check_table_multiple_button(){
         var send_array = [];
         var print_array = [];
         var archive_array = [];
+        var start_array = [];
         
         $(".datatable-checkbox-children").each(function () {
             var cancel_data = $(this).data('cancel');
@@ -2896,6 +2897,7 @@ function check_table_multiple_button(){
             var send = $(this).data('send');
             var print = $(this).data('print');
             var archive = $(this).data('archive');
+            var start = $(this).data('start');
 
             if($(this).prop('checked') === true){
                 lock_array.push(lock);
@@ -2913,6 +2915,7 @@ function check_table_multiple_button(){
                 send_array.push(send);
                 print_array.push(print);
                 archive_array.push(archive);
+                start_array.push(start);
             }
         });
 
@@ -2934,6 +2937,8 @@ function check_table_multiple_button(){
         var print_checker = arr => arr.every(v => v === 1);
         var archive_checker = arr => arr.every(v => v === 1);
         var unarchive_checker = arr => arr.every(v => v === 0);
+        var start_checker = arr => arr.every(v => v === 1);
+        var stop_checker = arr => arr.every(v => v === 0);
         
         if(lock_checker(lock_array) || unlock_checker(lock_array)){
             if(lock_checker(lock_array)){
@@ -2965,6 +2970,22 @@ function check_table_multiple_button(){
         else{
             $('.multiple-archive').addClass('d-none');
             $('.multiple-unarchive').addClass('d-none');
+        }
+
+        if(start_checker(start_array) || stop_checker(start_array)){
+            if(start_checker(start_array)){
+                $('.multiple-start').removeClass('d-none');
+                $('.multiple-stop').addClass('d-none');
+            }
+
+            if(stop_checker(start_array)){
+                $('.multiple-start').addClass('d-none');
+                $('.multiple-stop').removeClass('d-none');
+            }
+        }
+        else{
+            $('.multiple-start').addClass('d-none');
+            $('.multiple-stop').addClass('d-none');
         }
 
         if(activate_checker(active_array) || deactivate_checker(active_array)){
@@ -3084,6 +3105,10 @@ function check_table_multiple_button(){
         $('.multiple-tag-loan-details-as-unpaid').addClass('d-none');
         $('.multiple-send').addClass('d-none');
         $('.multiple-print').addClass('d-none');
+        $('.multiple-archive').addClass('d-none');
+        $('.multiple-unarchive').addClass('d-none');
+        $('.multiple-start').addClass('d-none');
+        $('.multiple-stop').addClass('d-none');
     }
 }
 

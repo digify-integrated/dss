@@ -1690,7 +1690,7 @@ class Api{
     public function update_upload_setting($upload_setting_id, $upload_setting, $description, $max_file_size, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
-            $upload_setting_details = $this->get_upload_setting_details($parameter_id, null, null);
+            $upload_setting_details = $this->get_upload_setting_details($upload_setting_id, null, null);
             
             if(!empty($upload_setting_details[0]['TRANSACTION_LOG_ID'])){
                 $transaction_log_id = $upload_setting_details[0]['TRANSACTION_LOG_ID'];

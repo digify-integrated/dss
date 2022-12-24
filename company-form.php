@@ -154,7 +154,7 @@
                                                     <div class="row mb-4">
                                                         <label for="company_logo" class="col-md-3 col-form-label">Company Logo</label>
                                                         <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="company_logo" id="company_logo">
+                                                            <input class="form-control" type="file" name="company_logo" id="company_logo" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
