@@ -2367,6 +2367,31 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE update_job_position_attachment(IN attachment_id VARCHAR(100), IN attachment VARCHAR(500))
+BEGIN
+	SET @attachment_id = attachment_id;
+	SET @attachment = attachment;
+
+	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT = @attachment WHERE ATTACHMENT_ID = @attachment_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_attachment_details(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100))
+BEGIN
+	SET @attachment_id = attachment_id;
+	SET @job_position_id = job_position_id;
+	SET @attachment_name = attachment_name;
+
+	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT_NAME = @attachment_name WHERE ATTACHMENT_ID = @attachment_id AND JOB_POSITION_ID = @job_position_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 CREATE PROCEDURE insert_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @job_position_id = job_position_id;
@@ -2429,16 +2454,15 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE insert_job_position_attachment(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN attachment VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+CREATE PROCEDURE insert_job_position_attachment(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @attachment_id = attachment_id;
 	SET @job_position_id = job_position_id;
 	SET @attachment_name = attachment_name;
-	SET @attachment = attachment;
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, ATTACHMENT, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name, @attachment, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name,, @transaction_log_id, @record_log)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

@@ -2723,7 +2723,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
-    # Department table
+    # Departments table
     else if($type == 'departments table'){
         if(isset($_POST['filter_status'])){
             if ($api->databaseConnection()) {
@@ -2789,8 +2789,8 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
-    # Department table
-    else if($type == 'departments table'){
+    # Job positions table
+    else if($type == 'job positions table'){
         if(isset($_POST['filter_status']) || isset($_POST['filter_department'])){
             if ($api->databaseConnection()) {
                 $filter_status = $_POST['filter_status'];
@@ -2841,10 +2841,10 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             $data_start = '1';
                         }
     
-                        $department_status = $api->get_department_status($status)[0]['BADGE'];
+                        $job_position_recruitment_status = $api->get_job_position_recruitment_status($recruitment_status)[0]['BADGE'];
 
-                        $department_details = $api->get_department_details($parent_department);
-                        $parent_department_name = $department_details[0]['DEPARTMENT'] ?? null;
+                        $department_details = $api->get_department_details($department);
+                        $department_name = $department_details[0]['DEPARTMENT'] ?? null;
     
                         $job_position_id_encrypted = $api->encrypt_data($job_position_id);
     
@@ -2852,10 +2852,11 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-start="'. $data_start .'" type="checkbox" value="'. $job_position_id .'">',
                             'JOB_POSITION_ID' => $job_position_id,
                             'JOB_POSITION' => $job_position,
-                            'STATUS' => $department_status,
-                            'MANAGER' => $manager,
-                            'EMPLOYEES' => 0,
-                            'PARENT_DEPARTMENT' => $parent_department_name,
+                            'DEPARTMENT' => $department_name,
+                            'NUMBER_OF_EMPLOYEE' => 0,
+                            'EXPECTED_NEW_EMPLOYEES' => $expected_new_employees,
+                            'FORECASTED_EMPLOYEE' => 0,
+                            'RECRUITMENT_STATUS' => $job_position_recruitment_status,
                             'VIEW' => '<div class="d-flex gap-2">
                                             <a href="job-position-form.php?id='. $job_position_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Job Position">
                                                 <i class="bx bx-show font-size-16 align-middle"></i>
@@ -2873,6 +2874,219 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         }
     }
     # -------------------------------------------------------------
+
+    # Job position responsibility table
+    else if($type == 'job position responsibility table'){
+        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+            if ($api->databaseConnection()) {
+                $job_position_id = $_POST['job_position_id'];
+
+                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                $update_job_position_responsibility = $api->check_role_access_rights($username, '92', 'action');
+                $delete_job_position_responsibility = $api->check_role_access_rights($username, '93', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT RESPONSIBILITY_ID, RESPONSIBILITY FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = :job_position_id');
+                $sql->bindValue(':job_position_id', $job_position_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $responsibility_id = $row['RESPONSIBILITY_ID'];
+                        $responsibility = $row['RESPONSIBILITY'];
+
+                        if($update_job_position_responsibility > 0 && $update_job_position > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Responsibility">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = '';
+                        }
+
+                        if($delete_job_position_responsibility > 0 && $update_job_position > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Responsibility">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'RESPONSIBILITY' => $responsibility,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Job position requirement table
+    else if($type == 'job position requirement table'){
+        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+            if ($api->databaseConnection()) {
+                $job_position_id = $_POST['job_position_id'];
+
+                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                $update_job_position_requirement = $api->check_role_access_rights($username, '92', 'action');
+                $delete_job_position_requirement = $api->check_role_access_rights($username, '93', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT REQUIREMENT_ID, REQUIREMENT FROM employee_job_position_requirement WHERE JOB_POSITION_ID = :job_position_id');
+                $sql->bindValue(':job_position_id', $job_position_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $requirement_id = $row['REQUIREMENT_ID'];
+                        $requirement = $row['REQUIREMENT'];
+
+                        if($update_job_position_requirement > 0 && $update_job_position > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Requirement">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = '';
+                        }
+
+                        if($delete_job_position_requirement > 0 && $update_job_position > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Requirement">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'REQUIREMENT' => $requirement,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Job position qualification table
+    else if($type == 'job position qualification table'){
+        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+            if ($api->databaseConnection()) {
+                $job_position_id = $_POST['job_position_id'];
+
+                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                $update_job_position_qualification = $api->check_role_access_rights($username, '92', 'action');
+                $delete_job_position_qualification = $api->check_role_access_rights($username, '93', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT QUALIFICACTION_ID, QUALIFICACTION FROM employee_job_position_qualification WHERE JOB_POSITION_ID = :job_position_id');
+                $sql->bindValue(':job_position_id', $job_position_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $qualification_id = $row['QUALIFICACTION_ID'];
+                        $qualification = $row['QUALIFICACTION'];
+
+                        if($update_job_position_qualification > 0 && $update_job_position > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Qualification">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = '';
+                        }
+
+                        if($delete_job_position_qualification > 0 && $update_job_position > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Qualification">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'QUALIFICACTION' => $qualification,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
+    # Job position attachment table
+    else if($type == 'job position attachment table'){
+        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+            if ($api->databaseConnection()) {
+                $job_position_id = $_POST['job_position_id'];
+
+                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                $delete_job_position_attachment = $api->check_role_access_rights($username, '102', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT ATTACHMENT_ID, ATTACHMENT_NAME, ATTACHMENT FROM employee_job_position_attachment WHERE JOB_POSITION_ID = :job_position_id');
+                $sql->bindValue(':job_position_id', $job_position_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $attachment_id = $row['ATTACHMENT_ID'];
+                        $attachment_name = $row['ATTACHMENT_NAME'];
+                        $attachment = $row['ATTACHMENT'];
+
+                        if($delete_job_position_attachment > 0 && $update_job_position > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Attachment">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'ATTACHMENT' => '<a href="'. $attachment .'" target="_blank">' . $attachment_name . '</a>',
+                            'ACTION' => $delete
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+        
+    }
+    # -------------------------------------------------------------
+
 
 }
 

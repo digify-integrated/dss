@@ -1099,6 +1099,131 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_job_position_exist
+    # Purpose    : Checks if the job position exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_job_position_exist($job_position_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_job_position_exist(:job_position_id)');
+            $sql->bindValue(':job_position_id', $job_position_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_job_position_responsibility_exist
+    # Purpose    : Checks if the job position responsibility exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_job_position_responsibility_exist($responsibility_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_job_position_responsibility_exist(:responsibility_id)');
+            $sql->bindValue(':responsibility_id', $responsibility_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_job_position_requirement_exist
+    # Purpose    : Checks if the job position requirement exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_job_position_requirement_exist($requirement_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_job_position_requirement_exist(:requirement_id)');
+            $sql->bindValue(':requirement_id', $requirement_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_job_position_qualification_exist
+    # Purpose    : Checks if the job position qualification exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_job_position_qualification_exist($qualification_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_job_position_qualification_exist(:qualification_id)');
+            $sql->bindValue(':qualification_id', $qualification_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_job_position_attachment_exist
+    # Purpose    : Checks if the job position attachment exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_job_position_attachment_exist($attachment_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_job_position_attachment_exist(:attachment_id)');
+            $sql->bindValue(':attachment_id', $attachment_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -3063,6 +3188,479 @@ class Api{
                 }
                 else{
                     return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position
+    # Purpose    : Updates job position.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position($job_position_id, $job_position, $description, $department, $expected_new_employees, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_details = $this->get_job_position_details($job_position_id);
+            
+            if(!empty($job_position_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $job_position_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position(:job_position_id, :job_position, :description, :department, :expected_new_employees, :transaction_log_id, :record_log)');
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':job_position', $job_position);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':department', $department);
+            $sql->bindValue(':expected_new_employees', $expected_new_employees);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($job_position_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_attachment
+    # Purpose    : Updates job position attachment.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $attachment_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            if(!empty($attachment_tmp_name)){ 
+                $file_name = $this->generate_file_name(10);
+                $file_new = $file_name . '.' . $attachment_actual_ext;
+
+                $directory = './assets/employee/job_position_attachment/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/employee/job_position_attachment/' . $file_new;
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    $job_position_attachment_details = $this->get_job_position_attachment_details($attachment_id);
+                    $attachment = $job_position_attachment_details[0]['ATTACHMENT'];
+                    $transaction_log_id = $job_position_attachment_details[0]['TRANSACTION_LOG_ID'];
+    
+                    if(file_exists($attachment)){
+                        if (unlink($attachment)) {
+                            if(move_uploaded_file($attachment_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_job_position_attachment(:attachment_id, :file_path)');
+                                $sql->bindValue(':attachment_id', $attachment_id);
+                                $sql->bindValue(':file_path', $file_path);
+                            
+                                if($sql->execute()){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position attachment.');
+                                        
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    return $sql->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your file.';
+                            }
+                        }
+                        else {
+                            return $attachment . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($attachment_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_job_position_attachment(:attachment_id, :file_path)');
+                                $sql->bindValue(':attachment_id', $attachment_id);
+                                $sql->bindValue(':file_path', $file_path);
+                        
+                            if($sql->execute()){
+                                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position attachment.');
+                                    
+                                if($insert_transaction_log){
+                                    return true;
+                                }
+                                else{
+                                    return $insert_transaction_log;
+                                }
+                            }
+                            else{
+                                return $sql->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_recruitment_status
+    # Purpose    : Updates job position recruitment status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_recruitment_status($job_position_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_details = $this->get_job_position_details($job_position_id);
+            $transaction_log_id = $job_position_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Start';
+            }
+            else{
+                $log_status = 'Stop';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position_recruitment_status(:job_position_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated job position recruitment status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_responsibility
+    # Purpose    : Updates job position responsibility.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_responsibility($responsibility_id, $job_position_id, $responsibility, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_responsibility_details = $this->get_job_position_responsibility_details($job_position_id);
+            
+            if(!empty($job_position_responsibility_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $job_position_responsibility_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position_responsibility(:responsibility_id, :job_position_id, :responsibility, :transaction_log_id, :record_log)');
+            $sql->bindValue(':responsibility_id', $responsibility_id);
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':responsibility', $responsibility);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($job_position_responsibility_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position responsibility.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position responsibility.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_requirement
+    # Purpose    : Updates job position requirement.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_requirement($requirement_id, $job_position_id, $requirement, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_requirement_details = $this->get_job_position_requirement_details($job_position_id);
+            
+            if(!empty($job_position_requirement_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $job_position_requirement_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position_requirement(:requirement_id, :job_position_id, :requirement, :transaction_log_id, :record_log)');
+            $sql->bindValue(':requirement_id', $requirement_id);
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':requirement', $requirement);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($job_position_requirement_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position requirement.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position requirement.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_qualification
+    # Purpose    : Updates job position qualification.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_qualification($qualification_id, $job_position_id, $qualification, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_qualification_details = $this->get_job_position_qualification_details($job_position_id);
+            
+            if(!empty($job_position_qualification_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $job_position_qualification_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position_qualification(:qualification_id, :job_position_id, :qualification, :transaction_log_id, :record_log)');
+            $sql->bindValue(':qualification_id', $qualification_id);
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':qualification', $qualification);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($job_position_qualification_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position qualification.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position qualification.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_job_position_attachment_details
+    # Purpose    : Updates job position attachment details.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $job_position_attachment_details = $this->get_job_position_attachment_details($job_position_id);
+            
+            if(!empty($job_position_attachment_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $job_position_attachment_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_job_position_attachment_details(:attachment_id, :job_position_id, :attachment_name, :transaction_log_id, :record_log)');
+            $sql->bindValue(':attachment_id', $attachment_id);
+            $sql->bindValue(':job_position_id', $job_position_id);
+            $sql->bindValue(':attachment_name', $attachment_name);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($job_position_attachment_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position attachment.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated job position attachment.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
                 }
             }
             else{
@@ -6643,6 +7241,36 @@ class Api{
             default:
                 $status = 'Archived';
                 $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_job_position_recruitment_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_job_position_recruitment_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Recruitment In Progress';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Not Recruiting';
+                $button_class = 'bg-warning';
         }
 
         $response[] = array(

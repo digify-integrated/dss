@@ -1778,6 +1778,314 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit job position
+    else if($transaction == 'submit job position'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && isset($_POST['job_position']) && !empty($_POST['job_position']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['expected_new_employees'])){
+                    $job_position_id = $_POST['job_position_id'];
+                    $job_position = $_POST['job_position'];
+                    $description = $_POST['description'];
+                    $department = $_POST['department'];
+                    $expected_new_employees = $_POST['expected_new_employees'] ?? 0;
+        
+                    $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+         
+                    if($check_job_position_exist > 0){
+                        $update_job_position = $api->update_job_position($job_position_id, $job_position, $description, $department, $expected_new_employees, $username);
+        
+                        if($update_job_position){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_job_position
+                            );
+                        }
+                    }
+                    else{
+                        $insert_job_position = $api->insert_job_position($job_position, $description, $department, $expected_new_employees, $username);
+            
+                        if($insert_job_position[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'JOB_POSITION_ID' => $insert_job_position[0]['JOB_POSITION_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_job_position[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit job position responsibility
+    else if($transaction == 'submit job position responsibility'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['responsibility_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['responsibility']) && !empty($_POST['responsibility'])){
+                    $responsibility_id = $_POST['responsibility_id'];
+                    $job_position_id = $_POST['job_position_id'];
+                    $job_position_responsibility = $_POST['job_position_responsibility'];
+        
+                    $check_job_position_responsibility_exist = $api->check_job_position_responsibility_exist($responsibility_id);
+         
+                    if($check_job_position_responsibility_exist > 0){
+                        $update_job_position_responsibility = $api->update_job_position_responsibility($responsibility_id, $job_position_id, $responsibility, $username);
+        
+                        if($update_job_position_responsibility){
+                            echo 'Updated';
+                        }
+                        else{
+                            echo $update_job_position_responsibility;
+                        }
+                    }
+                    else{
+                        $insert_job_position_responsibility = $api->insert_job_position_responsibility($job_position_id, $responsibility, $username);
+            
+                        if($insert_job_position_responsibility){
+                            echo 'Inserted';
+                        }
+                        else{
+                            echo $insert_job_position_responsibility;
+                        }
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit job position requirement
+    else if($transaction == 'submit job position requirement'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['requirement_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['requirement']) && !empty($_POST['requirement'])){
+                    $requirement_id = $_POST['requirement_id'];
+                    $job_position_id = $_POST['job_position_id'];
+                    $requirement = $_POST['requirement'];
+        
+                    $check_job_position_requirement_exist = $api->check_job_position_requirement_exist($requirement_id);
+         
+                    if($check_job_position_requirement_exist > 0){
+                        $update_job_position_requirement = $api->update_job_position_requirement($requirement_id, $job_position_id, $requirement, $username);
+        
+                        if($update_job_position_requirement){
+                            echo 'Updated';
+                        }
+                        else{
+                            echo $update_job_position_requirement;
+                        }
+                    }
+                    else{
+                        $insert_job_position_requirement = $api->insert_job_position_requirement($job_position_id, $requirement, $username);
+            
+                        if($insert_job_position_requirement){
+                            echo 'Inserted';
+                        }
+                        else{
+                            echo $insert_job_position_requirement;
+                        }
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit job position qualification
+    else if($transaction == 'submit job position qualification'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['qualification_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['qualification']) && !empty($_POST['qualification'])){
+                    $qualification_id = $_POST['qualification_id'];
+                    $job_position_id = $_POST['job_position_id'];
+                    $qualification = $_POST['qualification'];
+        
+                    $check_job_position_qualification_exist = $api->check_job_position_qualification_exist($qualification_id);
+         
+                    if($check_job_position_qualification_exist > 0){
+                        $update_job_position_qualification = $api->update_job_position_qualification($qualification_id, $job_position_id, $qualification, $username);
+        
+                        if($update_job_position_qualification){
+                            echo 'Updated';
+                        }
+                        else{
+                            echo $update_job_position_qualification;
+                        }
+                    }
+                    else{
+                        $insert_job_position_qualification = $api->insert_job_position_qualification($job_position_id, $qualification, $username);
+            
+                        if($insert_job_position_qualification){
+                            echo 'Inserted';
+                        }
+                        else{
+                            echo $insert_job_position_qualification;
+                        }
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit job position attachment
+    else if($transaction == 'submit job position attachment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['attachment_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['attachment_name']) && !empty($_POST['attachment_name'])){
+                    $file_type = '';
+                    $attachment_id = $_POST['attachment_id'];
+                    $job_position_id = $_POST['job_position_id'];
+                    $attachment_name = $_POST['attachment_name'];
+        
+                    $attachment_file_name = $_FILES['attachment']['name'];
+                    $attachment_size = $_FILES['attachment']['size'];
+                    $attachment_error = $_FILES['attachment']['error'];
+                    $attachment_tmp_name = $_FILES['attachment']['tmp_name'];
+                    $attachment_ext = explode('.', $attachment_file_name);
+                    $attachment_actual_ext = strtolower(end($attachment_ext));
+        
+                    $upload_setting_details = $api->get_upload_setting_details(7);
+                    $upload_file_type_details = $api->get_upload_file_type_details(7);
+                    $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+        
+                    for($i = 0; $i < count($upload_file_type_details); $i++) {
+                        $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+        
+                        if($i != (count($upload_file_type_details) - 1)){
+                            $file_type .= ',';
+                        }
+                    }
+        
+                    $allowed_ext = explode(',', $file_type);
+        
+                    $check_job_position_attachment_exist = $api->check_job_position_attachment_exist($attachment_id);
+         
+                    if($check_job_position_attachment_exist > 0){
+                        if(!empty($attachment_tmp_name)){
+                            if(in_array($attachment_actual_ext, $allowed_ext)){
+                                if(!$attachment_error){
+                                    if($attachment_size < $file_max_size){
+                                        $update_job_position_attachment = $api->update_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $attachment_id, $username);
+                
+                                        if($update_job_position_attachment){
+                                            $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
+        
+                                            if($update_job_position_attachment_details){
+                                                echo 'Updated';
+                                            }
+                                            else{
+                                                echo $update_job_position_attachment_details;
+                                            }
+                                        }
+                                        else{
+                                            echo $update_job_position_attachment;
+                                        }
+                                    }
+                                    else{
+                                        echo 'File Size';
+                                    }
+                                }
+                                else{
+                                    echo 'There was an error uploading the file.';
+                                }
+                            }
+                            else{
+                                echo 'File Type'
+                            }
+                        }
+                        else{
+                            $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
+        
+                            if($update_job_position_attachment_details){
+                                echo 'Updated';
+                            }
+                            else{
+                                echo $update_job_position_attachment_details;
+                            }
+                        }
+                    }
+                    else{
+                        if(in_array($attachment_actual_ext, $allowed_ext)){
+                            if(!$attachment_error){
+                                if($attachment_size < $file_max_size){
+                                    $insert_job_position_attachment = $api->insert_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $job_position_id, $attachment_name, $username);
+        
+                                    if($insert_job_position_attachment){
+                                        echo 'Inserted';
+                                    }
+                                    else{
+                                        echo $insert_job_position_attachment;
+                                    }
+                                }
+                                else{
+                                    echo 'File Size';
+                                }
+                            }
+                            else{
+                                echo 'There was an error uploading the file.';
+                            }
+                        }
+                        else{
+                            echo 'File Type'
+                        }
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -3432,6 +3740,278 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete job position
+    else if($transaction == 'delete job position'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_id = $_POST['job_position_id'];
+        
+                    $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                    if($check_job_position_exist > 0){
+                        $delete_job_position = $api->delete_job_position($job_position_id, $username);
+                                            
+                        if($delete_job_position){
+                            $delete_all_job_position_responsibility = $api->delete_all_job_position_responsibility($job_position_id, $username);
+                                            
+                            if($delete_all_job_position_responsibility){
+                                $delete_all_job_position_requirement = $api->delete_all_job_position_requirement($job_position_id, $username);
+                                            
+                                if($delete_all_job_position_requirement){
+                                    $delete_all_job_position_qualification = $api->delete_all_job_position_qualification($job_position_id, $username);
+                                            
+                                    if($delete_all_job_position_qualification){
+                                        $delete_all_job_position_attachment = $api->delete_all_job_position_attachment($job_position_id, $username);
+                                            
+                                        if($delete_all_job_position_attachment){
+                                            echo 'Deleted';
+                                        }
+                                        else{
+                                            echo $delete_all_job_position_attachment;
+                                        }
+                                    }
+                                    else{
+                                        echo $delete_all_job_position_qualification;
+                                    }
+                                }
+                                else{
+                                    echo $delete_all_job_position_requirement;
+                                }
+                            }
+                            else{
+                                echo $delete_all_job_position_responsibility;
+                            }
+                        }
+                        else{
+                            echo $delete_job_position;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple job position
+    else if($transaction == 'delete multiple job position'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_ids = $_POST['job_position_id'];
+        
+                    foreach($job_position_ids as $job_position_id){
+                        $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                        if($check_job_position_exist > 0){
+                            $delete_job_position = $api->delete_job_position($job_position_id, $username);
+                                            
+                            if($delete_job_position){
+                                $delete_all_job_position_responsibility = $api->delete_all_job_position_responsibility($job_position_id, $username);
+                                            
+                                if($delete_all_job_position_responsibility){
+                                    $delete_all_job_position_requirement = $api->delete_all_job_position_requirement($job_position_id, $username);
+                                            
+                                    if($delete_all_job_position_requirement){
+                                        $delete_all_job_position_qualification = $api->delete_all_job_position_qualification($job_position_id, $username);
+                                            
+                                        if($delete_all_job_position_qualification){
+                                            $delete_all_job_position_attachment = $api->delete_all_job_position_attachment($job_position_id, $username);
+                                                        
+                                            if(!$delete_all_job_position_attachment){
+                                                $error = $delete_all_job_position_attachment;
+                                                break;
+                                            }
+                                        }
+                                        else{
+                                            $error = $delete_all_job_position_qualification;
+                                            break;
+                                        }
+                                    }
+                                    else{
+                                        $error = $delete_all_job_position_requirement;
+                                        break;
+                                    }
+                                }
+                                else{
+                                    $error = $delete_all_job_position_responsibility;
+                                    break;
+                                }
+                            }
+                            else{
+                                $error = $delete_job_position;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete job position responsibility
+    else if($transaction == 'delete job position responsibility'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['responsibility_id']) && !empty($_POST['responsibility_id'])){
+                    $responsibility_id = $_POST['responsibility_id'];
+        
+                    $check_job_position_responsibility_exist = $api->check_job_position_responsibility_exist($responsibility_id);
+        
+                    if($check_job_position_responsibility_exist > 0){
+                        $delete_job_position_responsibility = $api->delete_job_position_responsibility($responsibility_id, $username);
+                                            
+                        if($delete_job_position_responsibility){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_job_position_responsibility;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete job position requirement
+    else if($transaction == 'delete job position requirement'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['requirement_id']) && !empty($_POST['requirement_id'])){
+                    $requirement_id = $_POST['requirement_id'];
+        
+                    $check_job_position_requirement_exist = $api->check_job_position_requirement_exist($requirement_id);
+        
+                    if($check_job_position_requirement_exist > 0){
+                        $delete_job_position_requirement = $api->delete_job_position_requirement($requirement_id, $username);
+                                            
+                        if($delete_job_position_requirement){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_job_position_requirement;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete job position qualification
+    else if($transaction == 'delete job position qualification'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['qualification_id']) && !empty($_POST['qualification_id'])){
+                    $qualification_id = $_POST['qualification_id'];
+        
+                    $check_job_position_qualification_exist = $api->check_job_position_qualification_exist($qualification_id);
+        
+                    if($check_job_position_qualification_exist > 0){
+                        $delete_job_position_qualification = $api->delete_job_position_qualification($qualification_id, $username);
+                                            
+                        if($delete_job_position_qualification){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_job_position_qualification;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete job position attachment
+    else if($transaction == 'delete job position attachment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['attachment_id']) && !empty($_POST['attachment_id'])){
+                    $attachment_id = $_POST['attachment_id'];
+        
+                    $check_job_position_attachment_exist = $api->check_job_position_attachment_exist($attachment_id);
+        
+                    if($check_job_position_attachment_exist > 0){
+                        $delete_job_position_attachment = $api->delete_job_position_attachment($attachment_id, $username);
+                                            
+                        if($delete_job_position_attachment){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_job_position_attachment;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -4214,6 +4794,166 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #   Start transactions
+    # -------------------------------------------------------------
+
+    # Start job position recruitment
+    else if($transaction == 'start job position recruitment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_id = $_POST['job_position_id'];
+        
+                    $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                    if($check_job_position_exist > 0){
+                        $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '1', $username);
+            
+                        if($update_job_position_recruitment_status){
+                            echo 'Started';
+                        }
+                        else{
+                            echo $update_job_position_recruitment_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Start multiple department
+    else if($transaction == 'start multiple job position recruitment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_ids = $_POST['job_position_id'];
+        
+                    foreach($job_position_ids as $job_position_id){
+                        $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                        if($check_job_position_exist > 0){
+                            $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '1', $username);
+                                            
+                            if(!$update_job_position_recruitment_status){
+                                $error = $update_job_position_recruitment_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Unarchived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #   Stop transactions
+    # -------------------------------------------------------------
+
+    # Stop job position recruitment
+    else if($transaction == 'stop job position recruitment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_id = $_POST['job_position_id'];
+        
+                    $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                    if($check_job_position_exist > 0){
+                        $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '2', $username);
+            
+                        if($update_job_position_recruitment_status){
+                            echo 'Started';
+                        }
+                        else{
+                            echo $update_job_position_recruitment_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Stop multiple department
+    else if($transaction == 'stop multiple job position recruitment'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                    $job_position_ids = $_POST['job_position_id'];
+        
+                    foreach($job_position_ids as $job_position_id){
+                        $check_job_position_exist = $api->check_job_position_exist($job_position_id);
+        
+                        if($check_job_position_exist > 0){
+                            $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '2', $username);
+                                            
+                            if(!$update_job_position_recruitment_status){
+                                $error = $update_job_position_recruitment_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Unarchived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Cancel transactions
     # -------------------------------------------------------------
 
@@ -4596,6 +5336,86 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'MANAGER' => $department_details[0]['MANAGER'],
                 'STATUS' =>  $api->get_department_status($department_details[0]['STATUS'])[0]['BADGE'],
                 'TRANSACTION_LOG_ID' => $department_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Job position details
+    else if($transaction == 'job position details'){
+        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+            $job_position_id = $_POST['job_position_id'];
+            $job_position_details = $api->get_job_position_details($job_position_id);
+
+            $response[] = array(
+                'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
+                'DESCRIPTION' => $job_position_details[0]['DESCRIPTION'],
+                'EXPECTED_NEW_EMPLOYEES' => $job_position_details[0]['EXPECTED_NEW_EMPLOYEES'],
+                'RECRUITMENT_STATUS' =>  $api->get_job_position_recruitment_status($job_position_details[0]['RECRUITMENT_STATUS'])[0]['BADGE'],
+                'DEPARTMENT' => $job_position_details[0]['DEPARTMENT'],
+                'TRANSACTION_LOG_ID' => $job_position_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Job position responsibility details
+    else if($transaction == 'job position responsibility details'){
+        if(isset($_POST['responsibility_id']) && !empty($_POST['responsibility_id'])){
+            $responsibility_id = $_POST['responsibility_id'];
+            $job_position_responsibility_details = $api->get_job_position_responsibility_details($responsibility_id);
+
+            $response[] = array(
+                'RESPONSIBILITY' => $job_position_responsibility_details[0]['RESPONSIBILITY']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Job position requirement details
+    else if($transaction == 'job position requirement details'){
+        if(isset($_POST['requirement_id']) && !empty($_POST['requirement_id'])){
+            $requirement_id = $_POST['requirement_id'];
+            $job_position_requirement_details = $api->get_job_position_requirement_details($requirement_id);
+
+            $response[] = array(
+                'REQUIREMENT' => $job_position_requirement_details[0]['REQUIREMENT']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Job position qualification details
+    else if($transaction == 'job position qualification details'){
+        if(isset($_POST['qualification_id']) && !empty($_POST['qualification_id'])){
+            $qualification_id = $_POST['qualification_id'];
+            $job_position_qualification_details = $api->get_job_position_qualification_details($qualification_id);
+
+            $response[] = array(
+                'QUALIFICATION' => $job_position_qualification_details[0]['QUALIFICATION']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Job position attachment details
+    else if($transaction == 'job position attachment details'){
+        if(isset($_POST['attachment_id']) && !empty($_POST['attachment_id'])){
+            $attachment_id = $_POST['attachment_id'];
+            $job_position_attachment_details = $api->get_job_position_attachment_details($attachment_id);
+
+            $response[] = array(
+                'ATTACHMENT_NAME' => $job_position_attachment_details[0]['ATTACHMENT_NAME']
             );
 
             echo json_encode($response);

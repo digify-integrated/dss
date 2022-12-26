@@ -181,9 +181,9 @@
                                                     <div class="row mb-4">
                                                         <input type="hidden" id="job_position_id" name="job_position_id">
                                                         <input type="hidden" id="transaction_log_id">
-                                                        <label for="department" class="col-md-3 col-form-label">Job Position <span class="text-danger">*</span></label>
+                                                        <label for="job_position" class="col-md-3 col-form-label">Job Position <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="department" name="department" maxlength="100" <?php echo $disabled; ?>>
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="job_position" name="job_position" maxlength="100" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
