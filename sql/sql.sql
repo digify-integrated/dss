@@ -2379,13 +2379,15 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_job_position_attachment_details(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100))
+CREATE PROCEDURE update_job_position_attachment_details(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @attachment_id = attachment_id;
 	SET @job_position_id = job_position_id;
 	SET @attachment_name = attachment_name;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
 
-	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT_NAME = @attachment_name WHERE ATTACHMENT_ID = @attachment_id AND JOB_POSITION_ID = @job_position_id';
+	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT_NAME = @attachment_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ATTACHMENT_ID = @attachment_id AND JOB_POSITION_ID = @job_position_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -2462,7 +2464,7 @@ BEGIN
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name,, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name, @transaction_log_id, @record_log)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -2473,7 +2475,7 @@ CREATE PROCEDURE get_job_position_details(IN job_position_id VARCHAR(100))
 BEGIN
 	SET @job_position_id = job_position_id;
 
-	SET @query = 'SELECT JOB_POSITION, DESCRIPTION, MANAGER, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
+	SET @query = 'SELECT JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
@@ -2482,9 +2484,9 @@ END //
 
 CREATE PROCEDURE get_job_position_responsibility_details(IN responsibility_id VARCHAR(100))
 BEGIN
-	SET @job_position_id = job_position_id;
+	SET @responsibility_id = responsibility_id;
 
-	SET @query = 'SELECT RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
+	SET @query = 'SELECT JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

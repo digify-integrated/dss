@@ -350,6 +350,14 @@ function initialize_click_events(){
         generate_modal('state form', 'State', 'LG' , '1', '1', 'form', 'state-form', '1', username);
     });
 
+    $(document).on('click','.update-state',function() {
+        var state_id = $(this).data('state-id');
+
+        sessionStorage.setItem('state_id', state_id);
+
+        generate_modal('state form', 'State', 'LG' , '1', '1', 'form', 'state-form', '0', username);
+    });
+
     $(document).on('click','.delete-state',function() {
         var state_id = $(this).data('state-id');
         var country_id = $(this).data('country-id');

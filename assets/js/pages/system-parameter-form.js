@@ -15,7 +15,7 @@
                     $('#parameter').val(response[0].PARAMETER);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
                     $('#parameter_description').val(response[0].PARAMETER_DESCRIPTION);
-                    $('#extension').val(response[0].PARAMETER_EXTENSION);
+                    $('#parameter_extension').val(response[0].PARAMETER_EXTENSION);
                     $('#parameter_number').val(response[0].PARAMETER_NUMBER);
 
                     $('#parameter_id').val(parameter_id);

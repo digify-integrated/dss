@@ -147,7 +147,7 @@ function initialize_page_access_table(datatable_name, buttons = false, show_all 
             buttons: [
                 'csv', 'excel', 'pdf'
             ],
-            'order': [[ 1, 'asc' ]],
+            'order': [[ 0, 'asc' ]],
             'columns' : column,
             'scrollY': false,
             'scrollX': true,
@@ -174,7 +174,7 @@ function initialize_page_access_table(datatable_name, buttons = false, show_all 
                 'data': {'type' : type, 'username' : username, 'page_id' : page_id},
                 'dataSrc' : ''
             },
-            'order': [[ 1, 'asc' ]],
+            'order': [[ 0, 'asc' ]],
             'columns' : column,
             'scrollY': false,
             'scrollX': true,

@@ -223,8 +223,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             }
                         }
                     }
-        
-                   
                 }
             }
             else{
@@ -1476,32 +1474,38 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $check_user_account_status = $api->check_user_account_status($username);
 
             if($check_user_account_status){
-                if(isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+                if(isset($_POST['state_name']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+                    $state_id = $_POST['state_id'];
                     $state_name = $_POST['state_name'];
                     $country_id = $_POST['country_id'];
+
+                    $check_state_exist = $api->check_state_exist($state_id);
+         
+                    if($check_state_exist > 0){
+                        $update_state = $api->update_state($state_id, $state_name, $country_id, $username);
         
-                    $insert_state = $api->insert_state($state_name, $country_id, $username);
-            
-                    if($insert_state[0]['RESPONSE']){
-                        $response[] = array(
-                            'RESPONSE' => 'Inserted',
-                            'STATE_ID' => $insert_state[0]['STATE_ID']
-                        );
+                        if($update_state){
+                            echo 'Updated';
+                        }
+                        else{
+                            echo $update_state;
+                        }
                     }
                     else{
-                        $response[] = array(
-                            'RESPONSE' => $insert_state[0]['RESPONSE']
-                        );
+                        $insert_state = $api->insert_state($state_name, $country_id, $username);
+            
+                        if($insert_state[0]['RESPONSE']){
+                            echo 'Inserted';
+                        }
+                        else{
+                            echo $insert_state[0]['RESPONSE'];
+                        }
                     }
                 }
             }
             else{
-                $response[] = array(
-                    'RESPONSE' => 'Inactive User'
-                );
+                echo 'Inactive User';
             }
-
-            echo json_encode($response);
         }
     }
     # -------------------------------------------------------------
@@ -1848,7 +1852,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 if(isset($_POST['responsibility_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['responsibility']) && !empty($_POST['responsibility'])){
                     $responsibility_id = $_POST['responsibility_id'];
                     $job_position_id = $_POST['job_position_id'];
-                    $job_position_responsibility = $_POST['job_position_responsibility'];
+                    $responsibility = $_POST['responsibility'];
         
                     $check_job_position_responsibility_exist = $api->check_job_position_responsibility_exist($responsibility_id);
          
@@ -2036,7 +2040,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                 }
                             }
                             else{
-                                echo 'File Type'
+                                echo 'File Type';
                             }
                         }
                         else{
@@ -2072,7 +2076,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             }
                         }
                         else{
-                            echo 'File Type'
+                            echo 'File Type';
                         }
                     }
                 }
@@ -2080,8 +2084,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             else{
                 echo 'Inactive User';
             }
-
-            echo json_encode($response);
         }
     }
     # -------------------------------------------------------------
@@ -4831,48 +4833,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
-    # Start multiple department
-    else if($transaction == 'start multiple job position recruitment'){
-        if(isset($_POST['username']) && !empty($_POST['username'])){
-            $username = $_POST['username'];
-            $check_user_account_status = $api->check_user_account_status($username);
-
-            if($check_user_account_status){
-                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                    $job_position_ids = $_POST['job_position_id'];
-        
-                    foreach($job_position_ids as $job_position_id){
-                        $check_job_position_exist = $api->check_job_position_exist($job_position_id);
-        
-                        if($check_job_position_exist > 0){
-                            $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '1', $username);
-                                            
-                            if(!$update_job_position_recruitment_status){
-                                $error = $update_job_position_recruitment_status;
-                                break;
-                            }
-                        }
-                        else{
-                            $error = 'Not Found';
-                            break;
-                        }
-                    }
-        
-                    if(empty($error)){
-                        echo 'Unarchived';
-                    }
-                    else{
-                        echo $error;
-                    }
-                }
-            }
-            else{
-                echo 'Inactive User';
-        	}
-        }
-    }
-    # -------------------------------------------------------------
-
     # -------------------------------------------------------------
     #   Stop transactions
     # -------------------------------------------------------------
@@ -4893,7 +4853,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '2', $username);
             
                         if($update_job_position_recruitment_status){
-                            echo 'Started';
+                            echo 'Stopped';
                         }
                         else{
                             echo $update_job_position_recruitment_status;
@@ -4901,48 +4861,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     }
                     else{
                         echo 'Not Found';
-                    }
-                }
-            }
-            else{
-                echo 'Inactive User';
-        	}
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Stop multiple department
-    else if($transaction == 'stop multiple job position recruitment'){
-        if(isset($_POST['username']) && !empty($_POST['username'])){
-            $username = $_POST['username'];
-            $check_user_account_status = $api->check_user_account_status($username);
-
-            if($check_user_account_status){
-                if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                    $job_position_ids = $_POST['job_position_id'];
-        
-                    foreach($job_position_ids as $job_position_id){
-                        $check_job_position_exist = $api->check_job_position_exist($job_position_id);
-        
-                        if($check_job_position_exist > 0){
-                            $update_job_position_recruitment_status = $api->update_job_position_recruitment_status($job_position_id, '2', $username);
-                                            
-                            if(!$update_job_position_recruitment_status){
-                                $error = $update_job_position_recruitment_status;
-                                break;
-                            }
-                        }
-                        else{
-                            $error = 'Not Found';
-                            break;
-                        }
-                    }
-        
-                    if(empty($error)){
-                        echo 'Unarchived';
-                    }
-                    else{
-                        echo $error;
                     }
                 }
             }

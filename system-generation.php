@@ -238,9 +238,61 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 $form .= '<div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
+                                    <input type="hidden" id="state_id" name="state_id">
                                     <label for="state_name" class="form-label">State <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="state_name" name="state_name" maxlength="200">
                                 </div>
+                            </div>
+                        </div>';
+            }
+            else if($form_type == 'job position responsibility form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="responsibility_id" name="responsibility_id">
+                                    <label for="responsibility" class="form-label">Responsiblity <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="responsibility" name="responsibility" maxlength="500">
+                                </div>
+                            </div>
+                        </div>';
+            }
+            else if($form_type == 'job position requirement form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="requirement_id" name="requirement_id">
+                                    <label for="requirement" class="form-label">Requirement <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="requirement" name="requirement" maxlength="500">
+                                </div>
+                            </div>
+                        </div>';
+            }
+            else if($form_type == 'job position qualification form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="qualification_id" name="qualification_id">
+                                    <label for="qualification" class="form-label">Qualification <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="qualification" name="qualification" maxlength="500">
+                                </div>
+                            </div>
+                        </div>';
+            }
+            else if($form_type == 'job position attachment form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="attachment_id" name="attachment_id">
+                                    <input type="hidden" id="update" value="0">
+                                    <label for="attachment_name" class="form-label">Attachment Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="attachment_name" name="attachment_name" maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="attachment" class="form-label">Attachment</label>
+                                <input class="form-control" type="file" name="attachment" id="attachment">
                             </div>
                         </div>';
             }
@@ -1109,7 +1161,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1206,7 +1257,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1285,7 +1335,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1421,7 +1470,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1466,7 +1514,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1511,7 +1558,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1586,7 +1632,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1617,7 +1662,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1648,7 +1692,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1679,7 +1722,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1710,7 +1752,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1741,7 +1782,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1906,7 +1946,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -1938,7 +1977,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2256,7 +2294,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2287,7 +2324,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2349,7 +2385,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2393,6 +2428,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 $country_id = $_POST['country_id'];
 
                 $update_country = $api->check_role_access_rights($username, '62', 'action');
+                $update_state = $api->check_role_access_rights($username, '65', 'action');
                 $delete_state = $api->check_role_access_rights($username, '66', 'action');
     
                 $sql = $api->db_connection->prepare('SELECT STATE_ID, STATE_NAME FROM global_state WHERE COUNTRY_ID = :country_id');
@@ -2402,6 +2438,15 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     while($row = $sql->fetch()){
                         $state_id = $row['STATE_ID'];
                         $state_name = $row['STATE_NAME'];
+
+                        if($update_state > 0 && $update_country > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-state" data-country-id="'. $country_id .'" data-state-id="'. $state_id .'" title="Edit State">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = null;
+                        }
 
                         if($delete_state > 0 && $update_country > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-state" data-country-id="'. $country_id .'" data-state-id="'. $state_id .'" title="Delete State">
@@ -2414,7 +2459,10 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     
                         $response[] = array(
                             'STATE_NAME' => $state_name,
-                            'ACTION' => $delete
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
                         );
                     }
     
@@ -2425,7 +2473,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2688,7 +2735,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2719,7 +2765,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2894,16 +2939,16 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $responsibility = $row['RESPONSIBILITY'];
 
                         if($update_job_position_responsibility > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Responsibility">
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Responsibility">
                                             <i class="bx bx-pencil font-size-16 align-middle"></i>
                                         </button>';
                         }
                         else{
-                            $update = '';
+                            $update = null;
                         }
 
                         if($delete_job_position_responsibility > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Responsibility">
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Responsibility">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
                             </button>';
                         }
@@ -2927,7 +2972,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2950,16 +2994,16 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $requirement = $row['REQUIREMENT'];
 
                         if($update_job_position_requirement > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Requirement">
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Requirement">
                                             <i class="bx bx-pencil font-size-16 align-middle"></i>
                                         </button>';
                         }
                         else{
-                            $update = '';
+                            $update = null;
                         }
 
                         if($delete_job_position_requirement > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Requirement">
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Requirement">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
                             </button>';
                         }
@@ -2983,7 +3027,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -2997,25 +3040,25 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 $update_job_position_qualification = $api->check_role_access_rights($username, '92', 'action');
                 $delete_job_position_qualification = $api->check_role_access_rights($username, '93', 'action');
     
-                $sql = $api->db_connection->prepare('SELECT QUALIFICACTION_ID, QUALIFICACTION FROM employee_job_position_qualification WHERE JOB_POSITION_ID = :job_position_id');
+                $sql = $api->db_connection->prepare('SELECT QUALIFICATION_ID, QUALIFICATION FROM employee_job_position_qualification WHERE JOB_POSITION_ID = :job_position_id');
                 $sql->bindValue(':job_position_id', $job_position_id);
     
                 if($sql->execute()){
                     while($row = $sql->fetch()){
-                        $qualification_id = $row['QUALIFICACTION_ID'];
-                        $qualification = $row['QUALIFICACTION'];
+                        $qualification_id = $row['QUALIFICATION_ID'];
+                        $qualification = $row['QUALIFICATION'];
 
                         if($update_job_position_qualification > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-job-position-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Qualification">
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Qualification">
                                             <i class="bx bx-pencil font-size-16 align-middle"></i>
                                         </button>';
                         }
                         else{
-                            $update = '';
+                            $update = null;
                         }
 
                         if($delete_job_position_qualification > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Qualification">
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Qualification">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
                             </button>';
                         }
@@ -3024,7 +3067,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         }
     
                         $response[] = array(
-                            'QUALIFICACTION' => $qualification,
+                            'QUALIFICATION' => $qualification,
                             'ACTION' => '<div class="d-flex gap-2">
                                 '. $update .'
                                 '. $delete .'
@@ -3039,7 +3082,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 
@@ -3050,6 +3092,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 $job_position_id = $_POST['job_position_id'];
 
                 $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                $update_job_position_attachment = $api->check_role_access_rights($username, '101', 'action');
                 $delete_job_position_attachment = $api->check_role_access_rights($username, '102', 'action');
     
                 $sql = $api->db_connection->prepare('SELECT ATTACHMENT_ID, ATTACHMENT_NAME, ATTACHMENT FROM employee_job_position_attachment WHERE JOB_POSITION_ID = :job_position_id');
@@ -3061,8 +3104,17 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $attachment_name = $row['ATTACHMENT_NAME'];
                         $attachment = $row['ATTACHMENT'];
 
+                        if($update_job_position_attachment > 0 && $update_job_position > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Attachment">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = null;
+                        }
+
                         if($delete_job_position_attachment > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-job-position-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Attachment">
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Attachment">
                                 <i class="bx bx-trash font-size-16 align-middle"></i>
                             </button>';
                         }
@@ -3072,7 +3124,10 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     
                         $response[] = array(
                             'ATTACHMENT' => '<a href="'. $attachment .'" target="_blank">' . $attachment_name . '</a>',
-                            'ACTION' => $delete
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
                         );
                     }
     
@@ -3083,7 +3138,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 }
             }
         }
-        
     }
     # -------------------------------------------------------------
 

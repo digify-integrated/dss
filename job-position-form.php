@@ -81,13 +81,13 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Department Form</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Job Position Form</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Employee</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
-                                            <li class="breadcrumb-item"><a href="departments.php">Departments</a></li>
+                                            <li class="breadcrumb-item"><a href="job-positions.php">Job Positions</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <?php
                                                 if(!empty($job_position_id)){
@@ -109,7 +109,7 @@
                                                 <div class="col-md-12">
                                                     <div class="d-flex align-items-start">
                                                         <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Department Form</h4>
+                                                            <h4 class="card-title">Job Position Form</h4>
                                                         </div>
                                                         <div class="flex-grow-1 align-self-center">
                                                         <?php
@@ -123,7 +123,7 @@
                                                                 }
 
                                                                 if($delete_job_position > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="delete-department">Delete Job Position</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="delete-job-position">Delete Job Position</button>';
                                                                 }
 
                                                                 if(($start_job_position_recruitment > 0 && $job_position_recruitment_status == 2) || ($stop_job_position_recruitment > 0 && $job_position_recruitment_status == 1)){
@@ -142,19 +142,19 @@
                                                                     $dropdown_action .= '<div class="dropdown-divider"></div>';
 
                                                                     if($add_job_position_attachment > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Attachment</button>';
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-attachment">Add Attachment</button>';
                                                                     }
 
                                                                     if($add_job_position_responsibility > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Responsibility</button>';
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-responsibility">Add Responsibility</button>';
                                                                     }
 
                                                                     if($add_job_position_requirement > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Requirement</button>';
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-requirement">Add Requirement</button>';
                                                                     }
 
                                                                     if($add_job_position_qualification > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Qualification</button>';
+                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-qualification">Add Qualification</button>';
                                                                     }
                                                                 }
 
@@ -176,6 +176,13 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <?php
+                                                if(!empty($job_position_id)){
+                                                    echo '<div class="row">
+                                                            <div class="col-md-12" id="job_position_recruitment_status"></div>
+                                                        </div>';
+                                                }
+                                            ?>
                                             <div class="row mt-4">
                                                 <div class="col-md-6">
                                                     <div class="row mb-4">
@@ -187,11 +194,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
-                                                        <label for="description" class="col-md-3 col-form-label">Description</label>
+                                                        <label for="description" class="col-md-3 col-form-label">Description <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                         <input type="text" class="form-control form-maxlength" autocomplete="off" id="description" name="description" maxlength="500" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6">
                                                     <div class="row mb-4">
                                                         <label for="department" class="col-md-3 col-form-label">Department <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
@@ -204,7 +213,7 @@
                                                     <div class="row mb-4">
                                                         <label for="expected_new_employees" class="col-md-3 col-form-label">Expected New Employees</label>
                                                         <div class="col-md-9">
-                                                            <input id="expected_new_employees" name="expected_new_employees" class="form-control" type="number" min="0" <?php echo $disabled; ?>>
+                                                            <input id="expected_new_employees" name="expected_new_employees" class="form-control" type="number" min="0" value="0" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>
                                                 </div>

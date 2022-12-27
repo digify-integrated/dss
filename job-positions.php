@@ -21,8 +21,6 @@
         else{
             $add_job_position = $api->check_role_access_rights($username, '86', 'action');
             $delete_job_position = $api->check_role_access_rights($username, '88', 'action');
-            $start_job_position_recruitment = $api->check_role_access_rights($username, '89', 'action');
-            $stop_job_position_recruitment = $api->check_role_access_rights($username, '90', 'action');
 
             require('views/_interface_settings.php');
         }
@@ -84,21 +82,13 @@
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_job_position > 0 || $start_job_position_recruitment > 0 || $stop_job_position_recruitment > 0){
+                                                            if($delete_job_position > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
                                                                 if($delete_job_position > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-job-positions">Delete Job Positions</button>';
-                                                                }
-
-                                                                if($start_job_position_recruitment > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-start" type="button" id="start-job-position-recruitment">Start Recruitment</button>';
-                                                                }
-
-                                                                if($stop_job_position_recruitment > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-stop" type="button" id="stop-job-position-recruitment">Stop Recruitment</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-job-position">Delete Job Positions</button>';
                                                                 }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -110,7 +100,7 @@
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
                                                             if($add_job_position > 0){
-                                                                echo '<a href="job-positions-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                                echo '<a href="job-position-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
                                                         <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
