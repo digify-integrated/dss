@@ -102,51 +102,47 @@
                                         <form id="interface-setting-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Interface Setting Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($interface_setting_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_interface_setting > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="interface-setting-form.php">Add Interface Setting</a>';
-                                                                }
-
-                                                                if($delete_interface_setting > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="delete-interface-setting">Delete Interface Setting</button>';
-                                                                }
-
-                                                                if(($activate_interface_setting > 0 && $interface_setting_status == 2) || ($deactivate_interface_setting > 0 && $interface_setting_status == 1)){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-
-                                                                    if($activate_interface_setting > 0 && $interface_setting_status == 2){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="activate-interface-setting">Activate Interface Setting</button>';
-                                                                    }
-    
-                                                                    if($deactivate_interface_setting > 0 && $interface_setting_status == 1){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="deactivate-interface-setting">Deactivate Interface Setting</button>';
-                                                                    }
-                                                                }
-
-                                                                $dropdown_action .= '</div>
-                                                                </div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">Interface Setting Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_interface_setting > 0 || ($update_interface_setting > 0 && !empty($interface_setting_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                                if(!empty($interface_setting_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_interface_setting > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="interface-setting-form.php">Add Interface Setting</a></li>';
+                                                                    }
+    
+                                                                    if($delete_interface_setting > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="delete-interface-setting">Delete Interface Setting</button></li>';
+                                                                    }
+    
+                                                                    if(($activate_interface_setting > 0 && $interface_setting_status == 2) || ($deactivate_interface_setting > 0 && $interface_setting_status == 1)){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+    
+                                                                        if($activate_interface_setting > 0 && $interface_setting_status == 2){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="activate-interface-setting">Activate Interface Setting</button></li>';
+                                                                        }
+        
+                                                                        if($deactivate_interface_setting > 0 && $interface_setting_status == 1){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-interface-setting-id="'. $interface_setting_id .'" id="deactivate-interface-setting">Deactivate Interface Setting</button></li>';
+                                                                        }
+                                                                    }    
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -284,6 +280,7 @@
         <script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
         <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+        <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/pages/interface-setting-form.js?v=<?php echo rand(); ?>"></script>

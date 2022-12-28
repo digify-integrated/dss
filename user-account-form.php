@@ -109,63 +109,59 @@
                                         <form id="user-account-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">User Account Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($user_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_user_account > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="user-account-form.php">Add User Account</a>';
-                                                                }
-
-                                                                if($delete_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-user-account">Delete User Account</button>';
-                                                                }
-
-                                                                if(($add_user_account_role > 0 || ($activate_user_account > 0 && $user_status == 'Inactive') || ($deactivate_user_account > 0 && $user_status == 'Active') || ($lock_user_account > 0 && $failed_login < 5) || ($unlock_user_account > 0 && $failed_login >= 5)) && $update_user_account > 0){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-
-                                                                    if($add_user_account_role > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="add-user-account-role">Add Role</button>';
-                                                                    }                                                              
-
-                                                                    if($activate_user_account > 0 && $user_status == 'Inactive'){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="activate-user-account">Activate User Account</button>';
-                                                                    }
-
-                                                                    if($deactivate_user_account > 0 && $user_status == 'Active'){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="deactivate-user-account">Deactivate User Account</button>';
-                                                                    }
-
-                                                                    if($lock_user_account > 0 && $failed_login < 5){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="lock-user-account">Lock User Account</button>';
-                                                                    }
-
-                                                                    if($unlock_user_account > 0 && $failed_login >= 5){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="unlock-user-account">Unlock User Account</button>';
-                                                                    }
-                                                                }
-
-                                                                $dropdown_action .= '</div>
-                                                                </div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">User Account Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_user_account > 0 || ($update_user_account > 0 && !empty($user_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                                if(!empty($user_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_user_account > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="user-account-form.php">Add User Account</a></li>';
+                                                                    }
+    
+                                                                    if($delete_user_account > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-user-account">Delete User Account</button></li>';
+                                                                    }
+    
+                                                                    if(($add_user_account_role > 0 || ($activate_user_account > 0 && $user_status == 'Inactive') || ($deactivate_user_account > 0 && $user_status == 'Active') || ($lock_user_account > 0 && $failed_login < 5) || ($unlock_user_account > 0 && $failed_login >= 5)) && $update_user_account > 0){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+    
+                                                                        if($add_user_account_role > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="add-user-account-role">Add Role</button></li>';
+                                                                        }                                                              
+    
+                                                                        if($activate_user_account > 0 && $user_status == 'Inactive'){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="activate-user-account">Activate User Account</button></li>';
+                                                                        }
+    
+                                                                        if($deactivate_user_account > 0 && $user_status == 'Active'){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="deactivate-user-account">Deactivate User Account</button></li>';
+                                                                        }
+    
+                                                                        if($lock_user_account > 0 && $failed_login < 5){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="lock-user-account">Lock User Account</button></li>';
+                                                                        }
+    
+                                                                        if($unlock_user_account > 0 && $failed_login >= 5){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="unlock-user-account">Unlock User Account</button></li>';
+                                                                        }
+                                                                    }
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>

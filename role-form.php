@@ -102,59 +102,55 @@
                                         <form id="role-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Role Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($role_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_role > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="role-form.php">Add Role</a>';
-                                                                }
-
-                                                                if($delete_role > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-role-id="'. $role_id .'" id="delete-role">Delete Role</button>';
-                                                                }
-
-                                                                if(($add_role_module_access > 0 || $add_role_page_access > 0 || $add_role_action_access > 0 || $add_role_user_account > 0) && $update_role > 0){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-
-                                                                    if($add_role_module_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button>';
-                                                                    }                                                                    
-
-                                                                    if($add_role_page_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
-                                                                    }                                                                    
-
-                                                                    if($add_role_action_access > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
-                                                                    }                                                                    
-
-                                                                    if($add_role_user_account > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-user-account">Add User Account</button>';
-                                                                    }                                                                    
-                                                                }
-
-                                                                $dropdown_action .= '</div>
-                                                                </div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">Role Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_role > 0 || ($update_role > 0 && !empty($role_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                                if(!empty($role_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_role > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="role-form.php">Add Role</a></li>';
+                                                                    }
+    
+                                                                    if($delete_role > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-role-id="'. $role_id .'" id="delete-role">Delete Role</button></li>';
+                                                                    }
+    
+                                                                    if(($add_role_module_access > 0 || $add_role_page_access > 0 || $add_role_action_access > 0 || $add_role_user_account > 0) && $update_role > 0){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div>';
+    
+                                                                        if($add_role_module_access > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-module-access">Add Module Access</button></li>';
+                                                                        }
+    
+                                                                        if($add_role_page_access > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button></li>';
+                                                                        }
+    
+                                                                        if($add_role_action_access > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button></li>';
+                                                                        }
+    
+                                                                        if($add_role_user_account > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-user-account">Add User Account</button></li>';
+                                                                        }
+                                                                    }
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>

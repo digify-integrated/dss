@@ -100,43 +100,40 @@
                                         <form id="page-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Page Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($page_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_page > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="page-form.php">Add Page</a>';
-                                                                }
-
-                                                                if($delete_page > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-page-id="'. $page_id .'" id="delete-page">Delete Page</button>';
-                                                                }
-
-                                                                if($add_page_access_right > 0 && $update_page > 0){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button>';
-                                                                }
-
-                                                                $dropdown_action .= '</div></div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">Page Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_page > 0 || ($update_page > 0 && !empty($page_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                               if(!empty($page_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_page > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="page-form.php">Add Page</a></li>';
+                                                                    }
+    
+                                                                    if($delete_page > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-page-id="'. $page_id .'" id="delete-page">Delete Page</button></li>';
+                                                                    }
+    
+                                                                    if($add_page_access_right > 0 && $update_page > 0){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-page-access">Add Page Access</button></li>';
+                                                                    }
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -2620,6 +2620,120 @@ CREATE INDEX employee_job_position_responsibility_index ON employee_job_position
 CREATE INDEX employee_job_position_requirement_index ON employee_job_position_requirement(REQUIREMENT_ID);
 CREATE INDEX employee_job_position_qualification_index ON employee_job_position_qualification(QUALIFICATION_ID);
 
+/* Global Company */
+CREATE TABLE employee_work_location(
+	WORK_LOCATION_ID VARCHAR(50) PRIMARY KEY,
+	WORK_LOCATION VARCHAR(100) NOT NULL,
+	WORK_LOCATION_ADDRESS VARCHAR(500),
+	EMAIL VARCHAR(50),
+	TELEPHONE VARCHAR(20),
+	MOBILE VARCHAR(20),
+	LOCATION_NUMBER INT(10),
+	STATUS TINYINT(1),
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_work_location_index ON employee_work_location(WORK_LOCATION_ID);
+
+CREATE PROCEDURE check_work_location_exist(IN work_location_id VARCHAR(50))
+BEGIN
+	SET @work_location_id = work_location_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_work_location(IN work_location_id VARCHAR(50), IN work_location VARCHAR(100), IN work_location_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(50), IN mobile VARCHAR(50), IN location_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @work_location_id = work_location_id;
+	SET @work_location = work_location;
+	SET @work_location_address = work_location_address;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @location_number = location_number;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_work_location SET WORK_LOCATION = @work_location, WORK_LOCATION_ADDRESS = @work_location_address, EMAIL = @email, TELEPHONE = @telephone, MOBILE = @mobile, LOCATION_NUMBER = @location_number, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WORK_LOCATION_ID = @work_location_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_work_location_status(IN work_location_id VARCHAR(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @work_location_id = work_location_id;
+	SET @status = status;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_work_location SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WORK_LOCATION_ID = @work_location_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_work_location(IN work_location_id VARCHAR(50), IN work_location VARCHAR(100), IN work_location_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(50), IN mobile VARCHAR(50), IN location_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @work_location_id = work_location_id;
+	SET @work_location = work_location;
+	SET @work_location_address = work_location_address;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @location_number = location_number;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_work_location (WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@work_location_id, @work_location, @work_location_address, @email, @telephone, @mobile, @location_number, "1", @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_work_location_details(IN work_location_id VARCHAR(50))
+BEGIN
+	SET @work_location_id = work_location_id;
+
+	SET @query = 'SELECT WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_work_location(IN work_location_id VARCHAR(50))
+BEGIN
+	SET @work_location_id = work_location_id;
+
+	SET @query = 'DELETE FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_work_location_options(IN generation_type VARCHAR(10))
+BEGIN
+	IF @generation_type = 'active' THEN
+		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "2" ORDER BY WORK_LOCATION';
+	ELSE
+		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location ORDER BY WORK_LOCATION';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
 BEGIN

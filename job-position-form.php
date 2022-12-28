@@ -107,71 +107,67 @@
                                         <form id="job-position-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Job Position Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($job_position_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_job_position > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="job-position-form.php">Add Job Position</a>';
-                                                                }
-
-                                                                if($delete_job_position > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="delete-job-position">Delete Job Position</button>';
-                                                                }
-
-                                                                if(($start_job_position_recruitment > 0 && $job_position_recruitment_status == 2) || ($stop_job_position_recruitment > 0 && $job_position_recruitment_status == 1)){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-
-                                                                    if($start_job_position_recruitment > 0 && $job_position_recruitment_status == 2){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="start-job-position-recruitment">Start Recruitment</button>';
-                                                                    }
-    
-                                                                    if($stop_job_position_recruitment > 0 && $job_position_recruitment_status == 1){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="stop-job-position-recruitment">Stop Recruitment</button>';
-                                                                    }
-                                                                }
-
-                                                                if(($add_job_position_attachment > 0 || $add_job_position_responsibility > 0 || $add_job_position_requirement > 0 || $add_job_position_qualification > 0) && $update_job_position > 0){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-
-                                                                    if($add_job_position_attachment > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-attachment">Add Attachment</button>';
-                                                                    }
-
-                                                                    if($add_job_position_responsibility > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-responsibility">Add Responsibility</button>';
-                                                                    }
-
-                                                                    if($add_job_position_requirement > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-requirement">Add Requirement</button>';
-                                                                    }
-
-                                                                    if($add_job_position_qualification > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item" type="button" id="add-qualification">Add Qualification</button>';
-                                                                    }
-                                                                }
-
-                                                                $dropdown_action .= '</div>
-                                                                </div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">Job Position Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_job_position > 0 || ($update_job_position > 0 && !empty($job_position_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                                if(!empty($job_position_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_job_position > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="job-position-form.php">Add Job Position</a></li>';
+                                                                    }
+    
+                                                                    if($delete_job_position > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="delete-job-position">Delete Job Position</button></li>';
+                                                                    }
+    
+                                                                    if(($start_job_position_recruitment > 0 && $job_position_recruitment_status == 2) || ($stop_job_position_recruitment > 0 && $job_position_recruitment_status == 1)){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+    
+                                                                        if($start_job_position_recruitment > 0 && $job_position_recruitment_status == 2){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="start-job-position-recruitment">Start Recruitment</button></li>';
+                                                                        }
+        
+                                                                        if($stop_job_position_recruitment > 0 && $job_position_recruitment_status == 1){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-job-position-id="'. $job_position_id .'" id="stop-job-position-recruitment">Stop Recruitment</button></li>';
+                                                                        }
+                                                                    }
+    
+                                                                    if(($add_job_position_attachment > 0 || $add_job_position_responsibility > 0 || $add_job_position_requirement > 0 || $add_job_position_qualification > 0) && $update_job_position > 0){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+    
+                                                                        if($add_job_position_attachment > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-attachment">Add Attachment</button></li>';
+                                                                        }
+    
+                                                                        if($add_job_position_responsibility > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-responsibility">Add Responsibility</button></li>';
+                                                                        }
+    
+                                                                        if($add_job_position_requirement > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-requirement">Add Requirement</button></li>';
+                                                                        }
+    
+                                                                        if($add_job_position_qualification > 0){
+                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-qualification">Add Qualification</button></li>';
+                                                                        }
+                                                                    }
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>

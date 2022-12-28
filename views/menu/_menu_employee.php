@@ -3,8 +3,9 @@
 
     $departments_page = $api->check_role_access_rights($username, '31', 'page');
     $job_positions_page = $api->check_role_access_rights($username, '33', 'page');
+    $work_locations_page = $api->check_role_access_rights($username, '35', 'page');
 
-    if($departments_page > 0 || $job_positions_page > 0){
+    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="configurations-menu" role="button">
                         </i><span key="t-configuration">Configurations</span> <div class="arrow-down"></div>
@@ -17,6 +18,10 @@
 
         if($departments_page > 0){
             $menu .= '<a href="departments.php" class="dropdown-item" key="t-departments">Departments</a>';
+        }
+
+        if($work_locations_page > 0){
+            $menu .= '<a href="work-locations.php" class="dropdown-item" key="t-departments">Work Locations</a>';
         }
        
         $menu .= '</div>

@@ -99,44 +99,40 @@
                                         <form id="upload-setting-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="flex-grow-1 align-self-center">
-                                                            <h4 class="card-title">Upload Setting Form</h4>
-                                                        </div>
-                                                        <div class="flex-grow-1 align-self-center">
-                                                        <?php
-                                                            if(!empty($upload_setting_id)){
-                                                                $dropdown_action = '<div class="btn-group">
-                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
-                                                                        <div class="dropdown-menu dropdown-menu-end">';
-
-                                                                if($add_upload_setting > 0){
-                                                                    $dropdown_action .= '<a class="dropdown-item" href="upload-setting-form.php">Add Upload Setting</a>';
-                                                                }
-
-                                                                if($delete_upload_setting > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" data-upload-setting-id="'. $upload_setting_id .'" id="delete-upload-setting">Delete Upload Setting</button>';
-                                                                }
-
-                                                                if($add_upload_setting_file_type > 0 && $update_upload_setting > 0){
-                                                                    $dropdown_action .= '<div class="dropdown-divider"></div>';
-                                                                    $dropdown_action .= '<button class="dropdown-item" type="button" id="add-upload-setting-file-type">Add File Type</button>';
-                                                                }
-
-                                                                $dropdown_action .= '</div>
-                                                                </div>';
-
-                                                                echo $dropdown_action;
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="d-flex gap-2 flex-wrap">
+                                                    <div class="d-flex align-items-center">
+                                                        <h4 class="card-title flex-grow-1">Upload Setting Form</h4>
+                                                        <div class="flex-shrink-0">
                                                             <?php
                                                                 if(($add_upload_setting > 0 || ($update_upload_setting > 0 && !empty($upload_setting_id)))){
                                                                     echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
                                                                 }
                                                             ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger w-sm">Discard</button>
+                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                            <?php
+                                                                if(!empty($upload_setting_id)){
+                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
+                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+
+                                                                    if($add_upload_setting > 0){
+                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="upload-setting-form.php">Add Upload Setting</a></li>';
+                                                                    }
+    
+                                                                    if($delete_upload_setting > 0){
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-upload-setting-id="'. $upload_setting_id .'" id="delete-upload-setting">Delete Upload Setting</button></li>';
+                                                                    }
+    
+                                                                    if($add_upload_setting_file_type > 0 && $update_upload_setting > 0){
+                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
+                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-upload-setting-file-type">Add File Type</button></li>';
+                                                                    }
+
+                                                                    $dropdown_action .= ' </ul>
+                                                                    </div>';
+
+                                                                    echo $dropdown_action;
+                                                                }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 </div>
