@@ -2088,6 +2088,67 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit work location
+    else if($transaction == 'submit work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && isset($_POST['work_location']) && !empty($_POST['work_location']) && isset($_POST['work_location_address']) && !empty($_POST['work_location_address']) && isset($_POST['email']) && isset($_POST['telephone']) && isset($_POST['mobile']) && isset($_POST['location_number'])){
+                    $work_location_id = $_POST['work_location_id'];
+                    $work_location = $_POST['work_location'];
+                    $work_location_address = $_POST['work_location_address'];
+                    $email = $_POST['email'];
+                    $telephone = $_POST['telephone'];
+                    $mobile = $_POST['mobile'];
+                    $location_number = $_POST['location_number'] ?? 1;
+        
+                    $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+         
+                    if($check_work_location_exist > 0){
+                        $update_work_location = $api->update_work_location($work_location_id, $work_location, $work_location_address, $email, $telephone, $mobile, $location_number, $username);
+        
+                        if($update_work_location){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_work_location
+                            );
+                        }
+                    }
+                    else{
+                        $insert_work_location = $api->insert_work_location($work_location, $work_location_address, $email, $telephone, $mobile, $location_number, $username);
+            
+                        if($insert_work_location[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'WORK_LOCATION_ID' => $insert_work_location[0]['WORK_LOCATION_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_work_location[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -3742,6 +3803,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete department
+    else if($transaction == 'delete department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_id = $_POST['department_id'];
+        
+                    $check_department_exist = $api->check_department_exist($department_id);
+        
+                    if($check_department_exist > 0){
+                        $delete_department = $api->delete_department($department_id, $username);
+                                            
+                        if($delete_department){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_department;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple department
+    else if($transaction == 'delete multiple department'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
+                    $department_ids = $_POST['department_id'];
+        
+                    foreach($department_ids as $department_id){
+                        $check_department_exist = $api->check_department_exist($department_id);
+        
+                        if($check_department_exist > 0){
+                            $delete_department = $api->delete_department($department_id, $username);
+                                            
+                            if(!$delete_department){
+                                $error = $delete_department;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # Delete job position
     else if($transaction == 'delete job position'){
         if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -4014,6 +4151,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete work location
+    else if($transaction == 'delete work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_id = $_POST['work_location_id'];
+        
+                    $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                    if($check_work_location_exist > 0){
+                        $delete_work_location = $api->delete_work_location($work_location_id, $username);
+                                            
+                        if($delete_work_location){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_work_location;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple work location
+    else if($transaction == 'delete multiple work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_ids = $_POST['work_location_id'];
+        
+                    foreach($work_location_ids as $work_location_id){
+                        $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                        if($check_work_location_exist > 0){
+                            $delete_work_location = $api->delete_work_location($work_location_id, $username);
+                                            
+                            if(!$delete_work_location){
+                                $error = $delete_work_location;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -4081,82 +4294,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         
                     if(empty($error)){
                         echo 'Unlocked';
-                    }
-                    else{
-                        echo $error;
-                    }
-                }
-            }
-            else{
-                echo 'Inactive User';
-        	}
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Delete department
-    else if($transaction == 'delete department'){
-        if(isset($_POST['username']) && !empty($_POST['username'])){
-            $username = $_POST['username'];
-            $check_user_account_status = $api->check_user_account_status($username);
-
-            if($check_user_account_status){
-                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                    $department_id = $_POST['department_id'];
-        
-                    $check_department_exist = $api->check_department_exist($department_id);
-        
-                    if($check_department_exist > 0){
-                        $delete_department = $api->delete_department($department_id, $username);
-                                            
-                        if($delete_department){
-                            echo 'Deleted';
-                        }
-                        else{
-                            echo $delete_department;
-                        }
-                    }
-                    else{
-                        echo 'Not Found';
-                    }
-                }
-            }
-            else{
-                echo 'Inactive User';
-        	}
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Delete multiple department
-    else if($transaction == 'delete multiple department'){
-        if(isset($_POST['username']) && !empty($_POST['username'])){
-            $username = $_POST['username'];
-            $check_user_account_status = $api->check_user_account_status($username);
-
-            if($check_user_account_status){
-                if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                    $department_ids = $_POST['department_id'];
-        
-                    foreach($department_ids as $department_id){
-                        $check_department_exist = $api->check_department_exist($department_id);
-        
-                        if($check_department_exist > 0){
-                            $delete_department = $api->delete_department($department_id, $username);
-                                            
-                            if(!$delete_department){
-                                $error = $delete_department;
-                                break;
-                            }
-                        }
-                        else{
-                            $error = 'Not Found';
-                            break;
-                        }
-                    }
-        
-                    if(empty($error)){
-                        echo 'Deleted';
                     }
                     else{
                         echo $error;
@@ -4715,6 +4852,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Archive work location
+    else if($transaction == 'archive work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_id = $_POST['work_location_id'];
+        
+                    $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                    if($check_work_location_exist > 0){
+                        $update_work_location_status = $api->update_work_location_status($work_location_id, '2', $username);
+            
+                        if($update_work_location_status){
+                            echo 'Archived';
+                        }
+                        else{
+                            echo $update_work_location_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Archive multiple work location
+    else if($transaction == 'archive multiple work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_ids = $_POST['work_location_id'];
+        
+                    foreach($work_location_ids as $work_location_id){
+                        $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                        if($check_work_location_exist > 0){
+                            $update_work_location_status = $api->update_work_location_status($work_location_id, '2', $username);
+                                            
+                            if(!$update_work_location_status){
+                                $error = $update_work_location_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Archived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unarchive transactions
     # -------------------------------------------------------------
@@ -4771,6 +4984,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                             
                             if(!$update_department_status){
                                 $error = $update_department_status;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Unarchived';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Unarchive work location
+    else if($transaction == 'unarchive work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_id = $_POST['work_location_id'];
+        
+                    $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                    if($check_work_location_exist > 0){
+                        $update_work_location_status = $api->update_work_location_status($work_location_id, '1', $username);
+            
+                        if($update_work_location_status){
+                            echo 'Unarchived';
+                        }
+                        else{
+                            echo $update_work_location_status;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Unarchive multiple work location
+    else if($transaction == 'unarchive multiple work location'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+                    $work_location_ids = $_POST['work_location_id'];
+        
+                    foreach($work_location_ids as $work_location_id){
+                        $check_work_location_exist = $api->check_work_location_exist($work_location_id);
+        
+                        if($check_work_location_exist > 0){
+                            $update_work_location_status = $api->update_work_location_status($work_location_id, '1', $username);
+                                            
+                            if(!$update_work_location_status){
+                                $error = $update_work_location_status;
                                 break;
                             }
                         }
@@ -5340,7 +5629,28 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         }
     }
     # -------------------------------------------------------------
+    
+    # Work location details
+    else if($transaction == 'work location details'){
+        if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
+            $work_location_id = $_POST['work_location_id'];
+            $work_location_details = $api->get_work_location_details($work_location_id);
 
+            $response[] = array(
+                'WORK_LOCATION' => $work_location_details[0]['WORK_LOCATION'],
+                'WORK_LOCATION_ADDRESS' => $work_location_details[0]['WORK_LOCATION_ADDRESS'],
+                'EMAIL' => $work_location_details[0]['EMAIL'],
+                'TELEPHONE' => $work_location_details[0]['TELEPHONE'],
+                'MOBILE' => $work_location_details[0]['MOBILE'],
+                'LOCATION_NUMBER' => $work_location_details[0]['LOCATION_NUMBER'],
+                'STATUS' =>  $api->get_work_location_status($work_location_details[0]['STATUS'])[0]['BADGE'],
+                'TRANSACTION_LOG_ID' => $work_location_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
 }
 
 ?>

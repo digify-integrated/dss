@@ -2655,17 +2655,17 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
                         $user_id_encrypted = $api->encrypt_data($username);
 
-                        if($failed_login >= 5){    
+                        if($failed_login >= 5){
                             $data_lock = '1';
                         }
                         else{
                             $data_lock = '0';
                         }
     
-                        if($user_status == 'Active'){    
+                        if($user_status == 'Active'){
                             $data_active = '1';
                         }
-                        else{    
+                        else{
                             $data_active = '0';
                         }
     
@@ -3128,6 +3128,65 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 '. $update .'
                                 '. $delete .'
                             </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Work locations table
+    else if($type == 'work locations table'){
+        if(isset($_POST['filter_status'])){
+            if ($api->databaseConnection()) {
+                $filter_status = $_POST['filter_status'];
+
+                $query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, STATUS FROM employee_work_location';
+
+                if(!empty($filter_status)){
+                    $query .= ' WHERE STATUS = :filter_status';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $work_location_id = $row['WORK_LOCATION_ID'];
+                        $work_location = $row['WORK_LOCATION'];
+                        $work_location_address = $row['WORK_LOCATION_ADDRESS'];
+                        $status = $row['STATUS'];
+
+                        if($status == '1'){
+                            $data_archive = '1';
+                        }
+                        else{
+                            $data_archive = '0';
+                        }
+    
+                        $work_location_status = $api->get_work_location_status($status)[0]['BADGE'];
+    
+                        $work_location_id_encrypted = $api->encrypt_data($work_location_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $work_location_id .'">',
+                            'WORK_LOCATION_ID' => $work_location_id,
+                            'WORK_LOCATION' => $work_location . '<p class="text-muted mb-0">'. $work_location_address .'</p>',
+                            'STATUS' => $work_location_status,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="work-location-form.php?id='. $work_location_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Work Location">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
                         );
                     }
     

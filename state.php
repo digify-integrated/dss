@@ -103,7 +103,7 @@
                                                                 echo '<a href="state-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
+                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light w-sm" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
                                                     </div>
                                                 </div>
 

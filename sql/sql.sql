@@ -2692,7 +2692,7 @@ BEGIN
 	SET @transaction_log_id = transaction_log_id;
 	SET @record_log = record_log;
 
-	SET @query = 'INSERT INTO employee_work_location (WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@work_location_id, @work_location, @work_location_address, @email, @telephone, @mobile, @location_number, "1", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_work_location (WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@work_location_id, @work_location, @work_location_address, @email, @telephone, @mobile, @location_number, "1", @transaction_log_id, @record_log)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

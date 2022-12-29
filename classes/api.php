@@ -1224,6 +1224,31 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_work_location_exist
+    # Purpose    : Checks if the work location exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_work_location_exist($work_location_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_work_location_exist(:work_location_id)');
+            $sql->bindValue(':work_location_id', $work_location_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -3671,6 +3696,121 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_work_location
+    # Purpose    : Updates work location.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_work_location($work_location_id, $work_location, $work_location_address, $email, $telephone, $mobile, $location_number, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $work_location_details = $this->get_work_location_details($work_location_id);
+            
+            if(!empty($work_location_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $work_location_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_department(:work_location_id, :work_location, :work_location_address, :email, :telephone, :mobile, :location_number, :transaction_log_id, :record_log)');
+            $sql->bindValue(':work_location_id', $work_location_id);
+            $sql->bindValue(':work_location', $work_location);
+            $sql->bindValue(':work_location_address', $work_location_address);
+            $sql->bindValue(':email', $email);
+            $sql->bindValue(':telephone', $telephone);
+            $sql->bindValue(':mobile', $mobile);
+            $sql->bindValue(':location_number', $location_number);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($work_location_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated work location.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated work location.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_work_location_status
+    # Purpose    : Updates work location status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_work_location_status($work_location_id, $status, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $work_location_details = $this->get_work_location_details($work_location_id);
+            $transaction_log_id = $work_location_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Unarchive';
+            }
+            else{
+                $log_status = 'Archive';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_work_location_status(:work_location_id, :status, :transaction_log_id, :record_log)');
+            $sql->bindValue(':work_location_id', $work_location_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated work location status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -5521,6 +5661,86 @@ class Api{
         }
     }
     # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_work_location
+    # Purpose    : Insert work location.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_work_location($work_location, $work_location_address, $email, $telephone, $mobile, $location_number, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(22, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_work_location(:id, :work_location, :work_location_address, :email, :telephone, :mobile, :location_number, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':work_location', $work_location);
+            $sql->bindValue(':work_location_address', $work_location_address);
+            $sql->bindValue(':email', $email);
+            $sql->bindValue(':telephone', $telephone);
+            $sql->bindValue(':mobile', $mobile);
+            $sql->bindValue(':location_number', $location_number);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 22, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted work location.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'WORK_LOCATION_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
     
     # -------------------------------------------------------------
     #   Delete methods
@@ -6733,6 +6953,29 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_work_location
+    # Purpose    : Delete work location.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_work_location($work_location_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_work_location(:work_location_id)');
+            $sql->bindValue(':work_location_id', $work_location_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -7691,6 +7934,45 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_work_location_details
+    # Purpose    : Gets the work location details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_work_location_details($work_location_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_work_location_details(:work_location_id)');
+            $sql->bindValue(':work_location_id', $work_location_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'WORK_LOCATION' => $row['WORK_LOCATION'],
+                        'WORK_LOCATION_ADDRESS' => $row['WORK_LOCATION_ADDRESS'],
+                        'EMAIL' => $row['EMAIL'],
+                        'TELEPHONE' => $row['TELEPHONE'],
+                        'MOBILE' => $row['MOBILE'],
+                        'LOCATION_NUMBER' => $row['LOCATION_NUMBER'],
+                        'STATUS' => $row['STATUS'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -8030,6 +8312,36 @@ class Api{
             default:
                 $status = 'Not Recruiting';
                 $button_class = 'bg-warning';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_work_location_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_work_location_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 1:
+                $status = 'Unarchived';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Archived';
+                $button_class = 'bg-danger';
         }
 
         $response[] = array(

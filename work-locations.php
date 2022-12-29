@@ -90,15 +90,15 @@
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
                                                                 if($delete_work_locations > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-department">Delete Department</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-work-location">Delete Work Location</button>';
                                                                 }
 
                                                                 if($archive_work_locations > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-archive" type="button" id="archive-department">Archive Department</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-archive" type="button" id="archive-work-location">Archive Work Location</button>';
                                                                 }
 
                                                                 if($unarchive_work_locations > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-unarchive" type="button" id="unarchive-department">Unarchive Department</button>';
+                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-unarchive" type="button" id="unarchive-work-location">Unarchive Work Location</button>';
                                                                 }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -110,7 +110,7 @@
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
                                                             if($add_work_locations > 0){
-                                                                echo '<a href="department-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                                echo '<a href="work-location-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
                                                         <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
@@ -152,9 +152,6 @@
                                                             <th class="all">Work Location ID</th>
                                                             <th class="all">Work Location</th>
                                                             <th class="all">Status</th>
-                                                            <th class="all">Manager</th>
-                                                            <th class="all">Employees</th>
-                                                            <th class="all">Parent Department</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>

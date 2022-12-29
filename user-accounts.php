@@ -124,7 +124,7 @@
                                                                 echo '<a href="user-account-form.php" class="btn btn-primary w-sm">Create</a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
+                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light w-sm" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
                                                     </div>
 
                                                     <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
