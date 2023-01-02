@@ -83,12 +83,15 @@
                                                         <?php
                                                             if($delete_action > 0){
                                                                 $dropdown_action = '<div class="btn-group">
-                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
+                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                        <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                    </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_action > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-action">Delete Action</button>';
-                                                                }
+                                                                    if($delete_action > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-action">Delete Action</button>';
+                                                                    }
 
                                                                 $dropdown_action .= '</div></div>';
 
@@ -99,7 +102,10 @@
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
                                                             if($add_action > 0){
-                                                                echo '<a href="action-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                                echo '<a href="action-form.php" class="btn btn-primary">
+                                                                    <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
+                                                                    <span class="d-none d-sm-block">Create</span>
+                                                                </a>';
                                                             }
                                                         ?>
                                                     </div>

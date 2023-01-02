@@ -2,29 +2,22 @@
     'use strict';
 
     $(function() {
-        if($('#interface-setting-id').length){
-            var transaction = 'interface setting details';
-            var interface_setting_id = $('#interface-setting-id').text();
+        if($('#employee-type-id').length){
+            var transaction = 'employee type details';
+            var employee_type_id = $('#employee-type-id').text();
 
             $.ajax({
                 url: 'controller.php',
                 method: 'POST',
                 dataType: 'JSON',
-                data: {interface_setting_id : interface_setting_id, transaction : transaction},
+                data: {employee_type_id : employee_type_id, transaction : transaction},
                 success: function(response) {
-                    $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
+                    $('#employee_type').val(response[0].EMPLOYEE_TYPE);
                     $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#description').val(response[0].DESCRIPTION);
                     
-                    document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
-                    document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
-                    document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
-                    document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
-                    document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
-
-                    $('#interface_setting_id').val(interface_setting_id);
+                    $('#employee_type_id').val(employee_type_id);
                 },
-                complete: function(){                    
+                complete: function(){
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
                     }
@@ -32,22 +25,16 @@
             });
         }
 
-        $('#interface-setting-form').validate({
+        $('#employee-type-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit interface setting';
+                var transaction = 'submit employee type';
                 var username = $('#username').text();
-
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
 
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: formData,
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
                     dataType: 'JSON',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function(){
                         document.getElementById('submit-data').disabled = true;
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -55,19 +42,19 @@
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
                             if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
+                                var redirect_link = window.location.href + '?id=' + response[0]['EMPLOYEE_TYPE_ID'];
 
-                                show_alert_event('Insert Interface Setting Success', 'The interface setting has been inserted.', 'success', 'redirect', redirect_link);
+                                show_alert_event('Insert Employee Type Success', 'The employee type has been inserted.', 'success', 'redirect', redirect_link);
                             }
                             else{
-                                show_alert_event('Update Interface Setting Success', 'The interface setting has been updated.', 'success', 'reload');
+                                show_alert_event('Update Employee Type Success', 'The employee type has been updated.', 'success', 'reload');
                             }
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Employee Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Interface Setting Error', response, 'error');
+                            show_alert('Employee Type Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -78,19 +65,13 @@
                 return false;
             },
             rules: {
-                interface_setting_name: {
+                employee_type: {
                     required: true
-                },
-                description: {
-                    required: true
-                },
+                }
             },
             messages: {
-                interface_setting_name: {
-                    required: 'Please enter the interface setting name',
-                },
-                description: {
-                    required: 'Please enter the description',
+                employee_type: {
+                    required: 'Please enter the employee type',
                 }
             },
             errorPlacement: function(label, element) {
@@ -213,97 +194,13 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     var username = $('#username').text();
 
-    $(document).on('click','#activate-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'activate interface setting';
+    $(document).on('click','#delete-employee-type',function() {
+        var employee_type_id = $(this).data('employee-type-id');
+        var transaction = 'delete employee type';
 
         Swal.fire({
-            title: 'Activate Interface Setting',
-            text: 'Are you sure you want to activate this interface setting?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Activate',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-success mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Activated' || response === 'Not Found'){
-                            if(response === 'Activated'){
-                                show_alert_event('Activate Interface Setting Success', 'The interface setting has been activated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Activate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Activate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Activate Interface Setting Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#deactivate-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'deactivate interface setting';
-
-        Swal.fire({
-            title: 'Deactivate Interface Setting',
-            text: 'Are you sure you want to deactivate this interface setting?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Deactivate',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deactivated' || response === 'Not Found'){
-                            if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Interface Setting Success', 'The interface setting has been deactivated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Deactivate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Deactivate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Deactivate Interface Setting Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#delete-interface-setting',function() {
-        var interface_setting_id = $(this).data('interface-setting-id');
-        var transaction = 'delete interface setting';
-
-        Swal.fire({
-            title: 'Delete Interface Setting',
-            text: 'Are you sure you want to delete this interface setting?',
+            title: 'Delete Employee Type',
+            text: 'Are you sure you want to delete this employee type?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -316,21 +213,21 @@ function initialize_click_events(){
                 $.ajax({
                     type: 'POST',
                     url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    data: {username : username, employee_type_id : employee_type_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Interface Settings Success', 'The interface settings has been deleted.', 'success', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Employee Type Success', 'The employee type has been deleted.', 'success', 'redirect', 'employee-types.php');
                             }
                             else{
-                                show_alert_event('Delete Interface Settings Error', 'The interface settings does not exist.', 'info', 'redirect', 'interface-settings.php');
+                                show_alert_event('Delete Employee Type Error', 'The employee type does not exist.', 'info', 'redirect', 'employee-types.php');
                             }
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Interface Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            show_alert_event('Delete Employee Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
                         else{
-                            show_alert('Delete Interface Settings Error', response, 'error');
+                            show_alert('Delete Employee Type Error', response, 'error');
                         }
                     }
                 });
@@ -340,7 +237,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -353,7 +249,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'interface-settings.php';
+                window.location.href = 'employee-types.php';
                 return false;
             }
         });

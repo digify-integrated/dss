@@ -12,7 +12,7 @@
                 dataType: 'JSON',
                 data: {work_location_id : work_location_id, transaction : transaction},
                 success: function(response) {
-                    $('#work location').val(response[0].WORK_LOCATION);
+                    $('#work_location').val(response[0].WORK_LOCATION);
                     $('#work_location_address').val(response[0].WORK_LOCATION_ADDRESS);
                     $('#email').val(response[0].EMAIL);
                     $('#telephone').val(response[0].TELEPHONE);
@@ -68,7 +68,7 @@
                     },
                     complete: function(){
                         document.getElementById('submit-data').disabled = false;
-                        $('#submit-data').html('Save');
+                        $('#submit-data').html('<span class="d-block d-sm-none"><i class="bx bx-save"></i></span><span class="d-none d-sm-block">Save</span>');
                     }
                 });
                 return false;

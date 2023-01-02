@@ -109,59 +109,71 @@
                                         <form id="user-account-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">User Account Form</h4>
-                                                        <div class="flex-shrink-0">
-                                                            <?php
-                                                                if(($add_user_account > 0 || ($update_user_account > 0 && !empty($user_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">User Account Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($user_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_user_account > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="user-account-form.php">Add User Account</a>';
+                                                                        }
+        
+                                                                        if($delete_user_account > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-user-account">Delete User Account</button>';
+                                                                        }
+        
+                                                                        if(($add_user_account_role > 0 || ($activate_user_account > 0 && $user_status == 'Inactive') || ($deactivate_user_account > 0 && $user_status == 'Active') || ($lock_user_account > 0 && $failed_login < 5) || ($unlock_user_account > 0 && $failed_login >= 5)) && $update_user_account > 0){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+        
+                                                                            if($add_user_account_role > 0){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="add-user-account-role">Add Role</button>';
+                                                                            }                                                              
+        
+                                                                            if($activate_user_account > 0 && $user_status == 'Inactive'){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="activate-user-account">Activate User Account</button>';
+                                                                            }
+        
+                                                                            if($deactivate_user_account > 0 && $user_status == 'Active'){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="deactivate-user-account">Deactivate User Account</button>';
+                                                                            }
+        
+                                                                            if($lock_user_account > 0 && $failed_login < 5){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="lock-user-account">Lock User Account</button>';
+                                                                            }
+        
+                                                                            if($unlock_user_account > 0 && $failed_login >= 5){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="unlock-user-account">Unlock User Account</button>';
+                                                                            }
+                                                                        }
 
-                                                                    if($add_user_account > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="user-account-form.php">Add User Account</a></li>';
-                                                                    }
-    
-                                                                    if($delete_user_account > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="delete-user-account">Delete User Account</button></li>';
-                                                                    }
-    
-                                                                    if(($add_user_account_role > 0 || ($activate_user_account > 0 && $user_status == 'Inactive') || ($deactivate_user_account > 0 && $user_status == 'Active') || ($lock_user_account > 0 && $failed_login < 5) || ($unlock_user_account > 0 && $failed_login >= 5)) && $update_user_account > 0){
-                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
-    
-                                                                        if($add_user_account_role > 0){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="add-user-account-role">Add Role</button></li>';
-                                                                        }                                                              
-    
-                                                                        if($activate_user_account > 0 && $user_status == 'Inactive'){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="activate-user-account">Activate User Account</button></li>';
-                                                                        }
-    
-                                                                        if($deactivate_user_account > 0 && $user_status == 'Active'){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="deactivate-user-account">Deactivate User Account</button></li>';
-                                                                        }
-    
-                                                                        if($lock_user_account > 0 && $failed_login < 5){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="lock-user-account">Lock User Account</button></li>';
-                                                                        }
-    
-                                                                        if($unlock_user_account > 0 && $failed_login >= 5){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-user-id="'. $user_id .'" id="unlock-user-account">Unlock User Account</button></li>';
-                                                                        }
-                                                                    }
-
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                                if(($add_user_account > 0 || ($update_user_account > 0 && !empty($user_id)))){
+                                                                    echo '<button type="submit" for="user-account-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -176,20 +188,20 @@
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
+                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="<?php echo $user_id; ?>" <?php echo $disabled . ' ' . $readonly; ?>>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row mb-4">
                                                         <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
                                                         <div class="col-md-9">
                                                             <div class="input-group auth-pass-inputgroup">
                                                                 <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" <?php echo $disabled; ?>>
                                                                 <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="<?php echo $user_id; ?>" <?php echo $disabled . ' ' . $readonly; ?>>
                                                         </div>
                                                     </div>
                                                 </div>

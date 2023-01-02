@@ -100,40 +100,52 @@
                                         <form id="action-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">Action Form</h4>
-                                                        <div class="flex-shrink-0">
-                                                            <?php
-                                                                if(($add_action > 0 || ($update_action > 0 && !empty($action_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">Action Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($action_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_action > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="action-form.php">Add Action</a>';
+                                                                        }
+    
+                                                                        if($delete_action > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-action-id="'. $action_id .'" id="delete-action">Delete Action</button>';
+                                                                        }
+    
+                                                                        if($add_action_access_right > 0 && $update_action > 0){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button>';
+                                                                        }
 
-                                                                    if($add_action > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="action-form.php">Add Action</a></li>';
-                                                                    }
-
-                                                                    if($delete_action > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-action-id="'. $action_id .'" id="delete-action">Delete Action</button></li>';
-                                                                    }
-
-                                                                    if($add_action_access_right > 0 && $update_action > 0){
-                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-action-access">Add Action Access</button></li>';
-                                                                    }
-
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                                if(($add_action > 0 || ($update_action > 0 && !empty($action_id)))){
+                                                                    echo '<button type="submit" for="action-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -143,8 +155,8 @@
                                                     <div class="row mb-4">
                                                         <input type="hidden" id="action_id" name="action_id">
                                                         <input type="hidden" id="transaction_log_id" name="transaction_log_id">
-                                                        <label for="action_name" class="col-md-3 col-form-label">Action Name <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
+                                                        <label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
+                                                        <div class="col-md-10">
                                                             <input type="text" class="form-control form-maxlength" autocomplete="off" id="action_name" name="action_name" maxlength="200" <?php echo $disabled; ?>>
                                                         </div>
                                                     </div>

@@ -3200,6 +3200,104 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Departure reasons table
+    else if($type == 'departure reasons table'){
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare('SELECT DEPARTURE_REASON_ID, DEPARTURE_REASON FROM employee_departure_reason');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $departure_reason_id = $row['DEPARTURE_REASON_ID'];
+                    $departure_reason = $row['DEPARTURE_REASON'];
+
+                    $departure_reason_id_encrypted = $api->encrypt_data($departure_reason_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $departure_reason_id .'">',
+                        'DEPARTURE_REASON_ID' => $departure_reason_id,
+                        'DEPARTURE_REASON' => $departure_reason,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="departure-reason-form.php?id='. $departure_reason_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Departure Reason">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Employee types table
+    else if($type == 'employee types table'){
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare('SELECT EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE FROM employee_employee_type');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $employee_type_id = $row['EMPLOYEE_TYPE_ID'];
+                    $employee_type = $row['EMPLOYEE_TYPE'];
+
+                    $employee_type_id_encrypted = $api->encrypt_data($employee_type_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $employee_type_id .'">',
+                        'EMPLOYEE_TYPE_ID' => $employee_type_id,
+                        'EMPLOYEE_TYPE' => $employee_type,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="employee-type-form.php?id='. $employee_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee Type">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Wage types table
+    else if($type == 'wage types table'){
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare('SELECT WAGE_TYPE_ID, WAGE_TYPE FROM employee_wage_type');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $wage_type_id = $row['WAGE_TYPE_ID'];
+                    $wage_type = $row['WAGE_TYPE'];
+
+                    $wage_type_id_encrypted = $api->encrypt_data($wage_type_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $wage_type_id .'">',
+                        'WAGE_TYPE_ID' => $wage_type_id,
+                        'WAGE_TYPE' => $wage_type,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="wage-type-form.php?id='. $wage_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Wage Type">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
 
 }
 

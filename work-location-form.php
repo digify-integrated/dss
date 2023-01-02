@@ -102,47 +102,59 @@
                                         <form id="work-location-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">Work Location Form</h4>
-                                                        <div class="flex-shrink-0">
-                                                            <?php
-                                                                if(($add_work_location > 0 || ($update_work_location > 0 && !empty($work_location_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">Work Location Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($work_location_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
-
-                                                                    if($add_work_location > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="work-location-form.php">Add Work Location</a></li>';
-                                                                    }
-    
-                                                                    if($delete_work_location > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="delete-work-location">Delete Work Location</button></li>';
-                                                                    }
-    
-                                                                    if(($archive_work_location > 0 && $work_location_status == 1) || ($unarchive_work_location > 0 && $work_location_status == 2)){
-                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
-    
-                                                                        if($archive_work_location > 0 && $work_location_status == 1){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="archive-work-location">Archive Work Location</button></li>';
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_work_location > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="work-location-form.php">Add Work Location</a>';
                                                                         }
         
-                                                                        if($unarchive_work_location > 0 && $work_location_status == 2){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="unarchive-work-location">Unarchive Work Location</button></li>';
+                                                                        if($delete_work_location > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="delete-work-location">Delete Work Location</button>';
                                                                         }
-                                                                    }
+        
+                                                                        if(($archive_work_location > 0 && $work_location_status == 1) || ($unarchive_work_location > 0 && $work_location_status == 2)){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+        
+                                                                            if($archive_work_location > 0 && $work_location_status == 1){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="archive-work-location">Archive Work Location</button>';
+                                                                            }
+            
+                                                                            if($unarchive_work_location > 0 && $work_location_status == 2){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-work-location-id="'. $work_location_id .'" id="unarchive-work-location">Unarchive Work Location</button>';
+                                                                            }
+                                                                        }
 
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                                if(($add_work_location > 0 || ($update_work_location > 0 && !empty($work_location_id)))){
+                                                                    echo '<button type="submit" for="work-location-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>

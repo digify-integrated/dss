@@ -89,28 +89,31 @@
                                                         <?php
                                                             if($delete_user_account > 0 || $lock_user_account > 0 || $unlock_user_account > 0 || $activate_user_account > 0 || $deactivate_user_account > 0){
                                                                 $dropdown_action = '<div class="btn-group">
-                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
+                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                        <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                    </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-user-account">Delete User Account</button>';
-                                                                }
-
-                                                                if($lock_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-lock" type="button" id="lock-user-account">Lock User Account</button>';
-                                                                }
-
-                                                                if($unlock_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-unlock" type="button" id="unlock-user-account">Unlock User Account</button>';
-                                                                }
-
-                                                                if($activate_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-activate" type="button" id="activate-user-account">Activate User Account</button>';
-                                                                }
-
-                                                                if($deactivate_user_account > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple-deactivate" type="button" id="deactivate-user-account">Deactivate User Account</button>';
-                                                                }
+                                                                    if($delete_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-user-account">Delete User Account</button>';
+                                                                    }
+    
+                                                                    if($lock_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-lock" type="button" id="lock-user-account">Lock User Account</button>';
+                                                                    }
+    
+                                                                    if($unlock_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-unlock" type="button" id="unlock-user-account">Unlock User Account</button>';
+                                                                    }
+    
+                                                                    if($activate_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-activate" type="button" id="activate-user-account">Activate User Account</button>';
+                                                                    }
+    
+                                                                    if($deactivate_user_account > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-deactivate" type="button" id="deactivate-user-account">Deactivate User Account</button>';
+                                                                    }
 
                                                                 $dropdown_action .= '</div></div>';
 
@@ -121,65 +124,68 @@
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
                                                             if($add_user_account > 0){
-                                                                echo '<a href="user-account-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                                echo '<a href="user-account-form.php" class="btn btn-primary">
+                                                                    <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
+                                                                    <span class="d-none d-sm-block">Create</span>
+                                                                </a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light w-sm" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
+                                                       <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt"></i></span></button>
                                                     </div>
+                                                </div>
+                                                
+                                                <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                    <div class="offcanvas-header">
+                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="offcanvas-body">
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">Password Expiry Date</p>
 
-                                                    <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                        <div class="offcanvas-header">
-                                                            <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                            <div class="input-group mb-3" id="filter-start-date-container">
+                                                                <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-start-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="Start Date">
+                                                                <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                                            </div>
+
+                                                            <div class="input-group" id="filter-end-date-container">
+                                                                <input type="text" class="form-control" id="filter_end_date" name="filter_end_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-end-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="End Date">
+                                                                <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                                            </div>
                                                         </div>
-                                                        <div class="offcanvas-body">
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">Password Expiry Date</p>
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">Last Connection Date</p>
 
-                                                                <div class="input-group mb-3" id="filter-start-date-container">
-                                                                    <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-start-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="Start Date">
-                                                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
-                                                                </div>
-
-                                                                <div class="input-group" id="filter-end-date-container">
-                                                                    <input type="text" class="form-control" id="filter_end_date" name="filter_end_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-end-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="End Date">
-                                                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
-                                                                </div>
+                                                            <div class="input-group mb-3" id="filter-last-connection-start-date-container">
+                                                                <input type="text" class="form-control" id="filter_last_connection_start_date" name="filter_last_connection_start_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-last-connection-start-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="Start Date">
+                                                                <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">Last Connection Date</p>
 
-                                                                <div class="input-group mb-3" id="filter-last-connection-start-date-container">
-                                                                    <input type="text" class="form-control" id="filter_last_connection_start_date" name="filter_last_connection_start_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-last-connection-start-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="Start Date">
-                                                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
-                                                                </div>
+                                                            <div class="input-group" id="filter-last-connection-end-date-container">
+                                                                <input type="text" class="form-control" id="filter_last_connection_end_date" name="filter_last_connection_end_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-last-connection-end-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="End Date">
+                                                                <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">User Account Status</p>
 
-                                                                <div class="input-group" id="filter-last-connection-end-date-container">
-                                                                    <input type="text" class="form-control" id="filter_last_connection_end_date" name="filter_last_connection_end_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#filter-last-connection-end-date-container" data-provide="datepicker" data-date-autoclose="true" data-date-orientation="right" placeholder="End Date">
-                                                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">User Account Status</p>
+                                                            <select class="form-control filter-select2" id="filter_user_account_status">
+                                                                <option value="">All</option>
+                                                                <option value="INACTIVE">Inactive</option>
+                                                                <option value="ACTIVE">Active</option>
+                                                             </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">User Account Lock Status</p>
 
-                                                                <select class="form-control filter-select2" id="filter_user_account_status">
-                                                                    <option value="">All</option>
-                                                                    <option value="INACTIVE">Inactive</option>
-                                                                    <option value="ACTIVE">Active</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">User Account Lock Status</p>
-
-                                                                <select class="form-control filter-select2" id="filter_user_account_lock_status">
-                                                                    <option value="">All</option>
-                                                                    <option value="locked">Locked</option>
-                                                                    <option value="Unlocked">Unlocked</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
-                                                            </div>
+                                                            <select class="form-control filter-select2" id="filter_user_account_lock_status">
+                                                                <option value="">All</option>
+                                                                <option value="locked">Locked</option>
+                                                                <option value="Unlocked">Unlocked</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
                                                         </div>
                                                     </div>
                                                 </div>

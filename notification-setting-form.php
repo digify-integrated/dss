@@ -101,51 +101,63 @@
                                         <form id="notification-setting-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">Notification Setting Form</h4>
-                                                        <div class="flex-shrink-0">
-                                                            <?php
-                                                                if(($add_notification_setting > 0 || ($update_notification_setting > 0 && !empty($notification_setting_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">Notification Setting Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($notification_setting_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_notification_setting > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="notification-setting-form.php">Add Notification Setting</a>';
+                                                                        }
+        
+                                                                        if($delete_notification_setting > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-notification-setting-id="'. $notification_setting_id .'" id="delete-notification-setting">Delete Notification Setting</button>';
+                                                                        }
+        
+                                                                        if(($add_notification_role_recipient > 0 || $add_notification_user_account_recipient > 0 || $add_notification_channel > 0) && $update_notification_setting > 0){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+        
+                                                                            if($add_notification_role_recipient > 0){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-role-recipient">Add Role Recipient</button>';
+                                                                            }
+        
+                                                                            if($add_notification_user_account_recipient > 0){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-user-account-recipient">Add User Account Recipient</button>';
+                                                                            }
+        
+                                                                            if($add_notification_channel > 0){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" id="add-notification-channel">Add Notification Channel</button>';
+                                                                            }
+                                                                        }
 
-                                                                    if($add_notification_setting > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="notification-setting-form.php">Add Notification Setting</a></li>';
-                                                                    }
-    
-                                                                    if($delete_notification_setting > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-notification-setting-id="'. $notification_setting_id .'" id="delete-notification-setting">Delete Notification Setting</button></li>';
-                                                                    }
-    
-                                                                    if(($add_notification_role_recipient > 0 || $add_notification_user_account_recipient > 0 || $add_notification_channel > 0) && $update_notification_setting > 0){
-                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
-    
-                                                                        if($add_notification_role_recipient > 0){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-notification-role-recipient">Add Role Recipient</button></li>';
-                                                                        }
-    
-                                                                        if($add_notification_user_account_recipient > 0){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-notification-user-account-recipient">Add User Account Recipient</button></li>';
-                                                                        }
-    
-                                                                        if($add_notification_channel > 0){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" id="add-notification-channel">Add Notification Channel</button></li>';
-                                                                        }
-                                                                    }
-
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                                if(($add_notification_setting > 0 || ($update_notification_setting > 0 && !empty($notification_setting_id)))){
+                                                                    echo '<button type="submit" for="action-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>

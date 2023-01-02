@@ -85,8 +85,8 @@
                                                             if($delete_notification_setting > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
-                                                                    <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                        <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
                                                                     </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
@@ -109,10 +109,7 @@
                                                                 </a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">
-                                                            <span class="d-block d-sm-none"><i class="bx bx-filter-alt"></i></span>
-                                                            <span class="d-none d-sm-block"><i class="bx bx-filter-alt label-icon"></i> Filter</span>  
-                                                        </button>
+                                                        <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt"></i></span></button>
                                                     </div>
                                                 </div>
 

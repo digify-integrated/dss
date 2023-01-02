@@ -84,12 +84,15 @@
                                                         <?php
                                                             if($delete_role > 0){
                                                                 $dropdown_action = '<div class="btn-group">
-                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">Action <i class="mdi mdi-chevron-down"></i></button>
+                                                                    <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                        <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                    </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                if($delete_role > 0){
-                                                                    $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-role">Delete Role</button>';
-                                                                }
+                                                                    if($delete_role > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-role">Delete Role</button>';
+                                                                    }
 
                                                                 $dropdown_action .= '</div></div>';
 
@@ -100,31 +103,33 @@
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
                                                             if($add_role > 0){
-                                                                echo '<a href="role-form.php" class="btn btn-primary w-sm">Create</a>';
+                                                                echo '<a href="role-form.php" class="btn btn-primary">
+                                                                    <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
+                                                                    <span class="d-none d-sm-block">Create</span>
+                                                                </a>';
                                                             }
                                                         ?>
-                                                        <button type="button" class="btn btn-info waves-effect btn-label waves-light w-sm" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt label-icon"></i> Filter</button>
+                                                       <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt"></i></span></button>
                                                     </div>
+                                                </div>
 
-                                                    <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                        <div class="offcanvas-header">
-                                                            <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="offcanvas-body">
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">Assignable</p>
+                                                <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                    <div class="offcanvas-header">
+                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="offcanvas-body">
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">Assignable</p>
 
-                                                                <select class="form-control filter-select2" id="filter_assignable">
-                                                                    <option value="">All</option>
-                                                                    <option value="1">True</option>
-                                                                    <option value="2">False</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
-                                                            </div>
+                                                            <select class="form-control filter-select2" id="filter_assignable">
+                                                                <option value="">All</option>
+                                                                <option value="1">True</option>
+                                                                <option value="2">False</option>
+                                                            </select>
                                                         </div>
+                                                    <div>
+                                                    <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
                                                     </div>
                                                 </div>
                                             </div>

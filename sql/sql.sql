@@ -2177,7 +2177,7 @@ END //
 CREATE PROCEDURE generate_department_options(IN generation_type VARCHAR(10))
 BEGIN
 	IF @generation_type = 'active' THEN
-		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department WHERE STATUS = "2" ORDER BY DEPARTMENT';
+		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department WHERE STATUS = "1" ORDER BY DEPARTMENT';
 	ELSE
 		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department ORDER BY DEPARTMENT';
     END IF;
@@ -2614,13 +2614,28 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE generate_job_position_options(IN generation_type VARCHAR(10))
+BEGIN
+	IF @generation_type = 'active' THEN
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "1" ORDER BY JOB_POSITION';
+	ELSEIF @generation_type = 'inactive' THEN
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "2" ORDER BY JOB_POSITION';
+	ELSE
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location ORDER BY JOB_POSITION';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 CREATE INDEX employee_job_position_index ON employee_job_position(JOB_POSITION_ID);
 CREATE INDEX employee_job_position_attachment_index ON employee_job_position_attachment(ATTACHMENT_ID);
 CREATE INDEX employee_job_position_responsibility_index ON employee_job_position_responsibility(RESPONSIBILITY_ID);
 CREATE INDEX employee_job_position_requirement_index ON employee_job_position_requirement(REQUIREMENT_ID);
 CREATE INDEX employee_job_position_qualification_index ON employee_job_position_qualification(QUALIFICATION_ID);
 
-/* Global Company */
+/* Employee Work Location */
 CREATE TABLE employee_work_location(
 	WORK_LOCATION_ID VARCHAR(50) PRIMARY KEY,
 	WORK_LOCATION VARCHAR(100) NOT NULL,
@@ -2724,10 +2739,250 @@ END //
 CREATE PROCEDURE generate_work_location_options(IN generation_type VARCHAR(10))
 BEGIN
 	IF @generation_type = 'active' THEN
-		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "2" ORDER BY WORK_LOCATION';
+		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "1" ORDER BY WORK_LOCATION';
 	ELSE
 		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location ORDER BY WORK_LOCATION';
     END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+/* Employee Departure Reason */
+CREATE TABLE employee_departure_reason(
+	DEPARTURE_REASON_ID VARCHAR(50) PRIMARY KEY,
+	DEPARTURE_REASON VARCHAR(100) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_departure_reason_index ON employee_departure_reason(DEPARTURE_REASON_ID);
+
+CREATE PROCEDURE check_departure_reason_exist(IN departure_reason_id VARCHAR(50))
+BEGIN
+	SET @departure_reason_id = departure_reason_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_departure_reason(IN departure_reason_id VARCHAR(50), IN departure_reason VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @departure_reason_id = departure_reason_id;
+	SET @departure_reason = departure_reason;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_departure_reason SET DEPARTURE_REASON = @departure_reason, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_departure_reason(IN departure_reason_id VARCHAR(50), IN departure_reason VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @departure_reason_id = departure_reason_id;
+	SET @departure_reason = departure_reason;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_departure_reason (DEPARTURE_REASON_ID, DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@departure_reason_id, @departure_reason, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_departure_reason_details(IN departure_reason_id VARCHAR(50))
+BEGIN
+	SET @departure_reason_id = departure_reason_id;
+
+	SET @query = 'SELECT DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_departure_reason(IN departure_reason_id VARCHAR(50))
+BEGIN
+	SET @departure_reason_id = departure_reason_id;
+
+	SET @query = 'DELETE FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_departure_reason_options()
+BEGIN
+	SET @query = 'SELECT DEPARTURE_REASON_ID, DEPARTURE_REASON FROM employee_departure_reason ORDER BY DEPARTURE_REASON';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+/* Employee Employee Type */
+CREATE TABLE employee_employee_type(
+	EMPLOYEE_TYPE_ID VARCHAR(50) PRIMARY KEY,
+	EMPLOYEE_TYPE VARCHAR(100) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_employee_type_index ON employee_employee_type(EMPLOYEE_TYPE_ID);
+
+CREATE PROCEDURE check_employee_type_exist(IN employee_type_id VARCHAR(50))
+BEGIN
+	SET @employee_type_id = employee_type_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_type(IN employee_type_id VARCHAR(50), IN employee_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @employee_type_id = employee_type_id;
+	SET @employee_type = employee_type;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_employee_type SET EMPLOYEE_TYPE = @employee_type, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_type(IN employee_type_id VARCHAR(50), IN employee_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @employee_type_id = employee_type_id;
+	SET @employee_type = employee_type;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_employee_type (EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@employee_type_id, @employee_type, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_type_details(IN employee_type_id VARCHAR(50))
+BEGIN
+	SET @employee_type_id = employee_type_id;
+
+	SET @query = 'SELECT EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_type(IN employee_type_id VARCHAR(50))
+BEGIN
+	SET @employee_type_id = employee_type_id;
+
+	SET @query = 'DELETE FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_employee_type_options()
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE FROM employee_employee_type ORDER BY EMPLOYEE_TYPE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+/* Employee Wage Type */
+CREATE TABLE employee_wage_type(
+	WAGE_TYPE_ID VARCHAR(50) PRIMARY KEY,
+	WAGE_TYPE VARCHAR(100) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_wage_type_index ON employee_wage_type(WAGE_TYPE_ID);
+
+CREATE PROCEDURE check_wage_type_exist(IN wage_type_id VARCHAR(50))
+BEGIN
+	SET @wage_type_id = wage_type_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_wage_type(IN wage_type_id VARCHAR(50), IN wage_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @wage_type_id = wage_type_id;
+	SET @wage_type = wage_type;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE employee_wage_type SET WAGE_TYPE = @wage_type, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WAGE_TYPE_ID = @wage_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_wage_type(IN wage_type_id VARCHAR(50), IN wage_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @wage_type_id = wage_type_id;
+	SET @wage_type = wage_type;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO employee_wage_type (WAGE_TYPE_ID, WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@wage_type_id, @wage_type, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_wage_type_details(IN wage_type_id VARCHAR(50))
+BEGIN
+	SET @wage_type_id = wage_type_id;
+
+	SET @query = 'SELECT WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_wage_type(IN wage_type_id VARCHAR(50))
+BEGIN
+	SET @wage_type_id = wage_type_id;
+
+	SET @query = 'DELETE FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_wage_type_options()
+BEGIN
+	SET @query = 'SELECT WAGE_TYPE_ID, WAGE_TYPE FROM employee_wage_type ORDER BY WAGE_TYPE';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

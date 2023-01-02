@@ -121,7 +121,7 @@ function initialize_click_events(){
         if(work_location_id.length > 0){
             Swal.fire({
                 title: 'Delete Multiple Work Locations',
-                text: 'Are you sure you want to delete these Work Locations?',
+                text: 'Are you sure you want to delete these work locations?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -138,12 +138,12 @@ function initialize_click_events(){
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Work Locations Success', 'The Work Locations have been deleted.', 'success');
+                                show_alert('Delete Multiple Work Locations Success', 'The work locations have been deleted.', 'success');
     
                                 reload_datatable('#work-locations-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Work Locations Error', 'Your work location is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                show_alert_event('Delete Multiple Work Locations Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                             }
                             else{
                                 show_alert('Delete Multiple Work Locations Error', response, 'error');
@@ -160,7 +160,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Work Locations', 'Please select the Work Locations you want to delete.', 'error');
+            show_alert('Delete Multiple Work Locations', 'Please select the work locations you want to delete.', 'error');
         }
     });
 

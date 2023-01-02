@@ -99,35 +99,47 @@
                                         <form id="state-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">State Form</h4>
-                                                        <div class="flex-shrink-0">
+                                                <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">State Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
-                                                                if(($add_state > 0 || ($update_state > 0 && !empty($state_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
-                                                            <?php
-                                                                if(!empty($state_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
+                                                                 if(!empty($state_id)){
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_state > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="state-form.php">Add State</a>';
+                                                                        }
+        
+                                                                        if($delete_state > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-state-id="'. $state_id .'" id="delete-state">Delete State</button>';
+                                                                        }
 
-                                                                    if($add_state > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="state-form.php">Add State</a></li>';
-                                                                    }
-    
-                                                                    if($delete_state > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-state-id="'. $state_id .'" id="delete-state">Delete State</button></li>';
-                                                                    }
-
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                                if(($add_state > 0 || ($update_state > 0 && !empty($state_id)))){
+                                                                    echo '<button type="submit" for="state-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>

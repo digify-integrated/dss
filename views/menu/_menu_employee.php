@@ -4,8 +4,11 @@
     $departments_page = $api->check_role_access_rights($username, '31', 'page');
     $job_positions_page = $api->check_role_access_rights($username, '33', 'page');
     $work_locations_page = $api->check_role_access_rights($username, '35', 'page');
+    $depature_reasons_page = $api->check_role_access_rights($username, '37', 'page');
+    $employee_types_page = $api->check_role_access_rights($username, '39', 'page');
+    $wage_types_page = $api->check_role_access_rights($username, '41', 'page');
 
-    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0){
+    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0 || $depature_reasons_page > 0 || $employee_types_page > 0 || $wage_types_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="configurations-menu" role="button">
                         </i><span key="t-configuration">Configurations</span> <div class="arrow-down"></div>
@@ -20,8 +23,20 @@
             $menu .= '<a href="departments.php" class="dropdown-item" key="t-departments">Departments</a>';
         }
 
+        if($depature_reasons_page > 0){
+            $menu .= '<a href="departure-reasons.php" class="dropdown-item" key="t-departure-reasons">Departure Reasons</a>';
+        }
+
+        if($employee_types_page > 0){
+            $menu .= '<a href="employee-types.php" class="dropdown-item" key="t-employee-types">Employee Types</a>';
+        }
+
+        if($wage_types_page > 0){
+            $menu .= '<a href="wage-types.php" class="dropdown-item" key="t-wage-types">Wage Types</a>';
+        }
+
         if($work_locations_page > 0){
-            $menu .= '<a href="work-locations.php" class="dropdown-item" key="t-departments">Work Locations</a>';
+            $menu .= '<a href="work-locations.php" class="dropdown-item" key="t-work-locations">Work Locations</a>';
         }
        
         $menu .= '</div>

@@ -1249,6 +1249,81 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_departure_reason_exist
+    # Purpose    : Checks if the departure reason exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_departure_reason_exist($departure_reason_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_departure_reason_exist(:departure_reason_id)');
+            $sql->bindValue(':departure_reason_id', $departure_reason_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_employee_type_exist
+    # Purpose    : Checks if the employee type exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_employee_type_exist($employee_type_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_employee_type_exist(:employee_type_id)');
+            $sql->bindValue(':employee_type_id', $employee_type_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_wage_type_exist
+    # Purpose    : Checks if the wage type exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_wage_type_exist($wage_type_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_wage_type_exist(:wage_type_id)');
+            $sql->bindValue(':wage_type_id', $wage_type_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1772,7 +1847,7 @@ class Api{
     public function update_system_code($system_code_id, $system_type, $system_code, $system_description, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
-            $system_code_details = $this->get_system_code_details($parameter_id, null, null);
+            $system_code_details = $this->get_system_code_details($system_code_id, null, null);
             
             if(!empty($system_code_details[0]['TRANSACTION_LOG_ID'])){
                 $transaction_log_id = $system_code_details[0]['TRANSACTION_LOG_ID'];
@@ -3718,7 +3793,7 @@ class Api{
                 $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
             }
 
-            $sql = $this->db_connection->prepare('CALL update_department(:work_location_id, :work_location, :work_location_address, :email, :telephone, :mobile, :location_number, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL update_work_location(:work_location_id, :work_location, :work_location_address, :email, :telephone, :mobile, :location_number, :transaction_log_id, :record_log)');
             $sql->bindValue(':work_location_id', $work_location_id);
             $sql->bindValue(':work_location', $work_location);
             $sql->bindValue(':work_location_address', $work_location_address);
@@ -3801,6 +3876,204 @@ class Api{
                 }
                 else{
                     return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_departure_reason
+    # Purpose    : Updates departure reason.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_departure_reason($departure_reason_id, $departure_reason, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $departure_reason_details = $this->get_departure_reason_details($departure_reason_id);
+            
+            if(!empty($departure_reason_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $departure_reason_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_departure_reason(:departure_reason_id, :departure_reason, :transaction_log_id, :record_log)');
+            $sql->bindValue(':departure_reason_id', $departure_reason_id);
+            $sql->bindValue(':departure_reason', $departure_reason);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($departure_reason_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated departure reason.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated departure reason.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_employee_type
+    # Purpose    : Updates employee type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee_type($employee_type_id, $employee_type, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $employee_type_details = $this->get_employee_type_details($employee_type_id);
+            
+            if(!empty($employee_type_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $employee_type_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_employee_type(:employee_type_id, :employee_type, :transaction_log_id, :record_log)');
+            $sql->bindValue(':employee_type_id', $employee_type_id);
+            $sql->bindValue(':employee_type', $employee_type);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($employee_type_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee type.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee type.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_wage_type
+    # Purpose    : Updates wage type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_wage_type($wage_type_id, $wage_type, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $wage_type_details = $this->get_wage_type_details($wage_type_id);
+            
+            if(!empty($wage_type_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $wage_type_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_wage_type(:wage_type_id, :wage_type, :transaction_log_id, :record_log)');
+            $sql->bindValue(':wage_type_id', $wage_type_id);
+            $sql->bindValue(':wage_type', $wage_type);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($wage_type_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated wage type.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated wage type.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
                 }
             }
             else{
@@ -5741,6 +6014,156 @@ class Api{
         }
     }
     # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_employee_type
+    # Purpose    : Insert employee type.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_employee_type($employee_type, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(24, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_employee_type(:id, :employee_type, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':employee_type', $employee_type);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 24, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted employee type.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'EMPLOYEE_TYPE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_wage_type
+    # Purpose    : Insert wage type.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_wage_type($wage_type, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(25, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_wage_type(:id, :wage_type, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':wage_type', $wage_type);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 25, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted wage type.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'WAGE_TYPE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
     
     # -------------------------------------------------------------
     #   Delete methods
@@ -6976,6 +7399,75 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_departure_reason
+    # Purpose    : Delete departure reason.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_departure_reason($departure_reason_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_departure_reason(:departure_reason_id)');
+            $sql->bindValue(':departure_reason_id', $departure_reason_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_employee_type
+    # Purpose    : Delete employee type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_employee_type($employee_type_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_employee_type(:employee_type_id)');
+            $sql->bindValue(':employee_type_id', $employee_type_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_wage_type
+    # Purpose    : Delete wage type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_wage_type($wage_type_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_wage_type(:wage_type_id)');
+            $sql->bindValue(':wage_type_id', $wage_type_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -7973,6 +8465,105 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_departure_reason_details
+    # Purpose    : Gets the departure reason details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_departure_reason_details($departure_reason_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_departure_reason_details(:departure_reason_id)');
+            $sql->bindValue(':departure_reason_id', $departure_reason_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'DEPARTURE_REASON' => $row['DEPARTURE_REASON'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_employee_type_details
+    # Purpose    : Gets the employee type details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_employee_type_details($employee_type_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_employee_type_details(:employee_type_id)');
+            $sql->bindValue(':employee_type_id', $employee_type_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'EMPLOYEE_TYPE' => $row['EMPLOYEE_TYPE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_wage_type_details
+    # Purpose    : Gets the wage type details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_wage_type_details($wage_type_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_wage_type_details(:wage_type_id)');
+            $sql->bindValue(':wage_type_id', $wage_type_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'WAGE_TYPE' => $row['WAGE_TYPE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
     
@@ -8791,6 +9382,183 @@ class Api{
                         $department = $row['DEPARTMENT'];
     
                         $option .= "<option value='". $department_id ."'>". $department ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_job_position_options
+    # Purpose    : Generates job position options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_job_position_options($generation_type){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_job_position_options(:generation_type)');
+            $sql->bindValue(':generation_type', $generation_type);
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $job_position_id = $row['JOB_POSITION_ID'];
+                        $job_position = $row['JOB_POSITION'];
+    
+                        $option .= "<option value='". $job_position_id ."'>". $job_position ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_work_location_options
+    # Purpose    : Generates work location options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_work_location_options($generation_type){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_work_location_options(:generation_type)');
+            $sql->bindValue(':generation_type', $generation_type);
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $work_location_id = $row['WORK_LOCATION_ID'];
+                        $work_location = $row['WORK_LOCATION'];
+    
+                        $option .= "<option value='". $work_location_id ."'>". $work_location ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_departure_reason_options
+    # Purpose    : Generates departure reason options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_departure_reason_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_departure_reason_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $departure_reason_id = $row['DEPARTURE_REASON_ID'];
+                        $departure_reason = $row['DEPARTURE_REASON'];
+    
+                        $option .= "<option value='". $departure_reason_id ."'>". $departure_reason ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_employee_type_options
+    # Purpose    : Generates employee type options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_employee_type_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_employee_type_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $employee_type_id = $row['EMPLOYEE_TYPE_ID'];
+                        $employee_type = $row['EMPLOYEE_TYPE'];
+    
+                        $option .= "<option value='". $employee_type_id ."'>". $employee_type ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_wage_type_options
+    # Purpose    : Generates wage type options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_wage_type_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_wage_type_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $wage_type_id = $row['WAGE_TYPE_ID'];
+                        $wage_type = $row['WAGE_TYPE'];
+    
+                        $option .= "<option value='". $wage_type_id ."'>". $wage_type ."</option>";
                     }
     
                     return $option;

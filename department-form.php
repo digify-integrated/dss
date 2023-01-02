@@ -103,54 +103,66 @@
                                         <form id="department-form" method="post" action="#">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="d-flex align-items-center">
-                                                        <h4 class="card-title flex-grow-1">Department Form</h4>
-                                                        <div class="flex-shrink-0">
-                                                            <?php
-                                                                if(($add_department > 0 || ($update_department > 0 && !empty($department_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary w-sm">Save</button>';
-                                                                }
-                                                            ?>
-                                                            <button type="button" id="discard" class="btn btn-outline-danger"><i class="bx bx-trash font-size-16 align-middle"></i></button>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1 align-self-center">
+                                                            <h4 class="card-title">Department Form</h4>
+                                                        </div>
+                                                        <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($department_id)){
-                                                                    $dropdown_action = '<div class="dropdown d-inline-block">
-                                                                    <button type="menu" class="btn btn-success" id="action_menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                                    <ul class="dropdown-menu" aria-labelledby="action_menu">';
-
-                                                                    if($add_department > 0){
-                                                                        $dropdown_action .= '<li><a class="dropdown-item" href="department-form.php">Add Department</a></li>';
-                                                                    }
-    
-                                                                    if($delete_department > 0){
-                                                                        $dropdown_action .= '<li><button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="delete-department">Delete Department</button></li>';
-                                                                    }
-    
-                                                                    if(($archive_department > 0 && $department_status == 1) || ($unarchive_department > 0 && $department_status == 2)){
-                                                                        $dropdown_action .= '<li><div class="dropdown-divider"></div></li>';
-    
-                                                                        if($archive_department > 0 && $department_status == 1){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="archive-department">Archive Department</button></li>';
+                                                                    $dropdown_action = '<div class="btn-group">
+                                                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
+                                                                            <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-end">';
+                                                                        
+                                                                        if($add_department > 0){
+                                                                            $dropdown_action .= '<a class="dropdown-item" href="department-form.php">Add Department</a>';
                                                                         }
         
-                                                                        if($unarchive_department > 0 && $department_status == 2){
-                                                                            $dropdown_action .= '<li><button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="unarchive-department">Unarchive Department</button></li>';
+                                                                        if($delete_department > 0){
+                                                                            $dropdown_action .= '<button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="delete-department">Delete Department</button>';
                                                                         }
-                                                                    }
+        
+                                                                        if(($archive_department > 0 && $department_status == 1) || ($unarchive_department > 0 && $department_status == 2)){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+        
+                                                                            if($archive_department > 0 && $department_status == 1){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="archive-department">Archive Department</button>';
+                                                                            }
+            
+                                                                            if($unarchive_department > 0 && $department_status == 2){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-department-id="'. $department_id .'" id="unarchive-department">Unarchive Department</button>';
+                                                                            }
+                                                                        }
 
-                                                                    $dropdown_action .= ' </ul>
-                                                                    </div>';
+                                                                    $dropdown_action .= '</div></div>';
 
                                                                     echo $dropdown_action;
                                                                 }
                                                             ?>
+                                                        </div>
+                                                        <div class="d-flex gap-2 flex-wrap">
+                                                            <?php
+                                                               if(($add_department > 0 || ($update_department > 0 && !empty($department_id)))){
+                                                                    echo '<button type="submit" for="department-form" id="submit-data" class="btn btn-primary">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>';
+                                                                }
+                                                            ?>
+                                                             <button type="button" id="discard" class="btn btn-outline-danger">
+                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                <span class="d-none d-sm-block">Discard</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <?php
                                                 if(!empty($department_id)){
-                                                    echo '<div class="row">
+                                                    echo '<div class="row mt-2">
                                                             <div class="col-md-12" id="department_status"></div>
                                                         </div>';
                                                 }

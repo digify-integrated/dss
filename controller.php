@@ -2149,6 +2149,175 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit departure reason
+    else if($transaction == 'submit departure reason'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['departure_reason_id']) && isset($_POST['departure_reason']) && !empty($_POST['departure_reason'])){
+                    $departure_reason_id = $_POST['departure_reason_id'];
+                    $departure_reason = $_POST['departure_reason'];
+        
+                    $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
+         
+                    if($check_departure_reason_exist > 0){
+                        $update_departure_reason = $api->update_departure_reason($departure_reason_id, $departure_reason, $username);
+        
+                        if($update_departure_reason){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_departure_reason
+                            );
+                        }
+                    }
+                    else{
+                        $insert_departure_reason = $api->insert_departure_reason($departure_reason, $username);
+            
+                        if($insert_departure_reason[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'DEPARTURE_REASON_ID' => $insert_departure_reason[0]['DEPARTURE_REASON_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_departure_reason[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit employee type
+    else if($transaction == 'submit employee type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['employee_type_id']) && isset($_POST['employee_type']) && !empty($_POST['employee_type'])){
+                    $employee_type_id = $_POST['employee_type_id'];
+                    $employee_type = $_POST['employee_type'];
+        
+                    $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
+         
+                    if($check_employee_type_exist > 0){
+                        $update_employee_type = $api->update_employee_type($employee_type_id, $employee_type, $username);
+        
+                        if($update_employee_type){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_employee_type
+                            );
+                        }
+                    }
+                    else{
+                        $insert_employee_type = $api->insert_employee_type($employee_type, $username);
+            
+                        if($insert_employee_type[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'EMPLOYEE_TYPE_ID' => $insert_employee_type[0]['EMPLOYEE_TYPE_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_employee_type[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit wage type
+    else if($transaction == 'submit wage type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $response = array();
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['wage_type_id']) && isset($_POST['wage_type']) && !empty($_POST['wage_type'])){
+                    $wage_type_id = $_POST['wage_type_id'];
+                    $wage_type = $_POST['wage_type'];
+        
+                    $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
+         
+                    if($check_wage_type_exist > 0){
+                        $update_wage_type = $api->update_wage_type($wage_type_id, $wage_type, $username);
+        
+                        if($update_wage_type){
+                            $response[] = array(
+                                'RESPONSE' => 'Updated'
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $update_wage_type
+                            );
+                        }
+                    }
+                    else{
+                        $insert_wage_type = $api->insert_wage_type($wage_type, $username);
+            
+                        if($insert_wage_type[0]['RESPONSE']){
+                            $response[] = array(
+                                'RESPONSE' => 'Inserted',
+                                'WAGE_TYPE_ID' => $insert_wage_type[0]['WAGE_TYPE_ID']
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_wage_type[0]['RESPONSE']
+                            );
+                        }
+                    }
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => 'Inactive User'
+                );
+            }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -4227,6 +4396,234 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete departure reason
+    else if($transaction == 'delete departure reason'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
+                    $departure_reason_id = $_POST['departure_reason_id'];
+        
+                    $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
+        
+                    if($check_departure_reason_exist > 0){
+                        $delete_departure_reason = $api->delete_departure_reason($departure_reason_id, $username);
+                                            
+                        if($delete_departure_reason){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_departure_reason;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple departure reason
+    else if($transaction == 'delete multiple departure reason'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
+                    $departure_reason_ids = $_POST['departure_reason_id'];
+        
+                    foreach($departure_reason_ids as $departure_reason_id){
+                        $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
+        
+                        if($check_departure_reason_exist > 0){
+                            $delete_departure_reason = $api->delete_departure_reason($departure_reason_id, $username);
+                                            
+                            if(!$delete_departure_reason){
+                                $error = $delete_departure_reason;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete employee type
+    else if($transaction == 'delete employee type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
+                    $employee_type_id = $_POST['employee_type_id'];
+        
+                    $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
+        
+                    if($check_employee_type_exist > 0){
+                        $delete_employee_type = $api->delete_employee_type($employee_type_id, $username);
+                                            
+                        if($delete_employee_type){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_employee_type;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple employee type
+    else if($transaction == 'delete multiple employee type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
+                    $employee_type_ids = $_POST['employee_type_id'];
+        
+                    foreach($employee_type_ids as $employee_type_id){
+                        $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
+        
+                        if($check_employee_type_exist > 0){
+                            $delete_employee_type = $api->delete_employee_type($employee_type_id, $username);
+                                            
+                            if(!$delete_employee_type){
+                                $error = $delete_employee_type;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete wage type
+    else if($transaction == 'delete wage type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
+                    $wage_type_id = $_POST['wage_type_id'];
+        
+                    $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
+        
+                    if($check_wage_type_exist > 0){
+                        $delete_wage_type = $api->delete_wage_type($wage_type_id, $username);
+                                            
+                        if($delete_wage_type){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $delete_wage_type;
+                        }
+                    }
+                    else{
+                        echo 'Not Found';
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple wage type
+    else if($transaction == 'delete multiple wage type'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $check_user_account_status = $api->check_user_account_status($username);
+
+            if($check_user_account_status){
+                if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
+                    $wage_type_ids = $_POST['wage_type_id'];
+        
+                    foreach($wage_type_ids as $wage_type_id){
+                        $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
+        
+                        if($check_wage_type_exist > 0){
+                            $delete_wage_type = $api->delete_wage_type($wage_type_id, $username);
+                                            
+                            if(!$delete_wage_type){
+                                $error = $delete_wage_type;
+                                break;
+                            }
+                        }
+                        else{
+                            $error = 'Not Found';
+                            break;
+                        }
+                    }
+        
+                    if(empty($error)){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+            }
+            else{
+                echo 'Inactive User';
+        	}
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -5645,6 +6042,54 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'LOCATION_NUMBER' => $work_location_details[0]['LOCATION_NUMBER'],
                 'STATUS' =>  $api->get_work_location_status($work_location_details[0]['STATUS'])[0]['BADGE'],
                 'TRANSACTION_LOG_ID' => $work_location_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Departure reason details
+    else if($transaction == 'departure reason details'){
+        if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
+            $departure_reason_id = $_POST['departure_reason_id'];
+            $departure_reason_details = $api->get_departure_reason_details($departure_reason_id);
+
+            $response[] = array(
+                'DEPARTURE_REASON' => $departure_reason_details[0]['DEPARTURE_REASON'],
+                'TRANSACTION_LOG_ID' => $departure_reason_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Employee type details
+    else if($transaction == 'employee type details'){
+        if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
+            $employee_type_id = $_POST['employee_type_id'];
+            $employee_type_details = $api->get_employee_type_details($employee_type_id);
+
+            $response[] = array(
+                'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
+                'TRANSACTION_LOG_ID' => $employee_type_details[0]['TRANSACTION_LOG_ID']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Wage type details
+    else if($transaction == 'wage type details'){
+        if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
+            $wage_type_id = $_POST['wage_type_id'];
+            $wage_type_details = $api->get_wage_type_details($wage_type_id);
+
+            $response[] = array(
+                'WAGE_TYPE' => $wage_type_details[0]['WAGE_TYPE'],
+                'TRANSACTION_LOG_ID' => $wage_type_details[0]['TRANSACTION_LOG_ID']
             );
 
             echo json_encode($response);

@@ -65,7 +65,7 @@
                     },
                     complete: function(){
                         document.getElementById('submit-data').disabled = false;
-                        $('#submit-data').html('Save');
+                        $('#submit-data').html('<span class="d-block d-sm-none"><i class="bx bx-save"></i></span><span class="d-none d-sm-block">Save</span>');
                     }
                 });
                 return false;
