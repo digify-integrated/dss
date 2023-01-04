@@ -3299,6 +3299,58 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Working schedules table
+    else if($type == 'working schedules table'){
+        if(isset($_POST['filter_schedule_type'])){
+            if ($api->databaseConnection()) {
+                $filter_schedule_type = $_POST['filter_schedule_type'];
+
+                $query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE, SCHEDULE_TYPE FROM employee_working_schedule';
+
+                if(!empty($filter_schedule_type)){
+                    $query .= ' WHERE STATUS = :filter_schedule_type';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)){
+                    $sql->bindValue(':filter_schedule_type', $filter_schedule_type);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
+                        $working_schedule = $row['WORKING_SCHEDULE'];
+                        $schedule_type = $row['SCHEDULE_TYPE'];
+
+                        $system_code_details = $api->get_system_code_details(null, 'SCHEDULETYPE', $schedule_type);
+                        $schedule_type_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                        $working_schedule_id_encrypted = $api->encrypt_data($working_schedule_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_id .'">',
+                            'DEPARTMENT_ID' => $working_schedule_id,
+                            'WORKING_SCHEDULE' => $working_schedule,
+                            'SCHEDULE_TYPE' => $schedule_type_name,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="working-schedule-form.php?id='. $working_schedule_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>

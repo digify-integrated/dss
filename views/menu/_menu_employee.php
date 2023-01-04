@@ -7,8 +7,13 @@
     $depature_reasons_page = $api->check_role_access_rights($username, '37', 'page');
     $employee_types_page = $api->check_role_access_rights($username, '39', 'page');
     $wage_types_page = $api->check_role_access_rights($username, '41', 'page');
+    $working_schedules_page = $api->check_role_access_rights($username, '43', 'page');
 
-    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0 || $depature_reasons_page > 0 || $employee_types_page > 0 || $wage_types_page > 0){
+    if($working_schedules_page > 0){
+        $menu .= '<li class="nav-item dropdown"><a href="working-schedules.php" class="nav-link">Working Schedules</a></li>';
+    }
+
+    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0 || $depature_reasons_page > 0 || $employee_types_page > 0 || $wage_types_page > 0 || $working_schedules_page > 0){
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="configurations-menu" role="button">
                         </i><span key="t-configuration">Configurations</span> <div class="arrow-down"></div>
