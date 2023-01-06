@@ -17,6 +17,9 @@ CREATE TABLE technical_module_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
+ALTER TABLE technical_module_access_rights
+ADD FOREIGN KEY (MODULE_ID) REFERENCES technical_module(MODULE_ID);
+
 CREATE INDEX technical_module_index ON technical_module(MODULE_ID);
 
 INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY, TRANSACTION_LOG_ID, ORDER_SEQUENCE) VALUES ('1', 'Technical', '1.0.0', 'Administrator Module', 'TECHNICAL', 'TL-3', '99');
@@ -26,153 +29,111 @@ INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES ('1', '1'
 
 CREATE PROCEDURE get_module_details(IN module_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-
-	SET @query = 'SELECT MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID = @module_id';
+	SET @query = 'SELECT MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id;
+	DEALLOCATE PREPARE stmt;
 END //
+
 
 CREATE PROCEDURE get_all_accessible_module_details(IN username VARCHAR(50))
 BEGIN
-	SET @username = username;
-
-	SET @query = 'SELECT MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID IN (SELECT MODULE_ID FROM technical_module_access_rights WHERE ROLE_ID IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = @username)) ORDER BY ORDER_SEQUENCE';
+	SET @query = 'SELECT MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_ICON, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE FROM technical_module WHERE MODULE_ID IN (SELECT MODULE_ID FROM technical_module_access_rights WHERE ROLE_ID IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = ?)) ORDER BY ORDER_SEQUENCE';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_module_exist(IN module_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module WHERE MODULE_ID = @module_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN default_page VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100), IN order_sequence INT)
 BEGIN
-	SET @module_id = module_id;
-	SET @module_name = module_name;
-	SET @module_version = module_version;
-	SET @module_description = module_description;
-	SET @module_category = module_category;
-	SET @default_page = default_page;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-	SET @order_sequence = order_sequence;
-
-	SET @query = 'UPDATE technical_module SET MODULE_NAME = @module_name, MODULE_VERSION = @module_version, MODULE_DESCRIPTION = @module_description, MODULE_CATEGORY = @module_category, DEFAULT_PAGE = @default_page, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log, ORDER_SEQUENCE = @order_sequence WHERE MODULE_ID = @module_id';
+	SET @query = 'UPDATE technical_module SET MODULE_NAME = ?, MODULE_VERSION = ?, MODULE_DESCRIPTION = ?, MODULE_CATEGORY = ?, DEFAULT_PAGE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ?, ORDER_SEQUENCE = ? WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_name, module_version, module_description, module_category, default_page, transaction_log_id, record_log, order_sequence, module_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_module_icon(IN module_id VARCHAR(100), IN module_icon VARCHAR(500))
 BEGIN
-	SET @module_id = module_id;
-	SET @module_icon = module_icon;
-
-	SET @query = 'UPDATE technical_module SET MODULE_ICON = @module_icon WHERE MODULE_ID = @module_id';
+	SET @query = 'UPDATE technical_module SET MODULE_ICON = ? WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_icon, module_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_module(IN module_id VARCHAR(100), IN module_name VARCHAR(200), IN module_version VARCHAR(20), IN module_description VARCHAR(500), IN module_category VARCHAR(50), IN default_page VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100), IN order_sequence INT)
 BEGIN
-	SET @module_id = module_id;
-	SET @module_name = module_name;
-	SET @module_version = module_version;
-	SET @module_description = module_description;
-	SET @module_category = module_category;
-	SET @default_page = default_page;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE) VALUES(@module_id, @module_name, @module_version, @module_description, @module_category, @default_page, @transaction_log_id, @record_log, @order_sequence)';
+	SET @query = 'INSERT INTO technical_module (MODULE_ID, MODULE_NAME, MODULE_VERSION, MODULE_DESCRIPTION, MODULE_CATEGORY, DEFAULT_PAGE, TRANSACTION_LOG_ID, RECORD_LOG, ORDER_SEQUENCE) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id, module_name, module_version, module_description, module_category, default_page, transaction_log_id, record_log, order_sequence;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_module(IN module_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-
-	SET @query = 'DELETE FROM technical_module WHERE MODULE_ID = @module_id';
+	SET @query = 'DELETE FROM technical_module WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_module_access_exist(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = @module_id AND ROLE_ID = @role_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_module_access(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-	SET @role_id = role_id;
-
-	SET @query = 'INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES(@module_id, @role_id)';
+	SET @query = 'INSERT INTO technical_module_access_rights (MODULE_ID, ROLE_ID) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_module_access(IN module_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-
-	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = @module_id';
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_module_access(IN module_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @module_id = module_id;
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = @module_id AND ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE MODULE_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING module_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_role_module_access(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_module_access_rights WHERE ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_module_access_rights WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_module_options()
@@ -181,7 +142,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Technical Action */
@@ -196,6 +157,9 @@ CREATE TABLE technical_action_access_rights(
 	ACTION_ID VARCHAR(100) PRIMARY KEY,
 	ROLE_ID VARCHAR(100) NOT NULL
 );
+
+ALTER TABLE technical_action_access_rights
+ADD FOREIGN KEY (ACTION_ID) REFERENCES technical_action(ACTION_ID);
 
 CREATE INDEX technical_action_index ON technical_action(ACTION_ID);
 
@@ -233,121 +197,92 @@ INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES ('15', '1
 
 CREATE PROCEDURE get_action_details(IN action_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-
-	SET @query = 'SELECT ACTION_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_action WHERE ACTION_ID = @action_id';
+	SET @query = 'SELECT ACTION_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_action WHERE ACTION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_action_exist(IN action_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action WHERE ACTION_ID = @action_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action WHERE ACTION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_action(IN action_id VARCHAR(100), IN action_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-	SET @action_name = action_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE technical_action SET ACTION_NAME = @action_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ACTION_ID = @action_id';
+	SET @query = 'UPDATE technical_action SET ACTION_NAME = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ACTION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_name, transaction_log_id, record_log, action_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_action(IN action_id VARCHAR(100), IN action_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-	SET @action_name = action_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@action_id, @action_name, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO technical_action (ACTION_ID, ACTION_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id, action_name, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_action(IN action_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-
-	SET @query = 'DELETE FROM technical_action WHERE ACTION_ID = @action_id';
+	SET @query = 'DELETE FROM technical_action WHERE ACTION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_action_access_exist(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = @action_id AND ROLE_ID = @role_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_action_access(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-	SET @role_id = role_id;
-
-	SET @query = 'INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES(@action_id, @role_id)';
+	SET @query = 'INSERT INTO technical_action_access_rights (ACTION_ID, ROLE_ID) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_action_access(IN action_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-
-	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = @action_id';
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_action_access(IN action_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @action_id = action_id;
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = @action_id AND ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ACTION_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING action_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_role_action_access(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_action_access_rights WHERE ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_action_access_rights WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Technical Page */
@@ -364,6 +299,9 @@ CREATE TABLE technical_page_access_rights(
 	ROLE_ID VARCHAR(100) NOT NULL
 );
 
+ALTER TABLE technical_page_access_rights
+ADD FOREIGN KEY (PAGE_ID) REFERENCES technical_page(PAGE_ID);
+
 CREATE INDEX technical_page_index ON technical_page(PAGE_ID);
 
 INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID) VALUES ('1', 'Modules', 1, 'TL-10');
@@ -378,123 +316,92 @@ INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES ('4', '1');
 
 CREATE PROCEDURE get_page_details(IN page_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-
-	SET @query = 'SELECT PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_page WHERE PAGE_ID = @page_id';
+	SET @query = 'SELECT PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM technical_page WHERE PAGE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_page_exist(IN page_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page WHERE PAGE_ID = @page_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page WHERE PAGE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_page(IN page_id VARCHAR(100), IN page_name VARCHAR(200), IN module_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-	SET @page_name = page_name;
-	SET @module_id= module_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE technical_page SET PAGE_NAME = @page_name, MODULE_ID = @module_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE PAGE_ID = @page_id';
+	SET @query = 'UPDATE technical_page SET PAGE_NAME = ?, MODULE_ID = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE PAGE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_name, module_id, transaction_log_id, record_log, page_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_page(IN page_id VARCHAR(100), IN page_name VARCHAR(200), IN module_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-	SET @page_name = page_name;
-	SET @module_id= module_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@page_id, @page_name, @module_id, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO technical_page (PAGE_ID, PAGE_NAME, MODULE_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id, page_name, module_id, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_page(IN page_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-
-	SET @query = 'DELETE FROM technical_page WHERE PAGE_ID = @page_id';
+	SET @query = 'DELETE FROM technical_page WHERE PAGE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_page_access_exist(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = @page_id AND ROLE_ID = @role_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_page_access(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-	SET @role_id = role_id;
-
-	SET @query = 'INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES(@page_id, @role_id)';
+	SET @query = 'INSERT INTO technical_page_access_rights (PAGE_ID, ROLE_ID) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_page_access(IN page_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-
-	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = @page_id';
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_page_access(IN page_id VARCHAR(100), IN role_id VARCHAR(100))
 BEGIN
-	SET @page_id = page_id;
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = @page_id AND ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE PAGE_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING page_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_role_page_access(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM technical_page_access_rights WHERE ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM technical_page_access_rights WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global System Code */
@@ -517,84 +424,66 @@ INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM
 
 CREATE PROCEDURE check_system_code_exist(IN system_code_id VARCHAR(100))
 BEGIN
-	SET @system_code_id = system_code_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_code WHERE SYSTEM_CODE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING system_code_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_system_code(IN system_code_id VARCHAR(100), IN system_type VARCHAR(20), IN system_code VARCHAR(20), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @system_code_id = system_code_id;
-	SET @system_type = system_type;
-	SET @system_code= system_code;
-	SET @system_description= system_description;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_system_code SET SYSTEM_TYPE = @system_type, SYSTEM_CODE = @system_code, SYSTEM_DESCRIPTION = @system_description, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE SYSTEM_CODE_ID = @system_code_id';
+	SET @query = 'UPDATE global_system_code SET SYSTEM_TYPE = ?, SYSTEM_CODE = ?, SYSTEM_DESCRIPTION = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE SYSTEM_CODE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING system_type, system_code, system_description, transaction_log_id, record_log, system_code_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_system_code(IN system_code_id VARCHAR(100), IN system_type VARCHAR(20), IN system_code VARCHAR(20), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @system_code_id = system_code_id;
-	SET @system_type = system_type;
-	SET @system_code= system_code;
-	SET @system_description= system_description;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@system_code_id, @system_type, @system_code, @system_description, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_system_code (SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING system_code_id, system_type, system_code, system_description, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_system_code(IN system_code_id VARCHAR(100))
 BEGIN
-	SET @system_code_id = system_code_id;
-
-	SET @query = 'DELETE FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
+	SET @query = 'DELETE FROM global_system_code WHERE SYSTEM_CODE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING system_code_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_system_code_details(IN system_code_id VARCHAR(100), IN system_type VARCHAR(100), IN system_code VARCHAR(100))
 BEGIN
-	SET @system_code_id = system_code_id;
-	SET @system_type = system_type;
-	SET @system_code = system_code;
+	SET @query = 'SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE';
 
-	IF @system_code_id IS NULL OR @system_code_id = '' THEN
-		SET @query = 'SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+	IF system_code_id IS NOT NULL OR system_code_id <> '' THEN
+		SET @query = CONCAT(@query, ' SYSTEM_CODE_ID = ?');
+
+		PREPARE stmt FROM @query; 
+		EXECUTE stmt USING system_code_id;
 	ELSE
-		SET @query = 'SELECT SYSTEM_CODE_ID, SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_CODE_ID = @system_code_id';
-    END IF;	
+		SET @query = CONCAT(@query, ' SYSTEM_TYPE = ? AND SYSTEM_CODE = ?');
+		
+		PREPARE stmt FROM @query; 
+		EXECUTE stmt USING system_type, system_code;
+	END IF;
 
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_system_code_options(IN system_type VARCHAR(100))
 BEGIN
-	SET @system_type = system_type;
-
-	SET @query = 'SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = @system_type ORDER BY SYSTEM_DESCRIPTION';
+	SET @query = 'SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = ? ORDER BY SYSTEM_DESCRIPTION';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING system_type;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Role */
@@ -612,19 +501,20 @@ CREATE TABLE global_role_user_account(
 	USERNAME VARCHAR(50) NOT NULL
 );
 
+ALTER TABLE global_role_user_account
+ADD FOREIGN KEY (ROLE_ID) REFERENCES global_role(ROLE_ID);
+
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
 
 INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('1', 'Administrator', 'Administrator', 'TL-2');
 
-CREATE PROCEDURE get_role_details(IN role_id VARCHAR(100))
+CREATE PROCEDURE check_system_code_exist(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT ROLE, ROLE_DESCRIPTION, ASSIGNABLE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_role WHERE ROLE_ID = @role_id';
+	SET @query = 'SELECT ROLE, ROLE_DESCRIPTION, ASSIGNABLE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_role WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_role_options()
@@ -633,108 +523,79 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_role_exist(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role WHERE ROLE_ID = @role_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_role_user_account_exist(IN role_id VARCHAR(100), IN username VARCHAR(50))
 BEGIN
-	SET @role_id = role_id;
-	SET @username = username;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role_user_account WHERE ROLE_ID = @role_id AND USERNAME = @username';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_role_user_account WHERE ROLE_ID = ? AND USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(200), IN assignable TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-	SET @role = role;
-	SET @role_description = role_description;
-	SET @assignable = assignable;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_role SET ROLE = @role, ROLE_DESCRIPTION = @role_description, ASSIGNABLE = @assignable, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ROLE_ID = @role_id';
+	SET @query = 'UPDATE global_role SET ROLE = ?, ROLE_DESCRIPTION = ?, ASSIGNABLE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role, role_description, assignable, transaction_log_id, record_log, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(200), IN assignable TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-	SET @role = role;
-	SET @role_description = role_description;
-	SET @assignable = assignable;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, ASSIGNABLE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@role_id, @role, @role_description, @assignable, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_role (ROLE_ID, ROLE, ROLE_DESCRIPTION, ASSIGNABLE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id, role, role_description, assignable, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_role(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM global_role WHERE ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM global_role WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_role_user_account(IN role_id VARCHAR(100), IN username VARCHAR(50))
 BEGIN
-	SET @role_id = role_id;
-	SET @username = username;
-
-	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = @role_id AND USERNAME = @username';
+	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = ? AND USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_role_user_account(IN role_id VARCHAR(100))
 BEGIN
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM global_role_user_account WHERE ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_role_user_account(IN role_id VARCHAR(100), IN username VARCHAR(50))
 BEGIN
-	SET @role_id = role_id;
-	SET @username = username;
-
-	SET @query = 'INSERT INTO global_role_user_account (ROLE_ID, USERNAME) VALUES(@role_id, @username)';
+	SET @query = 'INSERT INTO global_role_user_account (ROLE_ID, USERNAME) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING role_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global User Account */
@@ -755,157 +616,130 @@ CREATE INDEX global_user_account_index ON global_user_account(USERNAME);
 
 INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Administrator', 'Active', '2022-12-30', 0, null, 'TL-1');
 
+DELIMITER //
+DROP PROCEDURE check_user_account_exist //
+
 CREATE PROCEDURE check_user_account_exist(IN username VARCHAR(50))
 BEGIN
-	SET @username = username;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_user_account WHERE BINARY USERNAME = @username';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_user_account WHERE BINARY USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_user_account_details(IN username VARCHAR(50))
 BEGIN
-	SET @username = username;
-
-	SET @query = 'SELECT PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, LAST_CONNECTION_DATE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_user_account WHERE USERNAME = @username';
+	SET @query = 'SELECT PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, LAST_CONNECTION_DATE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_user_account WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_login_attempt(IN username VARCHAR(50), login_attemp INT(1), last_failed_attempt_date DATETIME)
 BEGIN
-	SET @username = username;
-	SET @login_attemp = login_attemp;
-	SET @last_failed_attempt_date = last_failed_attempt_date;
+	SET @query = 'UPDATE global_user_account SET';
 
-    IF @login_attemp > 0 THEN
-		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = @login_attemp, LAST_FAILED_LOGIN = @last_failed_attempt_date WHERE USERNAME = @username';
+    IF login_attemp > 0 THEN
+		SET @query = CONCAT(@query, ' FAILED_LOGIN = ?, LAST_FAILED_LOGIN = ? WHERE USERNAME = ?');
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING login_attemp, last_failed_attempt_date, username;
 	ELSE
-		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = @login_attemp WHERE USERNAME = @username';
+		SET @query = CONCAT(@query, ' FAILED_LOGIN = ? WHERE USERNAME = ?');
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING login_attemp, username;
     END IF;
 
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_user_last_connection(IN username VARCHAR(50), last_connection_date DATETIME)
 BEGIN
-	SET @username = username;
-	SET @last_connection_date = last_connection_date;
-
-	SET @query = 'UPDATE global_user_account SET LAST_CONNECTION_DATE = @last_connection_date WHERE USERNAME = @username';
+	SET @query = 'UPDATE global_user_account SET LAST_CONNECTION_DATE = ? WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING last_connection_date, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_user_account_password(IN username VARCHAR(50), password VARCHAR(200), password_expiry_date DATE)
 BEGIN
-	SET @username = username;
-	SET @password = password;
-	SET @password_expiry_date = password_expiry_date;
-
-	SET @query = 'UPDATE global_user_account SET PASSWORD = @password, PASSWORD_EXPIRY_DATE = @password_expiry_date WHERE USERNAME = @username';
+	SET @query = 'UPDATE global_user_account SET PASSWORD = ?, PASSWORD_EXPIRY_DATE = ? WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING password, password_expiry_date, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN file_as VARCHAR (300), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @username = username;
-	SET @password = password;
-	SET @file_as = file_as;
-	SET @password_expiry_date = password_expiry_date;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
+	SET @query = 'UPDATE global_user_account SET';
 
-	IF @password IS NULL OR @password = '' THEN
-		SET @query = 'UPDATE global_user_account SET FILE_AS = @file_as, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	IF password IS NOT NULL OR password <> '' THEN
+		SET @query = CONCAT(@query, 'FILE_AS = ?, PASSWORD = ?, PASSWORD_EXPIRY_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING file_as, password, password_expiry_date, transaction_log_id, record_log, username;
 	ELSE
-		SET @query = 'UPDATE global_user_account SET FILE_AS = @file_as, PASSWORD = @password, PASSWORD_EXPIRY_DATE = @password_expiry_date, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+		SET @query = CONCAT(@query, 'FILE_AS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING file_as, transaction_log_id, record_log, username;
     END IF;
 
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN file_as VARCHAR (300), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @username = username;
-	SET @password = password;
-	SET @file_as = file_as;
-	SET @password_expiry_date = password_expiry_date;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@username, @password, @file_as, "Inactive", @password_expiry_date, 0, null, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_user_account (USERNAME, PASSWORD, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, "Inactive", ?, 0, DEFAULT, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username, password, file_as, password_expiry_date, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_user_account(IN username VARCHAR(50))
 BEGIN
-	SET @username = username;
-
-	SET @query = 'DELETE FROM global_user_account WHERE USERNAME = @username';
+	SET @query = 'DELETE FROM global_user_account WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_user_account_role(IN username VARCHAR(50))
 BEGIN
-	SET @username = username;
-
-	SET @query = 'DELETE FROM global_role_user_account WHERE USERNAME = @username';
+	SET @query = 'DELETE FROM global_role_user_account WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_user_account_lock_status(IN username VARCHAR(50), IN transaction_type VARCHAR(10), IN last_failed_login DATE, IN record_log VARCHAR(100))
 BEGIN
-	SET @username = username;
-	SET @transaction_type = transaction_type;
-	SET @last_failed_login = last_failed_login;
-	SET @record_log = record_log;
-
-	IF @transaction_type = 'unlock' THEN
-		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 0, LAST_FAILED_LOGIN = null, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	IF transaction_type = 'unlock' THEN
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 0, LAST_FAILED_LOGIN = ?, RECORD_LOG = ? WHERE USERNAME = ?';
 	ELSE
-		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 5, LAST_FAILED_LOGIN = @last_failed_login, RECORD_LOG = @record_log WHERE USERNAME = @username';
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 5, LAST_FAILED_LOGIN = ?, RECORD_LOG = ? WHERE USERNAME = ?';
     END IF;
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING last_failed_login, record_log, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_user_account_status(IN username VARCHAR(50), IN user_status VARCHAR(10), IN record_log VARCHAR(100))
 BEGIN
-	SET @username = username;
-	SET @user_status = user_status;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_user_account SET USER_STATUS = @user_status, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	SET @query = 'UPDATE global_user_account SET USER_STATUS = ?, RECORD_LOG = ? WHERE USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING user_status, record_log, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Transaction Log */
@@ -921,17 +755,11 @@ CREATE INDEX global_transaction_log_index ON global_transaction_log(TRANSACTION_
 
 CREATE PROCEDURE insert_transaction_log(IN transaction_log_id VARCHAR(100), IN username VARCHAR(50), log_type VARCHAR(100), log_date DATETIME, log VARCHAR(4000))
 BEGIN
-	SET @transaction_log_id = transaction_log_id;
-	SET @username = username;
-	SET @log_type = log_type;
-	SET @log_date = log_date;
-	SET @log = log;
-
-	SET @query = 'INSERT INTO global_transaction_log (TRANSACTION_LOG_ID, USERNAME, LOG_TYPE, LOG_DATE, LOG) VALUES(@transaction_log_id, @username, @log_type, @log_date, @log)';
+	SET @query = 'INSERT INTO global_transaction_log (TRANSACTION_LOG_ID, USERNAME, LOG_TYPE, LOG_DATE, LOG) VALUES(?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING transaction_log_id, username, log_type, log_date, log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Upload Setting */
@@ -949,6 +777,9 @@ CREATE TABLE global_upload_file_type(
 	FILE_TYPE VARCHAR(50) NOT NULL
 );
 
+ALTER TABLE global_upload_file_type
+ADD FOREIGN KEY (UPLOAD_SETTING_ID) REFERENCES global_upload_setting(UPLOAD_SETTING_ID);
+
 CREATE INDEX global_upload_setting_index ON global_upload_setting(UPLOAD_SETTING_ID);
 
 INSERT INTO global_upload_setting (UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID) VALUES ('1', 'Module Icon', 'Upload setting for module icon.', '5', 'TL-14');
@@ -959,125 +790,92 @@ INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES ('1', 
 
 CREATE PROCEDURE check_upload_setting_exist(IN upload_setting_id INT(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_setting WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_upload_setting_file_type_exist(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-	SET @file_type = file_type;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id AND FILE_TYPE = @file_type';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = ? AND FILE_TYPE = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id, file_type;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(100), IN description VARCHAR(100), IN max_file_size VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-	SET @upload_setting = upload_setting;
-	SET @description = description;
-	SET @max_file_size = max_file_size;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_upload_setting SET UPLOAD_SETTING = @upload_setting, DESCRIPTION = @description, MAX_FILE_SIZE = @max_file_size, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'UPDATE global_upload_setting SET UPLOAD_SETTING = ?, DESCRIPTION = ?, MAX_FILE_SIZE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting, description, max_file_size, transaction_log_id, record_log, upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(100), IN description VARCHAR(100), IN max_file_size VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-	SET @upload_setting = upload_setting;
-	SET @description = description;
-	SET @max_file_size = max_file_size;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_upload_setting (UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@upload_setting_id, @upload_setting, @description, @max_file_size, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_upload_setting (UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id, upload_setting, description, max_file_size, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_upload_setting_file_type(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-	SET @file_type = file_type;
-
-	SET @query = 'INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES(@upload_setting_id, @file_type)';
+	SET @query = 'INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id, file_type;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_upload_setting_details(IN upload_setting_id INT(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-
-	SET @query = 'SELECT UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'SELECT UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_upload_setting WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_upload_file_type_details(IN upload_setting_id INT(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-
-	SET @query = 'SELECT FILE_TYPE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'SELECT FILE_TYPE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_upload_setting(IN upload_setting_id INT(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-
-	SET @query = 'DELETE FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'DELETE FROM global_upload_setting WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_upload_setting_file_type(IN upload_setting_id INT(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-
-	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_upload_setting_file_type(IN upload_setting_id INT(50), IN file_type VARCHAR(50))
 BEGIN
-	SET @upload_setting_id = upload_setting_id;
-	SET @file_type = file_type;
-
-	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id AND FILE_TYPE = @file_type';
+	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = ? AND FILE_TYPE = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING upload_setting_id, file_type;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global System Parameter */
@@ -1099,84 +897,61 @@ INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIP
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('4', 'Page', 'Parameter for pages.', '', 4, 'TL-25');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('5', 'Action', 'Parameter for actions.', '', 15, 'TL-33');
 
+DELIMITER //
+DROP PROCEDURE update_system_parameter_value //
+
 CREATE PROCEDURE update_system_parameter_value(IN parameter_id INT, IN parameter_number INT, IN record_log VARCHAR(100))
 BEGIN
-	SET @parameter_id = parameter_id;
-	SET @parameter_number = parameter_number;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_system_parameters SET PARAMETER_NUMBER = @parameter_number, RECORD_LOG = @record_log WHERE PARAMETER_ID = @parameter_id';
+	SET @query = 'UPDATE global_system_parameters SET PARAMETER_NUMBER = ?, RECORD_LOG = ? WHERE PARAMETER_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter_number, record_log, parameter_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_system_parameter_exist(IN parameter_id INT)
 BEGIN
-	SET @parameter_id = parameter_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_parameters WHERE PARAMETER_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_system_parameter(IN parameter_id INT, IN parameter VARCHAR(100), IN parameter_description VARCHAR(100), IN extension VARCHAR(10), IN parameter_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @parameter_id = parameter_id;
-	SET @parameter = parameter;
-	SET @parameter_description = parameter_description;
-	SET @extension = extension;
-	SET @parameter_number = parameter_number;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_system_parameters SET PARAMETER = @parameter, PARAMETER_DESCRIPTION = @parameter_description, PARAMETER_EXTENSION = @extension, PARAMETER_NUMBER = @parameter_number, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE PARAMETER_ID = @parameter_id';
+	SET @query = 'UPDATE global_system_parameters SET PARAMETER = ?, PARAMETER_DESCRIPTION = ?, PARAMETER_EXTENSION = ?, PARAMETER_NUMBER = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE PARAMETER_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter, parameter_description, extension, parameter_number, transaction_log_id, record_log, parameter_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_system_parameter(IN parameter_id INT, IN parameter VARCHAR(100), IN parameter_description VARCHAR(100), IN extension VARCHAR(10), IN parameter_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @parameter_id = parameter_id;
-	SET @parameter = parameter;
-	SET @parameter_description = parameter_description;
-	SET @extension = extension;
-	SET @parameter_number = parameter_number;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@parameter_id, @parameter, @parameter_description, @extension, @parameter_number, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter_id, parameter, parameter_description, extension, parameter_number, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_system_parameter_details(IN parameter_id INT)
 BEGIN
-	SET @parameter_id = parameter_id;
-
-	SET @query = 'SELECT PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+	SET @query = 'SELECT PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_parameters WHERE PARAMETER_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_system_parameter(IN parameter_id INT)
 BEGIN
-	SET @parameter_id = parameter_id;
-
-	SET @query = 'DELETE FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+	SET @query = 'DELETE FROM global_system_parameters WHERE PARAMETER_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING parameter_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Company */
@@ -1198,88 +973,56 @@ CREATE INDEX global_company_index ON global_company(COMPANY_ID);
 
 CREATE PROCEDURE check_company_exist(IN company_id VARCHAR(50))
 BEGIN
-	SET @company_id = company_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_company WHERE COMPANY_ID = @company_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_company WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN company_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @company_id = company_id;
-	SET @company_name = company_name;
-	SET @company_address = company_address;
-	SET @email = email;
-	SET @telephone = telephone;
-	SET @mobile = mobile;
-	SET @website = website;
-	SET @tax_id = tax_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_company SET COMPANY_NAME = @company_name, COMPANY_NAME = @company_name, COMPANY_ADDRESS = @company_address, EMAIL = @email, TELEPHONE = @telephone, MOBILE = @mobile, WEBSITE = @website, TAX_ID = @tax_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COMPANY_ID = @company_id';
+	SET @query = 'UPDATE global_company SET COMPANY_NAME = ?, COMPANY_ADDRESS = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, WEBSITE = ?website, TAX_ID = ?tax_id, TRANSACTION_LOG_ID = ?transaction_log_id, RECORD_LOG = ?record_log WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_name, company_address, email, telephone, mobile, company_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_company_logo(IN company_id VARCHAR(50), IN company_logo VARCHAR(500))
 BEGIN
-	SET @company_id = company_id;
-	SET @company_logo = company_logo;
-
-	SET @query = 'UPDATE global_company SET COMPANY_LOGO = @company_logo WHERE COMPANY_ID = @company_id';
+	SET @query = 'UPDATE global_company SET COMPANY_LOGO = ? WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_logo, company_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN company_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @company_id = company_id;
-	SET @company_name = company_name;
-	SET @company_address = company_address;
-	SET @email = email;
-	SET @telephone = telephone;
-	SET @mobile = mobile;
-	SET @website = website;
-	SET @tax_id = tax_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-
-	SET @query = 'INSERT INTO global_company (COMPANY_ID, COMPANY_NAME, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@company_id, @company_name, @company_address, @email, @telephone, @mobile, @website, @tax_id, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_company (COMPANY_ID, COMPANY_NAME, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_id, company_name, company_address, email, telephone, mobile, website, tax_id, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_company_details(IN company_id VARCHAR(50))
 BEGIN
-	SET @company_id = company_id;
-
-	SET @query = 'SELECT COMPANY_NAME, COMPANY_LOGO, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_company WHERE COMPANY_ID = @company_id';
+	SET @query = 'SELECT COMPANY_NAME, COMPANY_LOGO, COMPANY_ADDRESS, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_company WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_company(IN company_id VARCHAR(50))
 BEGIN
-	SET @company_id = company_id;
-
-	SET @query = 'DELETE FROM global_company WHERE COMPANY_ID = @company_id';
+	SET @query = 'DELETE FROM global_company WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING company_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Interface Setting */
@@ -1300,104 +1043,73 @@ CREATE INDEX global_interface_setting_index ON global_interface_setting(INTERFAC
 
 CREATE PROCEDURE check_interface_setting_exist(IN interface_setting_id INT(50))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_interface_setting WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_interface_setting WHERE INTERFACE_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_interface_setting(IN interface_setting_id INT(50), IN interface_setting_name VARCHAR(100), IN description VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-	SET @interface_setting_name = interface_setting_name;
-	SET @description = description;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_interface_setting SET INTERFACE_SETTING_NAME = @interface_setting_name, DESCRIPTION = @description, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	SET @query = 'UPDATE global_interface_setting SET INTERFACE_SETTING_NAME = ?, DESCRIPTION = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING interface_setting_name, description, transaction_log_id, record_log, interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_interface_settings_images(IN interface_setting_id INT(50), IN file_path VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100), IN request_type VARCHAR(20))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-	SET @file_path = file_path;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-	SET @request_type = request_type;
-
-	IF @request_type = 'login background' THEN
-		SET @query = 'UPDATE global_interface_setting SET LOGIN_BACKGROUND = @file_path, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
-	ELSEIF @request_type = 'login logo' THEN
-		SET @query = 'UPDATE global_interface_setting SET LOGIN_LOGO = @file_path, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
-	ELSEIF @request_type = 'menu logo' THEN
-		SET @query = 'UPDATE global_interface_setting SET MENU_LOGO = @file_path, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	IF request_type = 'login background' THEN
+		SET @query = 'UPDATE global_interface_setting SET LOGIN_BACKGROUND = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
+	ELSEIF request_type = 'login logo' THEN
+		SET @query = 'UPDATE global_interface_setting SET LOGIN_LOGO = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
+	ELSEIF request_type = 'menu logo' THEN
+		SET @query = 'UPDATE global_interface_setting SET MENU_LOGO = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
 	ELSE
-		SET @query = 'UPDATE global_interface_setting SET FAVICON = @file_path, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+		SET @query = 'UPDATE global_interface_setting SET FAVICON = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
     END IF;
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING file_path, transaction_log_id, record_log, interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_interface_setting_status(IN interface_setting_id INT(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-	SET @status = status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_interface_setting SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	SET @query = 'UPDATE global_interface_setting SET STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING status, transaction_log_id, record_log, interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_other_interface_setting_status(IN interface_setting_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_interface_setting SET STATUS = 2, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE INTERFACE_SETTING_ID != @interface_setting_id';
+	SET @query = 'UPDATE global_interface_setting SET STATUS = 2, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE INTERFACE_SETTING_ID != ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING transaction_log_id, record_log, interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_interface_setting(IN interface_setting_id INT(50), IN interface_setting_name VARCHAR(100), IN description VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-	SET @interface_setting_name = interface_setting_name;
-	SET @description = description;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_interface_setting (INTERFACE_SETTING_ID, INTERFACE_SETTING_NAME, DESCRIPTION, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@interface_setting_id, @interface_setting_name, @description, "2", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_interface_setting (INTERFACE_SETTING_ID, INTERFACE_SETTING_NAME, DESCRIPTION, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, "2", ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING interface_setting_id, interface_setting_name, description, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_interface_setting_details(IN interface_setting_id INT(50))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-
-	SET @query = 'SELECT INTERFACE_SETTING_NAME, DESCRIPTION, STATUS, LOGIN_BACKGROUND, LOGIN_LOGO, MENU_LOGO, FAVICON, TRANSACTION_LOG_ID, RECORD_LOG FROM global_interface_setting WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	SET @query = 'SELECT INTERFACE_SETTING_NAME, DESCRIPTION, STATUS, LOGIN_BACKGROUND, LOGIN_LOGO, MENU_LOGO, FAVICON, TRANSACTION_LOG_ID, RECORD_LOG FROM global_interface_setting WHERE INTERFACE_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_activated_interface_setting_details()
@@ -1406,18 +1118,16 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_interface_setting(IN interface_setting_id INT(50))
 BEGIN
-	SET @interface_setting_id = interface_setting_id;
-
-	SET @query = 'DELETE FROM global_interface_setting WHERE INTERFACE_SETTING_ID = @interface_setting_id';
+	SET @query = 'DELETE FROM global_interface_setting WHERE INTERFACE_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING interface_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Email Setting */
@@ -1443,99 +1153,56 @@ CREATE INDEX global_email_setting_index ON global_email_setting(EMAIL_SETTING_ID
 
 CREATE PROCEDURE check_email_setting_exist(IN email_setting_id INT(50))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_email_setting WHERE EMAIL_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_email_setting(IN email_setting_id INT(50), IN email_setting_name VARCHAR(100), IN description VARCHAR(200), IN mail_host VARCHAR(100), IN port INT, IN smtp_auth INT(1), IN smtp_auto_tls INT(1), IN mail_username VARCHAR(200), IN mail_password VARCHAR(200), IN mail_encryption VARCHAR(20), IN mail_from_name VARCHAR(200), IN mail_from_email VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-	SET @email_setting_name = email_setting_name;
-	SET @description = description;
-	SET @mail_host = mail_host;
-	SET @port = port;
-	SET @smtp_auth = smtp_auth;
-	SET @smtp_auto_tls = smtp_auto_tls;
-	SET @mail_username = mail_username;
-	SET @mail_password = mail_password;
-	SET @mail_encryption = mail_encryption;
-	SET @mail_from_name = mail_from_name;
-	SET @mail_from_email = mail_from_email;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_email_setting SET EMAIL_SETTING_NAME = @email_setting_name, DESCRIPTION = @description, MAIL_HOST = @mail_host, PORT = @port, SMTP_AUTH = @smtp_auth, SMTP_AUTO_TLS = @smtp_auto_tls, MAIL_USERNAME = @mail_username, MAIL_PASSWORD = @mail_password, MAIL_ENCRYPTION = @mail_encryption, MAIL_FROM_NAME = @mail_from_name, MAIL_FROM_EMAIL = @mail_from_email, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID = @interface_setting_id';
+	SET @query = 'UPDATE global_email_setting SET EMAIL_SETTING_NAME = ?, DESCRIPTION = ?, MAIL_HOST = ?, PORT = ?, SMTP_AUTH = ?, SMTP_AUTO_TLS = ?, MAIL_USERNAME = ?, MAIL_PASSWORD = ?, MAIL_ENCRYPTION = ?, MAIL_FROM_NAME = ?, MAIL_FROM_EMAIL = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMAIL_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING email_setting_name, description, mail_host, port, smtp_auth, smtp_auto_tls, mail_username, mail_password, mail_encryption, mail_from_name, mail_from_email, transaction_log_id, record_log, email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_email_setting_status(IN email_setting_id INT(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-	SET @status = status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_email_setting SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID = @email_setting_id';
+	SET @query = 'UPDATE global_email_setting SET STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMAIL_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING status, transaction_log_id, record_log, email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_other_email_setting_status(IN email_setting_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_email_setting SET STATUS = 2, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMAIL_SETTING_ID != @email_setting_id';
+	SET @query = 'UPDATE global_email_setting SET STATUS = 2, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMAIL_SETTING_ID != ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING transaction_log_id, record_log, email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_email_setting(IN email_setting_id INT(50), IN email_setting_name VARCHAR(100), IN description VARCHAR(200), IN mail_host VARCHAR(100), IN port INT, IN smtp_auth INT(1), IN smtp_auto_tls INT(1), IN mail_username VARCHAR(200), IN mail_password VARCHAR(200), IN mail_encryption VARCHAR(20), IN mail_from_name VARCHAR(200), IN mail_from_email VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-	SET @email_setting_name = email_setting_name;
-	SET @description = description;
-	SET @mail_host = mail_host;
-	SET @port = port;
-	SET @smtp_auth = smtp_auth;
-	SET @smtp_auto_tls = smtp_auto_tls;
-	SET @mail_username = mail_username;
-	SET @mail_password = mail_password;
-	SET @mail_encryption = mail_encryption;
-	SET @mail_from_name = mail_from_name;
-	SET @mail_from_email = mail_from_email;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_email_setting (EMAIL_SETTING_ID, EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@email_setting_id, @email_setting_name, @description, "2", @mail_host, @port, @smtp_auth, @smtp_auto_tls, @mail_username, @mail_password, @mail_encryption, @mail_from_name, @mail_from_email, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_email_setting (EMAIL_SETTING_ID, EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, "2", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING email_setting_id, email_setting_name, description, mail_host, port, smtp_auth, smtp_auto_tls, mail_username, mail_password, mail_encryption, mail_from_name, mail_from_email, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_email_setting_details(IN email_setting_id INT(50))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-
-	SET @query = 'SELECT EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+	SET @query = 'SELECT EMAIL_SETTING_NAME, DESCRIPTION, STATUS, MAIL_HOST, PORT, SMTP_AUTH, SMTP_AUTO_TLS, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_NAME, MAIL_FROM_EMAIL, TRANSACTION_LOG_ID, RECORD_LOG FROM global_email_setting WHERE EMAIL_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_activated_email_setting_details()
@@ -1544,18 +1211,16 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_email_setting(IN email_setting_id INT(50))
 BEGIN
-	SET @email_setting_id = email_setting_id;
-
-	SET @query = 'DELETE FROM global_email_setting WHERE EMAIL_SETTING_ID = @email_setting_id';
+	SET @query = 'DELETE FROM global_email_setting WHERE EMAIL_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING email_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Notification Setting */
@@ -1586,218 +1251,168 @@ CREATE TABLE global_notification_channel(
 	CHANNEL VARCHAR(20) NOT NULL
 );
 
+ALTER TABLE global_notification_user_account_recipient
+ADD FOREIGN KEY (NOTIFICATION_SETTING_ID) REFERENCES global_notification_setting(NOTIFICATION_SETTING_ID);
+
+ALTER TABLE global_notification_role_recipient
+ADD FOREIGN KEY (NOTIFICATION_SETTING_ID) REFERENCES global_notification_setting(NOTIFICATION_SETTING_ID);
+
+ALTER TABLE global_notification_channel
+ADD FOREIGN KEY (NOTIFICATION_SETTING_ID) REFERENCES global_notification_setting(NOTIFICATION_SETTING_ID);
+
 CREATE INDEX global_notification_setting_index ON global_notification_setting(NOTIFICATION_SETTING_ID);
 
 CREATE PROCEDURE check_notification_setting_exist(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_notification_user_account_recipient_exist(IN notification_setting_id INT(50), IN username VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @username = username;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND USERNAME = @username';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = ? AND USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_notification_role_recipient_exist(IN notification_setting_id INT(50), IN role_id VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @role_id = role_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND ROLE_ID = @role_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE check_notification_channel_exist(IN notification_setting_id INT(50), IN channel VARCHAR(20))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @channel = channel;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND CHANNEL = @channel';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = ? AND CHANNEL = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, channel;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_notification_setting(IN notification_setting_id INT(50), IN notification_setting VARCHAR(100), IN description VARCHAR(200), IN notification_title VARCHAR(500), IN notification_message VARCHAR(500), IN system_link VARCHAR(200), IN email_link VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @notification_setting = notification_setting;
-	SET @description = description;
-	SET @notification_title = notification_title;
-	SET @notification_message = notification_message;
-	SET @system_link = system_link;
-	SET @email_link = email_link;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_notification_setting SET NOTIFICATION_SETTING = @notification_setting, DESCRIPTION = @description, NOTIFICATION_TITLE = @notification_title, NOTIFICATION_MESSAGE = @notification_message, SYSTEM_LINK = @system_link, EMAIL_LINK = @email_link, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'UPDATE global_notification_setting SET NOTIFICATION_SETTING = ?, DESCRIPTION = ?, NOTIFICATION_TITLE = ?, NOTIFICATION_MESSAGE = ?, SYSTEM_LINK = ?, EMAIL_LINK = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting, description, notification_title, notification_message, system_link, email_link, transaction_log_id, record_log, notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_notification_setting(IN notification_setting_id INT(50), IN notification_setting VARCHAR(100), IN description VARCHAR(200), IN notification_title VARCHAR(500), IN notification_message VARCHAR(500), IN system_link VARCHAR(200), IN email_link VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @notification_setting = notification_setting;
-	SET @description = description;
-	SET @notification_title = notification_title;
-	SET @notification_message = notification_message;
-	SET @system_link = system_link;
-	SET @email_link = email_link;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_notification_setting (NOTIFICATION_SETTING_ID, NOTIFICATION_SETTING, DESCRIPTION, NOTIFICATION_TITLE, NOTIFICATION_MESSAGE, SYSTEM_LINK, EMAIL_LINK, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@notification_setting_id, @notification_setting, @description, @notification_title, @notification_message, @system_link, @email_link, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_notification_setting (NOTIFICATION_SETTING_ID, NOTIFICATION_SETTING, DESCRIPTION, NOTIFICATION_TITLE, NOTIFICATION_MESSAGE, SYSTEM_LINK, EMAIL_LINK, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, notification_setting, description, notification_title, notification_message, system_link, email_link, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_notification_user_account_recipient(IN notification_setting_id INT(50), IN username VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @username = username;
-
-	SET @query = 'INSERT INTO global_notification_user_account_recipient (NOTIFICATION_SETTING_ID, USERNAME) VALUES(@notification_setting_id, @username)';
+	SET @query = 'INSERT INTO global_notification_user_account_recipient (NOTIFICATION_SETTING_ID, USERNAME) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_notification_role_recipient(IN notification_setting_id INT(50), IN role_id VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @role_id = role_id;
-
-	SET @query = 'INSERT INTO global_notification_role_recipient (NOTIFICATION_SETTING_ID, ROLE_ID) VALUES(@notification_setting_id, @role_id)';
+	SET @query = 'INSERT INTO global_notification_role_recipient (NOTIFICATION_SETTING_ID, ROLE_ID) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_notification_channel(IN notification_setting_id INT(50), IN channel VARCHAR(20))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @channel = channel;
-
-	SET @query = 'INSERT INTO global_notification_channel (NOTIFICATION_SETTING_ID, CHANNEL) VALUES(@notification_setting_id, @channel)';
+	SET @query = 'INSERT INTO global_notification_channel (NOTIFICATION_SETTING_ID, CHANNEL) VALUES(?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, channel;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_notification_setting_details(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'SELECT NOTIFICATION_SETTING, DESCRIPTION, NOTIFICATION_TITLE, NOTIFICATION_MESSAGE, SYSTEM_LINK, EMAIL_LINK, TRANSACTION_LOG_ID, RECORD_LOG FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'SELECT NOTIFICATION_SETTING, DESCRIPTION, NOTIFICATION_TITLE, NOTIFICATION_MESSAGE, SYSTEM_LINK, EMAIL_LINK, TRANSACTION_LOG_ID, RECORD_LOG FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_notification_setting(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'DELETE FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'DELETE FROM global_notification_setting WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_notification_user_account_recipient(IN notification_setting_id INT(50), IN username VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @username = username;
-
-	SET @query = 'DELETE FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND USERNAME = @username';
+	SET @query = 'DELETE FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = ? AND USERNAME = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, username;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_notification_role_recipient(IN notification_setting_id INT(50), IN role_id VARCHAR(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @role_id = role_id;
-
-	SET @query = 'DELETE FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND ROLE_ID = @role_id';
+	SET @query = 'DELETE FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = ? AND ROLE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, role_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_notification_channel(IN notification_setting_id INT(50), IN channel VARCHAR(20))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-	SET @channel = channel;
-
-	SET @query = 'DELETE FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = @notification_setting_id AND CHANNEL = @channel';
+	SET @query = 'DELETE FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = ? AND CHANNEL = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id, channel;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_notification_role_recipient(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'DELETE FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'DELETE FROM global_notification_role_recipient WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_notification_user_account_recipient(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'DELETE FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'DELETE FROM global_notification_user_account_recipient WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_notification_channel(IN notification_setting_id INT(50))
 BEGIN
-	SET @notification_setting_id = notification_setting_id;
-
-	SET @query = 'DELETE FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = @notification_setting_id';
+	SET @query = 'DELETE FROM global_notification_channel WHERE NOTIFICATION_SETTING_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING notification_setting_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Country */
@@ -1810,76 +1425,61 @@ CREATE TABLE global_country(
 
 CREATE INDEX global_country_index ON global_country(COUNTRY_ID);
 
+DELIMITER //
+DROP PROCEDURE check_country_exist //
+
 CREATE PROCEDURE check_country_exist(IN country_id INT(50))
 BEGIN
-	SET @country_id = country_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_country WHERE COUNTRY_ID = @country_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_country WHERE COUNTRY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_country(IN country_id INT(50), IN country_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @country_id = country_id;
-	SET @country_name = country_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_country SET COUNTRY_NAME = @country_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COUNTRY_ID = @country_id';
+	SET @query = 'UPDATE global_country SET COUNTRY_NAME = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE COUNTRY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_name, transaction_log_id, record_log, country_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_country(IN country_id INT(50), IN country_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @country_id = country_id;
-	SET @country_name = country_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_country (COUNTRY_ID, COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@country_id, @country_name, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_country (COUNTRY_ID, COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_id, country_name, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_country_details(IN country_id INT(50))
 BEGIN
-	SET @country_id = country_id;
-
-	SET @query = 'SELECT COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM global_country WHERE COUNTRY_ID = @country_id';
+	SET @query = 'SELECT COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM global_country WHERE COUNTRY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_country(IN country_id INT(50))
 BEGIN
-	SET @country_id = country_id;
-
-	SET @query = 'DELETE FROM global_country WHERE COUNTRY_ID = @country_id';
+	SET @query = 'DELETE FROM global_country WHERE COUNTRY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_all_state(IN country_id INT(50))
 BEGIN
-	SET @country_id = country_id;
-
-	SET @query = 'DELETE FROM global_state WHERE COUNTRY_ID = @country_id';
+	SET @query = 'DELETE FROM global_state WHERE COUNTRY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING country_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_country_options()
@@ -1888,7 +1488,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global State */
@@ -1900,69 +1500,57 @@ CREATE TABLE global_state(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE global_state
+ADD FOREIGN KEY (COUNTRY_ID) REFERENCES global_country(COUNTRY_ID);
+
 CREATE INDEX global_state_index ON global_state(STATE_ID);
+
+DELIMITER //
+DROP PROCEDURE check_state_exist //
 
 CREATE PROCEDURE check_state_exist(IN state_id INT(50))
 BEGIN
-	SET @state_id = state_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_state WHERE STATE_ID = @state_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_state WHERE STATE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING state_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_state(IN state_id INT(50), IN state_name VARCHAR(200), IN country_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @state_id = state_id;
-	SET @state_name = state_name;
-	SET @country_id = country_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_state SET STATE_NAME = @state_name, COUNTRY_ID = @country_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE STATE_ID = @state_id';
+	SET @query = 'UPDATE global_state SET STATE_NAME = ?, COUNTRY_ID = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE STATE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING state_name, country_id, transaction_log_id, record_log, state_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_state(IN state_id INT(50), IN state_name VARCHAR(200), IN country_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @state_id = state_id;
-	SET @state_name = state_name;
-	SET @country_id = country_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_state (STATE_ID, STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@state_id, @state_name, @country_id, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_state (STATE_ID, STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING state_id, state_name, country_id, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_state_details(IN state_id INT(50))
 BEGIN
-	SET @state_id = state_id;
-
-	SET @query = 'SELECT STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_state WHERE STATE_ID = @state_id';
+	SET @query = 'SELECT STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_state WHERE STATE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING state_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_state(IN state_id INT(50))
 BEGIN
-	SET @state_id = state_id;
-
-	SET @query = 'DELETE FROM global_state WHERE STATE_ID = @state_id';
+	SET @query = 'DELETE FROM global_state WHERE STATE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING state_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Zoom API */
@@ -1979,98 +1567,70 @@ CREATE TABLE global_zoom_api(
 
 CREATE INDEX global_zoom_api_index ON global_zoom_api(ZOOM_API_ID);
 
+DELIMITER //
+DROP PROCEDURE check_zoom_api_exist //
+
 CREATE PROCEDURE check_zoom_api_exist(IN zoom_api_id INT(50))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_zoom_api WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_zoom_api WHERE ZOOM_API_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_zoom_api(IN zoom_api_id INT(50), IN zoom_api_name VARCHAR(100), IN description VARCHAR(200), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-	SET @zoom_api_name = zoom_api_name;
-	SET @description = description;
-	SET @api_key = api_key;
-	SET @api_secret = api_secret;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_zoom_api SET ZOOM_API_NAME = @zoom_api_name, DESCRIPTION = @description, API_KEY = @api_key, API_SECRET = @api_secret, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'UPDATE global_zoom_api SET ZOOM_API_NAME = ?, DESCRIPTION = ?, API_KEY = ?, API_SECRET = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ZOOM_API_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING zoom_api_name, description, api_key, api_secret, transaction_log_id, record_log, zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_zoom_api_status(IN zoom_api_id INT(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-	SET @status = status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_zoom_api SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'UPDATE global_zoom_api SET STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ZOOM_API_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING status, transaction_log_id, record_log, zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_other_zoom_api_status(IN zoom_api_id INT(50), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE global_zoom_api SET STATUS = 2, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ZOOM_API_ID != @zoom_api_id';
+	SET @query = 'UPDATE global_zoom_api SET STATUS = 2, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ZOOM_API_ID != ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING transaction_log_id, record_log, zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_zoom_api(IN zoom_api_id INT(50), IN zoom_api_name VARCHAR(100), IN description VARCHAR(200), IN api_key VARCHAR(1000), IN api_secret VARCHAR(1000), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-	SET @zoom_api_name = zoom_api_name;
-	SET @description = description;
-	SET @api_key = api_key;
-	SET @api_secret = api_secret;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO global_zoom_api (ZOOM_API_ID, ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@zoom_api_id, @zoom_api_name, @description, @api_key, @api_secret, "2", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO global_zoom_api (ZOOM_API_ID, ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, "2", ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING zoom_api_id, zoom_api_name, description, api_key, api_secret, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_zoom_api_details(IN zoom_api_id INT(50))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-
-	SET @query = 'SELECT ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_zoom_api WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'SELECT ZOOM_API_NAME, DESCRIPTION, API_KEY, API_SECRET, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM global_zoom_api WHERE ZOOM_API_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_zoom_api(IN zoom_api_id INT(50))
 BEGIN
-	SET @zoom_api_id = zoom_api_id;
-
-	SET @query = 'DELETE FROM global_zoom_api WHERE ZOOM_API_ID = @zoom_api_id';
+	SET @query = 'DELETE FROM global_zoom_api WHERE ZOOM_API_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING zoom_api_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_activated_zoom_api_details()
@@ -2079,7 +1639,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Employee Department */
@@ -2097,86 +1657,61 @@ CREATE INDEX employee_department_index ON employee_department(DEPARTMENT_ID);
 
 CREATE PROCEDURE check_department_exist(IN department_id VARCHAR(50))
 BEGIN
-	SET @department_id = department_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_department WHERE DEPARTMENT_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING department_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_department(IN department_id VARCHAR(50), IN department VARCHAR(100), IN parent_department VARCHAR(50), IN manager VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @department_id = department_id;
-	SET @department = department;
-	SET @parent_department = parent_department;
-	SET @manager = manager;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_department SET DEPARTMENT = @department, PARENT_DEPARTMENT = @parent_department, MANAGER = @manager, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTMENT_ID = @department_id';
+	SET @query = 'UPDATE employee_department SET DEPARTMENT = ?, PARENT_DEPARTMENT = ?, MANAGER = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE DEPARTMENT_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING department, parent_department, manager, transaction_log_id, record_log, department_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_department_status(IN department_id VARCHAR(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @department_id = department_id;
-	SET @status = status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_department SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTMENT_ID = @department_id';
+	SET @query = 'UPDATE employee_department SET STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE DEPARTMENT_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING status, transaction_log_id, record_log, department_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_department(IN department_id VARCHAR(50), IN department VARCHAR(100), IN parent_department VARCHAR(50), IN manager VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @department_id = department_id;
-	SET @department = department;
-	SET @parent_department = parent_department;
-	SET @manager = manager;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_department (DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@department_id, @department, @parent_department, @manager, "1", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_department (DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, "1", ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING department_id, department, parent_department, manager, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_department_details(IN department_id VARCHAR(50))
 BEGIN
-	SET @department_id = department_id;
-
-	SET @query = 'SELECT DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+	SET @query = 'SELECT DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_department WHERE DEPARTMENT_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING department_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_department(IN department_id VARCHAR(50))
 BEGIN
-	SET @department_id = department_id;
-
-	SET @query = 'DELETE FROM employee_department WHERE DEPARTMENT_ID = @department_id';
+	SET @query = 'DELETE FROM employee_department WHERE DEPARTMENT_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING department_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_department_options(IN generation_type VARCHAR(10))
 BEGIN
-	IF @generation_type = 'active' THEN
+	IF generation_type = 'active' THEN
 		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department WHERE STATUS = "1" ORDER BY DEPARTMENT';
 	ELSE
 		SET @query = 'SELECT DEPARTMENT_ID, DEPARTMENT FROM employee_department ORDER BY DEPARTMENT';
@@ -2184,7 +1719,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Employee Job Position */
@@ -2232,408 +1767,312 @@ CREATE TABLE employee_job_position_attachment(
 	RECORD_LOG VARCHAR(100)
 );
 
-CREATE PROCEDURE check_job_position_exist(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
+ALTER TABLE employee_job_position_responsibility
+ADD FOREIGN KEY (JOB_POSITION_ID) REFERENCES employee_job_position(JOB_POSITION_ID);
 
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
+ALTER TABLE employee_job_position_requirement
+ADD FOREIGN KEY (JOB_POSITION_ID) REFERENCES employee_job_position(JOB_POSITION_ID);
 
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
+ALTER TABLE employee_job_position_qualification
+ADD FOREIGN KEY (JOB_POSITION_ID) REFERENCES employee_job_position(JOB_POSITION_ID);
 
-CREATE PROCEDURE check_job_position_responsibility_exist(IN responsibility_id VARCHAR(100))
-BEGIN
-	SET @responsibility_id = responsibility_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE check_job_position_requirement_exist(IN requirement_id VARCHAR(100))
-BEGIN
-	SET @requirement_id = requirement_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE check_job_position_qualification_exist(IN qualification_id VARCHAR(100))
-BEGIN
-	SET @qualification_id = qualification_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE check_job_position_attachment_exist(IN attachment_id VARCHAR(100))
-BEGIN
-	SET @attachment_id = attachment_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-	SET @job_position = job_position;
-	SET @description = description;
-	SET @department = department;
-	SET @expected_new_employees = expected_new_employees;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_job_position SET JOB_POSITION = @job_position, DESCRIPTION = @description, DEPARTMENT = @department, EXPECTED_NEW_EMPLOYEES = @expected_new_employees, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_recruitment_status(IN job_position_id VARCHAR(50), IN recruitment_status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-	SET @recruitment_status = recruitment_status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	IF @recruitment_status = 2 THEN
-		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = @recruitment_status, EXPECTED_NEW_EMPLOYEES = 0, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
-	ELSE
-		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = @recruitment_status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE JOB_POSITION_ID = @job_position_id';
-    END IF;
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @responsibility_id = responsibility_id;
-	SET @job_position_id = job_position_id;
-	SET @responsibility = responsibility;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_job_position_responsibility SET RESPONSIBILITY = @responsibility, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE RESPONSIBILITY_ID = @responsibility_id AND JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @requirement_id = requirement_id;
-	SET @job_position_id = job_position_id;
-	SET @requirement = requirement;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_job_position_requirement SET REQUIREMENT = @requirement, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE REQUIREMENT_ID = @requirement_id AND JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @qualification_id = qualification_id;
-	SET @job_position_id = job_position_id;
-	SET @qualification = qualification;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_job_position_qualification SET QUALIFICATION = @qualification, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE QUALIFICATION_ID = @qualification_id AND JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_attachment(IN attachment_id VARCHAR(100), IN attachment VARCHAR(500))
-BEGIN
-	SET @attachment_id = attachment_id;
-	SET @attachment = attachment;
-
-	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT = @attachment WHERE ATTACHMENT_ID = @attachment_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_job_position_attachment_details(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @attachment_id = attachment_id;
-	SET @job_position_id = job_position_id;
-	SET @attachment_name = attachment_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT_NAME = @attachment_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE ATTACHMENT_ID = @attachment_id AND JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-	SET @job_position = job_position;
-	SET @description = description;
-	SET @department = department;
-	SET @expected_new_employees = expected_new_employees;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_job_position (JOB_POSITION_ID, JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@job_position_id, @job_position, @description, "2", @department, @expected_new_employees, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @responsibility_id = responsibility_id;
-	SET @job_position_id = job_position_id;
-	SET @responsibility = responsibility;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_job_position_responsibility (RESPONSIBILITY_ID, JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@responsibility_id, @job_position_id, @responsibility, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @requirement_id = requirement_id;
-	SET @job_position_id = job_position_id;
-	SET @requirement = requirement;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_job_position_requirement (REQUIREMENT_ID, JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@requirement_id, @job_position_id, @requirement, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @qualification_id = qualification_id;
-	SET @job_position_id = job_position_id;
-	SET @qualification = qualification;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_job_position_qualification (QUALIFICATION_ID, JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@qualification_id, @job_position_id, @qualification, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_job_position_attachment(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @attachment_id = attachment_id;
-	SET @job_position_id = job_position_id;
-	SET @attachment_name = attachment_name;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@attachment_id, @job_position_id, @attachment_name, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_job_position_details(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-
-	SET @query = 'SELECT JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_job_position_responsibility_details(IN responsibility_id VARCHAR(100))
-BEGIN
-	SET @responsibility_id = responsibility_id;
-
-	SET @query = 'SELECT JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_job_position_requirement_details(IN requirement_id VARCHAR(100))
-BEGIN
-	SET @requirement_id = requirement_id;
-
-	SET @query = 'SELECT JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_job_position_qualification_details(IN qualification_id VARCHAR(100))
-BEGIN
-	SET @qualification_id = qualification_id;
-
-	SET @query = 'SELECT JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_job_position_attachment_details(IN attachment_id VARCHAR(100))
-BEGIN
-	SET @attachment_id = attachment_id;
-
-	SET @query = 'SELECT JOB_POSITION_ID, ATTACHMENT_NAME, ATTACHMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_job_position(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-
-	SET @query = 'DELETE FROM employee_job_position WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_all_job_position_responsibility(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-
-	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_all_job_position_requirement(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-
-	SET @query = 'DELETE FROM employee_job_position_requirement WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_all_job_position_qualification(IN job_position_id VARCHAR(100))
-BEGIN
-	SET @job_position_id = job_position_id;
-
-	SET @query = 'DELETE FROM employee_job_position_qualification WHERE JOB_POSITION_ID = @job_position_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_job_position_responsibility(IN responsibility_id VARCHAR(100))
-BEGIN
-	SET @responsibility_id = responsibility_id;
-
-	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = @responsibility_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_job_position_requirement(IN requirement_id VARCHAR(100))
-BEGIN
-	SET @requirement_id = requirement_id;
-
-	SET @query = 'DELETE FROM employee_job_position_requirement WHERE REQUIREMENT_ID = @requirement_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_job_position_qualification(IN qualification_id VARCHAR(100))
-BEGIN
-	SET @qualification_id = qualification_id;
-
-	SET @query = 'DELETE FROM employee_job_position_qualification WHERE QUALIFICATION_ID = @qualification_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_job_position_attachment(IN attachment_id VARCHAR(100))
-BEGIN
-	SET @attachment_id = attachment_id;
-
-	SET @query = 'DELETE FROM employee_job_position_attachment WHERE ATTACHMENT_ID = @attachment_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE generate_job_position_options(IN generation_type VARCHAR(10))
-BEGIN
-	IF @generation_type = 'active' THEN
-		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "1" ORDER BY JOB_POSITION';
-	ELSEIF @generation_type = 'inactive' THEN
-		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "2" ORDER BY JOB_POSITION';
-	ELSE
-		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location ORDER BY JOB_POSITION';
-    END IF;
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
+ALTER TABLE employee_job_position_attachment
+ADD FOREIGN KEY (JOB_POSITION_ID) REFERENCES employee_job_position(JOB_POSITION_ID);
 
 CREATE INDEX employee_job_position_index ON employee_job_position(JOB_POSITION_ID);
 CREATE INDEX employee_job_position_attachment_index ON employee_job_position_attachment(ATTACHMENT_ID);
 CREATE INDEX employee_job_position_responsibility_index ON employee_job_position_responsibility(RESPONSIBILITY_ID);
 CREATE INDEX employee_job_position_requirement_index ON employee_job_position_requirement(REQUIREMENT_ID);
 CREATE INDEX employee_job_position_qualification_index ON employee_job_position_qualification(QUALIFICATION_ID);
+
+CREATE PROCEDURE check_job_position_exist(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_responsibility_exist(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING responsibility_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_requirement_exist(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_requirement WHERE REQUIREMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING requirement_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_qualification_exist(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_qualification WHERE QUALIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING qualification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_job_position_attachment_exist(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_job_position_attachment WHERE ATTACHMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_job_position SET JOB_POSITION = ?, DESCRIPTION = ?, DEPARTMENT = ?, EXPECTED_NEW_EMPLOYEES = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position, description, department, expected_new_employees, transaction_log_id, record_log, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_recruitment_status(IN job_position_id VARCHAR(50), IN recruitment_status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	IF recruitment_status = 2 THEN
+		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = ?, EXPECTED_NEW_EMPLOYEES = 0, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE JOB_POSITION_ID = ?';
+	ELSE
+		SET @query = 'UPDATE employee_job_position SET RECRUITMENT_STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE JOB_POSITION_ID = ?';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING recruitment_status, transaction_log_id, record_log, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_job_position_responsibility SET RESPONSIBILITY = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE RESPONSIBILITY_ID = ? AND JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING responsibility, transaction_log_id, record_log, responsibility_id, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_job_position_requirement SET REQUIREMENT = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE REQUIREMENT_ID = ? AND JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING requirement, transaction_log_id, record_log, requirement_id, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_job_position_qualification SET QUALIFICATION = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE QUALIFICATION_ID = ? AND JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING qualification, transaction_log_id, record_log, qualification_id, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_attachment(IN attachment_id VARCHAR(100), IN attachment VARCHAR(500))
+BEGIN
+	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT = ? WHERE ATTACHMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment, attachment_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_job_position_attachment_details(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_job_position_attachment SET ATTACHMENT_NAME = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ATTACHMENT_ID = ? AND JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment_name, transaction_log_id, record_log, attachment_id, job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position(IN job_position_id VARCHAR(100), IN job_position VARCHAR(100), IN description VARCHAR(500), IN department VARCHAR(50), IN expected_new_employees INT(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_job_position (JOB_POSITION_ID, JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, "2", ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id, job_position, description, department, expected_new_employees, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_responsibility(IN responsibility_id VARCHAR(100), IN job_position_id VARCHAR(100), IN responsibility VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_job_position_responsibility (RESPONSIBILITY_ID, JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING responsibility_id, job_position_id, responsibility, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_requirement(IN requirement_id VARCHAR(100), IN job_position_id VARCHAR(100), IN requirement VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_job_position_requirement (REQUIREMENT_ID, JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING requirement_id, job_position_id, requirement, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_qualification(IN qualification_id VARCHAR(100), IN job_position_id VARCHAR(100), IN qualification VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_job_position_qualification (QUALIFICATION_ID, JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING qualification_id, job_position_id, qualification, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_job_position_attachment(IN attachment_id VARCHAR(100), IN job_position_id VARCHAR(100), IN attachment_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_job_position_attachment (ATTACHMENT_ID, JOB_POSITION_ID, ATTACHMENT_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment_id, job_position_id, attachment_name, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_details(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT JOB_POSITION, DESCRIPTION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_responsibility_details(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT JOB_POSITION_ID, RESPONSIBILITY, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING responsibility_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_requirement_details(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT JOB_POSITION_ID, REQUIREMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_requirement WHERE REQUIREMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING requirement_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_qualification_details(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT JOB_POSITION_ID, QUALIFICATION, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_qualification WHERE QUALIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING qualification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_job_position_attachment_details(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT JOB_POSITION_ID, ATTACHMENT_NAME, ATTACHMENT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_job_position_attachment WHERE ATTACHMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_responsibility(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_requirement(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_requirement WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_job_position_qualification(IN job_position_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_qualification WHERE JOB_POSITION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING job_position_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_responsibility(IN responsibility_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_responsibility WHERE RESPONSIBILITY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING responsibility_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_requirement(IN requirement_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_requirement WHERE REQUIREMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING requirement_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_qualification(IN qualification_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_qualification WHERE QUALIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING qualification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_job_position_attachment(IN attachment_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_job_position_attachment WHERE ATTACHMENT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING attachment_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_job_position_options(IN generation_type VARCHAR(10))
+BEGIN
+	IF generation_type = 'active' THEN
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "1" ORDER BY JOB_POSITION';
+	ELSEIF generation_type = 'inactive' THEN
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location WHERE RECRUITMENT_STATUS = "2" ORDER BY JOB_POSITION';
+	ELSE
+		SET @query = 'SELECT JOB_POSITION_ID, JOB_POSITION FROM employee_work_location ORDER BY JOB_POSITION';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt ;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Work Location */
 CREATE TABLE employee_work_location(
@@ -2653,92 +2092,61 @@ CREATE INDEX employee_work_location_index ON employee_work_location(WORK_LOCATIO
 
 CREATE PROCEDURE check_work_location_exist(IN work_location_id VARCHAR(50))
 BEGIN
-	SET @work_location_id = work_location_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_work_location WHERE WORK_LOCATION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING work_location_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_work_location(IN work_location_id VARCHAR(50), IN work_location VARCHAR(100), IN work_location_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(50), IN mobile VARCHAR(50), IN location_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @work_location_id = work_location_id;
-	SET @work_location = work_location;
-	SET @work_location_address = work_location_address;
-	SET @email = email;
-	SET @telephone = telephone;
-	SET @mobile = mobile;
-	SET @location_number = location_number;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_work_location SET WORK_LOCATION = @work_location, WORK_LOCATION_ADDRESS = @work_location_address, EMAIL = @email, TELEPHONE = @telephone, MOBILE = @mobile, LOCATION_NUMBER = @location_number, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WORK_LOCATION_ID = @work_location_id';
+	SET @query = 'UPDATE employee_work_location SET WORK_LOCATION = ?, WORK_LOCATION_ADDRESS = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, LOCATION_NUMBER = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE WORK_LOCATION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING work_location, work_location_address, email, telephone, mobile, location_number, transaction_log_id, record_log, work_location_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_work_location_status(IN work_location_id VARCHAR(50), IN status TINYINT(1), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @work_location_id = work_location_id;
-	SET @status = status;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_work_location SET STATUS = @status, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WORK_LOCATION_ID = @work_location_id';
+	SET @query = 'UPDATE employee_work_location SET STATUS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE WORK_LOCATION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING status, transaction_log_id, record_log, work_location_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_work_location(IN work_location_id VARCHAR(50), IN work_location VARCHAR(100), IN work_location_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(50), IN mobile VARCHAR(50), IN location_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @work_location_id = work_location_id;
-	SET @work_location = work_location;
-	SET @work_location_address = work_location_address;
-	SET @email = email;
-	SET @telephone = telephone;
-	SET @mobile = mobile;
-	SET @location_number = location_number;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_work_location (WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@work_location_id, @work_location, @work_location_address, @email, @telephone, @mobile, @location_number, "1", @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_work_location (WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, "1", ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING work_location_id, work_location, work_location_address, email, telephone, mobile, location_number, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_work_location_details(IN work_location_id VARCHAR(50))
 BEGIN
-	SET @work_location_id = work_location_id;
-
-	SET @query = 'SELECT WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+	SET @query = 'SELECT WORK_LOCATION, WORK_LOCATION_ADDRESS, EMAIL, TELEPHONE, MOBILE, LOCATION_NUMBER, STATUS, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_work_location WHERE WORK_LOCATION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING work_location_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_work_location(IN work_location_id VARCHAR(50))
 BEGIN
-	SET @work_location_id = work_location_id;
-
-	SET @query = 'DELETE FROM employee_work_location WHERE WORK_LOCATION_ID = @work_location_id';
+	SET @query = 'DELETE FROM employee_work_location WHERE WORK_LOCATION_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING work_location_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_work_location_options(IN generation_type VARCHAR(10))
 BEGIN
-	IF @generation_type = 'active' THEN
+	IF generation_type = 'active' THEN
 		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "1" ORDER BY WORK_LOCATION';
 	ELSE
 		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location ORDER BY WORK_LOCATION';
@@ -2746,7 +2154,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Employee Departure Reason */
@@ -2761,63 +2169,47 @@ CREATE INDEX employee_departure_reason_index ON employee_departure_reason(DEPART
 
 CREATE PROCEDURE check_departure_reason_exist(IN departure_reason_id VARCHAR(50))
 BEGIN
-	SET @departure_reason_id = departure_reason_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING departure_reason_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_departure_reason(IN departure_reason_id VARCHAR(50), IN departure_reason VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @departure_reason_id = departure_reason_id;
-	SET @departure_reason = departure_reason;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_departure_reason SET DEPARTURE_REASON = @departure_reason, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+	SET @query = 'UPDATE employee_departure_reason SET DEPARTURE_REASON = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE DEPARTURE_REASON_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING departure_reason, transaction_log_id, record_log, departure_reason_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_departure_reason(IN departure_reason_id VARCHAR(50), IN departure_reason VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @departure_reason_id = departure_reason_id;
-	SET @departure_reason = departure_reason;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_departure_reason (DEPARTURE_REASON_ID, DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@departure_reason_id, @departure_reason, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_departure_reason (DEPARTURE_REASON_ID, DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING departure_reason_id, departure_reason, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_departure_reason_details(IN departure_reason_id VARCHAR(50))
 BEGIN
-	SET @departure_reason_id = departure_reason_id;
-
-	SET @query = 'SELECT DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+	SET @query = 'SELECT DEPARTURE_REASON, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING departure_reason_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_departure_reason(IN departure_reason_id VARCHAR(50))
 BEGIN
-	SET @departure_reason_id = departure_reason_id;
-
-	SET @query = 'DELETE FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = @departure_reason_id';
+	SET @query = 'DELETE FROM employee_departure_reason WHERE DEPARTURE_REASON_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING departure_reason_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_departure_reason_options()
@@ -2826,7 +2218,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Employee Employee Type */
@@ -2841,63 +2233,47 @@ CREATE INDEX employee_employee_type_index ON employee_employee_type(EMPLOYEE_TYP
 
 CREATE PROCEDURE check_employee_type_exist(IN employee_type_id VARCHAR(50))
 BEGIN
-	SET @employee_type_id = employee_type_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING employee_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_employee_type(IN employee_type_id VARCHAR(50), IN employee_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @employee_type_id = employee_type_id;
-	SET @employee_type = employee_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_employee_type SET EMPLOYEE_TYPE = @employee_type, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+	SET @query = 'UPDATE employee_employee_type SET EMPLOYEE_TYPE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING employee_type, transaction_log_id, record_log, employee_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_employee_type(IN employee_type_id VARCHAR(50), IN employee_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @employee_type_id = employee_type_id;
-	SET @employee_type = employee_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_employee_type (EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@employee_type_id, @employee_type, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_employee_type (EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING employee_type_id, employee_type, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_employee_type_details(IN employee_type_id VARCHAR(50))
 BEGIN
-	SET @employee_type_id = employee_type_id;
-
-	SET @query = 'SELECT EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+	SET @query = 'SELECT EMPLOYEE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING employee_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_employee_type(IN employee_type_id VARCHAR(50))
 BEGIN
-	SET @employee_type_id = employee_type_id;
-
-	SET @query = 'DELETE FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = @employee_type_id';
+	SET @query = 'DELETE FROM employee_employee_type WHERE EMPLOYEE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING employee_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_employee_type_options()
@@ -2906,7 +2282,7 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Employee Wage Type */
@@ -2919,65 +2295,57 @@ CREATE TABLE employee_wage_type(
 
 CREATE INDEX employee_wage_type_index ON employee_wage_type(WAGE_TYPE_ID);
 
+DELIMITER //
+DROP PROCEDURE check_wage_type_exist //
+DROP PROCEDURE update_wage_type //
+DROP PROCEDURE insert_wage_type //
+DROP PROCEDURE get_wage_type_details //
+DROP PROCEDURE delete_wage_type //
+DROP PROCEDURE generate_wage_type_options //
+
 CREATE PROCEDURE check_wage_type_exist(IN wage_type_id VARCHAR(50))
 BEGIN
-	SET @wage_type_id = wage_type_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_wage_type WHERE WAGE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING wage_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE update_wage_type(IN wage_type_id VARCHAR(50), IN wage_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @wage_type_id = wage_type_id;
-	SET @wage_type = wage_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_wage_type SET WAGE_TYPE = @wage_type, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WAGE_TYPE_ID = @wage_type_id';
+	SET @query = 'UPDATE employee_wage_type SET WAGE_TYPE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE WAGE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING wage_type, transaction_log_id, record_log, wage_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE insert_wage_type(IN wage_type_id VARCHAR(50), IN wage_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @wage_type_id = wage_type_id;
-	SET @wage_type = wage_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_wage_type (WAGE_TYPE_ID, WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@wage_type_id, @wage_type, @transaction_log_id, @record_log)';
+	SET @query = 'INSERT INTO employee_wage_type (WAGE_TYPE_ID, WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING wage_type_id, wage_type, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_wage_type_details(IN wage_type_id VARCHAR(50))
 BEGIN
-	SET @wage_type_id = wage_type_id;
-
-	SET @query = 'SELECT WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+	SET @query = 'SELECT WAGE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_wage_type WHERE WAGE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING wage_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE delete_wage_type(IN wage_type_id VARCHAR(50))
 BEGIN
-	SET @wage_type_id = wage_type_id;
-
-	SET @query = 'DELETE FROM employee_wage_type WHERE WAGE_TYPE_ID = @wage_type_id';
+	SET @query = 'DELETE FROM employee_wage_type WHERE WAGE_TYPE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING wage_type_id;
+	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE generate_wage_type_options()
@@ -2986,257 +2354,25 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE TABLE employee_working_schedule(
-	WORKING_SCHEDULE_ID VARCHAR(50) PRIMARY KEY,
-	WORKING_SCHEDULE VARCHAR(100) NOT NULL,
-	SCHEDULE_TYPE VARCHAR(20) NOT NULL,
-	TRANSACTION_LOG_ID VARCHAR(100),
-	RECORD_LOG VARCHAR(100)
-);
-
-CREATE TABLE employee_working_hours(
-	WORKING_SCHEDULE_ID VARCHAR(50) PRIMARY KEY,
-	START_DATE DATE,
-	END_DATE DATE,
-	MONDAY_MORNING_WORK_FROM TIME,
-	MONDAY_MORNING_WORK_TO TIME,
-	MONDAY_AFTERNOON_WORK_FROM TIME,
-	MONDAY_AFTERNOON_WORK_TO TIME,
-	TUESDAY_MORNING_WORK_FROM TIME,
-	TUESDAY_MORNING_WORK_TO TIME,
-	TUESDAY_AFTERNOON_WORK_FROM TIME,
-	TUESDAY_AFTERNOON_WORK_TO TIME,
-	WEDNESDAY_MORNING_WORK_FROM TIME,
-	WEDNESDAY_MORNING_WORK_TO TIME,
-	WEDNESDAY_AFTERNOON_WORK_FROM TIME,
-	WEDNESDAY_AFTERNOON_WORK_TO TIME,
-	THURSDAY_MORNING_WORK_FROM TIME,
-	THURSDAY_MORNING_WORK_TO TIME,
-	THURSDAY_AFTERNOON_WORK_FROM TIME,
-	THURSDAY_AFTERNOON_WORK_TO TIME,
-	FRIDAY_MORNING_WORK_FROM TIME,
-	FRIDAY_MORNING_WORK_TO TIME,
-	FRIDAY_AFTERNOON_WORK_FROM TIME,
-	FRIDAY_AFTERNOON_WORK_TO TIME,
-	SATURDAY_MORNING_WORK_FROM TIME,
-	SATURDAY_MORNING_WORK_TO TIME,
-	SATURDAY_AFTERNOON_WORK_FROM TIME,
-	SATURDAY_AFTERNOON_WORK_TO TIME,
-	SUNDAY_MORNING_WORK_FROM TIME,
-	SUNDAY_MORNING_WORK_TO TIME,
-	SUNDAY_AFTERNOON_WORK_FROM TIME,
-	SUNDAY_AFTERNOON_WORK_TO TIME
-);
-
-CREATE INDEX employee_working_schedule_index ON employee_working_schedule(WORKING_SCHEDULE_ID);
-CREATE INDEX employee_working_hours_index ON employee_working_hours(WORKING_HOURS_ID);
-
-CREATE PROCEDURE check_working_schedule_exist(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_working_schedule(IN working_schedule_id VARCHAR(50), IN working_schedule VARCHAR(100), IN schedule_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-	SET @working_schedule = working_schedule;
-	SET @schedule_type = schedule_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'UPDATE employee_working_schedule SET WORKING_SCHEDULE = @working_schedule, SCHEDULE_TYPE = @schedule_type, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_working_schedule(IN working_schedule_id VARCHAR(50), IN working_schedule VARCHAR(100), IN schedule_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-	SET @working_schedule = working_schedule;
-	SET @schedule_type = schedule_type;
-	SET @transaction_log_id = transaction_log_id;
-	SET @record_log = record_log;
-
-	SET @query = 'INSERT INTO employee_working_schedule (WORKING_SCHEDULE_ID, WORKING_SCHEDULE, SCHEDULE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@working_schedule_id, @working_schedule, @schedule_type, @transaction_log_id, @record_log)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_working_schedule_details(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'SELECT WORKING_SCHEDULE, SCHEDULE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_working_schedule(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'DELETE FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE delete_all_working_hours(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'DELETE FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE generate_working_schedule_options()
-BEGIN
-	SET @query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE FROM employee_working_schedule ORDER BY WORKING_SCHEDULE';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE check_working_hours_exist(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE update_working_hours(IN working_schedule_id VARCHAR(50), IN start_date DATE, IN end_date DATE, IN monday_morning_work_from TIME, IN monday_morning_work_to TIME, IN monday_afternoon_work_from TIME, IN monday_afternoon_work_to TIME, IN tuesday_morning_work_from TIME, IN tuesday_morning_work_to TIME, IN tuesday_afternoon_work_from TIME, IN tuesday_afternoon_work_to TIME, IN wednesday_morning_work_from TIME, IN wednesday_morning_work_to TIME, IN wednesday_afternoon_work_from TIME, IN wednesday_afternoon_work_to TIME, IN thursday_morning_work_from TIME, IN thursday_morning_work_to TIME, IN thursday_afternoon_work_from TIME, IN thursday_afternoon_work_to TIME, IN friday_morning_work_from TIME, IN friday_morning_work_to TIME, IN friday_afternoon_work_from TIME, IN friday_afternoon_work_to TIME, IN saturday_morning_work_from TIME, IN saturday_morning_work_to TIME, IN saturday_afternoon_work_from TIME, IN saturday_afternoon_work_to TIME, IN sunday_morning_work_from TIME, IN sunday_morning_work_to TIME, IN sunday_afternoon_work_from TIME, IN sunday_afternoon_work_to TIME)
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-	SET @start_date = start_date;
-	SET @end_date = end_date;
-	SET @monday_morning_work_from = monday_morning_work_from;
-	SET @monday_morning_work_to = monday_morning_work_to;
-	SET @monday_afternoon_work_from = monday_afternoon_work_from;
-	SET @monday_afternoon_work_to = monday_afternoon_work_to;
-	SET @tuesday_morning_work_from = tuesday_morning_work_from;
-	SET @tuesday_morning_work_to = tuesday_morning_work_to;
-	SET @tuesday_afternoon_work_from = tuesday_afternoon_work_from;
-	SET @tuesday_afternoon_work_to = tuesday_afternoon_work_to;
-	SET @wednesday_morning_work_from = wednesday_morning_work_from;
-	SET @wednesday_morning_work_to = wednesday_morning_work_to;
-	SET @wednesday_afternoon_work_from = wednesday_afternoon_work_from;
-	SET @wednesday_afternoon_work_to = wednesday_afternoon_work_to;
-	SET @thursday_morning_work_from = thursday_morning_work_from;
-	SET @thursday_morning_work_to = thursday_morning_work_to;
-	SET @thursday_afternoon_work_from = thursday_afternoon_work_from;
-	SET @thursday_afternoon_work_to = thursday_afternoon_work_to;
-	SET @friday_morning_work_from = friday_morning_work_from;
-	SET @friday_morning_work_to = friday_morning_work_to;
-	SET @friday_afternoon_work_from = friday_afternoon_work_from;
-	SET @friday_afternoon_work_to = friday_afternoon_work_to;
-	SET @saturday_morning_work_from = saturday_morning_work_from;
-	SET @saturday_morning_work_to = saturday_morning_work_to;
-	SET @saturday_afternoon_work_from = saturday_afternoon_work_from;
-	SET @saturday_afternoon_work_to = saturday_afternoon_work_to;
-	SET @sunday_morning_work_from = sunday_morning_work_from;
-	SET @sunday_morning_work_to = sunday_morning_work_to;
-	SET @sunday_afternoon_work_from = sunday_afternoon_work_from;
-	SET @sunday_afternoon_work_to = sunday_afternoon_work_to;
-
-	SET @query = 'UPDATE employee_working_schedule SET START_DATE = @start_date, END_DATE = @end_date, MONDAY_MORNING_WORK_FROM = @monday_morning_work_from, MONDAY_MORNING_WORK_TO = @monday_morning_work_to, MONDAY_AFTERNOON_WORK_FROM = @monday_afternoon_work_from, MONDAY_AFTERNOON_WORK_TO = @monday_afternoon_work_to, TUESDAY_MORNING_WORK_FROM = @tuesday_morning_work_from, TUESDAY_MORNING_WORK_TO = @tuesday_morning_work_to, TUESDAY_AFTERNOON_WORK_FROM = @tuesday_afternoon_work_from, TUESDAY_AFTERNOON_WORK_TO = @tuesday_afternoon_work_to, WEDNESDAY_MORNING_WORK_FROM = @wednesday_morning_work_from, WEDNESDAY_MORNING_WORK_TO = @wednesday_morning_work_to, WEDNESDAY_AFTERNOON_WORK_FROM = @wednesday_afternoon_work_from, WEDNESDAY_AFTERNOON_WORK_TO = @wednesday_afternoon_work_to, THURSDAY_MORNING_WORK_FROM = @thursday_morning_work_from, THURSDAY_MORNING_WORK_TO = @thursday_morning_work_to, THURSDAY_AFTERNOON_WORK_FROM = @thursday_afternoon_work_from, THURSDAY_AFTERNOON_WORK_TO = @thursday_afternoon_work_to, FRIDAY_MORNING_WORK_FROM = @friday_morning_work_from, FRIDAY_MORNING_WORK_TO = @friday_morning_work_to, FRIDAY_AFTERNOON_WORK_FROM = @friday_afternoon_work_from, FRIDAY_AFTERNOON_WORK_TO = @friday_afternoon_work_to, SATURDAY_MORNING_WORK_FROM = @saturday_morning_work_from, SATURDAY_MORNING_WORK_TO = @saturday_morning_work_to, SATURDAY_AFTERNOON_WORK_FROM = @saturday_afternoon_work_from, SATURDAY_AFTERNOON_WORK_TO = @saturday_afternoon_work_to, SUNDAY_MORNING_WORK_FROM = @sunday_morning_work_from, SUNDAY_MORNING_WORK_TO = @sunday_morning_work_to, SUNDAY_AFTERNOON_WORK_FROM = @sunday_afternoon_work_from, SUNDAY_AFTERNOON_WORK_TO = @sunday_afternoon_work_to WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE insert_working_hours(IN working_schedule_id VARCHAR(50), IN start_date DATE, IN end_date DATE, IN monday_morning_work_from TIME, IN monday_morning_work_to TIME, IN monday_afternoon_work_from TIME, IN monday_afternoon_work_to TIME, IN tuesday_morning_work_from TIME, IN tuesday_morning_work_to TIME, IN tuesday_afternoon_work_from TIME, IN tuesday_afternoon_work_to TIME, IN wednesday_morning_work_from TIME, IN wednesday_morning_work_to TIME, IN wednesday_afternoon_work_from TIME, IN wednesday_afternoon_work_to TIME, IN thursday_morning_work_from TIME, IN thursday_morning_work_to TIME, IN thursday_afternoon_work_from TIME, IN thursday_afternoon_work_to TIME, IN friday_morning_work_from TIME, IN friday_morning_work_to TIME, IN friday_afternoon_work_from TIME, IN friday_afternoon_work_to TIME, IN saturday_morning_work_from TIME, IN saturday_morning_work_to TIME, IN saturday_afternoon_work_from TIME, IN saturday_afternoon_work_to TIME, IN sunday_morning_work_from TIME, IN sunday_morning_work_to TIME, IN sunday_afternoon_work_from TIME, IN sunday_afternoon_work_to TIME)
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-	SET @start_date = start_date;
-	SET @end_date = end_date;
-	SET @monday_morning_work_from = monday_morning_work_from;
-	SET @monday_morning_work_to = monday_morning_work_to;
-	SET @monday_afternoon_work_from = monday_afternoon_work_from;
-	SET @monday_afternoon_work_to = monday_afternoon_work_to;
-	SET @tuesday_morning_work_from = tuesday_morning_work_from;
-	SET @tuesday_morning_work_to = tuesday_morning_work_to;
-	SET @tuesday_afternoon_work_from = tuesday_afternoon_work_from;
-	SET @tuesday_afternoon_work_to = tuesday_afternoon_work_to;
-	SET @wednesday_morning_work_from = wednesday_morning_work_from;
-	SET @wednesday_morning_work_to = wednesday_morning_work_to;
-	SET @wednesday_afternoon_work_from = wednesday_afternoon_work_from;
-	SET @wednesday_afternoon_work_to = wednesday_afternoon_work_to;
-	SET @thursday_morning_work_from = thursday_morning_work_from;
-	SET @thursday_morning_work_to = thursday_morning_work_to;
-	SET @thursday_afternoon_work_from = thursday_afternoon_work_from;
-	SET @thursday_afternoon_work_to = thursday_afternoon_work_to;
-	SET @friday_morning_work_from = friday_morning_work_from;
-	SET @friday_morning_work_to = friday_morning_work_to;
-	SET @friday_afternoon_work_from = friday_afternoon_work_from;
-	SET @friday_afternoon_work_to = friday_afternoon_work_to;
-	SET @saturday_morning_work_from = saturday_morning_work_from;
-	SET @saturday_morning_work_to = saturday_morning_work_to;
-	SET @saturday_afternoon_work_from = saturday_afternoon_work_from;
-	SET @saturday_afternoon_work_to = saturday_afternoon_work_to;
-	SET @sunday_morning_work_from = sunday_morning_work_from;
-	SET @sunday_morning_work_to = sunday_morning_work_to;
-	SET @sunday_afternoon_work_from = sunday_afternoon_work_from;
-	SET @sunday_afternoon_work_to = sunday_afternoon_work_to;
-
-	SET @query = 'INSERT INTO employee_working_hours (WORKING_SCHEDULE_ID, START_DATE, END_DATE, MONDAY_MORNING_WORK_FROM, MONDAY_MORNING_WORK_TO, MONDAY_AFTERNOON_WORK_FROM, MONDAY_AFTERNOON_WORK_TO, TUESDAY_MORNING_WORK_FROM, TUESDAY_MORNING_WORK_TO, TUESDAY_AFTERNOON_WORK_FROM, TUESDAY_AFTERNOON_WORK_TO, WEDNESDAY_MORNING_WORK_FROM, WEDNESDAY_MORNING_WORK_TO, WEDNESDAY_AFTERNOON_WORK_FROM, WEDNESDAY_AFTERNOON_WORK_TO, THURSDAY_MORNING_WORK_FROM, THURSDAY_MORNING_WORK_TO, THURSDAY_AFTERNOON_WORK_FROM, THURSDAY_AFTERNOON_WORK_TO, FRIDAY_MORNING_WORK_FROM, FRIDAY_MORNING_WORK_TO, FRIDAY_AFTERNOON_WORK_FROM, FRIDAY_AFTERNOON_WORK_TO, SATURDAY_MORNING_WORK_FROM, SATURDAY_MORNING_WORK_TO, SATURDAY_AFTERNOON_WORK_FROM, SATURDAY_AFTERNOON_WORK_TO, SUNDAY_MORNING_WORK_FROM, SUNDAY_MORNING_WORK_TO, SUNDAY_AFTERNOON_WORK_FROM, SUNDAY_AFTERNOON_WORK_TO) VALUES(@working_schedule_id, @start_date, @end_date, @monday_morning_work_from, @monday_morning_work_to, @monday_afternoon_work_from, @monday_afternoon_work_to, @tuesday_morning_work_from, @tuesday_morning_work_to, @tuesday_afternoon_work_from, @tuesday_afternoon_work_to, @wednesday_morning_work_from, @wednesday_morning_work_to, @wednesday_afternoon_work_from, @wednesday_afternoon_work_to, @thursday_morning_work_from, @thursday_morning_work_to, @thursday_afternoon_work_from, @thursday_afternoon_work_to,  @friday_morning_work_from, @friday_morning_work_to, @friday_afternoon_work_from, @friday_afternoon_work_to, @saturday_morning_work_from, @saturday_morning_work_to, @saturday_afternoon_work_from, @saturday_afternoon_work_to, @sunday_morning_work_from, @sunday_morning_work_to, @sunday_afternoon_work_from, @sunday_afternoon_work_to)';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
-END //
-
-CREATE PROCEDURE get_working_hours_details(IN working_schedule_id VARCHAR(50))
-BEGIN
-	SET @working_schedule_id = working_schedule_id;
-
-	SET @query = 'SELECT START_DATE, END_DATE, MONDAY_MORNING_WORK_FROM, MONDAY_MORNING_WORK_TO, MONDAY_AFTERNOON_WORK_FROM, MONDAY_AFTERNOON_WORK_TO, TUESDAY_MORNING_WORK_FROM, TUESDAY_MORNING_WORK_TO, TUESDAY_AFTERNOON_WORK_FROM, TUESDAY_AFTERNOON_WORK_TO, WEDNESDAY_MORNING_WORK_FROM, WEDNESDAY_MORNING_WORK_TO, WEDNESDAY_AFTERNOON_WORK_FROM, WEDNESDAY_AFTERNOON_WORK_TO, THURSDAY_MORNING_WORK_FROM, THURSDAY_MORNING_WORK_TO, THURSDAY_AFTERNOON_WORK_FROM, THURSDAY_AFTERNOON_WORK_TO, FRIDAY_MORNING_WORK_FROM, FRIDAY_MORNING_WORK_TO, FRIDAY_AFTERNOON_WORK_FROM, FRIDAY_AFTERNOON_WORK_TO, SATURDAY_MORNING_WORK_FROM, SATURDAY_MORNING_WORK_TO, SATURDAY_AFTERNOON_WORK_FROM, SATURDAY_AFTERNOON_WORK_TO, SUNDAY_MORNING_WORK_FROM, SUNDAY_MORNING_WORK_TO, SUNDAY_AFTERNOON_WORK_FROM, SUNDAY_AFTERNOON_WORK_TO FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = @working_schedule_id';
-
-	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	DEALLOCATE PREPARE stmt;
 END //
 
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
 BEGIN
-	SET @role_id = role_id;
-	SET @access_right_id = access_right_id;
-	SET @access_type = access_type;
+	SET ?role_id = role_id;
+	SET ?access_right_id = access_right_id;
+	SET ?access_type = access_type;
 
-	IF @access_type = 'module' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = @access_right_id AND ROLE_ID = @role_id';
-	ELSEIF @access_type = 'page' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = @access_right_id AND ROLE_ID = @role_id';
+	IF ?access_type = 'module' THEN
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = ?access_right_id AND ROLE_ID = ?role_id';
+	ELSEIF ?access_type = 'page' THEN
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = ?access_right_id AND ROLE_ID = ?role_id';
 	ELSE
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = @access_right_id AND ROLE_ID = @role_id';
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = ?access_right_id AND ROLE_ID = ?role_id';
     END IF;
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt;
-	DROP PREPARE stmt;
+	EXECUTE stmt USING ;
+	DEALLOCATE PREPARE stmt;
 END //

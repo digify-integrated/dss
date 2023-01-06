@@ -1,115 +1,80 @@
 <?php
     $menu = '';
 
-    $module_page = $api->check_role_access_rights($username, '1', 'page');
-    $pages_page = $api->check_role_access_rights($username, '3', 'page');
-    $action_page = $api->check_role_access_rights($username, '5', 'page');
-    $system_parameters_page = $api->check_role_access_rights($username, '7', 'page');
-    $roles_page = $api->check_role_access_rights($username, '9', 'page');
-    $upload_settings_page = $api->check_role_access_rights($username, '11', 'page');
-    $system_codes_page = $api->check_role_access_rights($username, '13', 'page');
-    $company_page = $api->check_role_access_rights($username, '15', 'page');
-    $interface_settings_page = $api->check_role_access_rights($username, '17', 'page');
-    $email_settings_page = $api->check_role_access_rights($username, '19', 'page');
-    $notification_settings_page = $api->check_role_access_rights($username, '21', 'page');
-    $country_page = $api->check_role_access_rights($username, '23', 'page');
-    $state_page = $api->check_role_access_rights($username, '25', 'page');
-    $zoom_api_page = $api->check_role_access_rights($username, '27', 'page');
-    $user_accounts_page = $api->check_role_access_rights($username, '29', 'page');
+    $menu_pages = [
+        'modules' => ['id' => '1', 'url' => 'modules.php', 'label' => 'Modules', 'group' => 'Technical'],
+        'pages' => ['id' => '33', 'url' => 'pages.php', 'label' => 'Pages', 'group' => 'Technical'],
+        'actions' => ['id' => '31', 'url' => 'actions.php', 'label' => 'Actions', 'group' => 'Technical'],
+        'country' => ['id' => '35', 'url' => 'country.php', 'label' => 'Country', 'group' => 'Configurations'],
+        'email_settings' => ['id' => '35', 'url' => 'email-settings.php', 'label' => 'Email Settings', 'group' => 'Configurations'],
+        'system_parameters' => ['id' => '37', 'url' => 'system-parameters.php', 'label' => 'System Parameters', 'group' => 'Configurations'],
+        'upload_settings' => ['id' => '41', 'url' => 'upload-settings.php', 'label' => 'Upload Settings', 'group' => 'Configurations'],
+        'system_codes' => ['id' => '35', 'url' => 'system-codes.php', 'label' => 'System Codes', 'group' => 'Configurations'],
+        'interface_settings' => ['id' => '35', 'url' => 'interface-settings.php', 'label' => 'Interface Settings', 'group' => 'Configurations'],
+        'notification_settings' => ['id' => '35', 'url' => 'notification-settings.php', 'label' => 'Notification Settings', 'group' => 'Configurations'],
+        'state' => ['id' => '35', 'url' => 'state.php', 'label' => 'State', 'group' => 'Configurations'],
+        'zoom_api' => ['id' => '35', 'url' => 'zoom-api.php', 'label' => 'Zoom API', 'group' => 'Configurations'],
+        'roles' => ['id' => '39', 'url' => 'roles.php', 'label' => 'Roles', 'group' => 'Administration'],
+        'user_accounts' => ['id' => '35', 'url' => 'user-accounts.php', 'label' => 'User Accounts', 'group' => 'Administration'],
+        'company' => ['id' => '35', 'url' => 'company.php', 'label' => 'Company', 'group' => null],
+    ];
 
-    if($module_page > 0 || $pages_page > 0 || $action_page > 0){
+    ksort($menu_pages);
+    
+    $menu = '';
+    $technical_menu = '';
+    $configurations_menu = '';
+    $administration_menu = '';
+    $standalone_menu = '';
+    
+    foreach ($menu_pages as $page_menu_id => $menu_page) {
+        if ($api->check_role_access_rights($username, $menu_page['id'], 'page') > 0) {
+            if ($menu_page['group'] == 'Technical') {
+                $technical_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
+            } 
+            else if ($menu_page['group'] == 'Configurations') {
+                $configurations_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
+            } 
+            else if ($menu_page['group'] == 'Administration') {
+                $administration_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
+            }
+            else{
+                $standalone_menu .= '<li class="nav-item dropdown"><a href="' . $menu_page['url'] . '" class="nav-link">' .$menu_page['label'] . '</a></li>';
+            }
+        }
+    }
+    
+    if (!empty($technical_menu)) {
         $menu .= '<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="technical-menu" role="button">
-                        </i><span key="t-technical">Technical</span> <div class="arrow-down"></div>
+                    <a class="nav-link dropdown-toggle" href="#" id="technicalDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Technical
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="technical-menu">';
-
-
-        if($action_page > 0){
-            $menu .= '<a href="actions.php" class="dropdown-item" key="t-actions">Actions</a>';
-        }
-
-        if($module_page > 0){
-            $menu .= '<a href="modules.php" class="dropdown-item" key="t-modules">Modules</a>';
-        }
-
-        if($pages_page > 0){
-            $menu .= '<a href="pages.php" class="dropdown-item" key="t-pages">Pages</a>';
-        }
-       
-        $menu .= '</div>
-        </li>';
+                    <div class="dropdown-menu" aria-labelledby="technicalDropdown">' . $technical_menu . '</div>
+                  </li>';
     }
-
-    if($country_page > 0 || $email_settings_page > 0 || $interface_settings_page > 0 || $notification_settings_page > 0 || $state_page > 0 || $system_codes_page > 0 || $system_parameters_page > 0 || $upload_settings_page > 0 || $zoom_api_page > 0){
+    
+    if (!empty($configurations_menu)) {
         $menu .= '<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="configurations-menu" role="button">
-                        </i><span key="t-configuration">Configurations</span> <div class="arrow-down"></div>
+                    <a class="nav-link dropdown-toggle" href="#" id="configurationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Configurations
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="configurations-menu">';
-
-        if($country_page > 0){
-            $menu .= '<a href="country.php" class="dropdown-item" key="t-country">Country</a>';
-        }
-
-        if($email_settings_page > 0){
-            $menu .= '<a href="email-settings.php" class="dropdown-item" key="t-email-settings">Email Settings</a>';
-        }
-
-        if($interface_settings_page > 0){
-            $menu .= '<a href="interface-settings.php" class="dropdown-item" key="t-interface-settings">Interface Settings</a>';
-        }
-
-        if($notification_settings_page > 0){
-            $menu .= '<a href="notification-settings.php" class="dropdown-item" key="t-notification-settings">Notification Settings</a>';
-        }
-            
-        if($state_page > 0){
-            $menu .= '<a href="state.php" class="dropdown-item" key="t-state">State</a>';
-        }
-
-        if($system_codes_page > 0){
-            $menu .= '<a href="system-codes.php" class="dropdown-item" key="t-system-codes">System Codes</a>';
-        }
-
-        if($system_parameters_page > 0){
-            $menu .= '<a href="system-parameters.php" class="dropdown-item" key="t-system-parameters">System Parameters</a>';
-        }
-
-        if($upload_settings_page > 0){
-            $menu .= '<a href="upload-settings.php" class="dropdown-item" key="t-upload-settings">Upload Settings</a>';
-        }
-        
-        if($zoom_api_page > 0){
-            $menu .= '<a href="zoom-api.php" class="dropdown-item" key="t-zoom-account">Zoom API</a>';
-        }
-       
-        $menu .= '</div>
-        </li>';
+                    <div class="dropdown-menu" aria-labelledby="configurationsDropdown">' . $configurations_menu . '</div>
+                  </li>';
     }
-
-    if($roles_page > 0 || $user_accounts_page > 0){
+    
+    if (!empty($administration_menu)) {
         $menu .= '<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="administration-menu" role="button">
-                        </i><span key="t-administration">Administration</span> <div class="arrow-down"></div>
+                    <a class="nav-link dropdown-toggle" href="#" id="administrationDropdown" role="button" data-toggle="dropdown" aria-haspopup "true" aria-expanded="false">
+                      Administration
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="administration-menu">';
-
-        if($roles_page > 0){
-            $menu .= '<a href="roles.php" class="dropdown-item" key="t-roles">Roles</a>';
-        }
-
-        if($user_accounts_page > 0){
-            $menu .= '<a href="user-accounts.php" class="dropdown-item" key="t-user-accounts">User Accounts</a>';
-        }
-       
-        $menu .= '</div>
-        </li>';
+                    <div class="dropdown-menu" aria-labelledby="administrationDropdown">' . $administration_menu . '</div>
+                  </li>';
     }
-
-    if($company_page > 0){
-        $menu .= '<li class="nav-item dropdown"><a href="company.php" class="nav-link">Company</a></li>';
+    
+    if (!empty($standalone_menu)) {
+        $menu .= $standalone_menu;
     }
+   
 ?>
 
 <div class="topnav">

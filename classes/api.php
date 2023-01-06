@@ -29,21 +29,19 @@ class Api{
     #
     # -------------------------------------------------------------
     public function databaseConnection(){
-        // if connection already exists
         if ($this->db_connection != null) {
-            return true;
+            return $this->db_connection;
         } 
         else {
             try {
                 $this->db_connection = new PDO('mysql:host='. DB_HOST .';dbname='. DB_NAME . ';character_set=utf8', DB_USER, DB_PASS);
-                return true;
+                return $this->db_connection;
             } 
             catch (PDOException $e) {
                 $this->errors[] = $e->getMessage();
+                return null;
             }
         }
-        // default return
-        return false;
     }
     # -------------------------------------------------------------
 
@@ -57,15 +55,20 @@ class Api{
     # -------------------------------------------------------------
     public function backup_database($file_name, $username){
         if ($this->databaseConnection()) {
-            $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
-            
-            exec('C:\xampp\mysql\bin\mysqldump.exe --routines -u '. DB_USER .' -p'. DB_PASS .' '. DB_NAME .' -r "'. $backup_file .'"  2>&1', $output, $return);
+            if ($this->databaseConnection()) {
+                $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
 
-            if(!$return) {
-                return true;
+                exec('C:\xampp\mysql\bin\mysqldump.exe --routines -u '. DB_USER .' -p'. DB_PASS .' '. DB_NAME .' -r "'. $backup_file .'"  2>&1', $output, $return);
+
+                if ($return === 0) {
+                    return true;
+                }
+                else {
+                    return 'Error: mysqldump command failed with error code ' . $return;
+                }
             }
             else {
-                return $return;
+                return 'Error: Unable to connect to database';
             }
         }
     }
@@ -193,13 +196,17 @@ class Api{
     #
     # -------------------------------------------------------------
     public function validate_email($email){
-        $regex = "/^([a-zA-Z0-9\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/";
+        if (!isset($email) || empty($email)) {
+            return 'Error: Missing or invalid email';
+        }
+
+        $regex = '/^([a-zA-Z0-9\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/';
 
         if (preg_match($regex, $email)) {
             return true;
         }
-        else{
-            return 'The email is not valid';
+        else {
+            return 'Error: Invalid email format';
         }
     }
     # -------------------------------------------------------------
@@ -436,34 +443,36 @@ class Api{
     #
     # -------------------------------------------------------------
     public function time_elapsed_string($datetime, $full = false) {
-        $now = new DateTime;
+        $now = new DateTime();
         $ago = new DateTime($datetime);
         $diff = $now->diff($ago);
-    
+
         $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
-    
-        $string = array(
+
+        $timeUnits = array(
             'y' => 'year',
             'm' => 'month',
             'w' => 'week',
             'd' => 'day',
             'h' => 'hour',
             'i' => 'minute',
-            's' => 'second',
+            's' => 'second'
         );
 
-        foreach ($string as $k => &$v) {
-            if ($diff->$k) {
-                $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
-            } 
-            else {
-                unset($string[$k]);
+        $elapsedTime = [];
+
+        foreach ($timeUnits as $unit => $label) {
+            if ($diff->$unit) {
+                $elapsedTime[] = $diff->$unit . ' ' . $label . ($diff->$unit > 1 ? 's' : '');
             }
         }
-    
-        if (!$full) $string = array_slice($string, 0, 1);
-        return $string ? implode(', ', $string) . ' ago' : 'just now';
+
+        if (!$full) {
+            $elapsedTime = array_slice($elapsedTime, 0, 1);
+        }
+
+        return $elapsedTime ? implode(', ', $elapsedTime) . ' ago' : 'just now';
     }
     # -------------------------------------------------------------
 
@@ -476,9 +485,13 @@ class Api{
     #
     # -------------------------------------------------------------
     public function directory_checker($directory) {
-        if(!file_exists($directory)) {
-            mkdir($directory, 0777);
-            return true;
+        if (!file_exists($directory)) {
+            if (mkdir($directory, 0777)) {
+                return true;
+            } 
+            else {
+              return 'Error creating directory.';
+            }
         } 
         else {
             return true;
@@ -506,10 +519,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -531,10 +544,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -557,10 +570,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -582,10 +595,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -608,10 +621,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -633,10 +646,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -659,10 +672,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -684,10 +697,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -709,10 +722,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -735,10 +748,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -760,10 +773,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -785,10 +798,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -811,10 +824,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -836,10 +849,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -861,10 +874,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -886,10 +899,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -911,10 +924,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -937,10 +950,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -963,10 +976,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -989,10 +1002,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1014,10 +1027,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1039,10 +1052,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1064,10 +1077,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1089,10 +1102,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1114,10 +1127,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1139,10 +1152,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1164,10 +1177,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1189,10 +1202,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1214,10 +1227,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1239,10 +1252,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1264,10 +1277,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1289,10 +1302,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1314,10 +1327,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1337,6 +1350,7 @@ class Api{
     # -------------------------------------------------------------
     public function update_login_attempt($username, $login_attemp, $last_failed_attempt_date){
         if ($this->databaseConnection()) {
+            
             $sql = $this->db_connection->prepare('CALL update_login_attempt(:username, :login_attemp, :last_failed_attempt_date)');
             $sql->bindValue(':username', $username);
             $sql->bindValue(':login_attemp', $login_attemp);
@@ -1346,7 +1360,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1370,7 +1384,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1397,7 +1411,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1466,7 +1480,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1537,7 +1551,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1588,7 +1602,7 @@ class Api{
                                     }
                                 }
                                 else{
-                                    return $sql->errorInfo()[2];
+                                    return $stmt->errorInfo()[2];
                                 }
                             }
                             else{
@@ -1616,7 +1630,7 @@ class Api{
                                 }
                             }
                             else{
-                                return $sql->errorInfo()[2];
+                                return $stmt->errorInfo()[2];
                             }
                         }
                         else{
@@ -1696,7 +1710,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1762,7 +1776,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1830,7 +1844,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1898,7 +1912,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -1966,7 +1980,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2038,7 +2052,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2089,7 +2103,7 @@ class Api{
                                     }
                                 }
                                 else{
-                                    return $sql->errorInfo()[2];
+                                    return $stmt->errorInfo()[2];
                                 }
                             }
                             else{
@@ -2117,7 +2131,7 @@ class Api{
                                 }
                             }
                             else{
-                                return $sql->errorInfo()[2];
+                                return $stmt->errorInfo()[2];
                             }
                         }
                         else{
@@ -2197,7 +2211,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2241,7 +2255,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2270,7 +2284,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2453,7 +2467,7 @@ class Api{
                                     }
                                 }
                                 else{
-                                    return $sql->errorInfo()[2];
+                                    return $stmt->errorInfo()[2];
                                 }
                             }
                             else{
@@ -2504,7 +2518,7 @@ class Api{
                                 }
                             }
                             else{
-                                return $sql->errorInfo()[2];
+                                return $stmt->errorInfo()[2];
                             }
                         }
                         else{
@@ -2593,7 +2607,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2637,7 +2651,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2666,7 +2680,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2737,7 +2751,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2803,7 +2817,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2870,7 +2884,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2939,7 +2953,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -2983,7 +2997,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3012,7 +3026,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3086,7 +3100,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3109,6 +3123,7 @@ class Api{
                 $record_log = 'ULCK->' . $username . '->' . date('Y-m-d h:i:s');
                 $log_type = 'Unlock';
                 $log = 'User ' . $username . ' unlocked user account.';
+                $system_date = null;
             }
             else{
                 $record_log = 'LCK->' . $username . '->' . date('Y-m-d h:i:s');
@@ -3133,7 +3148,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3179,7 +3194,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3247,7 +3262,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3291,7 +3306,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3360,7 +3375,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3411,7 +3426,7 @@ class Api{
                                     }
                                 }
                                 else{
-                                    return $sql->errorInfo()[2];
+                                    return $stmt->errorInfo()[2];
                                 }
                             }
                             else{
@@ -3439,7 +3454,7 @@ class Api{
                                 }
                             }
                             else{
-                                return $sql->errorInfo()[2];
+                                return $stmt->errorInfo()[2];
                             }
                         }
                         else{
@@ -3496,7 +3511,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3563,7 +3578,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3630,7 +3645,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3697,7 +3712,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3764,7 +3779,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3835,7 +3850,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3879,7 +3894,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -3945,7 +3960,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4011,7 +4026,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4077,7 +4092,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4108,7 +4123,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4306,7 +4321,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4406,7 +4421,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4505,7 +4520,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4606,7 +4621,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -4784,7 +4799,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5183,7 +5198,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5207,7 +5222,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5231,7 +5246,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5510,7 +5525,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5728,7 +5743,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5791,7 +5806,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5854,7 +5869,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -5929,7 +5944,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6186,7 +6201,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6227,7 +6242,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6250,7 +6265,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6274,7 +6289,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6297,7 +6312,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6320,7 +6335,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6344,7 +6359,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6367,7 +6382,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6390,7 +6405,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6414,7 +6429,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6437,7 +6452,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6460,7 +6475,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6483,7 +6498,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6506,7 +6521,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6530,7 +6545,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6553,7 +6568,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6576,7 +6591,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6599,7 +6614,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6622,7 +6637,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6646,7 +6661,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6687,7 +6702,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6754,7 +6769,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6777,7 +6792,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6800,7 +6815,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6824,7 +6839,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6848,7 +6863,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6872,7 +6887,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6895,7 +6910,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6918,7 +6933,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6941,7 +6956,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6964,7 +6979,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -6987,7 +7002,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7010,7 +7025,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7033,7 +7048,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7056,7 +7071,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7079,7 +7094,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7103,7 +7118,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7126,7 +7141,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7149,7 +7164,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7172,7 +7187,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7195,7 +7210,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7218,7 +7233,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7243,7 +7258,7 @@ class Api{
                 while($row = $sql->fetch()){
                     $attachment_id = $row['ATTACHMENT_ID'];
 
-                    $delete_job_position_attachment = $this->delete_job_position_attachment($attachment_id);
+                    $delete_job_position_attachment = $this->delete_job_position_attachment($attachment_id, $username);
 
                     if(!$delete_job_position_attachment){
                         $error = $delete_job_position_attachment;
@@ -7259,7 +7274,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7282,7 +7297,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7305,7 +7320,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7328,7 +7343,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7369,7 +7384,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7392,7 +7407,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7415,7 +7430,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7438,7 +7453,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7461,7 +7476,7 @@ class Api{
                 return true;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7503,7 +7518,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7541,7 +7556,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7576,7 +7591,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7612,7 +7627,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7651,7 +7666,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7691,7 +7706,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7725,7 +7740,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7758,7 +7773,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7793,7 +7808,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7824,7 +7839,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7864,7 +7879,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7903,7 +7918,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7942,7 +7957,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -7986,7 +8001,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8030,7 +8045,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8068,7 +8083,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8101,7 +8116,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8135,7 +8150,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8172,7 +8187,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8209,7 +8224,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8245,7 +8260,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8282,7 +8297,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8316,7 +8331,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8350,7 +8365,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8384,7 +8399,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8419,7 +8434,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8458,7 +8473,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8491,7 +8506,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8524,7 +8539,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8557,7 +8572,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8565,6 +8580,29 @@ class Api{
 
     # -------------------------------------------------------------
     #   Get methods
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_default_image
+    # Purpose    : returns the default image.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_default_image($type) {
+        $defaultImages = [
+            'profile' => './assets/images/default/default-avatar.png',
+            'login background' => './assets/images/default/default-bg.jpg',
+            'login logo' => './assets/images/default/default-login-logo.png',
+            'menu logo' => './assets/images/default/default-menu-logo.png',
+            'module icon' => './assets/images/default/default-module-icon.svg',
+            'favicon' => './assets/images/default/default-favicon.png',
+            'company logo' => './assets/images/default/default-company-logo.png',
+        ];
+
+        return $defaultImages[$type] ?? './assets/images/default/default-image-placeholder.png';
+    }
     # -------------------------------------------------------------
     
     # -------------------------------------------------------------
@@ -8585,10 +8623,10 @@ class Api{
             if($sql->execute()){
                 $row = $sql->fetch();
 
-                return $row['TOTAL'];
+                return (int) $row['TOTAL'];
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8621,7 +8659,7 @@ class Api{
                 return $response;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -8817,39 +8855,24 @@ class Api{
     public function get_date_difference($date_1, $date_2){
         $response = array();
 
-        $diff = abs(strtotime($date_2) - strtotime($date_1));
-
-        $years = floor($diff / (365 * 60 * 60 * 24));
-        $months = floor(($diff - $years * 365 * 60 * 60 * 24) / (30 * 60 * 60 * 24));
-        $days = floor(($diff - $years * 365 * 60 * 60 * 24 - $months * 30 * 60 * 60 * 24)/ (60 * 60 * 24));
-
-        if($years > 1 || $years == 0){
-            $years = $years . ' Years';
-        }
-        else{
-            $years = $years . ' Year';
-        }
-
-        if($months > 1 || $months == 0){
-            $months = $months . ' Months';
-        }
-        else{
-            $months = $months . ' Month';
-        }
-
-        if($days > 1 || $days == 0){
-            $days = $days . ' Days';
-        }
-        else{
-            $days = $days . ' Day';
-        }
-
+        $start = new DateTime($date_1);
+        $end = new DateTime($date_2);
+        $diff = $start->diff($end);
+    
+        $years = $diff->y;
+        $months = $diff->m;
+        $days = $diff->d;
+    
+        $years = $years . ' Year' . ($years > 1 ? 's' : '');
+        $months = $months . ' Month' . ($months > 1 ? 's' : '');
+        $days = $days . ' Day' . ($days > 1 ? 's' : '');
+    
         $response[] = array(
             'YEARS' => $years,
             'MONTHS' => $months,
             'DAYS' => $days
         );
-
+    
         return $response;
     }
     # -------------------------------------------------------------
@@ -8962,7 +8985,7 @@ class Api{
             return 'modal-dialog-scrollable';
         }
         else{
-            return '';
+            return null;
         }
     }
     # -------------------------------------------------------------
@@ -8986,7 +9009,7 @@ class Api{
             return 'modal-xl';
         }
         else {
-            return '';
+            return null;
         }
     }
     # -------------------------------------------------------------
@@ -9103,35 +9126,9 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_image($image, $type){
-        if(empty($image) || !file_exists($image)){
-            switch ($type) {
-                case 'profile':
-                    return './assets/images/default/default-avatar.png';
-                break;
-                case 'login background':
-                    return './assets/images/default/default-bg.jpg';
-                break;
-                case 'login logo':
-                    return './assets/images/default/default-login-logo.png';
-                break;
-                case 'menu logo':
-                    return './assets/images/default/default-menu-logo.png';
-                case 'module icon':
-                    return './assets/images/default/default-module-icon.svg';
-                break;
-                case 'favicon':
-                    return './assets/images/default/default-favicon.png';
-                break;
-                case 'company logo':
-                    return './assets/images/default/default-company-logo.png';
-                break;
-                default:
-                    return './assets/images/default/default-image-placeholder.png';
-            }
-        }
-        else{
-            return $image;
-        }
+        $image = $image ?? '';
+        
+        return (empty($image) || !file_exists($image)) ? $this->get_default_image($type) : $image;
     }
     # -------------------------------------------------------------
 
@@ -9174,7 +9171,7 @@ class Api{
             $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :username');
             $sql->bindValue(':username', $username);
 
-            if($sql->execute()){       
+            if($sql->execute()){
                 while($row = $sql->fetch()){
                     $role_id = $row['ROLE_ID'];
                     $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
@@ -9183,7 +9180,7 @@ class Api{
                 return $total;
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9201,15 +9198,16 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function generate_file_name($length) {
+    public function generate_file_name($length, $prefix = '') {
         $key = '';
+        
         $keys = array_merge(range(0, 9), range('a', 'z'));
-    
+        $maxIndex = count($keys) - 1;
+
         for ($i = 0; $i < $length; $i++) {
-            $key .= $keys[array_rand($keys)];
+            $key .= $keys[random_int(0, $maxIndex)];
         }
-    
-        return $key;
+        return $prefix . $key . uniqid('', true);
     }
     # -------------------------------------------------------------
 
@@ -9247,7 +9245,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9282,7 +9280,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9317,7 +9315,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9352,7 +9350,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9388,7 +9386,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9424,7 +9422,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9460,7 +9458,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9495,7 +9493,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9530,7 +9528,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }
@@ -9565,7 +9563,7 @@ class Api{
                 }
             }
             else{
-                return $sql->errorInfo()[2];
+                return $stmt->errorInfo()[2];
             }
         }
     }

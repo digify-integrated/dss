@@ -1,52 +1,45 @@
 <?php
+    $menu_pages = [
+        'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
+        'job_positions' => ['id' => '33', 'url' => 'job-positions.php', 'label' => 'Job Positions', 'group' => 'Configurations'],
+        'departments' => ['id' => '31', 'url' => 'departments.php', 'label' => 'Departments', 'group' => 'Configurations'],
+        'departure_reasons' => ['id' => '37', 'url' => 'departure-reasons.php', 'label' => 'Departure Reasons', 'group' => 'Configurations'],
+        'employee_types' => ['id' => '39', 'url' => 'employee-types.php', 'label' => 'Employee Types', 'group' => 'Configurations'],
+        'wage_types' => ['id' => '41', 'url' => 'wage-types.php', 'label' => 'Wage Types', 'group' => 'Configurations'],
+        'work_locations' => ['id' => '35', 'url' => 'work-locations.php', 'label' => 'Work Locations', 'group' => 'Configurations'],
+        'work_schedules' => ['id' => '43', 'url' => 'work-schedules.php', 'label' => 'Work Schedules', 'group' => 'Configurations'],
+    ];
+
+    ksort($menu_pages);
+    
     $menu = '';
-
-    $departments_page = $api->check_role_access_rights($username, '31', 'page');
-    $job_positions_page = $api->check_role_access_rights($username, '33', 'page');
-    $work_locations_page = $api->check_role_access_rights($username, '35', 'page');
-    $depature_reasons_page = $api->check_role_access_rights($username, '37', 'page');
-    $employee_types_page = $api->check_role_access_rights($username, '39', 'page');
-    $wage_types_page = $api->check_role_access_rights($username, '41', 'page');
-    $working_schedules_page = $api->check_role_access_rights($username, '43', 'page');
-
-    if($working_schedules_page > 0){
-        $menu .= '<li class="nav-item dropdown"><a href="working-schedules.php" class="nav-link">Working Schedules</a></li>';
+    $configurations_menu = '';
+    $standalone_menu = '';
+    
+    foreach ($menu_pages as $page_menu_id => $menu_page) {
+        if ($api->check_role_access_rights($username, $menu_page['id'], 'page') > 0) {
+            if ($menu_page['group'] == 'Configurations') {
+                $configurations_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
+            }
+            else{
+                $standalone_menu .= '<li class="nav-item dropdown"><a href="' . $menu_page['url'] . '" class="nav-link">' .$menu_page['label'] . '</a></li>';
+            }
+        }
     }
 
-    if($departments_page > 0 || $job_positions_page > 0 || $work_locations_page > 0 || $depature_reasons_page > 0 || $employee_types_page > 0 || $wage_types_page > 0 || $working_schedules_page > 0){
+    if (!empty($standalone_menu)) {
+        $menu .= $standalone_menu;
+    }
+    
+    if (!empty($configurations_menu)) {
         $menu .= '<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="configurations-menu" role="button">
-                        </i><span key="t-configuration">Configurations</span> <div class="arrow-down"></div>
+                    <a class="nav-link dropdown-toggle" href="#" id="configurationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Configurations
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="configurations-menu">';
-
-        if($job_positions_page > 0){
-            $menu .= '<a href="job-positions.php" class="dropdown-item" key="t-job-positions">Job Positions</a>';
-        }
-
-        if($departments_page > 0){
-            $menu .= '<a href="departments.php" class="dropdown-item" key="t-departments">Departments</a>';
-        }
-
-        if($depature_reasons_page > 0){
-            $menu .= '<a href="departure-reasons.php" class="dropdown-item" key="t-departure-reasons">Departure Reasons</a>';
-        }
-
-        if($employee_types_page > 0){
-            $menu .= '<a href="employee-types.php" class="dropdown-item" key="t-employee-types">Employee Types</a>';
-        }
-
-        if($wage_types_page > 0){
-            $menu .= '<a href="wage-types.php" class="dropdown-item" key="t-wage-types">Wage Types</a>';
-        }
-
-        if($work_locations_page > 0){
-            $menu .= '<a href="work-locations.php" class="dropdown-item" key="t-work-locations">Work Locations</a>';
-        }
-       
-        $menu .= '</div>
-        </li>';
+                    <div class="dropdown-menu" aria-labelledby="configurationsDropdown">' . $configurations_menu . '</div>
+                  </li>';
     }
+    
 ?>
 
 <div class="topnav">

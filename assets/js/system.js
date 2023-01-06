@@ -1438,97 +1438,6 @@ function display_form_details(form_type){
     }
 }
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var transaction_log_id = sessionStorage.getItem('transaction_log_id');
-    var type = 'transaction log table';
-    var settings;
-
-    var column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
-
-    var column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    if(show_all){
-        length_menu = [ [-1], ['All'] ];
-    }
-    else{
-        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
-    }
-
-    if(buttons){
-        settings = {
-            'ajax': { 
-                'url' : 'system-generation.php',
-                'method' : 'POST',
-                'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-                'dataSrc' : ''
-            },
-            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-            buttons: [
-                'csv', 'excel', 'pdf'
-            ],
-            'order': [[ 2, 'desc' ]],
-            'columns' : column,
-            'scrollY': false,
-            'scrollX': true,
-            'scrollCollapse': true,
-            'fnDrawCallback': function( oSettings ) {
-                readjust_datatable_column();
-            },
-            'aoColumnDefs': column_definition,
-            'lengthMenu': length_menu,
-            'language': {
-                'emptyTable': 'No data found',
-                'searchPlaceholder': 'Search...',
-                'search': '',
-                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        };
-    }
-    else{
-        settings = {
-            'ajax': { 
-                'url' : 'system-generation.php',
-                'method' : 'POST',
-                'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-                'dataSrc' : ''
-            },
-            'order': [[ 2, 'desc' ]],
-            'columns' : column,
-            'scrollY': false,
-            'scrollX': true,
-            'scrollCollapse': true,
-            'fnDrawCallback': function( oSettings ) {
-                readjust_datatable_column();
-            },
-            'aoColumnDefs': column_definition,
-            'lengthMenu': length_menu,
-            'language': {
-                'emptyTable': 'No data found',
-                'searchPlaceholder': 'Search...',
-                'search': '',
-                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        };
-    }
-
-    destroy_datatable(datatable_name);
-    
-    $(datatable_name).dataTable(settings);
-}
-
 // Get location function
 function get_location(map_div) {
     if(!map_div){
@@ -1838,27 +1747,6 @@ function generate_city_option(province, selected){
     });
 }
 
-function generate_pay_run_payee_option(pay_run_id){
-    var username = $('#username').text();
-    var type = 'pay run payee options';
-
-    $.ajax({
-        url: 'system-generation.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {type : type, pay_run_id : pay_run_id, username : username},
-        beforeSend: function(){
-            $('#payee').empty();
-        },
-        success: function(response) {
-            for(var i = 0; i < response.length; i++) {
-                newOption = new Option(response[i].FILE_AS, response[i].EMPLOYEE_ID, false, false);
-                $('#payee').append(newOption);
-            }
-        }
-    });
-}
-
 // Reset validation functions
 function reset_element_validation(element){
     $(element).parent().removeClass('has-danger');
@@ -1894,71 +1782,6 @@ function readjust_datatable_column(){
 
     $('#System-Modal').on('shown.bs.modal', function (e) {
         $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-    });
-}
-
-// Truncate functions
-function truncate_temporary_table(table_name){
-    var transaction = 'truncate temporary table';
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'TEXT',
-        data: {table_name : table_name, transaction : transaction},
-        success: function(response) {
-            if($('#import-attendance-record-datatable').length){
-                initialize_temporary_attendance_record_table('#import-attendance-record-datatable', false, true);
-            }
-
-            if($('#import-employee-datatable').length){
-                initialize_temporary_employee_table('#import-employee-datatable', false, true);
-            }
-
-            if($('#import-leave-entitlement-datatable').length){
-                initialize_temporary_leave_entitlement_table('#import-leave-entitlement-datatable', false, true);
-            }
-
-            if($('#import-leave-datatable').length){
-                initialize_temporary_leave_table('#import-leave-datatable', false, true);
-            }
-
-            if($('#import-attendance-adjustment-datatable').length){
-                initialize_temporary_attendance_adjustment_table('#import-attendance-adjustment-datatable', false, true);
-            }
-
-            if($('#import-attendance-creation-datatable').length){
-                initialize_temporary_attendance_creation_table('#import-attendance-creation-datatable', false, true);
-            }
-
-            if($('#import-allowance-datatable').length){
-                initialize_temporary_allowance_table('#import-allowance-datatable', false, true);
-            }
-
-            if($('#import-deduction-datatable').length){
-                initialize_temporary_deduction_table('#import-deduction-datatable', false, true);
-            }
-
-            if($('#import-government-contribution-datatable').length){
-                initialize_temporary_government_contribution_table('#import-government-contribution-datatable', false, true);
-            }
-
-            if($('#import-contribution-bracket-datatable').length){
-                initialize_temporary_contribution_bracket_table('#import-contribution-bracket-datatable', false, true);
-            }
-
-            if($('#import-contribution-deduction-datatable').length){
-                initialize_temporary_contribution_deduction_table('#import-contribution-deduction-datatable', false, true);
-            }
-
-            if($('#import-withholding-tax-datatable').length){
-                initialize_temporary_withholding_tax_table('#import-withholding-tax-datatable', false, true);
-            }
-
-            if($('#import-other-income-datatable').length){
-                initialize_temporary_other_income_table('#import-other-income-datatable', false, true);
-            }
-        }
     });
 }
 
@@ -2295,19 +2118,19 @@ function show_alert_confirmation(confirm_title, confirm_text, confirm_icon, conf
 function create_employee_qr_code(container, name, employee_id, email, mobile){
     document.getElementById(container).innerHTML = '';
 
-    var card = 'BEGIN:VCARD\r\n';
-    card += 'VERSION:3.0\r\n';
-    card += 'FN:'+ name +'\r\n';
-    card += 'EMAIL:' + email +'\r\n';
-    card += 'ID NO:[' + employee_id + ']\r\n';
+    let card, qrcode;
 
-    if(mobile){
-        card += 'TEL:' + mobile +'\r\n';
+    card = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${name}`, `EMAIL:${email}`, `ID NO:[${employee_id}]`];
+
+    if (mobile) {
+      card.push(`TEL:${mobile}`);
     }
     
-    card += 'END:VCARD';
+    card.push('END:VCARD');
+    
+    card = card.join('\r\n');
 
-    var qrcode = new QRCode(document.getElementById(container), {
+    qrcode = new QRCode(document.getElementById(container), {
         width: 300,
         height: 300,
         colorDark : "#000000",
@@ -2341,4 +2164,6 @@ function hide_multiple_buttons(){
     $('.multiple-print').addClass('d-none');
     $('.multiple-unarchive').addClass('d-none');
     $('.multiple-archive').addClass('d-none');
+    $('.multiple-start').addClass('d-none');
+    $('.multiple-stop').addClass('d-none');
 }
