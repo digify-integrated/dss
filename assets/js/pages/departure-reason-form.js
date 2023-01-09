@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#departure-reason-id').length){
-            var transaction = 'departure reason details';
-            var departure_reason_id = $('#departure-reason-id').text();
+            const transaction = 'departure reason details';
+            const departure_reason_id = $('#departure-reason-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -27,8 +27,8 @@
 
         $('#departure-reason-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit departure reason';
-                var username = $('#username').text();
+                const transaction = 'submit departure reason';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -101,19 +101,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -192,11 +192,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-departure-reason',function() {
-        var departure_reason_id = $(this).data('departure-reason-id');
-        var transaction = 'delete departure reason';
+        const departure_reason_id = $(this).data('departure-reason-id');
+        const transaction = 'delete departure reason';
 
         Swal.fire({
             title: 'Delete Departure Reason',

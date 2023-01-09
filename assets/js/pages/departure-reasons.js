@@ -13,18 +13,18 @@
 function initialize_departure_reason_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'departure reasons table';
+    const username = $('#username').text();
+    const type = 'departure reasons table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'DEPARTURE_REASON_ID' },
         { 'data' : 'DEPARTURE_REASON' },
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '79%', 'aTargets': 2 },
@@ -103,15 +103,15 @@ function initialize_departure_reason_table(datatable_name, buttons = false, show
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-departure-reason',function() {
-        var departure_reason_id = [];
-        var transaction = 'delete multiple departure reason';
+        let departure_reason_id = [];
+        const transaction = 'delete multiple departure reason';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                departure_reason_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                departure_reason_id.push(element.value);  
             }
         });
 

@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#department-id').length){
-            var transaction = 'department details';
-            var department_id = $('#department-id').text();
+            const transaction = 'department details';
+            const department_id = $('#department-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -34,8 +34,8 @@
 
         $('#department-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit department';
-                var username = $('#username').text();
+                const transaction = 'submit department';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -108,19 +108,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -199,16 +199,16 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_department_employee_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var department_id = $('#department_id').val();
-    var type = 'department role table';
+    const username = $('#username').text();
+    const department_id = $('#department_id').val();
+    const type = 'department role table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'EMPLOYEE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '100%', 'aTargets': 0 }
     ];
 
@@ -284,11 +284,11 @@ function initialize_department_employee_table(datatable_name, buttons = false, s
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#unarchive-department',function() {
-        var department_id = $(this).data('department-id');
-        var transaction = 'unarchive department';
+        const department_id = $(this).data('department-id');
+        const transaction = 'unarchive department';
 
         Swal.fire({
             title: 'Unarchive Department',
@@ -329,8 +329,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#archive-department',function() {
-        var department_id = $(this).data('department-id');
-        var transaction = 'archive department';
+        const department_id = $(this).data('department-id');
+        const transaction = 'archive department';
 
         Swal.fire({
             title: 'Archive Department',
@@ -371,8 +371,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-department',function() {
-        var department_id = $(this).data('department-id');
-        var transaction = 'delete department';
+        const department_id = $(this).data('department-id');
+        const transaction = 'delete department';
 
         Swal.fire({
             title: 'Delete Department',

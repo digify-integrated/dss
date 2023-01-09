@@ -13,12 +13,12 @@
 function initialize_pages_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'pages table';
-    var filter_module = $('#filter_module').val();
+    const username = $('#username').text();
+    const type = 'pages table';
+    const filter_module = $('#filter_module').val();
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'PAGE_ID' },
         { 'data' : 'PAGE_NAME' },
@@ -26,7 +26,7 @@ function initialize_pages_table(datatable_name, buttons = false, show_all = fals
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '64%', 'aTargets': 2 },
@@ -106,15 +106,15 @@ function initialize_pages_table(datatable_name, buttons = false, show_all = fals
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-page',function() {
-        var page_id = [];
-        var transaction = 'delete multiple page';
+        let page_id = [];
+        const transaction = 'delete multiple page';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                page_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                page_id.push(element.value);  
             }
         });
 
@@ -167,5 +167,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_pages_table('#pages-datatable');
     });
-
 }

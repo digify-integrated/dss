@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#system-code-id').length){
-            var transaction = 'system code details';
-            var system_code_id = $('#system-code-id').text();
+            const transaction = 'system code details';
+            const system_code_id = $('#system-code-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -30,8 +30,8 @@
 
         $('#system-code-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit system code';
-                var username = $('#username').text();
+                const transaction = 'submit system code';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -116,19 +116,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -207,11 +207,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-system-code',function() {
-        var system_code_id = $(this).data('system-code-id');
-        var transaction = 'delete system code';
+        const system_code_id = $(this).data('system-code-id');
+        const transaction = 'delete system code';
 
         Swal.fire({
             title: 'Delete System Code',
@@ -253,7 +253,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -271,5 +270,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

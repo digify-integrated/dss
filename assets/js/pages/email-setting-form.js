@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#email-setting-id').length){
-            var transaction = 'email setting details';
-            var email_setting_id = $('#email-setting-id').text();
+            const transaction = 'email setting details';
+            const email_setting_id = $('#email-setting-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -40,8 +40,8 @@
 
         $('#email-setting-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit email setting';
-                var username = $('#username').text();
+                const transaction = 'submit email setting';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -156,19 +156,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -247,11 +247,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#activate-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'activate email setting';
+        const email_setting_id = $(this).data('email-setting-id');
+        const transaction = 'activate email setting';
 
         Swal.fire({
             title: 'Activate Email Setting',
@@ -292,8 +292,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#deactivate-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'deactivate email setting';
+        const email_setting_id = $(this).data('email-setting-id');
+        const transaction = 'deactivate email setting';
 
         Swal.fire({
             title: 'Deactivate Email Setting',
@@ -334,8 +334,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-email-setting',function() {
-        var email_setting_id = $(this).data('email-setting-id');
-        var transaction = 'delete email setting';
+        const email_setting_id = $(this).data('email-setting-id');
+        const transaction = 'delete email setting';
 
         Swal.fire({
             title: 'Delete Email Setting',
@@ -376,7 +376,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',

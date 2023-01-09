@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#country-id').length){
-            var transaction = 'country details';
-            var country_id = $('#country-id').text();
+            const transaction = 'country details';
+            const country_id = $('#country-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -31,8 +31,8 @@
 
         $('#country-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit country';
-                var username = $('#username').text();
+                const transaction = 'submit country';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -105,17 +105,17 @@
 })(jQuery);
 
 function initialize_state_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var country_id = $('#country-id').text();
-    var type = 'country state table';
+    const username = $('#username').text();
+    const country_id = $('#country-id').text();
+    const type = 'country state table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'STATE_NAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -192,19 +192,19 @@ function initialize_state_table(datatable_name, buttons = false, show_all = fals
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -283,11 +283,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-country',function() {
-        var country_id = $(this).data('country-id');
-        var transaction = 'delete country';
+        const country_id = $(this).data('country-id');
+        const transaction = 'delete country';
 
         Swal.fire({
             title: 'Delete Country',
@@ -327,31 +327,12 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location.href = 'country.php';
-                return false;
-            }
-        });
-    });
-
     $(document).on('click','#add-state',function() {
         generate_modal('state form', 'State', 'LG' , '1', '1', 'form', 'state-form', '1', username);
     });
 
     $(document).on('click','.update-state',function() {
-        var state_id = $(this).data('state-id');
+        const state_id = $(this).data('state-id');
 
         sessionStorage.setItem('state_id', state_id);
 
@@ -359,9 +340,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-state',function() {
-        var state_id = $(this).data('state-id');
-        var country_id = $(this).data('country-id');
-        var transaction = 'delete state';
+        const state_id = $(this).data('state-id');
+        const country_id = $(this).data('country-id');
+        const transaction = 'delete state';
 
         Swal.fire({
             title: 'Delete State',
@@ -398,6 +379,25 @@ function initialize_click_events(){
                         }
                     }
                 });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#discard',function() {
+        Swal.fire({
+            title: 'Discard Changes',
+            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                window.location.href = 'country.php';
                 return false;
             }
         });

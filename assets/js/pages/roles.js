@@ -13,12 +13,12 @@
 function initialize_roles_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_assignable = $('#filter_assignable').val();
-    var type = 'roles table';
+    const username = $('#username').text();
+    const filter_assignable = $('#filter_assignable').val();
+    const type = 'roles table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE_ID' },
         { 'data' : 'ROLE' },
@@ -26,7 +26,7 @@ function initialize_roles_table(datatable_name, buttons = false, show_all = fals
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '69%', 'aTargets': 2 },
@@ -106,15 +106,15 @@ function initialize_roles_table(datatable_name, buttons = false, show_all = fals
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-role',function() {
-        var role_id = [];
-        var transaction = 'delete multiple role';
+        let role_id = [];
+        const transaction = 'delete multiple role';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                role_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                role_id.push(element.value);  
             }
         });
 
@@ -167,5 +167,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_roles_table('#roles-datatable');
     });
-
 }

@@ -1,7 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
+    $(() => {
         if($('#actions-datatable').length){
             initialize_actions_table('#actions-datatable');
         }
@@ -13,18 +13,18 @@
 function initialize_actions_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'actions table';
+    const username = $('#username').text();
+    const type = 'actions table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ACTION_ID' },
         { 'data' : 'ACTION_NAME' },
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '79%', 'aTargets': 2 },
@@ -103,15 +103,15 @@ function initialize_actions_table(datatable_name, buttons = false, show_all = fa
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
-    $(document).on('click','#delete-action',function() {
-        var action_id = [];
-        var transaction = 'delete multiple action';
+    $(document).on('click','#delete-action',() => {
+        let action_id = [];
+        const transaction = 'delete multiple action';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                action_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                action_id.push(element.value);
             }
         });
 
@@ -128,7 +128,6 @@ function initialize_click_events(){
                 buttonsStyling: !1
             }).then(function(result) {
                 if (result.value) {
-                    
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
@@ -161,7 +160,7 @@ function initialize_click_events(){
         }
     });
 
-    $(document).on('click','#apply-filter',function() {
+    $(document).on('click','#apply-filter',() => {
         initialize_actions_table('#actions-datatable');
     });
 

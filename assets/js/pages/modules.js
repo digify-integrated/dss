@@ -13,12 +13,12 @@
 function initialize_modules_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'modules table';
-    var filter_module_category = $('#filter_module_category').val();
+    const username = $('#username').text();
+    const type = 'modules table';
+    const filter_module_category = $('#filter_module_category').val();
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'MODULE_ID' },
         { 'data' : 'MODULE_NAME' },
@@ -26,7 +26,7 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '64%', 'aTargets': 2 },
@@ -106,15 +106,15 @@ function initialize_modules_table(datatable_name, buttons = false, show_all = fa
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-module',function() {
-        var module_id = [];
-        var transaction = 'delete multiple module';
+        let module_id = [];
+        const transaction = 'delete multiple module';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                module_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                module_id.push(element.value);  
             }
         });
 
@@ -167,5 +167,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_modules_table('#modules-datatable');
     });
-
 }

@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#work-location-id').length){
-            var transaction = 'work location details';
-            var work_location_id = $('#work-location-id').text();
+            const transaction = 'work location details';
+            const work_location_id = $('#work-location-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -36,8 +36,8 @@
 
         $('#work-location-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit work location';
-                var username = $('#username').text();
+                const transaction = 'submit work location';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -122,19 +122,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -213,16 +213,16 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_work_location_employee_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var work_location_id = $('#work_location_id').val();
-    var type = 'work location employee table';
+    const username = $('#username').text();
+    const work_location_id = $('#work_location_id').val();
+    const type = 'work location employee table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'EMPLOYEE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '100%', 'aTargets': 0 }
     ];
 
@@ -298,11 +298,11 @@ function initialize_work_location_employee_table(datatable_name, buttons = false
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#unarchive-work-location',function() {
-        var work_location_id = $(this).data('work-location-id');
-        var transaction = 'unarchive work location';
+        const work_location_id = $(this).data('work-location-id');
+        const transaction = 'unarchive work location';
 
         Swal.fire({
             title: 'Unarchive Work Location',
@@ -343,8 +343,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#archive-work-location',function() {
-        var work_location_id = $(this).data('work-location-id');
-        var transaction = 'archive work location';
+        const work_location_id = $(this).data('work-location-id');
+        const transaction = 'archive work location';
 
         Swal.fire({
             title: 'Archive Work Location',
@@ -385,8 +385,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-work-location',function() {
-        var work_location_id = $(this).data('work-location-id');
-        var transaction = 'delete work location';
+        const work_location_id = $(this).data('work-location-id');
+        const transaction = 'delete work location';
 
         Swal.fire({
             title: 'Delete Work Location',
@@ -444,5 +444,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

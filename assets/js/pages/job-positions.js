@@ -13,13 +13,13 @@
 function initialize_job_positions_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_status = $('#filter_status').val();
-    var filter_department = $('#filter_department').val();
-    var type = 'job positions table';
+    const username = $('#username').text();
+    const filter_status = $('#filter_status').val();
+    const filter_department = $('#filter_department').val();
+    const type = 'job positions table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'JOB_POSITION_ID' },
         { 'data' : 'JOB_POSITION' },
@@ -31,7 +31,7 @@ function initialize_job_positions_table(datatable_name, buttons = false, show_al
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '19%', 'aTargets': 2 },
@@ -115,15 +115,15 @@ function initialize_job_positions_table(datatable_name, buttons = false, show_al
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-job-position',function() {
-        var job_position_id = [];
-        var transaction = 'delete multiple job position';
+        let job_position_id = [];
+        const transaction = 'delete multiple job position';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                job_position_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                job_position_id.push(element.value);  
             }
         });
 
@@ -176,5 +176,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_job_positions_table('#job-positions-datatable');
     });
-
 }

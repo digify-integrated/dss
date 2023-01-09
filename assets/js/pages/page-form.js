@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#page-id').length){
-            var transaction = 'page details';
-            var page_id = $('#page-id').text();
+            const transaction = 'page details';
+            const page_id = $('#page-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -32,8 +32,8 @@
 
         $('#page-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit page';
-                var username = $('#username').text();
+                const transaction = 'submit page';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -112,17 +112,17 @@
 })(jQuery);
 
 function initialize_page_access_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var page_id = $('#page-id').text();
-    var type = 'page access table';
+    const username = $('#username').text();
+    const page_id = $('#page-id').text();
+    const type = 'page access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ROLE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -199,19 +199,19 @@ function initialize_page_access_table(datatable_name, buttons = false, show_all 
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -290,17 +290,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var page_id = $('#page-id').text();
-    var type = 'page role assignment table';
+    const username = $('#username').text();
+    const page_id = $('#page-id').text();
+    const type = 'page role assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -377,16 +377,16 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#add-page-access',function() {
         generate_modal('page access form', 'Page Access', 'LG' , '1', '1', 'form', 'page-access-form', '1', username);
     });
 
     $(document).on('click','.delete-page-access',function() {
-        var page_id = $(this).data('page-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete page access';
+        const page_id = $(this).data('page-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete page access';
 
         Swal.fire({
             title: 'Delete Page Access',
@@ -429,8 +429,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-page',function() {
-        var page_id = $(this).data('page-id');
-        var transaction = 'delete page';
+        const page_id = $(this).data('page-id');
+        const transaction = 'delete page';
 
         Swal.fire({
             title: 'Delete Page',
@@ -471,7 +471,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -489,5 +488,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

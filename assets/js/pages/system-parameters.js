@@ -13,11 +13,11 @@
 function initialize_system_parameters_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'system parameters table';
+    const username = $('#username').text();
+    const type = 'system parameters table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'PARAMETER_ID' },
         { 'data' : 'PARAMETER' },
@@ -26,7 +26,7 @@ function initialize_system_parameters_table(datatable_name, buttons = false, sho
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '59%', 'aTargets': 2 },
@@ -107,15 +107,15 @@ function initialize_system_parameters_table(datatable_name, buttons = false, sho
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-system-parameter',function() {
-        var parameter_id = [];
-        var transaction = 'delete multiple system parameter';
+        let parameter_id = [];
+        const transaction = 'delete multiple system parameter';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                parameter_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                parameter_id.push(element.value);  
             }
         });
 
@@ -168,5 +168,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_system_parameters_table('#system-parameters-datatable');
     });
-
 }

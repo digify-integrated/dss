@@ -13,12 +13,12 @@
 function initialize_work_location_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_status = $('#filter_status').val();
-    var type = 'work locations table';
+    const username = $('#username').text();
+    const filter_status = $('#filter_status').val();
+    const type = 'work locations table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'WORK_LOCATION_ID' },
         { 'data' : 'WORK_LOCATION' },
@@ -26,7 +26,7 @@ function initialize_work_location_table(datatable_name, buttons = false, show_al
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '15%', 'aTargets': 1 },
         { 'width': '59%', 'aTargets': 2 },
@@ -106,15 +106,15 @@ function initialize_work_location_table(datatable_name, buttons = false, show_al
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-work-location',function() {
-        var work_location_id = [];
-        var transaction = 'delete multiple work location';
+        let work_location_id = [];
+        const transaction = 'delete multiple work location';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                work_location_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                work_location_id.push(element.value);  
             }
         });
 
@@ -165,12 +165,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#unarchive-work-location',function() {
-        var work_location_id = [];
-        var transaction = 'unarchive multiple work location';
+        let work_location_id = [];
+        const transaction = 'unarchive multiple work location';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                work_location_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                work_location_id.push(element.value);  
             }
         });
 
@@ -224,12 +224,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#archive-work-location',function() {
-        var work_location_id = [];
-        var transaction = 'archive multiple work location';
+        let work_location_id = [];
+        const transaction = 'archive multiple work location';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                work_location_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                work_location_id.push(element.value);  
             }
         });
 
@@ -285,5 +285,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_work_location_table('#work-locations-datatable');
     });
-
 }

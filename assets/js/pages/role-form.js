@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#role-id').length){
-            var transaction = 'role details';
-            var role_id = $('#role-id').text();
+            const transaction = 'role details';
+            const role_id = $('#role-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -45,8 +45,8 @@
 
         $('#role-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit role';
-                var username = $('#username').text();
+                const transaction = 'submit role';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -125,17 +125,17 @@
 })(jQuery);
 
 function initialize_role_module_access_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role module access table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role module access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'MODULE_NAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -212,17 +212,17 @@ function initialize_role_module_access_table(datatable_name, buttons = false, sh
 }
 
 function initialize_role_page_access_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role page access table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role page access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'PAGE_NAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -299,17 +299,17 @@ function initialize_role_page_access_table(datatable_name, buttons = false, show
 }
 
 function initialize_role_action_access_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role action access table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role action access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ACTION_NAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -386,17 +386,17 @@ function initialize_role_action_access_table(datatable_name, buttons = false, sh
 }
 
 function initialize_role_user_account_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role user account table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role user account table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'USERNAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -473,19 +473,19 @@ function initialize_role_user_account_table(datatable_name, buttons = false, sho
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -564,17 +564,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_role_module_access_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role module access assignment table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role module access assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'MODULE_NAME' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -651,17 +651,17 @@ function initialize_role_module_access_assignment_table(datatable_name, buttons 
 }
 
 function initialize_role_page_access_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role page access assignment table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role page access assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'PAGE_NAME' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -738,17 +738,17 @@ function initialize_role_page_access_assignment_table(datatable_name, buttons = 
 }
 
 function initialize_role_action_access_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role action access assignment table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role action access assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ACTION_NAME' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -825,17 +825,17 @@ function initialize_role_action_access_assignment_table(datatable_name, buttons 
 }
 
 function initialize_role_user_account_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var role_id = $('#role-id').text();
-    var type = 'role user account assignment table';
+    const username = $('#username').text();
+    const role_id = $('#role-id').text();
+    const type = 'role user account assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'FILE_AS' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -912,11 +912,11 @@ function initialize_role_user_account_assignment_table(datatable_name, buttons =
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-role',function() {
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete role';
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete role';
 
         Swal.fire({
             title: 'Delete Role',
@@ -956,26 +956,6 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
-
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location.href = 'roles.php';
-                return false;
-            }
-        });
-    });
-
     $(document).on('click','#add-module-access',function() {
         generate_modal('role module access form', 'Module Access', 'LG' , '1', '1', 'form', 'role-module-access-form', '1', username);
     });
@@ -993,9 +973,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-module-access',function() {
-        var module_id = $(this).data('module-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete module access';
+        const module_id = $(this).data('module-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete module access';
 
         Swal.fire({
             title: 'Delete Module Access',
@@ -1038,9 +1018,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-page-access',function() {
-        var page_id = $(this).data('page-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete page access';
+        const page_id = $(this).data('page-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete page access';
 
         Swal.fire({
             title: 'Delete Page Access',
@@ -1083,9 +1063,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-action-access',function() {
-        var action_id = $(this).data('action-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete action access';
+        const action_id = $(this).data('action-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete action access';
 
         Swal.fire({
             title: 'Delete Action Access',
@@ -1128,9 +1108,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete role user account';
+        const user_id = $(this).data('user-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete role user account';
 
         Swal.fire({
             title: 'Delete User Account',
@@ -1167,6 +1147,25 @@ function initialize_click_events(){
                         }
                     }
                 });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#discard',function() {
+        Swal.fire({
+            title: 'Discard Changes',
+            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                window.location.href = 'roles.php';
                 return false;
             }
         });

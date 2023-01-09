@@ -27,8 +27,8 @@ function initialize_global_functions(){
     });
 
     $(document).on('click','.view-transaction-log',function() {
-        var username = $('#username').text();
-        var transaction_log_id = $(this).data('transaction-log-id');
+        const username = $('#username').text();
+        const transaction_log_id = $(this).data('transaction-log-id');
 
         sessionStorage.setItem('transaction_log_id', transaction_log_id);
 
@@ -36,8 +36,8 @@ function initialize_global_functions(){
     });
 
     $(document).on('click','#page-header-notifications-dropdown',function() {
-        var username = $('#username').text();
-        var transaction = 'partial notification status';
+        const username = $('#username').text();
+        const transaction = 'partial notification status';
 
         $.ajax({
             url: 'controller.php',
@@ -51,9 +51,9 @@ function initialize_global_functions(){
     });
 
     $(document).on('click','.notification-item',function() {
-        var username = $('#username').text();
-        var transaction = 'read notification status';
-        var notification_id = $(this).data('notification-id');
+        const username = $('#username').text();
+        const transaction = 'read notification status';
+        const notification_id = $(this).data('notification-id');
 
         $.ajax({
             url: 'controller.php',
@@ -67,7 +67,7 @@ function initialize_global_functions(){
     });
 
     $(document).on('click','#backup-database',function() {
-        var username = $('#username').text();
+        const username = $('#username').text();
         generate_modal('backup database form', 'Backup Database', 'R' , '1', '1', 'form', 'backup-database-form', '1', username);
     });
 
@@ -120,7 +120,7 @@ function initialize_elements(){
 
 function initialize_form_validation(form_type){
     var transaction;
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     if(form_type == 'change password form'){
         $('#change-password-form').validate({
@@ -196,12 +196,12 @@ function initialize_form_validation(form_type){
         $('#module-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit module access';
-                var role = [];
-                var module_id = $('#module_id').val();
+                let role = [];
+                const module_id = $('#module_id').val();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        role.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        role.push(element.value);  
                     }
                 });
 
@@ -260,12 +260,12 @@ function initialize_form_validation(form_type){
         $('#page-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit page access';
-                var role = [];
-                var page_id = $('#page_id').val();
+                let role = [];
+                const page_id = $('#page_id').val();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        role.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        role.push(element.value);  
                     }
                 });
 
@@ -324,12 +324,12 @@ function initialize_form_validation(form_type){
         $('#action-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit action access';
-                var role = [];
-                var action_id = $('#action_id').val();
+                let role = [];
+                const action_id = $('#action_id').val();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        role.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        role.push(element.value);  
                     }
                 });
 
@@ -388,14 +388,15 @@ function initialize_form_validation(form_type){
         $('#role-module-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit role module access';
-                var role_id = $('#role-id').text();
-                var module_id = [];
+                let module_id = [];
+                const role_id = $('#role-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        module_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        module_id.push(element.value);  
                     }
-                });        
+                });
+
 
                 $.ajax({
                     type: 'POST',
@@ -452,14 +453,14 @@ function initialize_form_validation(form_type){
         $('#role-page-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit role page access';
-                var role_id = $('#role-id').text();
-                var page_id = [];
+                let page_id = [];
+                const role_id = $('#role-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        page_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        page_id.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -516,12 +517,12 @@ function initialize_form_validation(form_type){
         $('#role-action-access-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit role action access';
-                var role_id = $('#role-id').text();
-                var action_id = [];
+                let action_id = [];
+                const role_id = $('#role-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        action_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        action_id.push(element.value);  
                     }
                 });
 
@@ -580,14 +581,14 @@ function initialize_form_validation(form_type){
         $('#role-user-account-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit role user account';
-                var role_id = $('#role-id').text();
-                var user_id = [];
+                let user_id = [];
+                const role_id = $('#role-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        user_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        user_id.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -644,14 +645,14 @@ function initialize_form_validation(form_type){
         $('#upload-setting-file-type-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit upload setting file type';
-                var upload_setting_id = $('#upload-setting-id').text();
-                var file_type = [];
+                let file_type = [];
+                const upload_setting_id = $('#upload-setting-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        file_type.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        file_type.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -708,14 +709,14 @@ function initialize_form_validation(form_type){
         $('#notification-role-recipient-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit notification role recipient';
-                var notification_setting_id = $('#notification-setting-id').text();
-                var role_id = [];
+                let role_id = [];
+                const notification_setting_id = $('#notification-setting-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        role_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        role_id.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -772,14 +773,14 @@ function initialize_form_validation(form_type){
         $('#notification-user-account-recipient-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit notification user account recipient';
-                var notification_setting_id = $('#notification-setting-id').text();
-                var user_id = [];
+                let user_id = [];
+                const notification_setting_id = $('#notification-setting-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        user_id.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        user_id.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -836,14 +837,14 @@ function initialize_form_validation(form_type){
         $('#notification-channel-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit notification channel';
-                var notification_setting_id = $('#notification-setting-id').text();
-                var channel = [];
+                let channel = [];
+                const notification_setting_id = $('#notification-setting-id').text();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        channel.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        channel.push(element.value);  
                     }
-                });        
+                });
 
                 $.ajax({
                     type: 'POST',
@@ -899,7 +900,7 @@ function initialize_form_validation(form_type){
     else if(form_type == 'state form'){
         $('#state-form').validate({
             submitHandler: function (form) {
-                var country_id = $('#country-id').text();
+                const country_id = $('#country-id').text();
                 transaction = 'submit country state'; 
 
                 $.ajax({
@@ -972,12 +973,12 @@ function initialize_form_validation(form_type){
         $('#user-account-role-form').validate({
             submitHandler: function (form) {
                 transaction = 'submit user account role';
-                var role = [];
-                var user_id = $('#user_id').val();
+                let role = [];
+                const user_id = $('#user_id').val();
 
-                $('.datatable-checkbox-children').each(function(){
-                    if($(this).is(':checked')){  
-                        role.push(this.value);  
+                $('.datatable-checkbox-children').each((index, element) => {
+                    if ($(element).is(':checked')) {
+                        role.push(element.value);  
                     }
                 });
 
@@ -1035,7 +1036,7 @@ function initialize_form_validation(form_type){
     else if(form_type == 'job position responsibility form'){
         $('#job-position-responsibility-form').validate({
             submitHandler: function (form) {
-                var job_position_id = $('#job-position-id').text();
+                const job_position_id = $('#job-position-id').text();
                 transaction = 'submit job position responsibility'; 
 
                 $.ajax({
@@ -1107,7 +1108,7 @@ function initialize_form_validation(form_type){
     else if(form_type == 'job position requirement form'){
         $('#job-position-requirement-form').validate({
             submitHandler: function (form) {
-                var job_position_id = $('#job-position-id').text();
+                const job_position_id = $('#job-position-id').text();
                 transaction = 'submit job position requirement'; 
 
                 $.ajax({
@@ -1179,7 +1180,7 @@ function initialize_form_validation(form_type){
     else if(form_type == 'job position qualification form'){
         $('#job-position-qualification-form').validate({
             submitHandler: function (form) {
-                var job_position_id = $('#job-position-id').text();
+                const job_position_id = $('#job-position-id').text();
                 transaction = 'submit job position qualification'; 
 
                 $.ajax({
@@ -1251,7 +1252,7 @@ function initialize_form_validation(form_type){
     else if(form_type == 'job position attachment form'){
         $('#job-position-attachment-form').validate({
             submitHandler: function (form) {
-                var job_position_id = $('#job-position-id').text();
+                const job_position_id = $('#job-position-id').text();
                 transaction = 'submit job position attachment'; 
 
                 var formData = new FormData(form);
@@ -1358,7 +1359,7 @@ function display_form_details(form_type){
     if(form_type == 'state form'){
         transaction = 'state details';
 
-        var state_id = sessionStorage.getItem('state_id');
+        const state_id = sessionStorage.getItem('state_id');
 
         $.ajax({
             url: 'controller.php',
@@ -1374,7 +1375,7 @@ function display_form_details(form_type){
     else if(form_type == 'job position responsibility form'){
         transaction = 'job position responsibility details';
 
-        var responsibility_id = sessionStorage.getItem('responsibility_id');
+        const responsibility_id = sessionStorage.getItem('responsibility_id');
 
         $.ajax({
             url: 'controller.php',
@@ -1390,7 +1391,7 @@ function display_form_details(form_type){
     else if(form_type == 'job position requirement form'){
         transaction = 'job position requirement details';
 
-        var requirement_id = sessionStorage.getItem('requirement_id');
+        const requirement_id = sessionStorage.getItem('requirement_id');
 
         $.ajax({
             url: 'controller.php',
@@ -1406,7 +1407,7 @@ function display_form_details(form_type){
     else if(form_type == 'job position qualification form'){
         transaction = 'job position qualification details';
 
-        var qualification_id = sessionStorage.getItem('qualification_id');
+        const qualification_id = sessionStorage.getItem('qualification_id');
 
         $.ajax({
             url: 'controller.php',
@@ -1422,7 +1423,7 @@ function display_form_details(form_type){
     else if(form_type == 'job position attachment form'){
         transaction = 'job position attachment details';
 
-        var attachment_id = sessionStorage.getItem('attachment_id');
+        const attachment_id = sessionStorage.getItem('attachment_id');
 
         $.ajax({
             url: 'controller.php',
@@ -1515,7 +1516,7 @@ function show_geolocation_error(error) {
 
 // Generate function
 function generate_modal(form_type, title, size, scrollable, submit_button, generate_type, form_id, add, username){
-    var type = 'system modal';
+    const type = 'system modal';
 
     $.ajax({
         url: 'system-generation.php',
@@ -1540,7 +1541,7 @@ function generate_modal(form_type, title, size, scrollable, submit_button, gener
 }
 
 function generate_form(form_type, form_id, add, username){
-    var type = 'system form';
+    const type = 'system form';
 
     $.ajax({
         url: 'system-generation.php',
@@ -1611,7 +1612,7 @@ function generate_form(form_type, form_id, add, username){
 }
 
 function generate_element(element_type, value, container, modal, username){
-    var type = 'system element';
+    const type = 'system element';
 
     $.ajax({
         url: 'system-generation.php',
@@ -1719,8 +1720,8 @@ function generate_element(element_type, value, container, modal, username){
 }
 
 function generate_city_option(province, selected){
-    var username = $('#username').text();
-    var type = 'city options';
+    const username = $('#username').text();
+    const type = 'city options';
 
     $.ajax({
         url: 'system-generation.php',

@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#notification-setting-id').length){
-            var transaction = 'notification setting details';
-            var notification_setting_id = $('#notification-setting-id').text();
+            const transaction = 'notification setting details';
+            const notification_setting_id = $('#notification-setting-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -44,8 +44,8 @@
 
         $('#notification-setting-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit notification setting';
-                var username = $('#username').text();
+                const transaction = 'submit notification setting';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -136,17 +136,17 @@
 })(jQuery);
 
 function initialize_notification_role_recipient_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification role recipient table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification role recipient table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ROLE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -223,17 +223,17 @@ function initialize_notification_role_recipient_table(datatable_name, buttons = 
 }
 
 function initialize_notification_user_account_recipient_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification user account recipient table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification user account recipient table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'USERNAME' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -310,17 +310,17 @@ function initialize_notification_user_account_recipient_table(datatable_name, bu
 }
 
 function initialize_notification_channel_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification channel table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification channel table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHANNEL' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -397,19 +397,19 @@ function initialize_notification_channel_table(datatable_name, buttons = false, 
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -488,17 +488,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_notification_role_recipient_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification role recipient assignment table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification role recipient assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -575,17 +575,17 @@ function initialize_notification_role_recipient_assignment_table(datatable_name,
 }
 
 function initialize_notification_user_account_recipient_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification user account recipient assignment table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification user account recipient assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'USERNAME' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -662,17 +662,17 @@ function initialize_notification_user_account_recipient_assignment_table(datatab
 }
 
 function initialize_notification_channel_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var notification_setting_id = $('#notification-setting-id').text();
-    var type = 'notification channel assignment table';
+    const username = $('#username').text();
+    const notification_setting_id = $('#notification-setting-id').text();
+    const type = 'notification channel assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'CHANNEL' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -749,11 +749,11 @@ function initialize_notification_channel_assignment_table(datatable_name, button
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-notification-setting',function() {
-        var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification setting';
+        const notification_setting_id = $(this).data('notification-setting-id');
+        const transaction = 'delete notification setting';
 
         Swal.fire({
             title: 'Delete Notification Setting',
@@ -793,25 +793,6 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location.href = 'notification-settings.php';
-                return false;
-            }
-        });
-    });
-
     $(document).on('click','#add-notification-role-recipient',function() {
         generate_modal('notification role recipient form', 'Notification Role Recipient', 'LG' , '1', '1', 'form', 'notification-role-recipient-form', '1', username);
     });
@@ -825,9 +806,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-notification-role-recipient',function() {
-        var role_id = $(this).data('role-id');
-        var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification role recipient';
+        const role_id = $(this).data('role-id');
+        const notification_setting_id = $(this).data('notification-setting-id');
+        const transaction = 'delete notification role recipient';
 
         Swal.fire({
             title: 'Delete Notification Role Recipient',
@@ -870,9 +851,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-notification-user-account-recipient',function() {
-        var user_id = $(this).data('user-id');
-        var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification user account recipient';
+        const user_id = $(this).data('user-id');
+        const notification_setting_id = $(this).data('notification-setting-id');
+        const transaction = 'delete notification user account recipient';
 
         Swal.fire({
             title: 'Delete Notification User Account Recipient',
@@ -915,9 +896,9 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-notification-channel',function() {
-        var channel = $(this).data('channel');
-        var notification_setting_id = $(this).data('notification-setting-id');
-        var transaction = 'delete notification channel';
+        const channel = $(this).data('channel');
+        const notification_setting_id = $(this).data('notification-setting-id');
+        const transaction = 'delete notification channel';
 
         Swal.fire({
             title: 'Delete Notification Channel',
@@ -954,6 +935,25 @@ function initialize_click_events(){
                         }
                     }
                 });
+                return false;
+            }
+        });
+    });
+
+    $(document).on('click','#discard',function() {
+        Swal.fire({
+            title: 'Discard Changes',
+            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                window.location.href = 'notification-settings.php';
                 return false;
             }
         });

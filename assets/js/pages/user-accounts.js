@@ -13,17 +13,17 @@
 function initialize_user_accounts_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_start_date = $('#filter_start_date').val();
-    var filter_end_date = $('#filter_end_date').val();
-    var filter_last_connection_start_date = $('#filter_last_connection_start_date').val();
-    var filter_last_connection_end_date = $('#filter_last_connection_end_date').val();
-    var filter_user_account_status = $('#filter_user_account_status').val();
-    var filter_user_account_lock_status = $('#filter_user_account_lock_status').val();
-    var type = 'user accounts table';
+    const username = $('#username').text();
+    const filter_start_date = $('#filter_start_date').val();
+    const filter_end_date = $('#filter_end_date').val();
+    const filter_last_connection_start_date = $('#filter_last_connection_start_date').val();
+    const filter_last_connection_end_date = $('#filter_last_connection_end_date').val();
+    const filter_user_account_status = $('#filter_user_account_status').val();
+    const filter_user_account_lock_status = $('#filter_user_account_lock_status').val();
+    const type = 'user accounts table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'USERNAME' },
         { 'data' : 'ACCOUNT_STATUS' },
@@ -33,7 +33,7 @@ function initialize_user_accounts_table(datatable_name, buttons = false, show_al
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '29%', 'aTargets': 1 },
         { 'width': '10%', 'aTargets': 2 },
@@ -115,15 +115,15 @@ function initialize_user_accounts_table(datatable_name, buttons = false, show_al
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-user-account',function() {
-        var user_id = [];
-        var transaction = 'delete multiple user account';
+        let user_id = [];
+        const transaction = 'delete multiple user account';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                user_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                user_id.push(element.value);  
             }
         });
 
@@ -174,12 +174,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#lock-user-account',function() {
-        var user_id = [];
-        var transaction = 'lock multiple user account';
+        let user_id = [];
+        const transaction = 'lock multiple user account';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                user_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                user_id.push(element.value);  
             }
         });
 
@@ -233,12 +233,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#unlock-user-account',function() {
-        var user_id = [];
-        var transaction = 'unlock multiple user account';
+        let user_id = [];
+        const transaction = 'unlock multiple user account';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                user_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                user_id.push(element.value);  
             }
         });
 
@@ -292,12 +292,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#activate-user-account',function() {
-        var user_id = [];
-        var transaction = 'activate multiple user account';
+        let user_id = [];
+        const transaction = 'activate multiple user account';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                user_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                user_id.push(element.value);  
             }
         });
 
@@ -351,12 +351,12 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#deactivate-user-account',function() {
-        var user_id = [];
-        var transaction = 'deactivate multiple user account';
+        let user_id = [];
+        const transaction = 'deactivate multiple user account';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                user_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                user_id.push(element.value);  
             }
         });
 
@@ -412,5 +412,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_user_accounts_table('#user-accounts-datatable');
     });
-
 }

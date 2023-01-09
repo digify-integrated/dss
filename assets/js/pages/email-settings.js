@@ -13,12 +13,12 @@
 function initialize_email_settings_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_status = $('#filter_status').val();
-    var type = 'email settings table';
+    const username = $('#username').text();
+    const filter_status = $('#filter_status').val();
+    const type = 'email settings table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'EMAIL_SETTING_ID' },
         { 'data' : 'EMAIL_SETTING_NAME' },
@@ -26,7 +26,7 @@ function initialize_email_settings_table(datatable_name, buttons = false, show_a
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '64%', 'aTargets': 2 },
@@ -106,15 +106,15 @@ function initialize_email_settings_table(datatable_name, buttons = false, show_a
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-email-setting',function() {
-        var email_setting_id = [];
-        var transaction = 'delete multiple email setting';
+        let email_setting_id = [];
+        const transaction = 'delete multiple email setting';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                email_setting_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                email_setting_id.push(element.value);  
             }
         });
 
@@ -167,5 +167,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_email_settings_table('#email-settings-datatable');
     });
-
 }

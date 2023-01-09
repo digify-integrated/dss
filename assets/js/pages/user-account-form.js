@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#user-id').length){
-            var transaction = 'user account details';
-            var user_id = $('#user_id').val();
+            const transaction = 'user account details';
+            const user_id = $('#user_id').val();
 
             $.ajax({
                 url: 'controller.php',
@@ -37,8 +37,8 @@
 
         $('#user-account-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit user account';
-                var username = $('#username').text();
+                const transaction = 'submit user account';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -124,19 +124,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -215,17 +215,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var user_id = $('#user_id').val();
-    var type = 'user account role assignment table';
+    const username = $('#username').text();
+    const user_id = $('#user_id').val();
+    const type = 'user account role assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -302,17 +302,17 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 }
 
 function initialize_user_account_role_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var user_id = $('#user_id').val();
-    var type = 'user account role table';
+    const username = $('#username').text();
+    const user_id = $('#user_id').val();
+    const type = 'user account role table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ROLE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -389,16 +389,16 @@ function initialize_user_account_role_table(datatable_name, buttons = false, sho
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#add-user-account-role',function() {
         generate_modal('user account role form', 'User Account Role', 'LG' , '1', '1', 'form', 'user-account-role-form', '1', username);
     });
 
     $(document).on('click','.delete-user-account-role',function() {
-        var user_id = $(this).data('user-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete user account role';
+        const user_id = $(this).data('user-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete user account role';
 
         Swal.fire({
             title: 'Delete User Account Role',
@@ -441,8 +441,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#activate-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var transaction = 'activate user account';
+        const user_id = $(this).data('user-id');
+        const transaction = 'activate user account';
 
         Swal.fire({
             title: 'Activate User Account',
@@ -483,8 +483,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#deactivate-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var transaction = 'deactivate user account';
+        const user_id = $(this).data('user-id');
+        const transaction = 'deactivate user account';
 
         Swal.fire({
             title: 'Deactivate User Account',
@@ -525,8 +525,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#unlock-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var transaction = 'unlock user account';
+        const user_id = $(this).data('user-id');
+        const transaction = 'unlock user account';
 
         Swal.fire({
             title: 'Unlock User Account',
@@ -567,8 +567,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#lock-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var transaction = 'lock user account';
+        const user_id = $(this).data('user-id');
+        const transaction = 'lock user account';
 
         Swal.fire({
             title: 'Lock User Account',
@@ -609,8 +609,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-user-account',function() {
-        var user_id = $(this).data('user-id');
-        var transaction = 'delete user account';
+        const user_id = $(this).data('user-id');
+        const transaction = 'delete user account';
 
         Swal.fire({
             title: 'Delete User Account',
@@ -651,7 +651,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -669,5 +668,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

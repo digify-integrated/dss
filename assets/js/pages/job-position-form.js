@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#job-position-id').length){
-            var transaction = 'job position details';
-            var job_position_id = $('#job-position-id').text();
+            const transaction = 'job position details';
+            const job_position_id = $('#job-position-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -49,8 +49,8 @@
 
         $('#job-position-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit job position';
-                var username = $('#username').text();
+                const transaction = 'submit job position';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -135,19 +135,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -226,17 +226,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_job_position_attachment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var job_position_id = $('#job-position-id').text();
-    var type = 'job position attachment table';
+    const username = $('#username').text();
+    const job_position_id = $('#job-position-id').text();
+    const type = 'job position attachment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ATTACHMENT' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -313,17 +313,17 @@ function initialize_job_position_attachment_table(datatable_name, buttons = fals
 }
 
 function initialize_job_position_responsibility_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var job_position_id = $('#job-position-id').text();
-    var type = 'job position responsibility table';
+    const username = $('#username').text();
+    const job_position_id = $('#job-position-id').text();
+    const type = 'job position responsibility table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'RESPONSIBILITY' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -400,17 +400,17 @@ function initialize_job_position_responsibility_table(datatable_name, buttons = 
 }
 
 function initialize_job_position_requirement_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var job_position_id = $('#job-position-id').text();
-    var type = 'job position requirement table';
+    const username = $('#username').text();
+    const job_position_id = $('#job-position-id').text();
+    const type = 'job position requirement table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'REQUIREMENT' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -487,17 +487,17 @@ function initialize_job_position_requirement_table(datatable_name, buttons = fal
 }
 
 function initialize_job_position_qualification_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var job_position_id = $('#job-position-id').text();
-    var type = 'job position qualification table';
+    const username = $('#username').text();
+    const job_position_id = $('#job-position-id').text();
+    const type = 'job position qualification table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'QUALIFICATION' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -574,14 +574,14 @@ function initialize_job_position_qualification_table(datatable_name, buttons = f
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#add-attachment',function() {
         generate_modal('job position attachment form', 'Attachment', 'R' , '1', '1', 'form', 'job-position-attachment-form', '1', username);
     });
 
     $(document).on('click','.update-attachment',function() {
-        var attachment_id = $(this).data('attachment-id');
+        const attachment_id = $(this).data('attachment-id');
 
         sessionStorage.setItem('attachment_id', attachment_id);
 
@@ -589,8 +589,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-attachment',function() {
-        var attachment_id = $(this).data('attachment-id');
-        var transaction = 'delete job position attachment';
+        const attachment_id = $(this).data('attachment-id');
+        const transaction = 'delete job position attachment';
 
         Swal.fire({
             title: 'Delete Attachment',
@@ -637,7 +637,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.update-responsibility',function() {
-        var responsibility_id = $(this).data('responsibility-id');
+        const responsibility_id = $(this).data('responsibility-id');
 
         sessionStorage.setItem('responsibility_id', responsibility_id);
 
@@ -645,8 +645,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-responsibility',function() {
-        var responsibility_id = $(this).data('responsibility-id');
-        var transaction = 'delete job position responsibility';
+        const responsibility_id = $(this).data('responsibility-id');
+        const transaction = 'delete job position responsibility';
 
         Swal.fire({
             title: 'Delete Responsibility',
@@ -693,7 +693,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.update-requirement',function() {
-        var requirement_id = $(this).data('requirement-id');
+        const requirement_id = $(this).data('requirement-id');
 
         sessionStorage.setItem('requirement_id', requirement_id);
 
@@ -701,8 +701,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-requirement',function() {
-        var requirement_id = $(this).data('requirement-id');
-        var transaction = 'delete job position requirement';
+        const requirement_id = $(this).data('requirement-id');
+        const transaction = 'delete job position requirement';
 
         Swal.fire({
             title: 'Delete Requirement',
@@ -749,7 +749,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.update-qualification',function() {
-        var qualification_id = $(this).data('qualification-id');
+        const qualification_id = $(this).data('qualification-id');
 
         sessionStorage.setItem('qualification_id', qualification_id);
 
@@ -757,8 +757,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','.delete-qualification',function() {
-        var qualification_id = $(this).data('qualification-id');
-        var transaction = 'delete job position qualification';
+        const qualification_id = $(this).data('qualification-id');
+        const transaction = 'delete job position qualification';
 
         Swal.fire({
             title: 'Delete Qualification',
@@ -801,8 +801,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#start-job-position-recruitment',function() {
-        var job_position_id = $(this).data('job-position-id');
-        var transaction = 'start job position recruitment';
+        const job_position_id = $(this).data('job-position-id');
+        const transaction = 'start job position recruitment';
 
         Swal.fire({
             title: 'Start Job Position Recruitment',
@@ -843,8 +843,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#stop-job-position-recruitment',function() {
-        var job_position_id = $(this).data('job-position-id');
-        var transaction = 'stop job position recruitment';
+        const job_position_id = $(this).data('job-position-id');
+        const transaction = 'stop job position recruitment';
 
         Swal.fire({
             title: 'Stop Job Position Recruitment',
@@ -885,8 +885,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-job-position',function() {
-        var job_position_id = $(this).data('job-position-id');
-        var transaction = 'delete job position';
+        const job_position_id = $(this).data('job-position-id');
+        const transaction = 'delete job position';
 
         Swal.fire({
             title: 'Delete Job Position',
@@ -927,7 +927,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -945,5 +944,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

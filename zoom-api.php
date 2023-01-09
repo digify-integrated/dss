@@ -82,7 +82,7 @@
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                             if($delete_zoom_api > 0){
+                                                            if($delete_zoom_api > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
                                                                         <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>

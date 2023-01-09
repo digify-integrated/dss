@@ -1,10 +1,10 @@
 (function($) {
     'use strict';
 
-    $(function() {
+    $(() => {
         if($('#action-id').length){
-            var transaction = 'action details';
-            var action_id = $('#action-id').text();
+            const transaction = 'action details';
+            const action_id = $('#action-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -30,8 +30,8 @@
 
         $('#action-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit action';
-                var username = $('#username').text();
+                const transaction = 'submit action';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -104,17 +104,17 @@
 })(jQuery);
 
 function initialize_action_access_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var action_id = $('#action-id').text();
-    var type = 'action access table';
+    const username = $('#username').text();
+    const action_id = $('#action-id').text();
+    const type = 'action access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ROLE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -191,19 +191,19 @@ function initialize_action_access_table(datatable_name, buttons = false, show_al
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -282,17 +282,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var action_id = $('#action-id').text();
-    var type = 'action role assignment table';
+    const username = $('#username').text();
+    const action_id = $('#action-id').text();
+    const type = 'action role assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -369,16 +369,16 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
-    $(document).on('click','#add-action-access',function() {
+    $(document).on('click','#add-action-access',() => {
         generate_modal('action access form', 'Action Access', 'LG' , '1', '1', 'form', 'action-access-form', '1', username);
     });
 
-    $(document).on('click','.delete-action-access',function() {
-        var action_id = $(this).data('action-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete action access';
+    $(document).on('click','.delete-action-access',() => {
+        const action_id = $(this).data('action-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete action access';
 
         Swal.fire({
             title: 'Delete Action Access',
@@ -420,9 +420,9 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-action',function() {
-        var action_id = $(this).data('action-id');
-        var transaction = 'delete action';
+    $(document).on('click','#delete-action',() => {
+        const action_id = $(this).data('action-id');
+        const transaction = 'delete action';
 
         Swal.fire({
             title: 'Delete Action',
@@ -462,8 +462,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
-
+    $(document).on('click','#discard',() => {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -481,5 +480,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#module-id').length){
-            var transaction = 'module details';
-            var module_id = $('#module-id').text();
+            const transaction = 'module details';
+            const module_id = $('#module-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -39,8 +39,8 @@
 
         $('#module-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit module';
-                var username = $('#username').text();
+                const transaction = 'submit module';
+                const username = $('#username').text();
                 
                 var formData = new FormData(form);
                 formData.append('username', username);
@@ -149,17 +149,17 @@
 })(jQuery);
 
 function initialize_module_access_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var module_id = $('#module-id').text();
-    var type = 'module access table';
+    const username = $('#username').text();
+    const module_id = $('#module-id').text();
+    const type = 'module access table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'ROLE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -236,19 +236,19 @@ function initialize_module_access_table(datatable_name, buttons = false, show_al
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -327,17 +327,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var module_id = $('#module-id').text();
-    var type = 'module role assignment table';
+    const username = $('#username').text();
+    const module_id = $('#module-id').text();
+    const type = 'module role assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'ROLE' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -414,16 +414,16 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#add-module-access',function() {
         generate_modal('module access form', 'Module Access', 'LG' , '1', '1', 'form', 'module-access-form', '1', username);
     });
 
     $(document).on('click','.delete-module-access',function() {
-        var module_id = $(this).data('module-id');
-        var role_id = $(this).data('role-id');
-        var transaction = 'delete module access';
+        const module_id = $(this).data('module-id');
+        const role_id = $(this).data('role-id');
+        const transaction = 'delete module access';
 
         Swal.fire({
             title: 'Delete Module Access',
@@ -466,8 +466,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-module',function() {
-        var module_id = $(this).data('module-id');
-        var transaction = 'delete module';
+        const module_id = $(this).data('module-id');
+        const transaction = 'delete module';
 
         Swal.fire({
             title: 'Delete Module',
@@ -508,7 +508,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -526,5 +525,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

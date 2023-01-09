@@ -2295,14 +2295,6 @@ CREATE TABLE employee_wage_type(
 
 CREATE INDEX employee_wage_type_index ON employee_wage_type(WAGE_TYPE_ID);
 
-DELIMITER //
-DROP PROCEDURE check_wage_type_exist //
-DROP PROCEDURE update_wage_type //
-DROP PROCEDURE insert_wage_type //
-DROP PROCEDURE get_wage_type_details //
-DROP PROCEDURE delete_wage_type //
-DROP PROCEDURE generate_wage_type_options //
-
 CREATE PROCEDURE check_wage_type_exist(IN wage_type_id VARCHAR(50))
 BEGIN
 	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_wage_type WHERE WAGE_TYPE_ID = ?';
@@ -2357,22 +2349,152 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
+/* Employee Working Schedule */
+CREATE TABLE employee_working_schedule(
+	WORKING_SCHEDULE_ID VARCHAR(100) PRIMARY KEY,
+	WORKING_SCHEDULE VARCHAR(100) NOT NULL,
+	WORKING_SCHEDULE_TYPE VARCHAR(20) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE employee_working_hours(
+	WORKING_HOURS_ID VARCHAR(100) PRIMARY KEY,
+	WORKING_SCHEDULE_ID VARCHAR(100) NOT NULL,
+	WORKING_HOURS VARCHAR(100) NOT NULL,
+	WORKING_DATE DATE,
+	DAY_OF_WEEK VARCHAR(20) NOT NULL,
+	DAY_PERIOD VARCHAR(20) NOT NULL,
+	WORK_FROM TIME NOT NULL,
+	WORK_TO TIME NOT NULL
+);
+
+ALTER TABLE employee_working_hours
+ADD FOREIGN KEY (WORKING_SCHEDULE_ID) REFERENCES employee_working_schedule(WORKING_SCHEDULE_ID);
+
+CREATE INDEX employee_working_schedule_index ON employee_working_schedule(WORKING_SCHEDULE_ID);
+CREATE INDEX employee_working_hours_index ON employee_working_hours(WORKING_HOURS_ID);
+
+CREATE PROCEDURE employee_working_schedule_exist(IN working_schedule_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_working_schedule(IN working_schedule_id VARCHAR(100), IN working_schedule VARCHAR(100), IN working_schedule_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_working_schedule SET WORKING_SCHEDULE = ?, WORKING_SCHEDULE_TYPE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule, working_schedule_type, transaction_log_id, record_log, working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_working_schedule(IN working_schedule_id VARCHAR(100), IN working_schedule VARCHAR(100), IN working_schedule_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_working_schedule (WORKING_SCHEDULE_ID, WORKING_SCHEDULE, WORKING_SCHEDULE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id, working_schedule, working_schedule_type, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_working_schedule_details(IN working_schedule_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT WORKING_SCHEDULE, WORKING_SCHEDULE_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_wage_type WHERE WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_working_schedule(IN working_schedule_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_employee_working_hours(IN working_schedule_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_employee_working_schedule()
+BEGIN
+	SET @query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE FROM employee_working_schedule ORDER BY WORKING_SCHEDULE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE employee_working_hours_exist(IN working_hours_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_working_hours WHERE WORKING_HOURS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_hours_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_working_hours(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN working_hours VARCHAR(100), IN working_date DATE, IN day_of_week VARCHAR(20), IN day_period VARCHAR(20), IN work_from TIME, IN work_to TIME)
+BEGIN
+	SET @query = 'UPDATE employee_working_hours SET WORKING_HOURS = ?, WORKING_DATE = ?, DAY_OF_WEEK = ?, DAY_PERIOD = ?, WORK_FROM = ?, WORK_TO = ? WHERE WORKING_HOURS_ID = ? AND WORKING_SCHEDULE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_hours, working_date, day_of_week, day_period, work_from, work_to, working_hours_id, working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_working_hours(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN working_hours VARCHAR(100), IN working_date DATE, IN day_of_week VARCHAR(20), IN day_period VARCHAR(20), IN work_from TIME, IN work_to TIME)
+BEGIN
+	SET @query = 'INSERT INTO employee_working_hours (WORKING_HOURS_ID, WORKING_SCHEDULE_ID, WORKING_HOURS, WORKING_DATE, DAY_OF_WEEK, DAY_PERIOD, WORK_FROM, WORK_TO) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_hours_id, working_schedule_id, working_hours, working_date, day_of_week, day_period, work_from, work_to;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_working_hours_details(IN working_hours_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT WORKING_SCHEDULE_ID, WORKING_HOURS, WORKING_DATE, DAY_OF_WEEK, DAY_PERIOD, WORK_FROM, WORK_TO FROM employee_working_hours WHERE WORKING_HOURS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_hours_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_working_hours(IN working_hours_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_working_hours WHERE WORKING_HOURS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_hours_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Global Stored Procedure */
 CREATE PROCEDURE get_access_rights_count(IN role_id VARCHAR(100), IN access_right_id VARCHAR(100), IN access_type VARCHAR(10))
 BEGIN
-	SET ?role_id = role_id;
-	SET ?access_right_id = access_right_id;
-	SET ?access_type = access_type;
-
-	IF ?access_type = 'module' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = ?access_right_id AND ROLE_ID = ?role_id';
-	ELSEIF ?access_type = 'page' THEN
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = ?access_right_id AND ROLE_ID = ?role_id';
+	IF access_type = 'module' THEN
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_module_access_rights WHERE MODULE_ID = ?  AND ROLE_ID = ?';
+	ELSEIF access_type = 'page' THEN
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_page_access_rights WHERE PAGE_ID = ? AND ROLE_ID = ?';
 	ELSE
-		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = ?access_right_id AND ROLE_ID = ?role_id';
+		SET @query = 'SELECT COUNT(1) AS TOTAL FROM technical_action_access_rights WHERE ACTION_ID = ? AND ROLE_ID = ?';
     END IF;
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING ;
+	EXECUTE stmt USING access_right_id, role_id;
 	DEALLOCATE PREPARE stmt;
 END //

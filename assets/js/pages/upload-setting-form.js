@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#upload-setting-id').length){
-            var transaction = 'upload setting details';
-            var upload_setting_id = $('#upload-setting-id').text();
+            const transaction = 'upload setting details';
+            const upload_setting_id = $('#upload-setting-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -33,8 +33,8 @@
 
         $('#upload-setting-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit upload setting';
-                var username = $('#username').text();
+                const transaction = 'submit upload setting';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -113,17 +113,17 @@
 })(jQuery);
 
 function initialize_upload_setting_file_type_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var upload_setting_id = $('#upload-setting-id').text();
-    var type = 'upload setting file type table';
+    const username = $('#username').text();
+    const upload_setting_id = $('#upload-setting-id').text();
+    const type = 'upload setting file type table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'FILE_TYPE' },
         { 'data' : 'ACTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '90%', 'aTargets': 0 },
         { 'width': '10%','bSortable': false, 'aTargets': 1 }
     ];
@@ -200,19 +200,19 @@ function initialize_upload_setting_file_type_table(datatable_name, buttons = fal
 }
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -291,17 +291,17 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_upload_file_type_assignment_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var upload_setting_id = $('#upload-setting-id').text();
-    var type = 'file type assignment table';
+    const username = $('#username').text();
+    const upload_setting_id = $('#upload-setting-id').text();
+    const type = 'file type assignment table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'SYSTEM_DESCRIPTION' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '99%','bSortable': false, 'aTargets': 1 }
     ];
@@ -378,16 +378,16 @@ function initialize_upload_file_type_assignment_table(datatable_name, buttons = 
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#add-upload-setting-file-type',function() {
         generate_modal('upload setting file type form', 'Allowed File Type', 'LG' , '1', '1', 'form', 'upload-setting-file-type-form', '1', username);
     });
 
     $(document).on('click','.delete-upload-setting-file-type',function() {
-        var upload_setting_id = $(this).data('upload-setting-id');
-        var file_type = $(this).data('file-type');
-        var transaction = 'delete upload setting file type';
+        const upload_setting_id = $(this).data('upload-setting-id');
+        const file_type = $(this).data('file-type');
+        const transaction = 'delete upload setting file type';
 
         Swal.fire({
             title: 'Delete Upload Setting File Type',
@@ -430,8 +430,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-upload-setting',function() {
-        var upload_setting_id = $(this).data('upload-setting-id');
-        var transaction = 'delete upload setting';
+        const upload_setting_id = $(this).data('upload-setting-id');
+        const transaction = 'delete upload setting';
 
         Swal.fire({
             title: 'Delete Upload Setting',
@@ -472,7 +472,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -490,5 +489,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

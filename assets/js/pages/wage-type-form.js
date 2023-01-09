@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#wage-type-id').length){
-            var transaction = 'wage type details';
-            var wage_type_id = $('#wage-type-id').text();
+            const transaction = 'wage type details';
+            const wage_type_id = $('#wage-type-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -27,8 +27,8 @@
 
         $('#wage-type-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit wage type';
-                var username = $('#username').text();
+                const transaction = 'submit wage type';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -101,19 +101,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -192,11 +192,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-wage-type',function() {
-        var wage_type_id = $(this).data('wage-type-id');
-        var transaction = 'delete wage type';
+        const wage_type_id = $(this).data('wage-type-id');
+        const transaction = 'delete wage type';
 
         Swal.fire({
             title: 'Delete Wage Type',
@@ -254,5 +254,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

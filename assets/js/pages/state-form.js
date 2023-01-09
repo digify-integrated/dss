@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#state-id').length){
-            var transaction = 'state details';
-            var state_id = $('#state-id').text();
+            const transaction = 'state details';
+            const state_id = $('#state-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -29,8 +29,8 @@
 
         $('#state-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit state';
-                var username = $('#username').text();
+                const transaction = 'submit state';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -109,19 +109,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -200,11 +200,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-state',function() {
-        var state_id = $(this).data('state-id');
-        var transaction = 'delete state';
+        const state_id = $(this).data('state-id');
+        const transaction = 'delete state';
 
         Swal.fire({
             title: 'Delete State',

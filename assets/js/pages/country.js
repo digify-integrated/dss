@@ -13,18 +13,18 @@
 function initialize_country_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'country table';
+    const username = $('#username').text();
+    const type = 'country table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'COUNTRY_ID' },
         { 'data' : 'COUNTRY_NAME' },
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '79%', 'aTargets': 2 },
@@ -103,15 +103,15 @@ function initialize_country_table(datatable_name, buttons = false, show_all = fa
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-country',function() {
-        var country_id = [];
-        var transaction = 'delete multiple country';
+        let country_id = [];
+        const transaction = 'delete multiple country';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                country_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                country_id.push(element.value);  
             }
         });
 

@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#zoom-api-id').length){
-            var transaction = 'zoom api details';
-            var zoom_api_id = $('#zoom-api-id').text();
+            const transaction = 'zoom api details';
+            const zoom_api_id = $('#zoom-api-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -32,8 +32,8 @@
 
         $('#zoom-api-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit zoom api';
-                var username = $('#username').text();
+                const transaction = 'submit zoom api';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -124,19 +124,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -215,11 +215,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#activate-zoom-api',function() {
-        var zoom_api_id = $(this).data('zoom-api-id');
-        var transaction = 'activate zoom api';
+        const zoom_api_id = $(this).data('zoom-api-id');
+        const transaction = 'activate zoom api';
 
         Swal.fire({
             title: 'Activate Zoom API',
@@ -260,8 +260,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#deactivate-zoom-api',function() {
-        var zoom_api_id = $(this).data('zoom-api-id');
-        var transaction = 'deactivate zoom api';
+        const zoom_api_id = $(this).data('zoom-api-id');
+        const transaction = 'deactivate zoom api';
 
         Swal.fire({
             title: 'Deactivate Zoom API',
@@ -302,8 +302,8 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-zoom-api',function() {
-        var zoom_api_id = $(this).data('zoom-api-id');
-        var transaction = 'delete zoom api';
+        const zoom_api_id = $(this).data('zoom-api-id');
+        const transaction = 'delete zoom api';
 
         Swal.fire({
             title: 'Delete Zoom API',
@@ -344,7 +344,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -362,5 +361,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

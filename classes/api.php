@@ -1349,8 +1349,7 @@ class Api{
     #
     # -------------------------------------------------------------
     public function update_login_attempt($username, $login_attemp, $last_failed_attempt_date){
-        if ($this->databaseConnection()) {
-            
+        if ($this->databaseConnection()) {            
             $sql = $this->db_connection->prepare('CALL update_login_attempt(:username, :login_attemp, :last_failed_attempt_date)');
             $sql->bindValue(':username', $username);
             $sql->bindValue(':login_attemp', $login_attemp);

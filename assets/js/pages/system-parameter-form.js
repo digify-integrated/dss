@@ -3,8 +3,8 @@
 
     $(function() {
         if($('#parameter-id').length){
-            var transaction = 'system parameter details';
-            var parameter_id = $('#parameter-id').text();
+            const transaction = 'system parameter details';
+            const parameter_id = $('#parameter-id').text();
 
             $.ajax({
                 url: 'controller.php',
@@ -30,8 +30,8 @@
 
         $('#system-parameter-form').validate({
             submitHandler: function (form) {
-                var transaction = 'submit system parameter';
-                var username = $('#username').text();
+                const transaction = 'submit system parameter';
+                const username = $('#username').text();
 
                 $.ajax({
                     type: 'POST',
@@ -110,19 +110,19 @@
 })(jQuery);
 
 function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){    
-    var username = $('#username').text();
-    var transaction_log_id = $('#transaction_log_id').val();
-    var type = 'transaction log table';
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction log table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'LOG_TYPE' },
         { 'data' : 'LOG' },
         { 'data' : 'LOG_DATE' },
         { 'data' : 'LOG_BY' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '15%', 'aTargets': 0 },
         { 'width': '45%', 'aTargets': 1 },
         { 'width': '20%', 'aTargets': 2 },
@@ -201,11 +201,11 @@ function initialize_transaction_log_table(datatable_name, buttons = false, show_
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-system-parameter',function() {
-        var parameter_id = $(this).data('parameter-id');
-        var transaction = 'delete system parameter';
+        const parameter_id = $(this).data('parameter-id');
+        const transaction = 'delete system parameter';
 
         Swal.fire({
             title: 'Delete System Parameter',
@@ -246,7 +246,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard',function() {
-
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -264,5 +263,4 @@ function initialize_click_events(){
             }
         });
     });
-
 }

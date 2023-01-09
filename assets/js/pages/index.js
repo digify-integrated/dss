@@ -4,7 +4,7 @@
     $(function() {
         $('#signin-form').validate({
             submitHandler: function (form) {
-                var transaction = 'authenticate';
+                const transaction = 'authenticate';
 
                 $.ajax({
                     type: 'POST',
@@ -37,10 +37,11 @@
                             else{
                                 show_alert('Authentication Error', response, 'error');
                             }
-
-                            document.getElementById('signin').disabled = false;
-                            $('#signin').html('Log In');
                         }
+                    },
+                    complete: function(){
+                        document.getElementById('signin').disabled = false;
+                        $('#signin').html('Log In');
                     }
                 });
 

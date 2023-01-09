@@ -13,11 +13,11 @@
 function initialize_system_codes_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var type = 'system codes table';
+    const username = $('#username').text();
+    const type = 'system codes table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'SYSTEM_CODE_ID' },
         { 'data' : 'SYSTEM_TYPE' },
@@ -26,7 +26,7 @@ function initialize_system_codes_table(datatable_name, buttons = false, show_all
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '14%', 'aTargets': 1 },
         { 'width': '25%', 'aTargets': 2 },
@@ -107,15 +107,15 @@ function initialize_system_codes_table(datatable_name, buttons = false, show_all
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-system-code',function() {
-        var system_code_id = [];
-        var transaction = 'delete multiple system code';
+        let system_code_id = [];
+        const transaction = 'delete multiple system code';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                system_code_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                system_code_id.push(element.value);  
             }
         });
 
@@ -169,5 +169,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_system_codes_table('#system-codes-datatable');
     });
-
 }

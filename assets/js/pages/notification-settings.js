@@ -13,19 +13,19 @@
 function initialize_notification_settings_table(datatable_name, buttons = false, show_all = false){
     hide_multiple_buttons();
     
-    var username = $('#username').text();
-    var filter_notification_channel = $('#filter_notification_channel').val();
-    var type = 'notification settings table';
+    const username = $('#username').text();
+    const filter_notification_channel = $('#filter_notification_channel').val();
+    const type = 'notification settings table';
     var settings;
 
-    var column = [ 
+    const column = [ 
         { 'data' : 'CHECK_BOX' },
         { 'data' : 'NOTIFICATION_SETTING_ID' },
         { 'data' : 'NOTIFICATION_SETTING' },
         { 'data' : 'VIEW' }
     ];
 
-    var column_definition = [
+    const column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
         { 'width': '10%', 'aTargets': 1 },
         { 'width': '79%', 'aTargets': 2 },
@@ -104,15 +104,15 @@ function initialize_notification_settings_table(datatable_name, buttons = false,
 }
 
 function initialize_click_events(){
-    var username = $('#username').text();
+    const username = $('#username').text();
 
     $(document).on('click','#delete-notification-setting',function() {
-        var notification_setting_id = [];
-        var transaction = 'delete multiple notification setting';
+        let notification_setting_id = [];
+        const transaction = 'delete multiple notification setting';
 
-        $('.datatable-checkbox-children').each(function(){
-            if($(this).is(':checked')){  
-                notification_setting_id.push(this.value);  
+        $('.datatable-checkbox-children').each((index, element) => {
+            if ($(element).is(':checked')) {
+                notification_setting_id.push(element.value);  
             }
         });
 
@@ -165,5 +165,4 @@ function initialize_click_events(){
     $(document).on('click','#apply-filter',function() {
         initialize_notification_settings_table('#notification-settings-datatable');
     });
-
 }

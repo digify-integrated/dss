@@ -1,13 +1,12 @@
 <?php
     $menu_pages = [
-        'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
         'job_positions' => ['id' => '33', 'url' => 'job-positions.php', 'label' => 'Job Positions', 'group' => 'Configurations'],
         'departments' => ['id' => '31', 'url' => 'departments.php', 'label' => 'Departments', 'group' => 'Configurations'],
         'departure_reasons' => ['id' => '37', 'url' => 'departure-reasons.php', 'label' => 'Departure Reasons', 'group' => 'Configurations'],
         'employee_types' => ['id' => '39', 'url' => 'employee-types.php', 'label' => 'Employee Types', 'group' => 'Configurations'],
         'wage_types' => ['id' => '41', 'url' => 'wage-types.php', 'label' => 'Wage Types', 'group' => 'Configurations'],
         'work_locations' => ['id' => '35', 'url' => 'work-locations.php', 'label' => 'Work Locations', 'group' => 'Configurations'],
-        'work_schedules' => ['id' => '43', 'url' => 'work-schedules.php', 'label' => 'Work Schedules', 'group' => 'Configurations'],
+        'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
     ];
 
     ksort($menu_pages);
