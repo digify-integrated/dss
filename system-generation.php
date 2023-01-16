@@ -3301,40 +3301,163 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
     # Working schedules table
     else if($type == 'working schedules table'){
-        if(isset($_POST['filter_schedule_type'])){
+        if(isset($_POST['filter_working_schedule_type'])){
             if ($api->databaseConnection()) {
-                $filter_schedule_type = $_POST['filter_schedule_type'];
+                $filter_working_schedule_type = $_POST['filter_working_schedule_type'];
 
-                $query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE, SCHEDULE_TYPE FROM employee_working_schedule';
+                $query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE, WORKING_SCHEDULE_TYPE FROM employee_working_schedule';
 
-                if(!empty($filter_schedule_type)){
-                    $query .= ' WHERE STATUS = :filter_schedule_type';
+                if(!empty($filter_working_schedule_type)){
+                    $query .= ' WHERE WORKING_SCHEDULE_TYPE = :filter_working_schedule_type';
                 }
     
                 $sql = $api->db_connection->prepare($query);
 
-                if(!empty($filter_status)){
-                    $sql->bindValue(':filter_schedule_type', $filter_schedule_type);
+                if(!empty($filter_working_schedule_type)){
+                    $sql->bindValue(':filter_working_schedule_type', $filter_working_schedule_type);
                 }
     
                 if($sql->execute()){
                     while($row = $sql->fetch()){
                         $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
                         $working_schedule = $row['WORKING_SCHEDULE'];
-                        $schedule_type = $row['SCHEDULE_TYPE'];
+                        $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
 
-                        $system_code_details = $api->get_system_code_details(null, 'SCHEDULETYPE', $schedule_type);
-                        $schedule_type_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+                        $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type);
+                        $working_schedule_type_name = $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'] ?? null;
     
                         $working_schedule_id_encrypted = $api->encrypt_data($working_schedule_id);
     
                         $response[] = array(
                             'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_id .'">',
-                            'DEPARTMENT_ID' => $working_schedule_id,
+                            'WORKING_SCHEDULE_ID' => $working_schedule_id,
                             'WORKING_SCHEDULE' => $working_schedule,
-                            'SCHEDULE_TYPE' => $schedule_type_name,
+                            'WORKING_SCHEDULE_TYPE' => $working_schedule_type_name,
                             'VIEW' => '<div class="d-flex gap-2">
                                             <a href="working-schedule-form.php?id='. $working_schedule_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Working hours table
+    else if($type == 'working hours table'){
+        if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
+            if ($api->databaseConnection()) {
+                $working_schedule_id = $_POST['working_schedule_id'];
+
+                $update_working_schedule = $api->check_role_access_rights($username, '118', 'action');
+                $update_working_hours = $api->check_role_access_rights($username, '121', 'action');
+                $delete_working_hours = $api->check_role_access_rights($username, '122', 'action');
+    
+                $sql = $api->db_connection->prepare('SELECT WORKING_HOURS_ID, WORKING_HOURS, WORKING_DATE, DAY_OF_WEEK, DAY_PERIOD, WORK_FROM, WORK_TO FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = :working_schedule_id');
+                $sql->bindValue(':working_schedule_id', $working_schedule_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $working_hours_id = $row['WORKING_HOURS_ID'];
+                        $working_hours = $row['WORKING_HOURS'];
+                        $day_of_week = $row['DAY_OF_WEEK'];
+                        $day_period = $row['DAY_PERIOD'];
+                        $working_date = $api->check_date('empty', $row['WORKING_DATE'], '', 'm/d/Y', '', '', '');
+                        $work_from = $api->check_date('empty', $row['WORK_FROM'], '', 'h:i:s a', '', '', '');
+                        $work_to = $api->check_date('empty', $row['WORK_TO'], '', 'h:i:s a', '', '', '');
+
+                        $system_code_details = $api->get_system_code_details(null, 'DAYOFWEEK', $day_of_week);
+                        $day_of_week_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                        $system_code_details = $api->get_system_code_details(null, 'DAYPERIOD', $day_period);
+                        $day_period_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                        if($update_working_hours > 0 && $update_working_schedule > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-working-hours" data-working-hours-id="'. $working_hours_id .'" data-working-hours-id="'. $working_hours_id .'" title="Edit Working Hours">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = null;
+                        }
+
+                        if($delete_working_hours > 0 && $update_working_schedule > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-working-hours" data-working-hours-id="'. $working_hours_id .'" data-working-hours-id="'. $working_hours_id .'" title="Delete Working Hours">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = null;
+                        }
+    
+                        $response[] = array(
+                            'WORKING_HOURS' => $working_hours,
+                            'WORKING_DATE' => $working_date,
+                            'DAY_OF_WEEK' => $day_of_week_name,
+                            'DAY_PERIOD' => $day_period_name,
+                            'WORK_FROM' => $work_from,
+                            'WORK_TO' => $work_to,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                '. $update .'
+                                '. $delete .'
+                            </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Working schedule types table
+    else if($type == 'working schedule types table'){
+        if(isset($_POST['filter_category'])){
+            if ($api->databaseConnection()) {
+                $filter_category = $_POST['filter_category'];
+
+                $query = 'SELECT WORKING_SCHEDULE_TYPE_ID, WORKING_SCHEDULE_TYPE, WORKING_SCHEDULE_TYPE_CATEGORY FROM employee_working_schedule_type';
+
+                if(!empty($filter_category)){
+                    $query .= ' WHERE WORKING_SCHEDULE_TYPE_CATEGORY = :filter_category';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_category)){
+                    $sql->bindValue(':filter_category', $filter_category);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $working_schedule_type_id = $row['WORKING_SCHEDULE_TYPE_ID'];
+                        $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
+                        $working_schedule_type_category = $row['WORKING_SCHEDULE_TYPE_CATEGORY'];
+
+                        $system_code_details = $api->get_system_code_details(null, 'WORKINGSCHEDTYPECAT', $working_schedule_type_category);
+                        $working_schedule_type_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                        $working_schedule_type_id_encrypted = $api->encrypt_data($working_schedule_type_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_type_id .'">',
+                            'WORKING_SCHEDULE_TYPE_ID' => $working_schedule_type_id,
+                            'WORKING_SCHEDULE_TYPE' => $working_schedule_type,
+                            'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_category_name,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="working-schedule-type-form.php?id='. $working_schedule_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule Type">
                                                 <i class="bx bx-show font-size-16 align-middle"></i>
                                             </a>
                                         </div>'

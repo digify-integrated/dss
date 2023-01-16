@@ -8,19 +8,19 @@
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        $page_details = $api->get_page_details(41);
+        $page_details = $api->get_page_details(43);
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 41, 'page');
+        $page_access_right = $api->check_role_access_rights($username, 43, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
             header('location: apps.php');
         }
         else{
-            $add_wage_type = $api->check_role_access_rights($username, '114', 'action');
-            $delete_wage_type = $api->check_role_access_rights($username, '116', 'action');
+            $add_working_schedule = $api->check_role_access_rights($username, '117', 'action');
+            $delete_working_schedule = $api->check_role_access_rights($username, '119', 'action');
 
             require('views/_interface_settings.php');
         }
@@ -34,6 +34,7 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
+        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
         <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <?php require('views/_required_css.php'); ?>
@@ -56,11 +57,11 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Wage Types</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Working Schedules</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Employee</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Employees</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
@@ -77,11 +78,11 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Wage Types List</h4>
+                                                        <h4 class="card-title">Working Schedules List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_wage_type > 0){
+                                                            if($delete_working_schedule > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
                                                                         <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
@@ -89,8 +90,8 @@
                                                                     </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                    if($delete_wage_type > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-wage-type">Delete Wage Type</button>';
+                                                                    if($delete_working_schedule > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-working-schedule">Delete Working Schedules</button>';
                                                                     }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -101,20 +102,41 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                            if($add_wage_type > 0){
-                                                                echo '<a href="wage-type-form.php" class="btn btn-primary">
+                                                            if($add_working_schedule > 0){
+                                                                echo '<a href="working-schedule-form.php" class="btn btn-primary">
                                                                     <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
                                                                     <span class="d-none d-sm-block">Create</span>
                                                                 </a>';
                                                             }
                                                         ?>
+                                                        <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas"><i class="bx bx-filter-alt"></i></span></button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                    <div class="offcanvas-header">
+                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="offcanvas-body">
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">Working Schedule Type</p>
+
+                                                            <select class="form-control filter-select2" id="filter_working_schedule_type">
+                                                                <option value="">All</option>
+                                                                <?php echo $api->generate_working_schedule_type_options(); ?>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="wage-types-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="working-schedules-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -122,8 +144,9 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Wage Type ID</th>
-                                                            <th class="all">Wage Type</th>
+                                                            <th class="all">Working Schedule ID</th>
+                                                            <th class="all">Working Schedule</th>
+                                                            <th class="all">Working Schedule Type</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>
@@ -149,7 +172,8 @@
         <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
+        <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/wage-types.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/working-schedules.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

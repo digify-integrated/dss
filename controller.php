@@ -2318,6 +2318,120 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit working schedule
+        case 'submit working schedule':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_id']) && isset($_POST['working_schedule']) && !empty($_POST['working_schedule']) && isset($_POST['working_schedule_type']) && !empty($_POST['working_schedule_type'])){
+                        $working_schedule_id = $_POST['working_schedule_id'];
+                        $working_schedule = $_POST['working_schedule'];
+                        $working_schedule_type = $_POST['working_schedule_type'];
+            
+                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
+             
+                        if($check_working_schedule_exist > 0){
+                            $update_working_schedule = $api->update_working_schedule($working_schedule_id, $working_schedule, $working_schedule_type, $username);
+            
+                            if($update_working_schedule){
+                                $response[] = array(
+                                    'RESPONSE' => 'Updated'
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $update_working_schedule
+                                );
+                            }
+                        }
+                        else{
+                            $insert_working_schedule = $api->insert_working_schedule($working_schedule, $working_schedule_type, $username);
+                
+                            if($insert_working_schedule[0]['RESPONSE']){
+                                $response[] = array(
+                                    'RESPONSE' => 'Inserted',
+                                    'WORKING_SCHEDULE_ID' => $insert_working_schedule[0]['WORKING_SCHEDULE_ID']
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $insert_working_schedule[0]['RESPONSE']
+                                );
+                            }
+                        }
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => 'Inactive User'
+                    );
+                }
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Submit working schedule type
+        case 'submit working schedule type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_type_id']) && isset($_POST['working_schedule_type']) && !empty($_POST['working_schedule_type']) && isset($_POST['working_schedule_type_category']) && !empty($_POST['working_schedule_type_category'])){
+                        $working_schedule_type_id = $_POST['working_schedule_type_id'];
+                        $working_schedule_type = $_POST['working_schedule_type'];
+                        $working_schedule_type_category = $_POST['working_schedule_type_category'];
+            
+                        $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
+             
+                        if($check_working_schedule_type_exist > 0){
+                            $update_working_schedule_type = $api->update_working_schedule_type($working_schedule_type_id, $working_schedule_type, $working_schedule_type_category, $username);
+            
+                            if($update_working_schedule_type){
+                                $response[] = array(
+                                    'RESPONSE' => 'Updated'
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $update_working_schedule_type
+                                );
+                            }
+                        }
+                        else{
+                            $insert_working_schedule_type = $api->insert_working_schedule_type($working_schedule_type, $working_schedule_type_category, $username);
+                
+                            if($insert_working_schedule_type[0]['RESPONSE']){
+                                $response[] = array(
+                                    'RESPONSE' => 'Inserted',
+                                    'WORKING_SCHEDULE_TYPE_ID' => $insert_working_schedule_type[0]['WORKING_SCHEDULE_TYPE_ID']
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $insert_working_schedule_type[0]['RESPONSE']
+                                );
+                            }
+                        }
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => 'Inactive User'
+                    );
+                }
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Delete transactions
         # -------------------------------------------------------------
@@ -4624,6 +4738,174 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Delete working schedule
+        case 'delete working schedule':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
+                        $working_schedule_id = $_POST['working_schedule_id'];
+            
+                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
+            
+                        if($check_working_schedule_exist > 0){
+                            $delete_all_working_hours = $api->delete_all_working_hours($working_schedule_id, $username);
+                                                
+                            if($delete_all_working_hours){
+                                $delete_working_schedule = $api->delete_working_schedule($working_schedule_id, $username);
+                                                
+                                if($delete_working_schedule){
+                                    echo 'Deleted';
+                                }
+                                else{
+                                    echo $delete_working_schedule;
+                                }
+                            }
+                            else{
+                                echo $delete_all_working_hours;
+                            }
+                            
+                        }
+                        else{
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Delete multiple working schedule
+        case 'delete multiple working schedule':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
+                        $working_schedule_ids = $_POST['working_schedule_id'];
+            
+                        foreach($working_schedule_ids as $working_schedule_id){
+                            $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
+            
+                            if($check_working_schedule_exist > 0){
+                                $delete_all_working_hours = $api->delete_all_working_hours($working_schedule_id, $username);
+                                                
+                                if($delete_all_working_hours){
+                                    $delete_working_schedule = $api->delete_working_schedule($working_schedule_id, $username);
+                                                
+                                    if(!$delete_working_schedule){
+                                        $error = $delete_working_schedule;
+                                        break;
+                                    }
+                                }
+                                else{
+                                    $error = $delete_all_working_hours;
+                                    break;
+                                }
+                            }
+                            else{
+                                $error = 'Not Found';
+                                break;
+                            }
+                        }
+            
+                        if(empty($error)){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $error;
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Delete working schedule type
+        case 'delete working schedule type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
+                        $working_schedule_type_id = $_POST['working_schedule_type_id'];
+            
+                        $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
+            
+                        if($check_working_schedule_type_exist > 0){
+                            $delete_working_schedule_type = $api->delete_working_schedule_type($working_schedule_type_id, $username);
+                                                
+                            if($delete_working_schedule_type){
+                                echo 'Deleted';
+                            }
+                            else{
+                                echo $delete_working_schedule_type;
+                            }
+                        }
+                        else{
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Delete multiple working schedule type
+        case 'delete multiple working schedule type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
+                        $working_schedule_type_ids = $_POST['working_schedule_type_id'];
+            
+                        foreach($working_schedule_type_ids as $working_schedule_type_id){
+                            $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
+            
+                            if($check_working_schedule_type_exist > 0){
+                                $delete_working_schedule_type = $api->delete_working_schedule_type($working_schedule_type_id, $username);
+                                                
+                                if(!$delete_working_schedule_type){
+                                    $error = $delete_working_schedule_type;
+                                    break;
+                                }
+                            }
+                            else{
+                                $error = 'Not Found';
+                                break;
+                            }
+                        }
+            
+                        if(empty($error)){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $error;
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Unlock transactions
         # -------------------------------------------------------------
@@ -6090,6 +6372,40 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $response[] = array(
                     'WAGE_TYPE' => $wage_type_details[0]['WAGE_TYPE'],
                     'TRANSACTION_LOG_ID' => $wage_type_details[0]['TRANSACTION_LOG_ID']
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Working schedule details
+        case 'working schedule details':
+            if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
+                $working_schedule_id = $_POST['working_schedule_id'];
+                $working_schedule_details = $api->get_working_schedule_details($working_schedule_id);
+    
+                $response[] = array(
+                    'WORKING_SCHEDULE' => $working_schedule_details[0]['WORKING_SCHEDULE'],
+                    'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE'],
+                    'TRANSACTION_LOG_ID' => $working_schedule_details[0]['TRANSACTION_LOG_ID']
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Working schedule type details
+        case 'working schedule type details':
+            if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
+                $working_schedule_type_id = $_POST['working_schedule_type_id'];
+                $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type_id);
+    
+                $response[] = array(
+                    'WORKING_SCHEDULE_TYPE' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'],
+                    'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY'],
+                    'TRANSACTION_LOG_ID' => $working_schedule_type_details[0]['TRANSACTION_LOG_ID']
                 );
     
                 echo json_encode($response);

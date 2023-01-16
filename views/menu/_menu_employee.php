@@ -7,6 +7,7 @@
         'wage_types' => ['id' => '41', 'url' => 'wage-types.php', 'label' => 'Wage Types', 'group' => 'Configurations'],
         'work_locations' => ['id' => '35', 'url' => 'work-locations.php', 'label' => 'Work Locations', 'group' => 'Configurations'],
         'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
+        'working_schedule_types' => ['id' => '43', 'url' => 'working-schedule-types.php', 'label' => 'Working Schedule Types', 'group' => 'Configurations'],
     ];
 
     ksort($menu_pages);

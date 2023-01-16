@@ -1337,6 +1337,81 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_working_schedule_exist
+    # Purpose    : Checks if the working schedule exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_working_schedule_exist($working_schedule_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_working_schedule_exist(:working_schedule_id)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_working_hours_exist
+    # Purpose    : Checks if the working hours exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_working_hours_exist($working_hours_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_working_hours_exist(:working_hours_id)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_working_schedule_type_exist
+    # Purpose    : Checks if the working schedule type exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_working_schedule_type_exist($working_schedule_type_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_working_schedule_type_exist(:working_schedule_type_id)');
+            $sql->bindValue(':working_schedule_type_id', $working_schedule_type_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -4098,6 +4173,212 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_working_schedule
+    # Purpose    : Updates working schedule.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_working_schedule($working_schedule_id, $working_schedule, $working_schedule_type, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $working_schedule_details = $this->get_working_schedule_details($working_schedule_id);
+            
+            if(!empty($working_schedule_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $working_schedule_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_working_schedule(:working_schedule_id, :working_schedule, :working_schedule_type, :transaction_log_id, :record_log)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+            $sql->bindValue(':working_schedule', $working_schedule);
+            $sql->bindValue(':working_schedule_type', $working_schedule_type);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($working_schedule_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_working_hours
+    # Purpose    : Updates working hours.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_working_hours($working_hours_id, $working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $working_hours_details = $this->get_working_hours_details($working_hours_id);
+            
+            if(!empty($working_hours_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $working_hours_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_working_hours(:working_hours_id, :working_schedule_id, :working_hours, :working_date, :day_of_week, :day_period, :work_from, :work_to, :transaction_log_id, :record_log)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+            $sql->bindValue(':working_hours', $working_hours);
+            $sql->bindValue(':working_date', $working_date);
+            $sql->bindValue(':day_of_week', $day_of_week);
+            $sql->bindValue(':day_period', $day_period);
+            $sql->bindValue(':work_from', $work_from);
+            $sql->bindValue(':work_to', $work_to);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($working_hours_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working hours.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working hours.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_working_schedule_type
+    # Purpose    : Updates working schedule type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_working_schedule_type($working_schedule_type_id, $working_schedule_type, $working_schedule_type_category, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $working_schedule_type_details = $this->get_working_schedule_type_details($working_schedule_type_id);
+            
+            if(!empty($working_schedule_type_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $working_schedule_type_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_working_schedule_type(:working_schedule_type_id, :working_schedule_type, :working_schedule_type_category, :transaction_log_id, :record_log)');
+            $sql->bindValue(':working_schedule_type_id', $working_schedule_type_id);
+            $sql->bindValue(':working_schedule_type', $working_schedule_type);
+            $sql->bindValue(':working_schedule_type_category', $working_schedule_type_category);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($working_schedule_type_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule type.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule type.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -6106,19 +6387,19 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : insert_wage_type
-    # Purpose    : Insert wage type.
+    # Name       : insert_working_schedule
+    # Purpose    : Insert working schedule.
     #
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function insert_wage_type($wage_type, $username){
+    public function insert_working_schedule($working_schedule, $working_schedule_type, $username){
         if ($this->databaseConnection()) {
             $response = array();
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
 
             # Get system parameter id
-            $system_parameter = $this->get_system_parameter(25, 1);
+            $system_parameter = $this->get_system_parameter(26, 1);
             $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
             $id = $system_parameter[0]['ID'];
 
@@ -6127,27 +6408,172 @@ class Api{
             $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
             $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
 
-            $sql = $this->db_connection->prepare('CALL insert_wage_type(:id, :wage_type, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL insert_working_schedule(:id, :working_schedule, :working_schedule_type, :transaction_log_id, :record_log)');
             $sql->bindValue(':id', $id);
-            $sql->bindValue(':wage_type', $wage_type);
+            $sql->bindValue(':working_schedule', $working_schedule);
+            $sql->bindValue(':working_schedule_type', $working_schedule_type);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
                 # Update system parameter value
-                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 25, $username);
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 26, $username);
 
                 if($update_system_parameter_value){
                     # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
-                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted wage type.');
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted working schedule.');
                                     
                         if($insert_transaction_log){
                             $response[] = array(
                                 'RESPONSE' => true,
-                                'WAGE_TYPE_ID' => $this->encrypt_data($id)
+                                'WORKING_SCHEDULE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_working_hours
+    # Purpose    : Insert working hours.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_working_hours($working_schedule_id, $qualification, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(27, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_working_hours(:id, :working_schedule_id, :working_hours, :working_date, :day_of_week, :day_period, :work_from, :work_to, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+            $sql->bindValue(':working_hours', $working_hours);
+            $sql->bindValue(':working_date', $working_date);
+            $sql->bindValue(':day_of_week', $day_of_week);
+            $sql->bindValue(':day_period', $day_period);
+            $sql->bindValue(':work_from', $work_from);
+            $sql->bindValue(':work_to', $work_to);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 27, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted working hours.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                           return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_working_schedule_type
+    # Purpose    : Insert working schedule type.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_working_schedule_type($working_schedule_type, $working_schedule_type_category, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(28, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_working_schedule_type(:id, :working_schedule_type, :working_schedule_type_category, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':working_schedule_type', $working_schedule_type);
+            $sql->bindValue(':working_schedule_type_category', $working_schedule_type_category);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 28, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted working schedule type.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'WORKING_SCHEDULE_TYPE_ID' => $this->encrypt_data($id)
                             );
                         }
                         else{
@@ -7482,6 +7908,98 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : delete_working_schedule
+    # Purpose    : Delete working schedule.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_working_schedule($working_schedule_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_working_schedule(:working_schedule_id)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_working_hours
+    # Purpose    : Delete working schedule.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_working_hours($working_schedule_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_working_hours(:working_schedule_id)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_working_hours
+    # Purpose    : Delete working hours.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_working_hours($working_hours_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_working_hours(:working_hours_id)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_working_schedule_type
+    # Purpose    : Delete working schedule type.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_working_schedule_type($working_schedule_type_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_working_schedule_type(:working_schedule_type_id)');
+            $sql->bindValue(':working_schedule_type_id', $working_schedule_type_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details methods
     # -------------------------------------------------------------
 
@@ -8578,6 +9096,113 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_working_schedule_details
+    # Purpose    : Gets the working schedule details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_working_schedule_details($working_schedule_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_working_schedule_details(:working_schedule_id)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'WORKING_SCHEDULE' => $row['WORKING_SCHEDULE'],
+                        'WORKING_SCHEDULE_TYPE' => $row['WORKING_SCHEDULE_TYPE'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_working_hours_details
+    # Purpose    : Gets the working hours details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_working_hours_details($working_hours_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_working_hours_details(:working_hours_id)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'WORKING_SCHEDULE_ID' => $row['WORKING_SCHEDULE_ID'],
+                        'WORKING_HOURS' => $row['WORKING_HOURS'],
+                        'WORKING_DATE' => $row['WORKING_DATE'],
+                        'DAY_OF_WEEK' => $row['DAY_OF_WEEK'],
+                        'DAY_PERIOD' => $row['DAY_PERIOD'],
+                        'WORK_FROM' => $row['WORK_FROM'],
+                        'WORK_TO' => $row['WORK_TO'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_working_schedule_type_details
+    # Purpose    : Gets the working schedule type details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_working_schedule_type_details($working_schedule_type_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_working_schedule_type_details(:working_schedule_type_id)');
+            $sql->bindValue(':working_schedule_type_id', $working_schedule_type_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'WORKING_SCHEDULE_TYPE' => $row['WORKING_SCHEDULE_TYPE'],
+                        'WORKING_SCHEDULE_TYPE_CATEGORY' => $row['WORKING_SCHEDULE_TYPE_CATEGORY'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
 
@@ -9556,6 +10181,76 @@ class Api{
                         $wage_type = $row['WAGE_TYPE'];
     
                         $option .= "<option value='". $wage_type_id ."'>". $wage_type ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_working_schedule_options
+    # Purpose    : Generates working schedule options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_working_schedule_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_working_schedule_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
+                        $working_schedule = $row['WORKING_SCHEDULE'];
+    
+                        $option .= "<option value='". $working_schedule_id ."'>". $working_schedule ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_working_schedule_type_options
+    # Purpose    : Generates working schedule type options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_working_schedule_type_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_working_schedule_type_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $working_schedule_type_id = $row['WORKING_SCHEDULE_TYPE_ID'];
+                        $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
+    
+                        $option .= "<option value='". $working_schedule_type_id ."'>". $working_schedule_type ."</option>";
                     }
     
                     return $option;
