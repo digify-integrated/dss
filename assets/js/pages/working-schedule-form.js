@@ -346,15 +346,29 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#add-working-hours',function() {
-        generate_modal('working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'working-hours-form', '1', username);
+        const category = $(this).data('category');
+
+        if(category == 'FIXED'){
+            generate_modal('fixed working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'fixed-working-hours-form', '1', username);
+        }
+        else{
+            generate_modal('flexible working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'flexible-working-hours-form', '1', username);
+        }
     });
 
     $(document).on('click','.update-working-hours',function() {
         const working_hours_id = $(this).data('working-hours-id');
+        const category = $(this).data('category');
 
         sessionStorage.setItem('working_hours_id', working_hours_id);
+        sessionStorage.setItem('category', category);
 
-        generate_modal('working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'working-hours-form', '0', username);
+        if(category == 'FIXED'){
+            generate_modal('fixed working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'fixed-working-hours-form', '0', username);
+        }
+        else{
+            generate_modal('flexible working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'flexible-working-hours-form', '0', username);
+        }
     });
 
     $(document).on('click','.delete-working-hours',function() {

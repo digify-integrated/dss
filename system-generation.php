@@ -296,6 +296,51 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             </div>
                         </div>';
             }
+            else if($form_type == 'fixed working hours form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <input type="hidden" id="working_hours_id" name="working_hours_id">
+                                    <label for="working_hours" class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="working_hours" name="working_hours" maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label for="day_of_week" class="col-form-label">Day of Week <span class="text-danger">*</span></label>
+                                    <select class="form-control form-select2" id="day_of_week" name="day_of_week">
+                                    <option value="">--</option>';
+                                    $form .= $api->generate_system_code_options('DAYOFWEEK');
+                                    $form .='</select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label for="day_period" class="col-form-label">Day Period <span class="text-danger">*</span></label>
+                                    <select class="form-control form-select2" id="day_period" name="day_period">
+                                    <option value="">--</option>';
+                                    $form .= $api->generate_system_code_options('DAYPERIOD');
+                                    $form .='</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label for="work_from" class="col-form-label">Work From <span class="text-danger">*</span></label>
+                                    <input type="time" id="work_from" name="work_from" class="form-control" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label for="work_to" class="col-form-label">Work To <span class="text-danger">*</span></label>
+                                    <input type="time" id="work_to" name="work_to" class="form-control" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>';
+            }
 
             $form .= '</form>';
 
@@ -3356,6 +3401,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
             if ($api->databaseConnection()) {
                 $working_schedule_id = $_POST['working_schedule_id'];
+                $working_schedule_type_category = $api->get_working_schedule_type_category($working_schedule_id);
 
                 $update_working_schedule = $api->check_role_access_rights($username, '118', 'action');
                 $update_working_hours = $api->check_role_access_rights($username, '121', 'action');
@@ -3381,7 +3427,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $day_period_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
 
                         if($update_working_hours > 0 && $update_working_schedule > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-working-hours" data-working-hours-id="'. $working_hours_id .'" data-working-hours-id="'. $working_hours_id .'" title="Edit Working Hours">
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-working-hours" data-working-hours-id="'. $working_hours_id .'" data-working-hours-id="'. $working_hours_id .'" data-category="'. $working_schedule_type_category .'" title="Edit Working Hours">
                                             <i class="bx bx-pencil font-size-16 align-middle"></i>
                                         </button>';
                         }

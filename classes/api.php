@@ -4184,6 +4184,7 @@ class Api{
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
             $working_schedule_details = $this->get_working_schedule_details($working_schedule_id);
+            $working_schedule_type_actual = $working_schedule_details[0]['WORKING_SCHEDULE_TYPE'];
             
             if(!empty($working_schedule_details[0]['TRANSACTION_LOG_ID'])){
                 $transaction_log_id = $working_schedule_details[0]['TRANSACTION_LOG_ID'];
@@ -4207,7 +4208,19 @@ class Api{
                     $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule.');
                                     
                     if($insert_transaction_log){
-                        return true;
+                        if($working_schedule_type_actual != $working_schedule_type){
+                            $delete_all_working_hours = $this->delete_all_working_hours($working_schedule_id, $username);
+
+                            if($delete_all_working_hours){
+                                return true;
+                            }
+                            else{
+                                return $delete_all_working_hours;
+                            }
+                        }
+                        else{
+                            return true;
+                        }
                     }
                     else{
                         return $insert_transaction_log;
@@ -4221,7 +4234,19 @@ class Api{
                         $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated working schedule.');
                                     
                         if($insert_transaction_log){
-                            return true;
+                            if($working_schedule_type_actual != $working_schedule_type){
+                                $delete_all_working_hours = $this->delete_all_working_hours($working_schedule_id, $username);
+    
+                                if($delete_all_working_hours){
+                                    return true;
+                                }
+                                else{
+                                    return $delete_all_working_hours;
+                                }
+                            }
+                            else{
+                                return true;
+                            }
                         }
                         else{
                             return $insert_transaction_log;
@@ -9588,6 +9613,33 @@ class Api{
         );
 
         return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_working_schedule_type_category
+    # Purpose    : Gets the working schedule type category.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_working_schedule_type_category($working_schedule_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_working_schedule_type(:working_schedule_id)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['WORKING_SCHEDULE_TYPE_CATEGORY'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
     }
     # -------------------------------------------------------------
 

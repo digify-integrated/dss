@@ -22,6 +22,8 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $working_schedule_id = $api->decrypt_data($id);
+
+                $working_schedule_type_category = $api->get_working_schedule_type_category($working_schedule_id);
             }
             else{
                 $working_schedule_id = null;
@@ -126,7 +128,7 @@
                                                                             $dropdown_action .= '<div class="dropdown-divider"></div>';
         
                                                                             if($add_working_hours > 0){
-                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" id="add-working-hours">Add Working Hours</button>';
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-category="'. $working_schedule_type_category .'" id="add-working-hours">Add Working Hours</button>';
                                                                             }
                                                                         }
 

@@ -2431,6 +2431,15 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
+CREATE PROCEDURE get_working_schedule_type(IN working_schedule_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT WORKING_SCHEDULE_TYPE_CATEGORY FROM employee_working_schedule_type WHERE WORKING_SCHEDULE_TYPE_ID = (SELECT WORKING_SCHEDULE_TYPE FROM employee_working_schedule WHERE WORKING_SCHEDULE_ID = ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING working_schedule_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
 CREATE PROCEDURE generate_working_schedule_options()
 BEGIN
 	SET @query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE FROM employee_working_schedule ORDER BY WORKING_SCHEDULE';
