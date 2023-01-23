@@ -6494,7 +6494,7 @@ class Api{
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function insert_working_hours($working_schedule_id, $qualification, $username){
+    public function insert_working_hours($working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username){
         if ($this->databaseConnection()) {
             $response = array();
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');

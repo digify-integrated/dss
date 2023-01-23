@@ -19,7 +19,7 @@
                     
                     $('#working_schedule_id').val(working_schedule_id);
                 },
-                complete: function(){                    
+                complete: function(){
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
                     }
@@ -349,10 +349,10 @@ function initialize_click_events(){
         const category = $(this).data('category');
 
         if(category == 'FIXED'){
-            generate_modal('fixed working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'fixed-working-hours-form', '1', username);
+            generate_modal('fixed working hours form', 'Working Hours', 'R' , '0', '1', 'form', 'fixed-working-hours-form', '1', username);
         }
         else{
-            generate_modal('flexible working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'flexible-working-hours-form', '1', username);
+            generate_modal('flexible working hours form', 'Working Hours', 'R' , '0', '1', 'form', 'flexible-working-hours-form', '1', username);
         }
     });
 
@@ -364,10 +364,10 @@ function initialize_click_events(){
         sessionStorage.setItem('category', category);
 
         if(category == 'FIXED'){
-            generate_modal('fixed working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'fixed-working-hours-form', '0', username);
+            generate_modal('fixed working hours form', 'Working Hours', 'R' , '0', '1', 'form', 'fixed-working-hours-form', '0', username);
         }
         else{
-            generate_modal('flexible working hours form', 'Working Hours', 'R' , '1', '1', 'form', 'flexible-working-hours-form', '0', username);
+            generate_modal('flexible working hours form', 'Working Hours', 'R' , '0', '1', 'form', 'flexible-working-hours-form', '0', username);
         }
     });
 

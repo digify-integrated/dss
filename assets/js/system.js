@@ -1349,6 +1349,198 @@ function initialize_form_validation(form_type){
             }
         });
     }
+    else if(form_type == 'fixed working hours form'){
+        $('#fixed-working-hours-form').validate({
+            submitHandler: function (form) {
+                const working_schedule_id = $('#working-schedule-id').text();
+                transaction = 'submit fixed working hours'; 
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert Working Hours Success', 'The working hours has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update Working Hours Success', 'The working hours has been updated.', 'success');
+                            }
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#working-hours-datatable');
+                        }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
+                        else{
+                            show_alert('Working Hours Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                working_hours: {
+                    required: true
+                },
+                day_of_week: {
+                    required: true
+                },
+                day_period: {
+                    required: true
+                },
+                work_from: {
+                    required: true
+                },
+                work_to: {
+                    required: true
+                }
+            },
+            messages: {
+                working_hours: {
+                    required: 'Please enter the name',
+                },
+                day_of_week: {
+                    required: 'Please choose the day of week',
+                },
+                day_period: {
+                    required: 'Please choose the day period',
+                },
+                work_from: {
+                    required: 'Please choose the work from',
+                },
+                work_to: {
+                    required: 'Please choose the work to',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'flexible working hours form'){
+        $('#flexible-working-hours-form').validate({
+            submitHandler: function (form) {
+                const working_schedule_id = $('#working-schedule-id').text();
+                transaction = 'submit flexible working hours'; 
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert Working Hours Success', 'The working hours has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update Working Hours Success', 'The working hours has been updated.', 'success');
+                            }
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#working-hours-datatable');
+                        }
+                        else if(response === 'Inactive User'){
+                            show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        }
+                        else{
+                            show_alert('Working Hours Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                working_hours: {
+                    required: true
+                },
+                working_date: {
+                    required: true
+                },
+                day_period: {
+                    required: true
+                },
+                work_from: {
+                    required: true
+                },
+                work_to: {
+                    required: true
+                }
+            },
+            messages: {
+                working_hours: {
+                    required: 'Please enter the name',
+                },
+                working_date: {
+                    required: 'Please choose the working date',
+                },
+                day_period: {
+                    required: 'Please choose the day period',
+                },
+                work_from: {
+                    required: 'Please choose the work from',
+                },
+                work_to: {
+                    required: 'Please choose the work to',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
 }
 
 // Display functions
@@ -1434,6 +1626,48 @@ function display_form_details(form_type){
                 $('#attachment_id').val(attachment_id);
                 $('#attachment_name').val(response[0].ATTACHMENT_NAME);
                 $('#update').val('1');
+            }
+        });
+    }
+    else if(form_type == 'fixed working hours form'){
+        transaction = 'fixed working hours details';
+
+        const working_hours_id = sessionStorage.getItem('working_hours_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {working_hours_id : working_hours_id, transaction : transaction},
+            success: function(response) {
+                $('#working_hours_id').val(working_hours_id);
+                $('#working_hours').val(response[0].WORKING_HOURS);
+                $('#work_from').val(response[0].WORK_FROM);
+                $('#work_to').val(response[0].WORK_TO);
+
+                check_empty(response[0].DAY_OF_WEEK, '#day_of_week', 'select');
+                check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
+            }
+        });
+    }
+    else if(form_type == 'flexible working hours form'){
+        transaction = 'flexible working hours details';
+
+        const working_hours_id = sessionStorage.getItem('working_hours_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {working_hours_id : working_hours_id, transaction : transaction},
+            success: function(response) {
+                $('#working_hours_id').val(working_hours_id);
+                $('#working_hours').val(response[0].WORKING_HOURS);
+                $('#working_date').val(response[0].WORKING_DATE);
+                $('#work_from').val(response[0].WORK_FROM);
+                $('#work_to').val(response[0].WORK_TO);
+
+                check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
             }
         });
     }

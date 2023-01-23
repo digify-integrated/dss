@@ -2375,6 +2375,101 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit fixed working hours
+        case 'submit fixed working hours':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_hours_id']) && isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id']) && isset($_POST['working_hours']) && !empty($_POST['working_hours']) && isset($_POST['day_of_week']) && !empty($_POST['day_of_week']) && isset($_POST['day_period']) && !empty($_POST['day_period']) && isset($_POST['work_from']) && !empty($_POST['work_from']) && isset($_POST['work_to']) && !empty($_POST['work_to'])){
+                        $working_hours_id = $_POST['working_hours_id'];
+                        $working_schedule_id = $_POST['working_schedule_id'];
+                        $working_hours = $_POST['working_hours'];
+                        $day_of_week = $_POST['day_of_week'];
+                        $day_period = $_POST['day_period'];
+                        $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
+                        $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
+            
+                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+             
+                        if($check_working_schedule_exist > 0){
+                            $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
+            
+                            if($update_working_hours){
+                                echo 'Updated';
+                            }
+                            else{
+                                echo $update_working_hours;
+                            }
+                        }
+                        else{
+                            $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
+                
+                            if($insert_working_hours){
+                                echo 'Inserted';
+                            }
+                            else{
+                                echo $insert_working_hours;
+                            }
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Submit flexible working hours
+        case 'submit flexible working hours':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_hours_id']) && isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id']) && isset($_POST['working_hours']) && !empty($_POST['working_hours']) && isset($_POST['working_date']) && !empty($_POST['working_date']) && isset($_POST['day_period']) && !empty($_POST['day_period']) && isset($_POST['work_from']) && !empty($_POST['work_from']) && isset($_POST['work_to']) && !empty($_POST['work_to'])){
+                        $working_hours_id = $_POST['working_hours_id'];
+                        $working_schedule_id = $_POST['working_schedule_id'];
+                        $working_hours = $_POST['working_hours'];
+                        $working_date = $api->check_date('empty', $_POST['working_date'], '', 'Y-m-d', '', '', '');
+                        $day_of_week = strtoupper(date("l", strtotime($working_date)));
+                        $day_period = $_POST['day_period'];
+                        $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
+                        $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
+            
+                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+             
+                        if($check_working_schedule_exist > 0){
+                            $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
+            
+                            if($update_working_hours){
+                                echo 'Updated';
+                            }
+                            else{
+                                echo $update_working_hours;
+                            }
+                        }
+                        else{
+                            $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
+                
+                            if($insert_working_hours){
+                                echo 'Inserted';
+                            }
+                            else{
+                                echo $insert_working_hours;
+                            }
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # Submit working schedule type
         case 'submit working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -4830,6 +4925,40 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Delete working hours
+        case 'delete working hours':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = $_POST['username'];
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
+                        $working_hours_id = $_POST['working_hours_id'];
+            
+                        $check_working_hours_exist = $api->check_working_hours_exist($working_hours_id);
+            
+                        if($check_working_hours_exist > 0){
+                            $delete_working_hours = $api->delete_working_hours($working_hours_id, $username);
+                                                
+                            if($delete_working_hours){
+                                echo 'Deleted';
+                            }
+                            else{
+                                echo $delete_working_hours;
+                            }
+                        }
+                        else{
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # Delete working schedule type
         case 'delete working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -6389,6 +6518,44 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'WORKING_SCHEDULE' => $working_schedule_details[0]['WORKING_SCHEDULE'],
                     'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE'],
                     'TRANSACTION_LOG_ID' => $working_schedule_details[0]['TRANSACTION_LOG_ID']
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Fixed working hours details
+        case 'fixed working hours details':
+            if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
+                $working_hours_id = $_POST['working_hours_id'];
+                $working_hours_details = $api->get_working_hours_details($working_hours_id);
+    
+                $response[] = array(
+                    'WORKING_HOURS' => $working_hours_details[0]['WORKING_HOURS'],
+                    'DAY_OF_WEEK' => $working_hours_details[0]['DAY_OF_WEEK'],
+                    'DAY_PERIOD' => $working_hours_details[0]['DAY_PERIOD'],
+                    'WORK_FROM' => $working_hours_details[0]['WORK_FROM'],
+                    'WORK_TO' => $working_hours_details[0]['WORK_TO']
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Flexible working hours details
+        case 'flexible working hours details':
+            if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
+                $working_hours_id = $_POST['working_hours_id'];
+                $working_hours_details = $api->get_working_hours_details($working_hours_id);
+    
+                $response[] = array(
+                    'WORKING_HOURS' => $working_hours_details[0]['WORKING_HOURS'],
+                    'WORKING_DATE' =>  $api->check_date('empty', $working_hours_details[0]['WORKING_DATE'] ?? null, '', 'n/d/Y', '', '', ''),
+                    'DAY_PERIOD' => $working_hours_details[0]['DAY_PERIOD'],
+                    'WORK_FROM' => $working_hours_details[0]['WORK_FROM'],
+                    'WORK_TO' => $working_hours_details[0]['WORK_TO']
                 );
     
                 echo json_encode($response);

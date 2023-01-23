@@ -2460,7 +2460,7 @@ END //
 
 CREATE PROCEDURE update_working_hours(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN working_hours VARCHAR(100), IN working_date DATE, IN day_of_week VARCHAR(20), IN day_period VARCHAR(20), IN work_from TIME, IN work_to TIME, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'UPDATE employee_working_hours SET WORKING_HOURS = ?, WORKING_DATE = ?, DAY_OF_WEEK = ?, DAY_PERIOD = ?, WORK_FROM = ?, WORK_TO = ? WHERE WORKING_HOURS_ID = ? AND WORKING_SCHEDULE_ID = ?';
+	SET @query = 'UPDATE employee_working_hours SET WORKING_HOURS = ?, WORKING_DATE = ?, DAY_OF_WEEK = ?, DAY_PERIOD = ?, WORK_FROM = ?, WORK_TO = ?, TRANSACTION_LOG_ID =?, RECORD_LOG = ? WHERE WORKING_HOURS_ID = ? AND WORKING_SCHEDULE_ID = ?';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt USING working_hours, working_date, day_of_week, day_period, work_from, work_to, transaction_log_id, record_log, working_hours_id, working_schedule_id;
