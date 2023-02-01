@@ -6,7 +6,7 @@
 	$api = new Api;
     $page_title = 'Digify Integrated Solutions';
 
-    #require('views/_interface_settings.php');
+    require('views/_interface_settings.php');
 ?>
 
 <!doctype html>

@@ -14,7 +14,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'authenticate':
             if(isset($_POST['password']) && !empty($_POST['password'])){
                 $username = $_POST['username'];
-                $password = $api->encrypt_data($_POST['password']);
+                $password = $_POST['password'];
     
                 $authenticate = $api->authenticate($username, $password);
                 
@@ -2383,6 +2383,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['working_hours_id']) && isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id']) && isset($_POST['working_hours']) && !empty($_POST['working_hours']) && isset($_POST['day_of_week']) && !empty($_POST['day_of_week']) && isset($_POST['day_period']) && !empty($_POST['day_period']) && isset($_POST['work_from']) && !empty($_POST['work_from']) && isset($_POST['work_to']) && !empty($_POST['work_to'])){
+                        $overlap = false;
                         $working_hours_id = $_POST['working_hours_id'];
                         $working_schedule_id = $_POST['working_schedule_id'];
                         $working_hours = $_POST['working_hours'];
@@ -2390,27 +2391,34 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $day_period = $_POST['day_period'];
                         $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
                         $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
-            
-                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
-             
-                        if($check_working_schedule_exist > 0){
-                            $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
-            
-                            if($update_working_hours){
-                                echo 'Updated';
-                            }
-                            else{
-                                echo $update_working_hours;
-                            }
+
+                        $check_overlap = $api->check_fixed_working_schedule_overlap($working_schedule_id, $day_of_week, $work_from, $work_to);
+
+                        if($overlap){
+                            echo 'Overlap';
                         }
                         else{
-                            $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
+                            $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+             
+                            if($check_working_schedule_exist > 0){
+                                $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
                 
-                            if($insert_working_hours){
-                                echo 'Inserted';
+                                if($update_working_hours){
+                                    echo 'Updated';
+                                }
+                                else{
+                                    echo $update_working_hours;
+                                }
                             }
                             else{
-                                echo $insert_working_hours;
+                                $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
+                    
+                                if($insert_working_hours){
+                                    echo 'Inserted';
+                                }
+                                else{
+                                    echo $insert_working_hours;
+                                }
                             }
                         }
                     }
@@ -2438,27 +2446,34 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $day_period = $_POST['day_period'];
                         $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
                         $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
-            
-                        $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
-             
-                        if($check_working_schedule_exist > 0){
-                            $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
-            
-                            if($update_working_hours){
-                                echo 'Updated';
-                            }
-                            else{
-                                echo $update_working_hours;
-                            }
+
+                        $check_overlap = $api->check_flexible_overlap($working_schedule_id, $working_date, $work_from, $work_to);
+
+                        if($overlap){
+                            echo 'Overlap';
                         }
                         else{
-                            $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
+                            $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+             
+                            if($check_working_schedule_exist > 0){
+                                $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
                 
-                            if($insert_working_hours){
-                                echo 'Inserted';
+                                if($update_working_hours){
+                                    echo 'Updated';
+                                }
+                                else{
+                                    echo $update_working_hours;
+                                }
                             }
                             else{
-                                echo $insert_working_hours;
+                                $insert_working_hours = $api->insert_working_hours($working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
+                    
+                                if($insert_working_hours){
+                                    echo 'Inserted';
+                                }
+                                else{
+                                    echo $insert_working_hours;
+                                }
                             }
                         }
                     }

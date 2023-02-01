@@ -2494,6 +2494,23 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
+CREATE PROCEDURE check_fixed_working_schedule_overlap(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN day_of_week VARCHAR(20), IN work_from TIME, IN work_to TIME)
+BEGIN
+	IF working_hours_id IS NOT NULL OR working_hours_id <> '' THEN
+		SET @query = 'SELECT COUNT FROM employee_working_hours WHERE WORKING_HOURS_ID != ? AND WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING working_hours_id, working_schedule_id, day_of_week, work_from, work_to, work_from, work_to;
+	ELSE
+		SET @query = 'SELECT * FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING day_of_week, work_from, work_to, work_from, work_to;
+    END IF;
+
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Working Schedule Type */
 CREATE TABLE employee_working_schedule_type(
 	WORKING_SCHEDULE_TYPE_ID VARCHAR(50) PRIMARY KEY,

@@ -96,45 +96,6 @@ class Api{
         return $datestring;
     }
     # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : CryptRC4
-    # Purpose    : Returns the encrypted password using RC4-40.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function CryptRC4($text) {
-        return openssl_encrypt($text, 'RC4-40', ENCRYPTION_KEY, 1 | 2);
-    }
-    # -------------------------------------------------------------
-    
-    # -------------------------------------------------------------
-    #
-    # Name       : ToHexDump
-    # Purpose    : Encrypt the text or password to binary hex.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function ToHexDump($text) {
-        return bin2hex($text);
-    }
-    # -------------------------------------------------------------
-    
-    # -------------------------------------------------------------
-    #
-    # Name       : FromHexDump
-    # Purpose    : Decrypt the text or password to binary hex.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-    public function FromHexDump($text) {
-        return hex2bin($text);
-    }
-    # -------------------------------------------------------------
     
     # -------------------------------------------------------------
     #
@@ -144,8 +105,18 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function encrypt_data($text) {
-        return $this->ToHexDump($this->CryptRC4($text));
+    public function encrypt_data($plaintext) {
+        if (empty($plaintext)) {
+            return false;
+        }
+    
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $ciphertext = openssl_encrypt($plaintext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        if (!$ciphertext) {
+            return false;
+        }
+    
+        return base64_encode($iv . $ciphertext);
     }
     # -------------------------------------------------------------
     
@@ -157,8 +128,21 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function decrypt_data($text) {
-        return $this->CryptRC4($this->FromHexDump($text));
+    public function decrypt_data($ciphertext) {    
+        $ciphertext = base64_decode($ciphertext);
+        if (!$ciphertext) {
+            return false;
+        }
+    
+        $iv = substr($ciphertext, 0, openssl_cipher_iv_length('aes-256-cbc'));
+        $ciphertext = substr($ciphertext, openssl_cipher_iv_length('aes-256-cbc'));
+    
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        if (!$plaintext) {
+            return false;
+        }
+    
+        return $plaintext;
     }
     # -------------------------------------------------------------
 
@@ -235,7 +219,9 @@ class Api{
 
                 if($user_status == 'Active'){
                     if($login_attemp < 5){
-                        if($user_account_details[0]['PASSWORD'] === $password){
+                        $decrypted_password = $this->decrypt_data($user_account_details[0]['PASSWORD']);
+                        
+                        if($decrypted_password === $password){
                             if(strtotime($system_date) > strtotime($password_expiry_date)){
                                 return 'Password Expired';
                             }
@@ -9846,6 +9832,39 @@ class Api{
 
             $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :username');
             $sql->bindValue(':username', $username);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $role_id = $row['ROLE_ID'];
+                    $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
+                }
+
+                return $total;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_fixed_working_schedule_overlap
+    # Purpose    : Checks if the fixed working hours overlaps with the other working hours.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_fixed_working_schedule_overlap($working_schedule_id, $day_of_week, $work_from, $work_to) {
+        if ($this->databaseConnection()) {
+            $total = 0;
+
+            $sql = $this->db_connection->prepare('CALL check_fixed_working_schedule_overlap(:working_schedule_id, :day_of_week, :work_from, :work_to)');
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+            $sql->bindValue(':day_of_week', $day_of_week);
+            $sql->bindValue(':work_from', $work_from);
+            $sql->bindValue(':work_to', $work_to);
 
             if($sql->execute()){
                 while($row = $sql->fetch()){
