@@ -1642,6 +1642,147 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
+/* Employee Details */
+CREATE TABLE employee_details(
+	EMPLOYEE_ID VARCHAR(100) PRIMARY KEY,
+	USERNAME VARCHAR(50),
+	BADGE_ID VARCHAR(100),
+	EMPLOYEE_IMAGE VARCHAR(500),
+	FILE_AS VARCHAR(350) NOT NULL,
+	FIRST_NAME VARCHAR(100) NOT NULL,
+	MIDDLE_NAME VARCHAR(100) NOT NULL,
+	LAST_NAME VARCHAR(100) NOT NULL,
+	SUFFIX VARCHAR(5),
+	COMPANY VARCHAR(50),
+	JOB_POSITION VARCHAR(50),
+	DEPARTMENT VARCHAR(50),
+	WORK_LOCATION VARCHAR(50),
+	WORKING_HOURS VARCHAR(50),
+	MANAGER VARCHAR(100),
+	COACH VARCHAR(100),
+	EMPLOYEE_TYPE VARCHAR(100),
+	EMPLOYEE_STATUS VARCHAR(100),
+	PERMANENCY_DATE DATE,
+	ONBOARD_DATE DATE,
+	OFFBOARD_DATE DATE,
+	DEPARTURE_REASON VARCHAR(50),
+	DETAILED_REASON VARCHAR(500),
+	WORK_EMAIL VARCHAR(50),
+	WORK_TELEPHONE VARCHAR(20),
+	WORK_MOBILE VARCHAR(20),
+	SSS VARCHAR(20),
+	TIN VARCHAR(20),
+	PAGIBIG VARCHAR(20),
+	PHILHEALTH VARCHAR(20),
+	BANK_ACCOUNT_NUMBER VARCHAR(100),
+	HOME_WORK_DISTANCE DOUBLE,
+	PERSONAL_EMAIL VARCHAR(50),
+	PERSONAL_TELEPHONE VARCHAR(20),
+	PERSONAL_MOBILE VARCHAR(20),
+	STREET_1 VARCHAR(200),
+	STREET_2 VARCHAR(200),
+	COUNTRY_ID INT,
+	STATE_ID INT,
+	CITY VARCHAR(100),
+	ZIP_CODE VARCHAR(10),
+	MARITAL_STATUS VARCHAR(20),
+	SPOUSE_NAME VARCHAR(500),
+	SPOUSE_BIRTHDAY DATE,
+	EMERGENCY_CONTACT VARCHAR(500),
+	EMERGENCY_PHONE VARCHAR(20),
+	NATIONALITY INT,
+	IDENTIFICATION_NUMBER VARCHAR(100),
+	PASSPORT_NUMBER VARCHAR(100),
+	GENDER VARCHAR(20),
+	BIRTHDAY DATE,
+	CERTIFICATE_LEVEL VARCHAR(20),
+	FIELD_OF_STUDY VARCHAR(200),
+	SCHOOL VARCHAR(200),
+	PLACE_OF_BIRTH VARCHAR(500),
+	NUMBER_OF_CHILDREN INT,
+	VISA_NUMBER VARCHAR(100),
+	WORK_PERMIT_NUMBER VARCHAR(100),
+	VISA_EXPIRY_DATE DATE,
+	WORK_PERMIT_EXPIRY_DATE DATE,
+	WORK_PERMIT VARCHAR(500),
+	TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_details_index ON employee_details(EMPLOYEE_ID);
+
+CREATE PROCEDURE check_employee_exist(IN employee_id INT)
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_details WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee(IN employee_id VARCHAR(100), IN badge_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN company VARCHAR(50), IN job_position VARCHAR(50), IN department VARCHAR(50), IN work_location VARCHAR(50), IN working_hours VARCHAR(50), IN manager VARCHAR(100), IN coach VARCHAR(100), IN employee_type VARCHAR(100), IN permanency_date DATE, IN onboard_date DATE, IN work_email VARCHAR(50), IN work_telephone VARCHAR(50), IN work_mobile VARCHAR(50), IN sss VARCHAR(20), IN tin VARCHAR(20), IN pagibig VARCHAR(20), IN philhealth VARCHAR(20), IN bank_account_number VARCHAR(100), IN home_work_distance DOUBLE, IN personal_email VARCHAR(50), IN personal_telephone VARCHAR(20), IN personal_mobile VARCHAR(20), IN street_1 VARCHAR(200), IN street_2 VARCHAR(200), IN country_id INT, IN state INT, IN city VARCHAR(100), IN zip_code VARCHAR(10), IN marital_status VARCHAR(20), IN spouse_name VARCHAR(500), IN spouse_birthday DATE, IN emergency_contact VARCHAR(500), IN emergency_phone VARCHAR(20), IN nationality INT, IN identification_number VARCHAR(100), IN passport_number VARCHAR(100), IN gender VARCHAR(20), IN birthday DATE, IN certificate_level VARCHAR(20), IN field_of_study VARCHAR(200), IN school VARCHAR(200), IN place_of_birth VARCHAR(500), IN number_of_children INT, IN visa_number VARCHAR(100), IN work_permit_number VARCHAR(100), IN visa_expiry_date DATE, IN work_permit_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_details SET BADGE_ID = ?, FILE_AS = ?, FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, SUFFIX = ?, COMPANY = ?, JOB_POSITION = ?, DEPARTMENT = ?, WORK_LOCATION = ?, WORKING_HOURS = ?, MANAGER = ?, COACH = ?, EMPLOYEE_TYPE = ?, PERMANENCY_DATE = ?, ONBOARD_DATE = ?, WORK_EMAIL = ?, WORK_TELEPHONE = ?, WORK_MOBILE = ?, SSS = ?, TIN = ?, PAGIBIG = ?, PHILHEALTH = ?, BANK_ACCOUNT_NUMBER = ?, HOME_WORK_DISTANCE = ?, PERSONAL_EMAIL = ?, PERSONAL_TELEPHONE = ?, PERSONAL_MOBILE = ?, STREET_1 = ?, STREET_2 = ?, COUNTRY_ID = ?, STATE_ID = ?, CITY = ?, ZIP_CODE = ?, MARITAL_STATUS = ?, SPOUSE_NAME = ?, SPOUSE_BIRTHDAY = ?, EMERGENCY_CONTACT = ?, EMERGENCY_PHONE = ?, NATIONALITY = ?, IDENTIFICATION_NUMBER = ?, PASSPORT_NUMBER = ?, GENDER = ?, BIRTHDAY = ?, CERTIFICATE_LEVEL = ?, FIELD_OF_STUDY = ?, SCHOOL = ?, PLACE_OF_BIRTH = ?, NUMBER_OF_CHILDREN = ?, VISA_NUMBER = ?, WORK_PERMIT_NUMBER = ?, VISA_EXPIRY_DATE = ?, WORK_PERMIT_EXPIRY_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING badge_id, file_as, first_name, middle_name, last_name, suffix, company, job_position, department, work_location, working_hours, manager, coach, employee_type, permanency_date, onboard_date, work_email, work_telephone, work_mobile, sss, tin, pagibig, philhealth, bank_account_number, home_work_distance, personal_email, personal_telephone, personal_mobile, street_1, street_2, country_id, state, city, zip_code, marital_status, spouse_name, spouse_birthday, emergency_contact, emergency_phone, nationality, identification_number, passport_number, gender, birthday, certificate_level, field_of_study, school, place_of_birth, number_of_children, visa_number, work_permit_number, visa_expiry_date, work_permit_expiry_date, transaction_log_id, record_log, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee(IN employee_id VARCHAR(100), IN badge_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN company VARCHAR(50), IN job_position VARCHAR(50), IN department VARCHAR(50), IN work_location VARCHAR(50), IN working_hours VARCHAR(50), IN manager VARCHAR(100), IN coach VARCHAR(100), IN employee_type VARCHAR(100), IN permanency_date DATE, IN onboard_date DATE, IN work_email VARCHAR(50), IN work_telephone VARCHAR(50), IN work_mobile VARCHAR(50), IN sss VARCHAR(20), IN tin VARCHAR(20), IN pagibig VARCHAR(20), IN philhealth VARCHAR(20), IN bank_account_number VARCHAR(100), IN home_work_distance DOUBLE, IN personal_email VARCHAR(50), IN personal_telephone VARCHAR(20), IN personal_mobile VARCHAR(20), IN street_1 VARCHAR(200), IN street_2 VARCHAR(200), IN country_id INT, IN state INT, IN city VARCHAR(100), IN zip_code VARCHAR(10), IN marital_status VARCHAR(20), IN spouse_name VARCHAR(500), IN spouse_birthday DATE, IN emergency_contact VARCHAR(500), IN emergency_phone VARCHAR(20), IN nationality INT, IN identification_number VARCHAR(100), IN passport_number VARCHAR(100), IN gender VARCHAR(20), IN birthday DATE, IN certificate_level VARCHAR(20), IN field_of_study VARCHAR(200), IN school VARCHAR(200), IN place_of_birth VARCHAR(500), IN number_of_children INT, IN visa_number VARCHAR(100), IN work_permit_number VARCHAR(100), IN visa_expiry_date DATE, IN work_permit_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_details (EMPLOYEE_ID, BADGE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, COMPANY, JOB_POSITION, DEPARTMENT, WORK_LOCATION, WORKING_HOURS, MANAGER, COACH, EMPLOYEE_TYPE, EMPLOYEE_STATUS, PERMANENCY_DATE, ONBOARD_DATE, WORK_EMAIL, WORK_TELEPHONE, WORK_MOBILE, SSS, TIN, PAGIBIG, PHILHEALTH, BANK_ACCOUNT_NUMBER, HOME_WORK_DISTANCE, PERSONAL_EMAIL, PERSONAL_TELEPHONE, PERSONAL_MOBILE, STREET_1, STREET_2, COUNTRY_ID, STATE_ID, CITY, ZIP_CODE, MARITAL_STATUS, SPOUSE_NAME, SPOUSE_BIRTHDAY, EMERGENCY_CONTACT, EMERGENCY_PHONE, NATIONALITY, IDENTIFICATION_NUMBER, PASSPORT_NUMBER, GENDER, BIRTHDAY, CERTIFICATE_LEVEL, FIELD_OF_STUDY, SCHOOL, PLACE_OF_BIRTH, NUMBER_OF_CHILDREN, VISA_NUMBER, WORK_PERMIT_NUMBER, VISA_EXPIRY_DATE, WORK_PERMIT_EXPIRY_DATE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "ACTIVE", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id, badge_id, file_as, first_name, middle_name, last_name, suffix, company, job_position, department, work_location, working_hours, manager, coach, employee_type, permanency_date, onboard_date, work_email, work_telephone, work_mobile, sss, tin, pagibig, philhealth, bank_account_number, home_work_distance, personal_email, personal_telephone, personal_mobile, street_1, street_2, country_id, state, city, zip_code, marital_status, spouse_name, spouse_birthday, emergency_contact, emergency_phone, nationality, identification_number, passport_number, gender, birthday, certificate_level, field_of_study, school, place_of_birth, number_of_children, visa_number, work_permit_number, visa_expiry_date, work_permit_expiry_date, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_details(IN id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, USERNAME, BADGE_ID, EMPLOYEE_IMAGE, FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, COMPANY, JOB_POSITION, DEPARTMENT, WORK_LOCATION, WORKING_HOURS, MANAGER, COACH, EMPLOYEE_TYPE, EMPLOYEE_STATUS, PERMANENCY_DATE, ONBOARD_DATE, OFFBOARD_DATE, DEPARTURE_REASON, DETAILED_REASON, WORK_EMAIL, WORK_TELEPHONE, WORK_MOBILE, SSS, TIN, PAGIBIG, PHILHEALTH, BANK_ACCOUNT_NUMBER, HOME_WORK_DISTANCE, PERSONAL_EMAIL, PERSONAL_TELEPHONE, PERSONAL_MOBILE, STREET_1, STREET_2, COUNTRY_ID, STATE_ID, CITY, ZIP_CODE, MARITAL_STATUS, SPOUSE_NAME, SPOUSE_BIRTHDAY, EMERGENCY_CONTACT, EMERGENCY_PHONE, NATIONALITY, IDENTIFICATION_NUMBER, PASSPORT_NUMBER, GENDER, BIRTHDAY, CERTIFICATE_LEVEL, FIELD_OF_STUDY, SCHOOL, PLACE_OF_BIRTH, NUMBER_OF_CHILDREN, VISA_NUMBER, WORK_PERMIT_NUMBER, VISA_EXPIRY_DATE, WORK_PERMIT_EXPIRY_DATE, WORK_PERMIT, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_details WHERE EMPLOYEE_ID = ? OR USERNAME = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_details WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_image(IN employee_id VARCHAR(100), IN employee_image VARCHAR(500))
+BEGIN
+	SET @query = 'UPDATE employee_details SET EMPLOYEE_IMAGE = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_image, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_status(IN employee_id VARCHAR(100), IN employee_status VARCHAR(100), IN offboard_date DATE, IN departure_reason VARCHAR(50), IN details_reason VARCHAR(500))
+BEGIN
+	SET @query = 'UPDATE employee_details SET EMPLOYEE_STATUS = ?, OFFBOARD_DATE = ?, DEPARTURE_REASON = ?, DETAILED_REASON = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_status, offboard_date, departure_reason, details_reason, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_employee_options()
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_details ORDER BY FILE_AS';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Employee Department */
 CREATE TABLE employee_department(
 	DEPARTMENT_ID VARCHAR(50) PRIMARY KEY,
@@ -2497,15 +2638,32 @@ END //
 CREATE PROCEDURE check_fixed_working_schedule_overlap(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN day_of_week VARCHAR(20), IN work_from TIME, IN work_to TIME)
 BEGIN
 	IF working_hours_id IS NOT NULL OR working_hours_id <> '' THEN
-		SET @query = 'SELECT COUNT FROM employee_working_hours WHERE WORKING_HOURS_ID != ? AND WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+		SET @query = 'SELECT COUNT(WORKING_HOURS_ID) AS TOTAL FROM employee_working_hours WHERE WORKING_HOURS_ID != ? AND WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
 
 		PREPARE stmt FROM @query;
 		EXECUTE stmt USING working_hours_id, working_schedule_id, day_of_week, work_from, work_to, work_from, work_to;
 	ELSE
-		SET @query = 'SELECT * FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+		SET @query = 'SELECT COUNT(WORKING_HOURS_ID) AS TOTAL FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = ? AND DAY_OF_WEEK = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
 
 		PREPARE stmt FROM @query;
-		EXECUTE stmt USING day_of_week, work_from, work_to, work_from, work_to;
+		EXECUTE stmt USING working_schedule_id, day_of_week, work_from, work_to, work_from, work_to;
+    END IF;
+
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_flexible_working_schedule_overlap(IN working_hours_id VARCHAR(100), IN working_schedule_id VARCHAR(100), IN working_date DATE, IN work_from TIME, IN work_to TIME)
+BEGIN
+	IF working_hours_id IS NOT NULL OR working_hours_id <> '' THEN
+		SET @query = 'SELECT COUNT(WORKING_HOURS_ID) AS TOTAL FROM employee_working_hours WHERE WORKING_HOURS_ID != ? AND WORKING_SCHEDULE_ID = ? AND WORKING_DATE = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING working_hours_id, working_schedule_id, working_date, work_from, work_to, work_from, work_to;
+	ELSE
+		SET @query = 'SELECT COUNT(WORKING_HOURS_ID) AS TOTAL FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = ? AND WORKING_DATE = ? AND ((WORK_FROM BETWEEN ? AND ?) OR (WORK_TO BETWEEN ? AND ?))';
+
+		PREPARE stmt FROM @query;
+		EXECUTE stmt USING working_schedule_id, working_date, work_from, work_to, work_from, work_to;
     END IF;
 
 	DEALLOCATE PREPARE stmt;

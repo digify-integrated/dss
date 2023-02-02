@@ -23,7 +23,7 @@
                 $id = $_GET['id'];
                 $department_id = $api->decrypt_data($id);
                 $department_details = $api->get_department_details($department_id);
-                $department_status = $department_details[0]['STATUS'];
+                $department_status = $department_details[0]['STATUS'] ?? null;
             }
             else{
                 $department_id = null;

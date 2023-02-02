@@ -2392,9 +2392,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
                         $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
 
-                        $check_overlap = $api->check_fixed_working_schedule_overlap($working_schedule_id, $day_of_week, $work_from, $work_to);
+                        $check_overlap = $api->check_fixed_working_schedule_overlap($working_hours_id, $working_schedule_id, $day_of_week, $work_from, $work_to);
 
-                        if($overlap){
+                        if($check_overlap > 0){
                             echo 'Overlap';
                         }
                         else{
@@ -2447,9 +2447,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
                         $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
 
-                        $check_overlap = $api->check_flexible_overlap($working_schedule_id, $working_date, $work_from, $work_to);
+                        $check_overlap = $api->check_flexible_working_schedule_overlap($working_hours_id, $working_schedule_id, $working_date, $work_from, $work_to);
 
-                        if($overlap){
+                        if($check_overlap > 0){
                             echo 'Overlap';
                         }
                         else{

@@ -112,11 +112,15 @@ class Api{
     
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $ciphertext = openssl_encrypt($plaintext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+
         if (!$ciphertext) {
             return false;
         }
-    
-        return base64_encode($iv . $ciphertext);
+
+        $encoded_ciphertext = base64_encode($iv . $ciphertext);
+        $encoded_ciphertext = urlencode($encoded_ciphertext);
+
+        return $encoded_ciphertext;
     }
     # -------------------------------------------------------------
     
@@ -128,8 +132,9 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function decrypt_data($ciphertext) {    
+    public function decrypt_data($ciphertext) {
         $ciphertext = base64_decode($ciphertext);
+        
         if (!$ciphertext) {
             return false;
         }
@@ -138,6 +143,7 @@ class Api{
         $ciphertext = substr($ciphertext, openssl_cipher_iv_length('aes-256-cbc'));
     
         $plaintext = openssl_decrypt($ciphertext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        
         if (!$plaintext) {
             return false;
         }
@@ -9856,23 +9862,48 @@ class Api{
     # Returns    : Number
     #
     # -------------------------------------------------------------
-    public function check_fixed_working_schedule_overlap($working_schedule_id, $day_of_week, $work_from, $work_to) {
+    public function check_fixed_working_schedule_overlap($working_hours_id, $working_schedule_id, $day_of_week, $work_from, $work_to) {
         if ($this->databaseConnection()) {
-            $total = 0;
-
-            $sql = $this->db_connection->prepare('CALL check_fixed_working_schedule_overlap(:working_schedule_id, :day_of_week, :work_from, :work_to)');
+            $sql = $this->db_connection->prepare('CALL check_fixed_working_schedule_overlap(:working_hours_id, :working_schedule_id, :day_of_week, :work_from, :work_to)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
             $sql->bindValue(':working_schedule_id', $working_schedule_id);
             $sql->bindValue(':day_of_week', $day_of_week);
             $sql->bindValue(':work_from', $work_from);
             $sql->bindValue(':work_to', $work_to);
 
             if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $role_id = $row['ROLE_ID'];
-                    $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
-                }
+                $row = $sql->fetch();
 
-                return $total;
+                return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_flexible_working_schedule_overlap
+    # Purpose    : Checks if the fixed working hours overlaps with the other working hours.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_flexible_working_schedule_overlap($working_hours_id, $working_schedule_id, $working_date, $work_from, $work_to) {
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_flexible_working_schedule_overlap(:working_hours_id, :working_schedule_id, :working_date, :work_from, :work_to)');
+            $sql->bindValue(':working_hours_id', $working_hours_id);
+            $sql->bindValue(':working_schedule_id', $working_schedule_id);
+            $sql->bindValue(':working_date', $working_date);
+            $sql->bindValue(':work_from', $work_from);
+            $sql->bindValue(':work_to', $work_to);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return (int) $row['TOTAL'];
             }
             else{
                 return $stmt->errorInfo()[2];

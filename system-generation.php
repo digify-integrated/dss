@@ -2884,7 +2884,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $manager = $row['MANAGER'];
                         $status = $row['STATUS'];
 
-                        if($status == '1'){
+                        if($status == 1){
                             $data_archive = '1';
                         }
                         else{

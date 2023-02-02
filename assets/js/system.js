@@ -1375,6 +1375,9 @@ function initialize_form_validation(form_type){
                             $('#System-Modal').modal('hide');
                             reload_datatable('#working-hours-datatable');
                         }
+                        else if(response === 'Overlap'){
+                            show_alert('Working Hours Error', 'Working hours cannot overlap with other wokring hours', 'error');
+                        }
                         else if(response === 'Inactive User'){
                             show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
                         }
@@ -1470,6 +1473,9 @@ function initialize_form_validation(form_type){
                           
                             $('#System-Modal').modal('hide');
                             reload_datatable('#working-hours-datatable');
+                        }
+                        else if(response === 'Overlap'){
+                            show_alert('Working Hours Error', 'Working hours cannot overlap with other wokring hours', 'error');
                         }
                         else if(response === 'Inactive User'){
                             show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
