@@ -8,23 +8,37 @@
         'work_locations' => ['id' => '35', 'url' => 'work-locations.php', 'label' => 'Work Locations', 'group' => 'Configurations'],
         'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
         'working_schedule_types' => ['id' => '43', 'url' => 'working-schedule-types.php', 'label' => 'Working Schedule Types', 'group' => 'Configurations'],
+        'employees' => ['id' => '43', 'url' => 'employees.php', 'label' => 'Employees', 'group' => 'Employees'],
     ];
 
     ksort($menu_pages);
     
     $menu = '';
     $configurations_menu = '';
+    $employees_menu = '';
     $standalone_menu = '';
     
     foreach ($menu_pages as $page_menu_id => $menu_page) {
         if ($api->check_role_access_rights($username, $menu_page['id'], 'page') > 0) {
-            if ($menu_page['group'] == 'Configurations') {
+            if ($menu_page['group'] == 'Employees') {
+                $employees_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
+            }
+            else if ($menu_page['group'] == 'Configurations') {
                 $configurations_menu .= '<a href="' . $menu_page['url'] . '" class="dropdown-item" key="t-' . $page_menu_id . '">' . $menu_page['label'] . '</a>';
             }
             else{
                 $standalone_menu .= '<li class="nav-item dropdown"><a href="' . $menu_page['url'] . '" class="nav-link">' .$menu_page['label'] . '</a></li>';
             }
         }
+    }
+    
+    if (!empty($employees_menu)) {
+        $menu .= '<li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="employeesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Employees
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="employeesDropdown">' . $employees_menu . '</div>
+                  </li>';
     }
 
     if (!empty($standalone_menu)) {

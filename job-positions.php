@@ -2,32 +2,32 @@
     require('session.php');
     require('config/config.php');
     require('classes/api.php');
-
+    
     $api = new Api;
     
     $check_user_account_status = $api->check_user_account_status($username);
-
-    if($check_user_account_status){
-        $page_details = $api->get_page_details(33);
-        $module_id = $page_details[0]['MODULE_ID'];
-        $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, 33, 'page');
-        $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
-
-        if($module_access_right == 0 || $page_access_right == 0){
-            header('location: apps.php');
-        }
-        else{
-            $add_job_position = $api->check_role_access_rights($username, '86', 'action');
-            $delete_job_position = $api->check_role_access_rights($username, '88', 'action');
-
-            require('views/_interface_settings.php');
-        }
+    if (!$check_user_account_status) {
+        header('Location: logout.php?logout');
+        exit();
     }
-    else{
-        header('location: logout.php?logout');
+    
+    $page_details = $api->get_page_details(33);
+    $module_id = $page_details[0]['MODULE_ID'];
+    $page_title = $page_details[0]['PAGE_NAME'];
+    
+    $page_access_right = $api->check_role_access_rights($username, 33, 'page');
+    $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
+    
+    if ($module_access_right == 0 || $page_access_right == 0) {
+        header('Location: apps.php');
+        exit();
     }
+    
+    $add_job_position = $api->check_role_access_rights($username, '86', 'action');
+    $delete_job_position = $api->check_role_access_rights($username, '88', 'action');
+
+    require('views/_interface_settings.php');
 ?>
 
 <!doctype html>

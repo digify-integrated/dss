@@ -1,13 +1,12 @@
-<?php
-
+<?php   
 session_start();
 
-if ($_SESSION['logged_in'] != 1) {
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== 1) {
     session_unset();
     session_destroy();
-    header('Location: index.php');
+    header('location: index.php');
     exit();
-}
+} 
 else {
     $username = $_SESSION['username'];
 }

@@ -6,30 +6,30 @@
     $api = new Api;
     
     $check_user_account_status = $api->check_user_account_status($username);
-    
-    if (!$check_user_account_status) {
-        header('Location: logout.php?logout');
-        exit();
-    }
-    
-    $page_details = $api->get_page_details(35);
-    $module_id = $page_details[0]['MODULE_ID'];
-    $page_title = $page_details[0]['PAGE_NAME'];
 
-    $page_access_right = $api->check_role_access_rights($username, 35, 'page');
-    $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
+    if($check_user_account_status){
+        $page_details = $api->get_page_details(47);
+        $module_id = $page_details[0]['MODULE_ID'];
+        $page_title = $page_details[0]['PAGE_NAME'];
     
-    if ($module_access_right == 0 || $page_access_right == 0) {
-        header('Location: apps.php');
-        exit();
+        $page_access_right = $api->check_role_access_rights($username, 47, 'page');
+        $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
+
+        if($module_access_right == 0 || $page_access_right == 0){
+            header('location: apps.php');
+        }
+        else{
+            $add_employee = $api->check_role_access_rights($username, '126', 'action');
+            $delete_employee = $api->check_role_access_rights($username, '128', 'action');
+            $archive_employee = $api->check_role_access_rights($username, '129', 'action');
+            $unarchive_employee = $api->check_role_access_rights($username, '130', 'action');
+
+            require('views/_interface_settings.php');
+        }
     }
-    
-    $add_work_locations = $api->check_role_access_rights($username, '103', 'action');
-    $delete_work_locations = $api->check_role_access_rights($username, '105', 'action');
-    $archive_work_locations = $api->check_role_access_rights($username, '106', 'action');
-    $unarchive_work_locations = $api->check_role_access_rights($username, '107', 'action');
-    
-    require('views/_interface_settings.php');
+    else{
+        header('location: logout.php?logout');
+    }
 ?>
 
 <!doctype html>
@@ -59,12 +59,12 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Work Locations</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Employees</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Employees</a></li>
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Configurations</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Employees</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
                                     </div>
@@ -80,11 +80,11 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Work Locations List</h4>
+                                                        <h4 class="card-title">Employees List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_work_locations > 0 || $archive_work_locations > 0 || $unarchive_work_locations > 0){
+                                                            if($delete_employee > 0 || $archive_employee > 0 || $unarchive_employee > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
                                                                         <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
@@ -92,16 +92,16 @@
                                                                     </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                    if($delete_work_locations > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-work-location">Delete Work Location</button>';
+                                                                    if($delete_employee > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-employee">Delete Employee</button>';
                                                                     }
     
-                                                                    if($archive_work_locations > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-archive" type="button" id="archive-work-location">Archive Work Location</button>';
+                                                                    if($archive_employee > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-archive" type="button" id="archive-employee">Archive Employee</button>';
                                                                     }
     
-                                                                    if($unarchive_work_locations > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-unarchive" type="button" id="unarchive-work-location">Unarchive Work Location</button>';
+                                                                    if($unarchive_employee > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple-unarchive" type="button" id="unarchive-employee">Unarchive Employee</button>';
                                                                     }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -112,8 +112,8 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                            if($add_work_locations > 0){
-                                                                echo '<a href="work-location-form.php" class="btn btn-primary">
+                                                            if($add_employee > 0){
+                                                                echo '<a href="employee-form.php" class="btn btn-primary">
                                                                     <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
                                                                     <span class="d-none d-sm-block">Create</span>
                                                                 </a>';
@@ -124,30 +124,62 @@
                                                 </div>
 
                                                 <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                    <div class="offcanvas-header">
-                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="offcanvas-body">
-                                                        <div class="mb-3">
-                                                            <p class="text-muted">Status</p>
+                                                        <div class="offcanvas-header">
+                                                            <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="offcanvas-body">
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Status</p>
 
-                                                            <select class="form-control filter-select2" id="filter_status">
-                                                                <option value="">All</option>
-                                                                <option value="1">Unarchived</option>
-                                                                <option value="2">Archived</option>
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
+                                                                <select class="form-control filter-select2" id="filter_status">
+                                                                    <option value="">All</option>
+                                                                    <option value="1">Unarchived</option>
+                                                                    <option value="2">Archived</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Department</p>
+
+                                                                <select class="form-control filter-select2" id="filter_department">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_department_options('active');?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Job Position</p>
+
+                                                                <select class="form-control filter-select2" id="filter_job_position">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_job_position_options('all');?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Employee Type</p>
+
+                                                                <select class="form-control filter-select2" id="filter_employee_type">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_employee_type_options();?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Work Location</p>
+
+                                                                <select class="form-control filter-select2" id="filter_work_location">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_work_location_options('active');?>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="work-locations-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="employees-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -155,7 +187,11 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Work Location ID</th>
+                                                            <th class="all">Employee ID</th>
+                                                            <th class="all">Employee</th>
+                                                            <th class="all">Department</th>
+                                                            <th class="all">Job Positon</th>
+                                                            <th class="all">Employee Type</th>
                                                             <th class="all">Work Location</th>
                                                             <th class="all">Status</th>
                                                             <th class="all">View</th>
@@ -185,6 +221,6 @@
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/work-locations.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/employees.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

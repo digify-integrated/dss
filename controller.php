@@ -13,8 +13,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Authenticate
         case 'authenticate':
             if(isset($_POST['password']) && !empty($_POST['password'])){
-                $username = $_POST['username'];
-                $password = $_POST['password'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $password = filter_var($_POST['password'], FILTER_SANITIZE_STRING);
     
                 $authenticate = $api->authenticate($username, $password);
                 
@@ -32,8 +32,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Change password
         case 'change password':
             if(isset($_POST['change_username']) && !empty($_POST['change_username']) && isset($_POST['change_password']) && !empty($_POST['change_password'])){
-                $username = $_POST['change_username'];
-                $password = $api->encrypt_data($_POST['change_password']);
+                $username = filter_var($_POST['change_username'], FILTER_SANITIZE_STRING);
+                $password = $api->encrypt_data(filter_var($_POST['change_password'], FILTER_SANITIZE_STRING));
                 $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
     
                 $check_user_account_exist = $api->check_user_account_exist($username);
@@ -70,7 +70,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -240,7 +240,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit module access
         case 'submit module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -281,7 +281,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -337,7 +337,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit page access
         case 'submit page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -378,7 +378,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -433,7 +433,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit action access
         case 'submit action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -474,7 +474,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -533,7 +533,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -590,7 +590,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role module access
         case 'submit role module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -630,7 +630,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role page access
         case 'submit role page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -670,7 +670,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role action access
         case 'submit role action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -710,7 +710,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role user account
         case 'submit role user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -751,7 +751,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -809,7 +809,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -866,7 +866,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit upload setting file type
         case 'submit upload setting file type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -907,7 +907,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();    
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1075,7 +1075,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1168,7 +1168,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1234,7 +1234,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1294,7 +1294,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification role recipient
         case 'submit notification role recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1334,7 +1334,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification user account recipient
         case 'submit notification user account recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1374,7 +1374,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification channel
         case 'submit notification channel':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1415,7 +1415,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1471,7 +1471,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit country state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1515,7 +1515,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1572,7 +1572,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1631,7 +1631,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1688,7 +1688,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit user account role
         case 'submit user account role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1729,7 +1729,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1787,7 +1787,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1846,7 +1846,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position responsibility':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1890,7 +1890,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position requirement':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1934,7 +1934,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position qualification':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -1978,7 +1978,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position attachment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2093,7 +2093,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2154,7 +2154,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2210,7 +2210,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2266,7 +2266,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2322,7 +2322,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2378,7 +2378,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit fixed working hours
         case 'submit fixed working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2433,7 +2433,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit flexible working hours
         case 'submit flexible working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2489,7 +2489,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2549,7 +2549,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete module
         case 'delete module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2590,7 +2590,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple module
         case 'delete multiple module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2640,7 +2640,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete module access
         case 'delete module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2675,7 +2675,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete page
         case 'delete page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2716,7 +2716,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple page
         case 'delete multiple page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2766,7 +2766,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete page access
         case 'delete page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2801,7 +2801,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete action
         case 'delete action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2842,7 +2842,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple action
         case 'delete multiple action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2892,7 +2892,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete action access
         case 'delete action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2927,7 +2927,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete system parameter
         case 'delete system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -2961,7 +2961,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple system parameter
         case 'delete multiple system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3003,7 +3003,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role
         case 'delete role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3065,7 +3065,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple role
         case 'delete multiple role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3139,7 +3139,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role user account
         case 'delete role user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3174,7 +3174,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete system code
         case 'delete system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3208,7 +3208,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple system code
         case 'delete multiple system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3250,7 +3250,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete upload setting
         case 'delete upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3291,7 +3291,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple upload setting
         case 'delete multiple upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3341,7 +3341,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete upload setting file type
         case 'delete upload setting file type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3376,7 +3376,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete company
         case 'delete company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3410,7 +3410,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple company
         case 'delete multiple company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3452,7 +3452,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete interface setting
         case 'delete interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3486,7 +3486,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple interface setting
         case 'delete multiple interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3528,7 +3528,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete email setting
         case 'delete email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3562,7 +3562,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple email setting
         case 'delete multiple email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3604,7 +3604,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification setting
         case 'delete notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3659,7 +3659,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple notification setting
         case 'delete multiple notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3725,7 +3725,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification role recipient
         case 'delete notification role recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3760,7 +3760,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification user account recipient
         case 'delete notification user account recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3795,7 +3795,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification channel
         case 'delete notification channel':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3830,7 +3830,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete country
         case 'delete country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3871,7 +3871,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple country
         case 'delete multiple country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3921,7 +3921,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete state
         case 'delete state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3955,7 +3955,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple state
         case 'delete multiple state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -3997,7 +3997,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete zoom api
         case 'delete zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4031,7 +4031,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple zoom api
         case 'delete multiple zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4073,7 +4073,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete user account
         case 'delete user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4114,7 +4114,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple user account
         case 'delete multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4164,7 +4164,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role user account
         case 'delete user account role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4199,7 +4199,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete department
         case 'delete department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4233,7 +4233,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple department
         case 'delete multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4275,7 +4275,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position
         case 'delete job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4337,7 +4337,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple job position
         case 'delete multiple job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4411,7 +4411,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position responsibility
         case 'delete job position responsibility':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4445,7 +4445,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position requirement
         case 'delete job position requirement':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4479,7 +4479,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position qualification
         case 'delete job position qualification':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4513,7 +4513,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position attachment
         case 'delete job position attachment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4547,7 +4547,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete work location
         case 'delete work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4581,7 +4581,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple work location
         case 'delete multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4623,7 +4623,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete departure reason
         case 'delete departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4657,7 +4657,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple departure reason
         case 'delete multiple departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4699,7 +4699,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete employee type
         case 'delete employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4733,7 +4733,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple employee type
         case 'delete multiple employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4775,7 +4775,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete wage type
         case 'delete wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4809,7 +4809,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple wage type
         case 'delete multiple wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4851,7 +4851,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working schedule
         case 'delete working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4893,7 +4893,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple working schedule
         case 'delete multiple working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4943,7 +4943,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working hours
         case 'delete working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -4977,7 +4977,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working schedule type
         case 'delete working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5011,7 +5011,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple working schedule type
         case 'delete multiple working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5057,7 +5057,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unlock user account
         case 'unlock user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5091,7 +5091,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unlock multiple user account
         case 'unlock multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5137,7 +5137,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Lock user account
         case 'lock user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5171,7 +5171,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Lock multiple user account
         case 'lock multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5217,7 +5217,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate interface setting
         case 'activate interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5258,7 +5258,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate email setting
         case 'activate email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5299,7 +5299,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate zoom api
         case 'activate zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5340,7 +5340,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate user account
         case 'activate user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5374,7 +5374,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate multiple user account
         case 'activate multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5420,7 +5420,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate interface setting
         case 'deactivate interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5454,7 +5454,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate email setting
         case 'deactivate email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5488,7 +5488,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate zoom api
         case 'deactivate zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5522,7 +5522,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate user account
         case 'deactivate user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5556,7 +5556,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate multiple user account
         case 'deactivate multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5602,7 +5602,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive department
         case 'archive department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5636,7 +5636,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive multiple department
         case 'archive multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5678,7 +5678,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive work location
         case 'archive work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5712,7 +5712,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive multiple work location
         case 'archive multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5758,7 +5758,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive department
         case 'unarchive department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5792,7 +5792,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive multiple department
         case 'unarchive multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5834,7 +5834,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive work location
         case 'unarchive work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5868,7 +5868,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive multiple work location
         case 'unarchive multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5914,7 +5914,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Start job position recruitment
         case 'start job position recruitment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -5952,7 +5952,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Stop job position recruitment
         case 'stop job position recruitment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = $_POST['username'];
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
@@ -6026,7 +6026,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Module details
         case 'module details':
             if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                $module_id = $_POST['module_id'];
+                $module_id = filter_var($_POST['module_id'], FILTER_SANITIZE_STRING);
+
                 $module_details = $api->get_module_details($module_id);
                 $module_icon_file_path = $module_details[0]['MODULE_ICON'] ?? null;
     
@@ -6053,7 +6054,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Page details
         case 'page details':
             if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
-                $page_id = $_POST['page_id'];
+                $page_id = filter_var($_POST['page_id'], FILTER_SANITIZE_STRING);
+
                 $page_details = $api->get_page_details($page_id);
     
                 $response[] = array(
@@ -6070,7 +6072,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Action details
         case 'action details':
             if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
-                $action_id = $_POST['action_id'];
+                $action_id = filter_var($_POST['action_id'], FILTER_SANITIZE_STRING);
+
                 $action_details = $api->get_action_details($action_id);
     
                 $response[] = array(
@@ -6086,7 +6089,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # System parameter details
         case 'system parameter details':
             if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
-                $parameter_id = $_POST['parameter_id'];
+                $parameter_id = filter_var($_POST['parameter_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $system_parameter_details = $api->get_system_parameter_details($parameter_id);
     
                 $response[] = array(
@@ -6105,7 +6109,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Role details
         case 'role details':
             if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                $role_id = $_POST['role_id'];
+                $role_id = filter_var($_POST['role_id'], FILTER_SANITIZE_STRING);
+
                 $role_details = $api->get_role_details($role_id);
     
                 $response[] = array(
@@ -6123,7 +6128,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # System code details
         case 'system code details':
             if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
-                $system_code_id = $_POST['system_code_id'];
+                $system_code_id = filter_var($_POST['system_code_id'], FILTER_SANITIZE_STRING);
+
                 $system_code_details = $api->get_system_code_details($system_code_id, null, null);
     
                 $response[] = array(
@@ -6141,7 +6147,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Upload setting details
         case 'upload setting details':
             if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
-                $upload_setting_id = $_POST['upload_setting_id'];
+                $upload_setting_id = filter_var($_POST['upload_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $upload_setting_details = $api->get_upload_setting_details($upload_setting_id);
     
                 $response[] = array(
@@ -6159,7 +6166,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Company details
         case 'company details':
             if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
-                $company_id = $_POST['company_id'];
+                $company_id = filter_var($_POST['company_id'], FILTER_SANITIZE_STRING);
+
                 $company_details = $api->get_company_details($company_id);
                 $company_logo_file_path = $company_details[0]['COMPANY_LOGO'] ?? null;
     
@@ -6187,7 +6195,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Interface setting details
         case 'interface setting details':
             if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                $interface_setting_id = $_POST['interface_setting_id'];
+                $interface_setting_id = filter_var($_POST['interface_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $interface_setting_details = $api->get_interface_setting_details($interface_setting_id);
                 $login_background_file_path = $interface_setting_details[0]['LOGIN_BACKGROUND'] ?? null;
                 $login_logo_file_path = $interface_setting_details[0]['LOGIN_LOGO'] ?? null;
@@ -6229,7 +6238,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Email setting details
         case 'email setting details':
             if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                $email_setting_id = $_POST['email_setting_id'];
+                $email_setting_id = filter_var($_POST['email_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $email_setting_details = $api->get_email_setting_details($email_setting_id);
     
                 $response[] = array(
@@ -6256,7 +6266,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Notification setting details
         case 'notification setting details':
             if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
-                $notification_setting_id = $_POST['notification_setting_id'];
+                $notification_setting_id = filter_var($_POST['notification_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $notification_setting_details = $api->get_notification_setting_details($notification_setting_id);
     
                 $response[] = array(
@@ -6277,7 +6288,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Country details
         case 'country details':
             if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                $country_id = $_POST['country_id'];
+                $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+
                 $country_details = $api->get_country_details($country_id);
     
                 $response[] = array(
@@ -6293,7 +6305,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # State details
         case 'state details':
             if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
-                $state_id = $_POST['state_id'];
+                $state_id = filter_var($_POST['state_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                
                 $state_details = $api->get_state_details($state_id);
     
                 $response[] = array(
@@ -6310,7 +6323,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Zoom API details
         case 'zoom api details':
             if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                $zoom_api_id = $_POST['zoom_api_id'];
+                $zoom_api_id = filter_var($_POST['zoom_api_id'], FILTER_SANITIZE_STRING);
+
                 $zoom_api_details = $api->get_zoom_api_details($zoom_api_id);
     
                 $response[] = array(
@@ -6330,7 +6344,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # User account details
         case 'user account details':
             if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                $user_id = $_POST['user_id'];
+                $user_id = filter_var($_POST['user_id'], FILTER_SANITIZE_STRING);
+
                 $user_account_details = $api->get_user_account_details($user_id);
                 $password_expiry_date = $user_account_details[0]['PASSWORD_EXPIRY_DATE'];
     
@@ -6357,7 +6372,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Department details
         case 'department details':
             if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                $department_id = $_POST['department_id'];
+                $department_id = filter_var($_POST['department_id'], FILTER_SANITIZE_STRING);
+
                 $department_details = $api->get_department_details($department_id);
     
                 $response[] = array(
@@ -6376,7 +6392,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position details
         case 'job position details':
             if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                $job_position_id = $_POST['job_position_id'];
+                $job_position_id = filter_var($_POST['job_position_id'], FILTER_SANITIZE_STRING);
+
                 $job_position_details = $api->get_job_position_details($job_position_id);
     
                 $response[] = array(
@@ -6396,7 +6413,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position responsibility details
         case 'job position responsibility details':
             if(isset($_POST['responsibility_id']) && !empty($_POST['responsibility_id'])){
-                $responsibility_id = $_POST['responsibility_id'];
+                $responsibility_id = filter_var($_POST['responsibility_id'], FILTER_SANITIZE_STRING);
+
                 $job_position_responsibility_details = $api->get_job_position_responsibility_details($responsibility_id);
     
                 $response[] = array(
@@ -6411,7 +6429,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position requirement details
         case 'job position requirement details':
             if(isset($_POST['requirement_id']) && !empty($_POST['requirement_id'])){
-                $requirement_id = $_POST['requirement_id'];
+                $requirement_id = filter_var($_POST['requirement_id'], FILTER_SANITIZE_STRING);
+                
                 $job_position_requirement_details = $api->get_job_position_requirement_details($requirement_id);
     
                 $response[] = array(
@@ -6426,7 +6445,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position qualification details
         case 'job position qualification details':
             if(isset($_POST['qualification_id']) && !empty($_POST['qualification_id'])){
-                $qualification_id = $_POST['qualification_id'];
+                $qualification_id = filter_var($_POST['qualification_id'], FILTER_SANITIZE_STRING);
+
                 $job_position_qualification_details = $api->get_job_position_qualification_details($qualification_id);
     
                 $response[] = array(
@@ -6441,7 +6461,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position attachment details
         case 'job position attachment details':
             if(isset($_POST['attachment_id']) && !empty($_POST['attachment_id'])){
-                $attachment_id = $_POST['attachment_id'];
+                $attachment_id = filter_var($_POST['attachment_id'], FILTER_SANITIZE_STRING);
+
                 $job_position_attachment_details = $api->get_job_position_attachment_details($attachment_id);
     
                 $response[] = array(
@@ -6456,7 +6477,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Work location details
         case 'work location details':
             if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                $work_location_id = $_POST['work_location_id'];
+                $work_location_id = filter_var($_POST['work_location_id'], FILTER_SANITIZE_STRING);
+
                 $work_location_details = $api->get_work_location_details($work_location_id);
     
                 $response[] = array(
@@ -6478,7 +6500,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Departure reason details
         case 'departure reason details':
             if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
-                $departure_reason_id = $_POST['departure_reason_id'];
+                $departure_reason_id = filter_var($_POST['departure_reason_id'], FILTER_SANITIZE_STRING);
+
                 $departure_reason_details = $api->get_departure_reason_details($departure_reason_id);
     
                 $response[] = array(
@@ -6494,7 +6517,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Employee type details
         case 'employee type details':
             if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
-                $employee_type_id = $_POST['employee_type_id'];
+                $employee_type_id = filter_var($_POST['employee_type_id'], FILTER_SANITIZE_STRING);
+
                 $employee_type_details = $api->get_employee_type_details($employee_type_id);
     
                 $response[] = array(
@@ -6510,7 +6534,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Wage type details
         case 'wage type details':
             if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
-                $wage_type_id = $_POST['wage_type_id'];
+                $wage_type_id = filter_var($_POST['wage_type_id'], FILTER_SANITIZE_STRING);
+
                 $wage_type_details = $api->get_wage_type_details($wage_type_id);
     
                 $response[] = array(
@@ -6526,7 +6551,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Working schedule details
         case 'working schedule details':
             if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-                $working_schedule_id = $_POST['working_schedule_id'];
+                $working_schedule_id = filter_var($_POST['working_schedule_id'], FILTER_SANITIZE_STRING);
+
                 $working_schedule_details = $api->get_working_schedule_details($working_schedule_id);
     
                 $response[] = array(
@@ -6543,7 +6569,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Fixed working hours details
         case 'fixed working hours details':
             if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
-                $working_hours_id = $_POST['working_hours_id'];
+                $working_hours_id = filter_var($_POST['working_hours_id'], FILTER_SANITIZE_STRING);
+
                 $working_hours_details = $api->get_working_hours_details($working_hours_id);
     
                 $response[] = array(
@@ -6562,7 +6589,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Flexible working hours details
         case 'flexible working hours details':
             if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
-                $working_hours_id = $_POST['working_hours_id'];
+                $working_hours_id = filter_var($_POST['working_hours_id'], FILTER_SANITIZE_STRING);
+
                 $working_hours_details = $api->get_working_hours_details($working_hours_id);
     
                 $response[] = array(
@@ -6581,7 +6609,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Working schedule type details
         case 'working schedule type details':
             if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
-                $working_schedule_type_id = $_POST['working_schedule_type_id'];
+                $working_schedule_type_id = filter_var($_POST['working_schedule_type_id'], FILTER_SANITIZE_STRING);
+                
                 $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type_id);
     
                 $response[] = array(

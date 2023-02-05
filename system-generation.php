@@ -1492,7 +1492,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $role_description = $row['ROLE_DESCRIPTION'];
                         $assignable = $row['ASSIGNABLE'];
     
-                        $assignable_status = $api->get_roles_assignable_status($assignable)[0]['BADGE'];
+                        $assignable_status = $api->get_roles_assignable_status($assignable)[0]['BADGE'] ?? null;
     
                         $role_id_encrypted = $api->encrypt_data($role_id);
     

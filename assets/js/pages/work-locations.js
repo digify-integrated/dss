@@ -34,74 +34,42 @@ function initialize_work_location_table(datatable_name, buttons = false, show_al
         { 'width': '10%','bSortable': false, 'aTargets': 4 }
     ];
 
-    if(show_all){
-        length_menu = [ [-1], ['All'] ];
-    }
-    else{
-        length_menu = [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ];
-    }
 
-    if(buttons){
-        settings = {
-            'ajax': { 
-                'url' : 'system-generation.php',
-                'method' : 'POST',
-                'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'filter_status' : filter_status},
-                'dataSrc' : ''
-            },
-            dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-            buttons: [
-                'csv', 'excel', 'pdf'
-            ],
-            'order': [[ 1, 'asc' ]],
-            'columns' : column,
-            'scrollY': false,
-            'scrollX': true,
-            'scrollCollapse': true,
-            'fnDrawCallback': function( oSettings ) {
-                readjust_datatable_column();
-            },
-            'aoColumnDefs': column_definition,
-            'lengthMenu': length_menu,
-            'language': {
-                'emptyTable': 'No data found',
-                'searchPlaceholder': 'Search...',
-                'search': '',
-                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        };
-    }
-    else{
-        settings = {
-            'ajax': { 
-                'url' : 'system-generation.php',
-                'method' : 'POST',
-                'dataType': 'JSON',
-                'data': {'type' : type, 'username' : username, 'filter_status' : filter_status},
-                'dataSrc' : ''
-            },
-            'order': [[ 1, 'asc' ]],
-            'columns' : column,
-            'scrollY': false,
-            'scrollX': true,
-            'scrollCollapse': true,
-            'fnDrawCallback': function( oSettings ) {
-                readjust_datatable_column();
-            },
-            'aoColumnDefs': column_definition,
-            'lengthMenu': length_menu,
-            'language': {
-                'emptyTable': 'No data found',
-                'searchPlaceholder': 'Search...',
-                'search': '',
-                'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        };
+    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
+
+    settings = {
+        'ajax': { 
+            'url' : 'system-generation.php',
+            'method' : 'POST',
+            'dataType': 'JSON',
+            'data': {'type' : type, 'username' : username, 'filter_status' : filter_status},
+            'dataSrc' : ''
+        },
+        'order': [[ 1, 'asc' ]],
+        'columns' : column,
+        'scrollY': false,
+        'scrollX': true,
+        'scrollCollapse': true,
+        'fnDrawCallback': function( oSettings ) {
+            readjust_datatable_column();
+        },
+        'aoColumnDefs': column_definition,
+        'lengthMenu': length_menu,
+        'language': {
+            'emptyTable': 'No data found',
+            'searchPlaceholder': 'Search...',
+            'search': '',
+            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+        }
+    };
+
+    if (buttons) {
+        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
+        settings.buttons = ['csv', 'excel', 'pdf'];
     }
 
     destroy_datatable(datatable_name);
-    
+
     $(datatable_name).dataTable(settings);
 }
 

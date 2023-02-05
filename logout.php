@@ -6,7 +6,8 @@ require('classes/api.php');
 $api = new Api;
 
 if (!isset($_SESSION['logged_in'])) {
-	header('Location: index.php');
+    header('Location: index.php');
+    exit();
 }
 
 if (isset($_GET['logout'])) {
@@ -19,16 +20,16 @@ if (isset($_GET['logout'])) {
     if($insert_transaction_log){
         session_destroy();
         session_unset();
-    
+
         header('Location: index.php');
         exit();
     }
     else{
-        echo $insert_transaction_log;
+        header('Location: apps.php');
     }
 }
 else{
-    header('Location: dashboard.php');
+    header('Location: apps.php');
 }
  
 ?>

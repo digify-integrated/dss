@@ -92,8 +92,12 @@ function initialize_global_functions(){
 }
 
 function initialize_elements(){
-    if ($('.form-maxlength').length) {
-        $('.form-maxlength').maxlength({
+    var form_max_length = $('.form-maxlength');
+    var formSelect2 = $('.form-select2');
+    var birthdayDatePicker = $('.birthday-date-picker');
+
+    if (form_max_length.length) {
+        form_max_length.maxlength({
             alwaysShow: true,
             warningClass: 'badge mt-1 bg-info',
             limitReachedClass: 'badge mt-1 bg-danger',
@@ -101,18 +105,18 @@ function initialize_elements(){
         });
     }
 
-    if ($('.form-select2').length) {
-        $('.form-select2').select2({
+    if (formSelect2.length) {
+        formSelect2.select2({
             dropdownParent: $('#System-Modal')
         });
 
-        $('.form-select2').on('select2:close', function (e) {  
+        formSelect2.on('select2:close', function (e) {  
             $(this).valid(); 
         });
     }
 
-    if ($('.birthday-date-picker').length) {
-        $('.birthday-date-picker').datepicker({
+    if (birthdayDatePicker.length) {
+        birthdayDatePicker.datepicker({
             endDate: '-18y'
         });
     }
@@ -1990,9 +1994,13 @@ function generate_city_option(province, selected){
 
 // Reset validation functions
 function reset_element_validation(element){
-    $(element).parent().removeClass('has-danger');
-    $(element).removeClass('form-control-danger');
-    $(element + '-error').remove();
+    $(element)
+    .parent()
+    .removeClass('has-danger')
+    .end()
+    .removeClass('form-control-danger')
+    .siblings(element + '-error')
+    .remove();
 }
 
 // Reload functions
@@ -2013,55 +2021,45 @@ function clear_datatable(datatable_name){
 
 // Re-adjust datatable columns
 function readjust_datatable_column(){
-    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-    });
+    const adjustDataTable = () => $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
 
-    $('a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
-        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-    });
-
-    $('#System-Modal').on('shown.bs.modal', function (e) {
-        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-    });
+    $('a[data-bs-toggle="tab"], a[data-bs-toggle="pill"], #System-Modal').on('shown.bs.tab shown.bs.modal', adjustDataTable);
 }
 
 // Check functions
 function check_option_exist(element, option, return_value){
-    if ($(element).find('option[value="' + option + '"]').length) {
-        $(element).val(option).trigger('change');
-    }
-    else{
-        $(element).val(return_value).trigger('change');
-    }
+    const $element = $(element);
+    const $option = $element.find(`option[value="${option}"]`);
+
+    $element.val($option.length ? option : returnValue).trigger('change');
 }
 
 function check_empty(value, id, type){
-    if(value != '' || value != null){
-        if(type == 'select'){
-            $(id).val(value).change();
-        }
-        else if(type == 'text'){
-            $(id).text(value);
-        }
-        else {
-            $(id).val(value);
-        }
+    const $element = $(id);
+
+if (value && value !== null) {
+    switch (type) {
+        case 'select':
+            $element.val(value).change();
+            break;
+        case 'text':
+            $element.text(value);
+            break;
+        default:
+            $element.val(value);
+            break;
     }
+}
 }
 
 function check_table_check_box(){
-    var input_elements = [].slice.call(document.querySelectorAll('.datatable-checkbox-children'));
-    var checked_value = input_elements.filter(chk => chk.checked).length;
+    const inputElements = Array.from(document.querySelectorAll('.datatable-checkbox-children'));
+    const $multiple = $('.multiple');
+    const $multipleAction = $('.multiple-action');
+    const checkedValue = inputElements.filter(chk => chk.checked).length;
 
-    if(checked_value > 0){
-        $('.multiple').removeClass('d-none');
-        $('.multiple-action').removeClass('d-none');
-    }
-    else{
-        $('.multiple').addClass('d-none');
-        $('.multiple-action').addClass('d-none');
-    }
+    $multiple.toggleClass('d-none', checkedValue === 0);
+    $multipleAction.toggleClass('d-none', checkedValue === 0);
 }
 
 function check_table_multiple_button(){
@@ -2323,15 +2321,15 @@ function show_alert(title, message, type){
 }
 
 function show_alert_event(title, message, type, event, rederict_link){
-    Swal.fire(title, message, type).then(function(){ 
-            if(event == 'reload'){
-                location.reload();
-            }
-            else if(event == 'redirect'){
-                window.location.href = rederict_link;
-            }
+    const handle_event = (event, rederict_link) => {
+        if (event === 'reload') {
+            location.reload();
+        } else if (event === 'redirect') {
+            window.location.href = rederict_link;
         }
-    );
+    };
+    
+    Swal.fire(title, message, type).then(() => handle_event(event, rederict_link));
 }
 
 function show_alert_confirmation(confirm_title, confirm_text, confirm_icon, confirm_button_text, button_color, confirm_type){
@@ -2356,29 +2354,28 @@ function show_alert_confirmation(confirm_title, confirm_text, confirm_icon, conf
     })
 }
 
-function create_employee_qr_code(container, name, employee_id, email, mobile){
+function create_employee_qr_code(container, name, employee_id, email, mobile, width, height){
     document.getElementById(container).innerHTML = '';
 
     let card, qrcode;
 
-    card = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${name}`, `EMAIL:${email}`, `ID NO:[${employee_id}]`];
+    const qrOptions = {
+    width: width,
+    height: height,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+    };
 
-    if (mobile) {
-      card.push(`TEL:${mobile}`);
-    }
-    
-    card.push('END:VCARD');
-    
-    card = card.join('\r\n');
+    card = 'BEGIN:VCARD\r\n' +
+        'VERSION:3.0\r\n' +
+        `FN:${name}\r\n` +
+        `EMAIL:${email}\r\n` +
+        `ID NO:[${employee_id}]\r\n` +
+        (mobile ? `TEL:${mobile}\r\n` : '') +
+        'END:VCARD';
 
-    qrcode = new QRCode(document.getElementById(container), {
-        width: 300,
-        height: 300,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H,
-    });
-
+    qrcode = new QRCode(document.getElementById(container), qrOptions);
     qrcode.makeCode(card);
 }
 
@@ -2386,25 +2383,10 @@ function create_employee_qr_code(container, name, employee_id, email, mobile){
 function hide_multiple_buttons(){
     $('#datatable-checkbox').prop('checked', false);
 
-    $('.multiple').addClass('d-none');
-    $('.multiple-lock').addClass('d-none');
-    $('.multiple-unlock').addClass('d-none');
-    $('.multiple-activate').addClass('d-none');
-    $('.multiple-deactivate').addClass('d-none');
-    $('.multiple-approve').addClass('d-none');
-    $('.multiple-reject').addClass('d-none');
-    $('.multiple-cancel').addClass('d-none');
-    $('.multiple-delete').addClass('d-none');
-    $('.multiple-cancel').addClass('d-none');
-    $('.multiple-pending').addClass('d-none');
-    $('.multiple-for-recommendation').addClass('d-none');
-    $('.multiple-recommendation').addClass('d-none');
-    $('.multiple-reject').addClass('d-none');
-    $('.multiple-approve').addClass('d-none');
-    $('.multiple-send').addClass('d-none');
-    $('.multiple-print').addClass('d-none');
-    $('.multiple-unarchive').addClass('d-none');
-    $('.multiple-archive').addClass('d-none');
-    $('.multiple-start').addClass('d-none');
-    $('.multiple-stop').addClass('d-none');
+    const classes = ['multiple', 'multiple-lock', 'multiple-unlock', 'multiple-activate', 'multiple-deactivate', 'multiple-approve',
+    'multiple-reject', 'multiple-cancel', 'multiple-delete', 'multiple-pending', 'multiple-for-recommendation',
+    'multiple-recommendation', 'multiple-send', 'multiple-print', 'multiple-unarchive', 'multiple-archive',
+    'multiple-start', 'multiple-stop'];
+
+    $(classes.join(', ')).toggleClass('d-none');
 }

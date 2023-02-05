@@ -2,20 +2,19 @@
     $app_content = '';
 
     $all_accessible_module_details = $api->get_all_accessible_module_details($username);
+    $module_count = count($all_accessible_module_details);
 
-    for ($i = 0; $i < count($all_accessible_module_details); $i++) {
-        $module_name = $all_accessible_module_details[$i]['MODULE_NAME'];
-        $module_description = $all_accessible_module_details[$i]['MODULE_DESCRIPTION'];
-        $module_version = $all_accessible_module_details[$i]['MODULE_VERSION'];
-        $module_category = $all_accessible_module_details[$i]['MODULE_CATEGORY'];
-        $module_icon = $all_accessible_module_details[$i]['MODULE_ICON'];
-        $default_page = $all_accessible_module_details[$i]['DEFAULT_PAGE'];
-
+    for ($i = 0; $i < $module_count; $i++) {
+        $module = $all_accessible_module_details[$i];
+        $module_name = $module['MODULE_NAME'];
+        $module_description = $module['MODULE_DESCRIPTION'];
+        $module_version = $module['MODULE_VERSION'];
+        $module_category = $module['MODULE_CATEGORY'];
+        $module_icon = $module['MODULE_ICON'];
+        $default_page = $module['DEFAULT_PAGE'];
         $module_icon_file_path = $api->check_image($module_icon, 'module icon');
-
-        $system_code_details = $api->get_system_code_details(null, 'MODULECAT', $module_category);
-        $module_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
-
+        $module_category_name = $api->get_system_code_details(null, 'MODULECAT', $module_category)[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
         if ($i % 4 == 0) {
             $app_content .= '<div class="row">';
         }
@@ -43,7 +42,7 @@
                             </div>
                         </div>';
     
-        if ($i % 4 == 3) {
+        if ($i % 4 == 3 || $i === $module_count - 1) {
             $app_content .= '</div>';
         }
     }

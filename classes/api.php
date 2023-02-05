@@ -13,6 +13,16 @@ class Api{
 
     public $response = array();
 
+    const TIME_UNITS = [
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second'
+    ];
+
     # -------------------------------------------------------------
     #   Custom methods
     # -------------------------------------------------------------
@@ -29,19 +39,19 @@ class Api{
     #
     # -------------------------------------------------------------
     public function databaseConnection(){
-        if ($this->db_connection != null) {
+        if ($this->db_connection) {
             return $this->db_connection;
-        } 
-        else {
-            try {
-                $this->db_connection = new PDO('mysql:host='. DB_HOST .';dbname='. DB_NAME . ';character_set=utf8', DB_USER, DB_PASS);
-                return $this->db_connection;
-            } 
-            catch (PDOException $e) {
-                $this->errors[] = $e->getMessage();
-                return null;
-            }
         }
+    
+        try {
+            $this->db_connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASS);
+            $this->db_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }
+        catch (PDOException $e) {
+            throw new Exception("Error connecting to database: " . $e->getMessage());
+        }
+    
+        return $this->db_connection;
     }
     # -------------------------------------------------------------
 
@@ -55,20 +65,20 @@ class Api{
     # -------------------------------------------------------------
     public function backup_database($file_name, $username){
         if ($this->databaseConnection()) {
-            if ($this->databaseConnection()) {
-                $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
+            $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
 
-                exec('C:\xampp\mysql\bin\mysqldump.exe --routines -u '. DB_USER .' -p'. DB_PASS .' '. DB_NAME .' -r "'. $backup_file .'"  2>&1', $output, $return);
+            try {
+                exec('C:\xampp\mysql\bin\mysqldump.exe --routines -u '. escapeshellarg(DB_USER) .' -p'. escapeshellarg(DB_PASS) .' '. escapeshellarg(DB_NAME) .' -r '. escapeshellarg($backup_file), $output, $return);
+            } 
+            catch (\Exception $e) {
+                return $e->getMessage();
+            }
 
-                if ($return === 0) {
-                    return true;
-                }
-                else {
-                    return 'Error: mysqldump command failed with error code ' . $return;
-                }
+            if ($return === 0) {
+                return true;
             }
             else {
-                return 'Error: Unable to connect to database';
+                return 'Error: mysqldump command failed with error code ' . $return;
             }
         }
     }
@@ -86,12 +96,8 @@ class Api{
     #
     # -------------------------------------------------------------
     public function format_date($format, $date, $modify){
-        if(!empty($modify)){
-            $datestring = (new DateTime($date))->modify($modify)->format($format);
-        }
-        else{
-            $datestring = (new DateTime($date))->format($format);
-        }
+        $datetime = new DateTime($date);
+        $datestring = $modify ? $datetime->modify($modify)->format($format) : $datetime->format($format);
 
         return $datestring;
     }
@@ -106,21 +112,14 @@ class Api{
     #
     # -------------------------------------------------------------
     public function encrypt_data($plaintext) {
-        if (empty($plaintext)) {
-            return false;
-        }
-    
+        if (empty(trim($plaintext))) return false;
+
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-        $ciphertext = openssl_encrypt($plaintext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
-
-        if (!$ciphertext) {
-            return false;
-        }
-
-        $encoded_ciphertext = base64_encode($iv . $ciphertext);
-        $encoded_ciphertext = urlencode($encoded_ciphertext);
-
-        return $encoded_ciphertext;
+        $ciphertext = openssl_encrypt(trim($plaintext), 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        
+        if (!$ciphertext) return false;
+        
+        return urlencode(base64_encode($iv . $ciphertext));
     }
     # -------------------------------------------------------------
     
@@ -134,20 +133,25 @@ class Api{
     # -------------------------------------------------------------
     public function decrypt_data($ciphertext) {
         $ciphertext = base64_decode($ciphertext);
-        
+
         if (!$ciphertext) {
             return false;
         }
-    
-        $iv = substr($ciphertext, 0, openssl_cipher_iv_length('aes-256-cbc'));
-        $ciphertext = substr($ciphertext, openssl_cipher_iv_length('aes-256-cbc'));
-    
+        
+        $iv_length = openssl_cipher_iv_length('aes-256-cbc');
+        if (strlen($ciphertext) < $iv_length) {
+            return false;
+        }
+        
+        $iv = substr($ciphertext, 0, $iv_length);
+        $ciphertext = substr($ciphertext, $iv_length);
+        
         $plaintext = openssl_decrypt($ciphertext, 'aes-256-cbc', ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
         
         if (!$plaintext) {
             return false;
         }
-    
+        
         return $plaintext;
     }
     # -------------------------------------------------------------
@@ -161,19 +165,10 @@ class Api{
     #
     # -------------------------------------------------------------
     public function add_months($months, DateTime $dateObject){
-        # Format date to Y-m-d
-        # Get the last day of the given month
+        $dateObject->modify('last day of +' . $months . ' month');
         $next = new DateTime($dateObject->format('Y-m-d'));
-        $next->modify('last day of +'.$months.' month');
-    
-        # If $dateObject day is greater than the day of $next
-        # Return the difference
-        # Else create a new interval
-        if($dateObject->format('d') > $next->format('d')) {
-            return $dateObject->diff($next);
-        } else {
-            return new DateInterval('P'.$months.'M');
-        }
+
+        return ($dateObject->format('d') > $next->format('d')) ? $dateObject->diff($next) : new DateInterval('P' . $months . 'M');        
     }
     # -------------------------------------------------------------
 
@@ -186,18 +181,17 @@ class Api{
     #
     # -------------------------------------------------------------
     public function validate_email($email){
-        if (!isset($email) || empty($email)) {
-            return 'Error: Missing or invalid email';
+        $email = trim($email);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'Error: Invalid email';
         }
 
-        $regex = '/^([a-zA-Z0-9\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/';
+        if (empty($email)) {
+            return 'Error: Missing email';
+        }
 
-        if (preg_match($regex, $email)) {
-            return true;
-        }
-        else {
-            return 'Error: Invalid email format';
-        }
+        return true;
     }
     # -------------------------------------------------------------
 
@@ -425,7 +419,7 @@ class Api{
         }
     }
     # -------------------------------------------------------------
-
+    
     # -------------------------------------------------------------
     #
     # Name       : time_elapsed_string
@@ -435,36 +429,27 @@ class Api{
     #
     # -------------------------------------------------------------
     public function time_elapsed_string($datetime, $full = false) {
-        $now = new DateTime();
-        $ago = new DateTime($datetime);
+        $now = new DateTimeImmutable();
+        $ago = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $datetime);
+
+        if ($ago === false) {
+            return 'Invalid datetime format';
+        }
+
         $diff = $now->diff($ago);
 
-        $diff->w = floor($diff->d / 7);
-        $diff->d -= $diff->w * 7;
-
-        $timeUnits = array(
-            'y' => 'year',
-            'm' => 'month',
-            'w' => 'week',
-            'd' => 'day',
-            'h' => 'hour',
-            'i' => 'minute',
-            's' => 'second'
-        );
-
-        $elapsedTime = [];
-
-        foreach ($timeUnits as $unit => $label) {
+        $elaped_time = [];
+        
+        foreach (TIME_UNITS as $unit => $label) {
             if ($diff->$unit) {
-                $elapsedTime[] = $diff->$unit . ' ' . $label . ($diff->$unit > 1 ? 's' : '');
+                $elaped_time[] = $diff->$unit . ' ' . $label . ($diff->$unit > 1 ? 's' : '');
+                if (!$full) {
+                    break;
+                }
             }
         }
 
-        if (!$full) {
-            $elapsedTime = array_slice($elapsedTime, 0, 1);
-        }
-
-        return $elapsedTime ? implode(', ', $elapsedTime) . ' ago' : 'just now';
+        return $elaped_time ? implode(', ', $elaped_time) . ' ago' : 'just now';
     }
     # -------------------------------------------------------------
 
@@ -477,17 +462,14 @@ class Api{
     #
     # -------------------------------------------------------------
     public function directory_checker($directory) {
-        if (!file_exists($directory)) {
-            if (mkdir($directory, 0777)) {
-                return true;
-            } 
-            else {
-              return 'Error creating directory.';
-            }
-        } 
-        else {
-            return true;
+        $directory = escapeshellarg($directory);
+        $result = shell_exec("mkdir $directory 2>&1");
+
+        if (!empty($result)) {
+            return 'Error creating directory: ' . $result;
         }
+
+        return true;
     }
     # -------------------------------------------------------------
 
@@ -9315,21 +9297,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_roles_assignable_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'True';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'False';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'True' : 'False';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9345,21 +9318,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_interface_setting_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Active';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Deactivated';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'Active' : 'Deactivated';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9375,21 +9339,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_email_setting_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Active';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Deactivated';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'Active' : 'Deactivated';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9405,21 +9360,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_zoom_api_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Active';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Deactivated';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'Active' : 'Deactivated';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9435,21 +9381,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_user_account_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 'Active':
-                $status = 'Active';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Inactive';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 'Active') ? 'Active' : 'Deactivated';
+        $button_class = ($stat === 'Active') ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9465,20 +9402,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_user_account_lock_status($failed_login){
-        $response = array();
-
-        if ($failed_login >= 5) {
-            $status = 'Locked';
-            $button_class = 'bg-danger';
-        }
-        else{
-            $status = 'Unlocked';
-            $button_class = 'bg-success';
-        }
-
+        $status = ($failed_login >= 5) ? 'Locked' : 'Unlocked';
+        $button_class = ($failed_login >= 5) ? 'bg-danger' : 'bg-success';
+        
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9494,27 +9423,28 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_date_difference($date_1, $date_2){
-        $response = array();
+        $response = [];
 
         $start = new DateTime($date_1);
         $end = new DateTime($date_2);
         $diff = $start->diff($end);
-    
+
         $years = $diff->y;
         $months = $diff->m;
         $days = $diff->d;
-    
-        $years = $years . ' Year' . ($years > 1 ? 's' : '');
-        $months = $months . ' Month' . ($months > 1 ? 's' : '');
-        $days = $days . ' Day' . ($days > 1 ? 's' : '');
-    
-        $response[] = array(
+
+        $years = $years . ' Year' . ($years === 1 ? '' : 's');
+        $months = $months . ' Month' . ($months === 1 ? '' : 's');
+        $days = $days . ' Day' . ($days === 1 ? '' : 's');
+
+        $response[] = [
             'YEARS' => $years,
             'MONTHS' => $months,
             'DAYS' => $days
-        );
-    
+        ];
+
         return $response;
+
     }
     # -------------------------------------------------------------
 
@@ -9527,21 +9457,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_department_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Unarchived';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Archived';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'Active' : 'Archived';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9557,21 +9478,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_job_position_recruitment_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Recruitment In Progress';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Not Recruiting';
-                $button_class = 'bg-warning';
-        }
+        $status = ($stat === 1) ? 'Recruitment In Progress' : 'Not Recruiting';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-info';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9587,21 +9499,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_work_location_status($stat){
-        $response = array();
-
-        switch ($stat) {
-            case 1:
-                $status = 'Unarchived';
-                $button_class = 'bg-success';
-                break;
-            default:
-                $status = 'Archived';
-                $button_class = 'bg-danger';
-        }
+        $status = ($stat === 1) ? 'Active' : 'Archived';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
 
         $response[] = array(
             'STATUS' => $status,
-            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
         );
 
         return $response;
@@ -9649,12 +9552,7 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_modal_scrollable($scrollable){
-        if($scrollable){
-            return 'modal-dialog-scrollable';
-        }
-        else{
-            return null;
-        }
+        return $scrollable ? 'modal-dialog-scrollable' : null;
     }
     # -------------------------------------------------------------
 
@@ -9667,18 +9565,9 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_modal_size($size){
-        if($size == 'SM'){
-            return 'modal-sm';
-        }
-        else if($size == 'LG'){
-            return 'modal-lg';
-        }
-        else if($size == 'XL'){
-            return 'modal-xl';
-        }
-        else {
-            return null;
-        }
+        $sizes = ['SM' => 'modal-sm', 'LG' => 'modal-lg', 'XL' => 'modal-xl'];
+
+        return $sizes[$size] ?? null;
     }
     # -------------------------------------------------------------
 
@@ -9692,12 +9581,7 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_number($number){
-        if(is_numeric($number) && (!empty($number) || $number > 0) && !empty($number)){
-            return $number;
-        }
-        else{
-            return '0';
-        }
+        return is_numeric($number) && $number > 0 && !empty($number) ? $number : '0';
     }
     # -------------------------------------------------------------
 
@@ -9710,78 +9594,25 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_date($type, $date, $time, $format, $modify, $system_date, $current_time){
-        if($type == 'default'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify);
-            }
-            else{
-                return $system_date;
-            }
+        $types = [
+            'default' => [$date, $system_date, 'format_date'],
+            'empty' => [$date, null, 'format_date'],
+            'attendance empty' => [$date, null, 'format_date'],
+            'summary' => [$date, '--', 'format_date'],
+            'na' => [$date, 'N/A', 'format_date'],
+            'complete' => [$date, 'N/A', 'format_date'],
+            'encoded' => [$date, 'N/A', 'format_date'],
+            'date time' => [$date, 'N/A', 'format_date'],
+            'default time' => [$date, $current_time, 'format_date']
+        ];
+        
+        if (array_key_exists($type, $types)) {
+            [$date_value, $default, $function] = $types[$type];
+            return !empty($date_value) ? $this->$function($format, $date_value, $modify) : $default;
         }
-        else if($type == 'empty'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify);
-            }
-            else{
-                return null;
-            }
-        }
-        else if($type == 'attendance empty'){
-            if(!empty($date) && $date != ' '){
-                return $this->format_date($format, $date, $modify);
-            }
-            else{
-                return null;
-            }
-        }
-        else if($type == 'summary'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify);
-            }
-            else{
-                return '--';
-            }
-        }
-        else if($type == 'na'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify);
-            }
-            else{
-                return 'N/A';
-            }
-        }
-        else if($type == 'complete'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify) . ' ' . $time;
-            }
-            else{
-                return 'N/A';
-            }
-        }
-        else if($type == 'encoded'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify) . ' ' . $time;
-            }
-            else{
-                return 'N/A';
-            }
-        }
-        else if($type == 'date time'){
-            if(!empty($date)){
-                return $this->format_date($format, $date, $modify) . ' ' . $time;
-            }
-            else{
-                return 'N/A';
-            }
-        }
-        else if($type == 'default time'){
-            if(!empty($date)){
-                return $time;
-            }
-            else{
-                return $current_time;
-            }
-        }
+        
+        return null;
+        
     }
     # -------------------------------------------------------------
 
@@ -9814,12 +9645,7 @@ class Api{
             $user_status = $user_account_details[0]['USER_STATUS'];
             $failed_login = $user_account_details[0]['FAILED_LOGIN'];
 
-            if($user_status == 'Active' && $failed_login < 5){
-                return true;
-            }
-            else{
-                return false;
-            }
+            return ($user_status == 'Active' && $failed_login < 5) ? true : false;
         }
     }
     # -------------------------------------------------------------
@@ -9835,20 +9661,18 @@ class Api{
     public function check_role_access_rights($username, $access_right_id, $access_type){
         if ($this->databaseConnection()) {
             $total = 0;
-
             $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :username');
             $sql->bindValue(':username', $username);
 
-            if($sql->execute()){
-                while($row = $sql->fetch()){
+            if ($sql->execute()) {
+                while ($row = $sql->fetch()) {
                     $role_id = $row['ROLE_ID'];
                     $total += $this->get_access_rights_count($role_id, $access_right_id, $access_type);
                 }
 
                 return $total;
-            }
-            else{
-                return $stmt->errorInfo()[2];
+            } else {
+                return $sql->errorInfo()[2];
             }
         }
     }
@@ -9925,15 +9749,11 @@ class Api{
     #
     # -------------------------------------------------------------
     public function generate_file_name($length, $prefix = '') {
-        $key = '';
-        
-        $keys = array_merge(range(0, 9), range('a', 'z'));
-        $maxIndex = count($keys) - 1;
+        $key = $prefix . array_reduce(array_fill(0, $length, null), function ($carry, $val) use ($keys, $maxIndex) {
+            return $carry . $keys[random_int(0, $maxIndex)];
+        }) . uniqid('', true);
 
-        for ($i = 0; $i < $length; $i++) {
-            $key .= $keys[random_int(0, $maxIndex)];
-        }
-        return $prefix . $key . uniqid('', true);
+        return $key;        
     }
     # -------------------------------------------------------------
 
@@ -9963,8 +9783,8 @@ class Api{
                     while($row = $sql->fetch()){
                         $system_code = $row['SYSTEM_CODE'];
                         $system_description = $row['SYSTEM_DESCRIPTION'];
-    
-                        $option .= "<option value='". $system_code ."'>". $system_description ."</option>";
+
+                        $option .= "<option value='". htmlspecialchars($system_code, ENT_QUOTES) ."'>". htmlspecialchars($system_description, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -9999,7 +9819,7 @@ class Api{
                         $role_id = $row['ROLE_ID'];
                         $role = $row['ROLE'];
     
-                        $option .= "<option value='". $role_id ."'>". $role ."</option>";
+                        $option .= "<option value='". htmlspecialchars($role_id, ENT_QUOTES) ."'>". htmlspecialchars($role, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10034,7 +9854,7 @@ class Api{
                         $module_id = $row['MODULE_ID'];
                         $module_name = $row['MODULE_NAME'];
     
-                        $option .= "<option value='". $module_id ."'>". $module_name ."</option>";
+                        $option .= "<option value='". htmlspecialchars($module_id, ENT_QUOTES) ."'>". htmlspecialchars($module_name, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10069,7 +9889,7 @@ class Api{
                         $country_id = $row['COUNTRY_ID'];
                         $country_name = $row['COUNTRY_NAME'];
     
-                        $option .= "<option value='". $country_id ."'>". $country_name ."</option>";
+                        $option .= "<option value='". htmlspecialchars($country_id, ENT_QUOTES) ."'>". htmlspecialchars($country_name, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10105,7 +9925,7 @@ class Api{
                         $department_id = $row['DEPARTMENT_ID'];
                         $department = $row['DEPARTMENT'];
     
-                        $option .= "<option value='". $department_id ."'>". $department ."</option>";
+                        $option .= "<option value='". htmlspecialchars($department_id, ENT_QUOTES) ."'>". htmlspecialchars($department, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10141,7 +9961,7 @@ class Api{
                         $job_position_id = $row['JOB_POSITION_ID'];
                         $job_position = $row['JOB_POSITION'];
     
-                        $option .= "<option value='". $job_position_id ."'>". $job_position ."</option>";
+                        $option .= "<option value='". htmlspecialchars($job_position_id, ENT_QUOTES) ."'>". htmlspecialchars($job_position, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10177,7 +9997,7 @@ class Api{
                         $work_location_id = $row['WORK_LOCATION_ID'];
                         $work_location = $row['WORK_LOCATION'];
     
-                        $option .= "<option value='". $work_location_id ."'>". $work_location ."</option>";
+                        $option .= "<option value='". htmlspecialchars($work_location_id, ENT_QUOTES) ."'>". htmlspecialchars($work_location, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10212,7 +10032,7 @@ class Api{
                         $departure_reason_id = $row['DEPARTURE_REASON_ID'];
                         $departure_reason = $row['DEPARTURE_REASON'];
     
-                        $option .= "<option value='". $departure_reason_id ."'>". $departure_reason ."</option>";
+                        $option .= "<option value='". htmlspecialchars($departure_reason_id, ENT_QUOTES) ."'>". htmlspecialchars($departure_reason, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10247,7 +10067,7 @@ class Api{
                         $employee_type_id = $row['EMPLOYEE_TYPE_ID'];
                         $employee_type = $row['EMPLOYEE_TYPE'];
     
-                        $option .= "<option value='". $employee_type_id ."'>". $employee_type ."</option>";
+                        $option .= "<option value='". htmlspecialchars($employee_type_id, ENT_QUOTES) ."'>". htmlspecialchars($employee_type, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10282,7 +10102,7 @@ class Api{
                         $wage_type_id = $row['WAGE_TYPE_ID'];
                         $wage_type = $row['WAGE_TYPE'];
     
-                        $option .= "<option value='". $wage_type_id ."'>". $wage_type ."</option>";
+                        $option .= "<option value='". htmlspecialchars($wage_type_id, ENT_QUOTES) ."'>". htmlspecialchars($wage_type, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10317,7 +10137,7 @@ class Api{
                         $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
                         $working_schedule = $row['WORKING_SCHEDULE'];
     
-                        $option .= "<option value='". $working_schedule_id ."'>". $working_schedule ."</option>";
+                        $option .= "<option value='". htmlspecialchars($working_schedule_id, ENT_QUOTES) ."'>". htmlspecialchars($working_schedule, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
@@ -10352,7 +10172,7 @@ class Api{
                         $working_schedule_type_id = $row['WORKING_SCHEDULE_TYPE_ID'];
                         $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
     
-                        $option .= "<option value='". $working_schedule_type_id ."'>". $working_schedule_type ."</option>";
+                        $option .= "<option value='". htmlspecialchars($working_schedule_type_id, ENT_QUOTES) ."'>". htmlspecialchars($working_schedule_type, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;

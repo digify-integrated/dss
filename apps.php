@@ -6,7 +6,6 @@
     $api = new Api;
     $page_title = 'Apps';
 
-    #$page_access = $api->check_role_permissions($username, 1);
     $check_user_account_status = $api->check_user_account_status($username);
 
     if(!$check_user_account_status){
