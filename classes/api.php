@@ -48,7 +48,7 @@ class Api{
             $this->db_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
-            throw new Exception("Error connecting to database: " . $e->getMessage());
+            throw new Exception('Error connecting to database: ' . $e->getMessage());
         }
     
         return $this->db_connection;
