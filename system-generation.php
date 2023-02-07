@@ -3356,6 +3356,39 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # ID types table
+    else if($type == 'id types table'){
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare('SELECT ID_TYPE_ID, ID_TYPE FROM employee_id_type');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $id_type_id = $row['ID_TYPE_ID'];
+                    $id_type = $row['ID_TYPE'];
+
+                    $id_type_id_encrypted = $api->encrypt_data($id_type_id);
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $id_type_id .'">',
+                        'ID_TYPE_ID' => $id_type_id,
+                        'ID_TYPE' => $id_type,
+                        'VIEW' => '<div class="d-flex gap-2">
+                                        <a href="id-type-form.php?id='. $id_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View ID Type">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </a>
+                                    </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # Wage types table
     else if($type == 'wage types table'){
         if ($api->databaseConnection()) {

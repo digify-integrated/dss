@@ -2262,6 +2262,62 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit id type
+        case 'submit id type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['id_type_id']) && isset($_POST['id_type']) && !empty($_POST['id_type'])){
+                        $id_type_id = $_POST['id_type_id'];
+                        $id_type = $_POST['id_type'];
+            
+                        $check_id_type_exist = $api->check_id_type_exist($id_type_id);
+             
+                        if($check_id_type_exist > 0){
+                            $update_id_type = $api->update_id_type($id_type_id, $id_type, $username);
+            
+                            if($update_id_type){
+                                $response[] = array(
+                                    'RESPONSE' => 'Updated'
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $update_id_type
+                                );
+                            }
+                        }
+                        else{
+                            $insert_id_type = $api->insert_id_type($id_type, $username);
+                
+                            if($insert_id_type[0]['RESPONSE']){
+                                $response[] = array(
+                                    'RESPONSE' => 'Inserted',
+                                    'ID_TYPE_ID' => $insert_id_type[0]['ID_TYPE_ID']
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $insert_id_type[0]['RESPONSE']
+                                );
+                            }
+                        }
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => 'Inactive User'
+                    );
+                }
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
         # Submit wage type
         case 'submit wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -4772,6 +4828,82 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Delete id type
+        case 'delete id type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
+                        $id_type_id = $_POST['id_type_id'];
+            
+                        $check_id_type_exist = $api->check_id_type_exist($id_type_id);
+            
+                        if($check_id_type_exist > 0){
+                            $delete_id_type = $api->delete_id_type($id_type_id, $username);
+                                                
+                            if($delete_id_type){
+                                echo 'Deleted';
+                            }
+                            else{
+                                echo $delete_id_type;
+                            }
+                        }
+                        else{
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Delete multiple id type
+        case 'delete multiple id type':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
+                        $id_type_ids = $_POST['id_type_id'];
+            
+                        foreach($id_type_ids as $id_type_id){
+                            $check_id_type_exist = $api->check_id_type_exist($id_type_id);
+            
+                            if($check_id_type_exist > 0){
+                                $delete_id_type = $api->delete_id_type($id_type_id, $username);
+                                                
+                                if(!$delete_id_type){
+                                    $error = $delete_id_type;
+                                    break;
+                                }
+                            }
+                            else{
+                                $error = 'Not Found';
+                                break;
+                            }
+                        }
+            
+                        if(empty($error)){
+                            echo 'Deleted';
+                        }
+                        else{
+                            echo $error;
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # Delete wage type
         case 'delete wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -6524,6 +6656,23 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $response[] = array(
                     'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
                     'TRANSACTION_LOG_ID' => $employee_type_details[0]['TRANSACTION_LOG_ID']
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # ID type details
+        case 'id type details':
+            if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
+                $id_type_id = filter_var($_POST['id_type_id'], FILTER_SANITIZE_STRING);
+
+                $id_type_details = $api->get_id_type_details($id_type_id);
+    
+                $response[] = array(
+                    'ID_TYPE' => $id_type_details[0]['ID_TYPE'],
+                    'TRANSACTION_LOG_ID' => $id_type_details[0]['TRANSACTION_LOG_ID']
                 );
     
                 echo json_encode($response);

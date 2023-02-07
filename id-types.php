@@ -12,11 +12,11 @@
         exit();
     }
     
-    $page_details = $api->get_page_details(39);
+    $page_details = $api->get_page_details(47);
     $module_id = $page_details[0]['MODULE_ID'];
     $page_title = $page_details[0]['PAGE_NAME'];
 
-    $page_access_right = $api->check_role_access_rights($username, 39, 'page');
+    $page_access_right = $api->check_role_access_rights($username, 47, 'page');
     $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
     
     if ($module_access_right == 0 || $page_access_right == 0) {
@@ -24,8 +24,8 @@
         exit();
     }
     
-    $add_employee_type = $api->check_role_access_rights($username, '111', 'action');
-    $delete_employee_type = $api->check_role_access_rights($username, '113', 'action');
+    $add_id_type = $api->check_role_access_rights($username, '126', 'action');
+    $delete_id_type = $api->check_role_access_rights($username, '128', 'action');
 
     require('views/_interface_settings.php');
 ?>
@@ -56,7 +56,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Employee Types</h4>
+                                    <h4 class="mb-sm-0 font-size-18">ID Types</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
@@ -77,11 +77,11 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Employee Types List</h4>
+                                                        <h4 class="card-title">ID Types List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
-                                                            if($delete_employee_type > 0){
+                                                            if($delete_id_type > 0){
                                                                 $dropdown_action = '<div class="btn-group">
                                                                     <button type="button" class="btn btn-outline-dark dropdown-toggle d-none multiple-action" data-bs-toggle="dropdown" aria-expanded="false">
                                                                         <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
@@ -89,8 +89,8 @@
                                                                     </button>
                                                                     <div class="dropdown-menu dropdown-menu-end">';
                                                                     
-                                                                    if($delete_employee_type > 0){
-                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-employee-type">Delete Employee Type</button>';
+                                                                    if($delete_id_type > 0){
+                                                                        $dropdown_action .= '<button class="dropdown-item d-none multiple" type="button" id="delete-id-type">Delete ID Type</button>';
                                                                     }
 
                                                                 $dropdown_action .= '</div></div>';
@@ -101,8 +101,8 @@
                                                     </div>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <?php
-                                                            if($add_employee_type > 0){
-                                                                echo '<a href="employee-type-form.php" class="btn btn-primary">
+                                                            if($add_id_type > 0){
+                                                                echo '<a href="id-type-form.php" class="btn btn-primary">
                                                                     <span class="d-block d-sm-none"><i class="bx bx-plus"></i></span>
                                                                     <span class="d-none d-sm-block">Create</span>
                                                                 </a>';
@@ -114,7 +114,7 @@
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="employee-types-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="id-types-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -122,8 +122,8 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Employee Type ID</th>
-                                                            <th class="all">Employee Type</th>
+                                                            <th class="all">ID Type ID</th>
+                                                            <th class="all">ID Type</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>
@@ -150,6 +150,6 @@
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/employee-types.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/id-types.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

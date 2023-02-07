@@ -8,7 +8,7 @@
         'work_locations' => ['id' => '35', 'url' => 'work-locations.php', 'label' => 'Work Locations', 'group' => 'Configurations'],
         'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
         'working_schedule_types' => ['id' => '43', 'url' => 'working-schedule-types.php', 'label' => 'Working Schedule Types', 'group' => 'Configurations'],
-        'employees' => ['id' => '43', 'url' => 'employees.php', 'label' => 'Employees', 'group' => 'Employees'],
+        'id_types' => ['id' => '43', 'url' => 'id-types.php', 'label' => 'ID Types', 'group' => 'Configurations'],
     ];
 
     ksort($menu_pages);

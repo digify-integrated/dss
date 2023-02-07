@@ -1833,6 +1833,70 @@ CREATE TABLE employee_employment_history(
 
 CREATE INDEX employee_employment_history_index ON employee_employment_history(EMPLOYEE_EMPLOYMENT_HISTORY_ID);
 
+/* Employee id Type */
+CREATE TABLE employee_id_type(
+	ID_TYPE_ID VARCHAR(50) PRIMARY KEY,
+	ID_TYPE VARCHAR(100) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE INDEX employee_id_type_index ON employee_id_type(ID_TYPE_ID);
+
+CREATE PROCEDURE check_id_type_exist(IN id_type_id VARCHAR(50))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_id_type WHERE ID_TYPE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_id_type(IN id_type_id VARCHAR(50), IN id_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_id_type SET ID_TYPE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE ID_TYPE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type, transaction_log_id, record_log, id_type_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_id_type(IN id_type_id VARCHAR(50), IN id_type VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_id_type (ID_TYPE_ID, ID_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type_id, id_type, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_id_type_details(IN id_type_id VARCHAR(50))
+BEGIN
+	SET @query = 'SELECT ID_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_id_type WHERE ID_TYPE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_id_type(IN id_type_id VARCHAR(50))
+BEGIN
+	SET @query = 'DELETE FROM employee_id_type WHERE ID_TYPE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_id_type_options()
+BEGIN
+	SET @query = 'SELECT ID_TYPE_ID, ID_TYPE FROM employee_id_type ORDER BY ID_TYPE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Employee Department */
 CREATE TABLE employee_department(
 	DEPARTMENT_ID VARCHAR(50) PRIMARY KEY,
