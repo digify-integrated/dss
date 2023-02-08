@@ -13,8 +13,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Authenticate
         case 'authenticate':
             if(isset($_POST['password']) && !empty($_POST['password'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
-                $password = filter_var($_POST['password'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     
                 $authenticate = $api->authenticate($username, $password);
                 
@@ -32,9 +32,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Change password
         case 'change password':
             if(isset($_POST['change_username']) && !empty($_POST['change_username']) && isset($_POST['change_password']) && !empty($_POST['change_password'])){
-                $username = filter_var($_POST['change_username'], FILTER_SANITIZE_STRING);
-                $password = $api->encrypt_data(filter_var($_POST['change_password'], FILTER_SANITIZE_STRING));
-                $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
+                $username = htmlspecialchars($_POST['change_username'], ENT_QUOTES, 'UTF-8');
+                $password = $api->encrypt_data(htmlspecialchars($_POST['change_password'], ENT_QUOTES, 'UTF-8'));
+                $password_expiry_date = $api->format_date('Y-m-d', htmlspecialchars($system_date, ENT_QUOTES, 'UTF-8'), '+6 months');
     
                 $check_user_account_exist = $api->check_user_account_exist($username);
     
@@ -70,19 +70,19 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && isset($_POST['module_name']) && !empty($_POST['module_name']) && isset($_POST['module_description']) && !empty($_POST['module_description']) && isset($_POST['module_category']) && !empty($_POST['module_category']) && isset($_POST['default_page']) && !empty($_POST['default_page']) && isset($_POST['order_sequence']) && isset($_POST['module_version']) && !empty($_POST['module_version'])){
                         $file_type = '';
-                        $module_id = $_POST['module_id'];
-                        $module_name = $_POST['module_name'];
-                        $module_description = $_POST['module_description'];
-                        $module_category = $_POST['module_category'];
-                        $module_version = $_POST['module_version'];
-                        $default_page = $_POST['default_page'];
-                        $order_sequence = $_POST['order_sequence'] ?? 0;
+                        $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
+                        $module_name = htmlspecialchars($_POST['module_name'], ENT_QUOTES, 'UTF-8');
+                        $module_description = htmlspecialchars($_POST['module_description'], ENT_QUOTES, 'UTF-8');
+                        $module_category = htmlspecialchars($_POST['module_category'], ENT_QUOTES, 'UTF-8');
+                        $module_version = htmlspecialchars($_POST['module_version'], ENT_QUOTES, 'UTF-8');
+                        $default_page = htmlspecialchars($_POST['default_page'], ENT_QUOTES, 'UTF-8');
+                        $order_sequence = (int) htmlspecialchars($_POST['order_sequence'] ?? 0, ENT_QUOTES, 'UTF-8');
             
                         $module_icon_name = $_FILES['module_icon']['name'];
                         $module_icon_size = $_FILES['module_icon']['size'];
@@ -240,14 +240,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit module access
         case 'submit module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && !empty($_POST['module_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                         $error = '';
-                        $module_id = $_POST['module_id'];
-                        $roles = explode(',', $_POST['role']);
+                        $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
+                        $roles = explode(',', htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($roles as $role){
                             $check_module_access_exist = $api->check_module_access_exist($module_id, $role);
@@ -281,14 +281,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['page_id']) && isset($_POST['page_name']) && !empty($_POST['page_name']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                        $page_id = $_POST['page_id'];
-                        $page_name = $_POST['page_name'];
-                        $module_id = $_POST['module_id'];
+                        $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
+                        $page_name = htmlspecialchars($_POST['page_name'], ENT_QUOTES, 'UTF-8');
+                        $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_page_exist = $api->check_page_exist($page_id);
              
@@ -337,14 +337,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit page access
         case 'submit page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                         $error = '';
-                        $page_id = $_POST['page_id'];
-                        $roles = explode(',', $_POST['role']);
+                        $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
+                        $roles = explode(',', htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($roles as $role){
                             $check_page_access_exist = $api->check_page_access_exist($page_id, $role);
@@ -378,13 +378,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && isset($_POST['action_name']) && !empty($_POST['action_name'])){
-                        $action_id = $_POST['action_id'];
-                        $action_name = $_POST['action_name'];
+                        $action_id = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
+                        $action_name = htmlspecialchars($_POST['action_name'], ENT_QUOTES, 'UTF-8');
             
                         $check_action_exist = $api->check_action_exist($action_id);
              
@@ -433,14 +433,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit action access
         case 'submit action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && !empty($_POST['action_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                         $error = '';
-                        $action_id = $_POST['action_id'];
-                        $roles = explode(',', $_POST['role']);
+                        $action_id = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
+                        $roles = explode(',', htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($roles as $role){
                             $check_action_access_exist = $api->check_action_access_exist($action_id, $role);
@@ -474,16 +474,16 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['parameter_id']) && isset($_POST['parameter']) && !empty($_POST['parameter']) && isset($_POST['parameter_description']) && !empty($_POST['parameter_description']) && isset($_POST['parameter_extension']) && isset($_POST['parameter_number'])){
-                        $parameter_id = $_POST['parameter_id'];
-                        $parameter = $_POST['parameter'];
-                        $parameter_description = $_POST['parameter_description'];
-                        $parameter_extension = $_POST['parameter_extension'];
-                        $parameter_number = $_POST['parameter_number'] ?? 0;
+                        $parameter_id = (int) htmlspecialchars($_POST['parameter_id'], ENT_QUOTES, 'UTF-8');
+                        $parameter = htmlspecialchars($_POST['parameter'], ENT_QUOTES, 'UTF-8');
+                        $parameter_description = htmlspecialchars($_POST['parameter_description'], ENT_QUOTES, 'UTF-8');
+                        $parameter_extension = htmlspecialchars($_POST['parameter_extension'], ENT_QUOTES, 'UTF-8');
+                        $parameter_number = (int) htmlspecialchars($_POST['parameter_number'] ?? 0, ENT_QUOTES, 'UTF-8');
             
                         $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
              
@@ -533,15 +533,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && isset($_POST['role']) && !empty($_POST['role']) && isset($_POST['role_description']) && !empty($_POST['role_description']) && isset($_POST['assignable']) && !empty($_POST['assignable'])){
-                        $role_id = $_POST['role_id'];
-                        $role = $_POST['role'];
-                        $role_description = $_POST['role_description'];
-                        $assignable = $_POST['assignable'];
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $role = htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8');
+                        $role_description = htmlspecialchars($_POST['role_description'], ENT_QUOTES, 'UTF-8');
+                        $assignable = (int) htmlspecialchars($_POST['assignable'], ENT_QUOTES, 'UTF-8');
             
                         $check_role_exist = $api->check_role_exist($role_id);
              
@@ -590,14 +590,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role module access
         case 'submit role module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['module_id']) && !empty($_POST['module_id'])){
                         $error = '';
-                        $role_id = $_POST['role_id'];
-                        $module_ids = explode(',', $_POST['module_id']);
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $module_ids = explode(',', htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($module_ids as $module_id){
                             $check_module_access_exist = $api->check_module_access_exist($module_id, $role_id);
@@ -630,14 +630,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role page access
         case 'submit role page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['page_id']) && !empty($_POST['page_id'])){
                         $error = '';
-                        $role_id = $_POST['role_id'];
-                        $page_ids = explode(',', $_POST['page_id']);
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $page_ids = explode(',', htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($page_ids as $page_id){
                             $check_page_access_exist = $api->check_page_access_exist($page_id, $role_id);
@@ -670,14 +670,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role action access
         case 'submit role action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['action_id']) && !empty($_POST['action_id'])){
                         $error = '';
-                        $role_id = $_POST['role_id'];
-                        $action_ids = explode(',', $_POST['action_id']);
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $action_ids = explode(',', htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($action_ids as $action_id){
                             $check_action_access_exist = $api->check_action_access_exist($action_id, $role_id);
@@ -710,14 +710,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit role user account
         case 'submit role user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
                         $error = '';
-                        $role_id = $_POST['role_id'];
-                        $user_ids = explode(',', $_POST['user_id']);
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = explode(',', htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($user_ids as $user_id){
                             $check_role_user_account_exist = $api->check_role_user_account_exist($role_id, $user_id);
@@ -751,15 +751,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['system_code_id']) && isset($_POST['system_type']) && !empty($_POST['system_type']) && isset($_POST['system_code']) && !empty($_POST['system_code']) && isset($_POST['system_description']) && !empty($_POST['system_description'])){
-                        $system_code_id = $_POST['system_code_id'];
-                        $system_type = $_POST['system_type'];
-                        $system_code = $_POST['system_code'];
-                        $system_description = $_POST['system_description'];
+                        $system_code_id = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
+                        $system_type = htmlspecialchars($_POST['system_type'], ENT_QUOTES, 'UTF-8');
+                        $system_code = htmlspecialchars($_POST['system_code'], ENT_QUOTES, 'UTF-8');
+                        $system_description = htmlspecialchars($_POST['system_description'], ENT_QUOTES, 'UTF-8');
             
                         $check_system_code_exist = $api->check_system_code_exist($system_code_id);
              
@@ -809,15 +809,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && isset($_POST['upload_setting']) && !empty($_POST['upload_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['max_file_size']) && !empty($_POST['max_file_size'])){
-                        $upload_setting_id = $_POST['upload_setting_id'];
-                        $upload_setting = $_POST['upload_setting'];
-                        $description = $_POST['description'];
-                        $max_file_size = $_POST['max_file_size'];
+                        $upload_setting_id = (int) htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $upload_setting = htmlspecialchars($_POST['upload_setting'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
+                        $max_file_size = (double) htmlspecialchars($_POST['max_file_size'], ENT_QUOTES, 'UTF-8');
             
                         $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
              
@@ -866,14 +866,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit upload setting file type
         case 'submit upload setting file type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
                         $error = '';
-                        $upload_setting_id = $_POST['upload_setting_id'];
-                        $file_types = explode(',', $_POST['file_type']);
+                        $upload_setting_id = (int) htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $file_types = explode(',', htmlspecialchars($_POST['file_type'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($file_types as $file_type){
                             $check_upload_setting_file_type_exist = $api->check_upload_setting_file_type_exist($upload_setting_id, $file_type);
@@ -907,20 +907,20 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();    
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['company_id']) && isset($_POST['company_name']) && !empty($_POST['company_name']) && isset($_POST['company_address']) && isset($_POST['tax_id']) && isset($_POST['email']) && isset($_POST['mobile']) && isset($_POST['telephone']) && isset($_POST['website'])){
                         $file_type = '';
-                        $company_id = $_POST['company_id'];
-                        $company_name = $_POST['company_name'];
-                        $company_address = $_POST['company_address'];
-                        $tax_id = $_POST['tax_id'];
-                        $email = $_POST['email'];
-                        $mobile = $_POST['mobile'];
-                        $telephone = $_POST['telephone'];
-                        $website = $_POST['website'];
+                        $company_id = htmlspecialchars($_POST['company_id'], ENT_QUOTES, 'UTF-8');
+                        $company_name = htmlspecialchars($_POST['company_name'], ENT_QUOTES, 'UTF-8');
+                        $company_address = htmlspecialchars($_POST['company_address'], ENT_QUOTES, 'UTF-8');
+                        $tax_id = htmlspecialchars($_POST['tax_id'], ENT_QUOTES, 'UTF-8');
+                        $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+                        $mobile = htmlspecialchars($_POST['mobile'], ENT_QUOTES, 'UTF-8');
+                        $telephone = htmlspecialchars($_POST['telephone'], ENT_QUOTES, 'UTF-8');
+                        $website = htmlspecialchars($_POST['website'], ENT_QUOTES, 'UTF-8');
             
                         $company_logo_name = $_FILES['company_logo']['name'];
                         $company_logo_size = $_FILES['company_logo']['size'];
@@ -1075,14 +1075,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && isset($_POST['interface_setting_name']) && !empty($_POST['interface_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) ){
-                        $interface_setting_id = $_POST['interface_setting_id'];
-                        $interface_setting_name = $_POST['interface_setting_name'];
-                        $description = $_POST['description'];
+                        $interface_setting_id = (int) htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $interface_setting_name = htmlspecialchars($_POST['interface_setting_name'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
             
                         $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
              
@@ -1168,23 +1168,23 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && isset($_POST['email_setting_name']) && !empty($_POST['email_setting_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['mail_host']) && !empty($_POST['mail_host']) && isset($_POST['port']) && isset($_POST['smtp_auth']) && isset($_POST['smtp_auto_tls']) && isset($_POST['mail_username']) && !empty($_POST['mail_username']) && isset($_POST['mail_password']) && !empty($_POST['mail_password']) && isset($_POST['mail_encryption']) && !empty($_POST['mail_encryption']) && isset($_POST['mail_from_name']) && !empty($_POST['mail_from_name']) && isset($_POST['mail_from_email']) && !empty($_POST['mail_from_email'])){
-                        $email_setting_id = $_POST['email_setting_id'];
-                        $email_setting_name = $_POST['email_setting_name'];
-                        $description = $_POST['description'];
-                        $mail_host = $_POST['mail_host'];
-                        $port = $_POST['port'] ?? 0;
-                        $smtp_auth = $_POST['smtp_auth'];
-                        $smtp_auto_tls = $_POST['smtp_auto_tls'];
-                        $mail_username = $_POST['mail_username'];
-                        $mail_password = $_POST['mail_password'];
-                        $mail_encryption = $_POST['mail_encryption'];
-                        $mail_from_name = $_POST['mail_from_name'];
-                        $mail_from_email = $_POST['mail_from_email'];
+                        $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $email_setting_name = htmlspecialchars($_POST['email_setting_name'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
+                        $mail_host = htmlspecialchars($_POST['mail_host'], ENT_QUOTES, 'UTF-8');
+                        $port = (int) htmlspecialchars($_POST['port'] ?? 0, ENT_QUOTES, 'UTF-8');
+                        $smtp_auth = (int) htmlspecialchars($_POST['smtp_auth'], ENT_QUOTES, 'UTF-8');
+                        $smtp_auto_tls = (int) htmlspecialchars($_POST['smtp_auto_tls'], ENT_QUOTES, 'UTF-8');
+                        $mail_username = htmlspecialchars($_POST['mail_username'], ENT_QUOTES, 'UTF-8');
+                        $mail_password = htmlspecialchars($_POST['mail_password'], ENT_QUOTES, 'UTF-8');
+                        $mail_encryption = htmlspecialchars($_POST['mail_encryption'], ENT_QUOTES, 'UTF-8');
+                        $mail_from_name = htmlspecialchars($_POST['mail_from_name'], ENT_QUOTES, 'UTF-8');
+                        $mail_from_email = htmlspecialchars($_POST['mail_from_email'], ENT_QUOTES, 'UTF-8');
             
                         $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
              
@@ -1234,18 +1234,18 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && isset($_POST['notification_setting']) && !empty($_POST['notification_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['notification_title']) && !empty($_POST['notification_title']) && isset($_POST['notification_message']) && !empty($_POST['notification_message']) && isset($_POST['system_link']) && isset($_POST['email_link'])){
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $notification_setting = $_POST['notification_setting'];
-                        $description = $_POST['description'];
-                        $notification_title = $_POST['notification_title'];
-                        $notification_message = $_POST['notification_message'];
-                        $system_link = $_POST['system_link'];
-                        $email_link = $_POST['email_link'];
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $notification_setting = htmlspecialchars($_POST['notification_setting'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
+                        $notification_title = htmlspecialchars($_POST['notification_title'], ENT_QUOTES, 'UTF-8');
+                        $notification_message = htmlspecialchars($_POST['notification_message'], ENT_QUOTES, 'UTF-8');
+                        $system_link = htmlspecialchars($_POST['system_link'], ENT_QUOTES, 'UTF-8');
+                        $email_link = htmlspecialchars($_POST['email_link'], ENT_QUOTES, 'UTF-8');
             
                         $check_notification_setting_exist = $api->check_notification_setting_exist($notification_setting_id);
              
@@ -1294,14 +1294,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification role recipient
         case 'submit notification role recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
                         $error = '';
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $role_ids = explode(',', $_POST['role_id']);
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $role_ids = explode(',', htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($role_ids as $role_id){
                             $check_notification_role_recipient_exist = $api->check_notification_role_recipient_exist($notification_setting_id, $role_id);
@@ -1334,14 +1334,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification user account recipient
         case 'submit notification user account recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
                         $error = '';
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $user_ids = explode(',', $_POST['user_id']);
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = explode(',', htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($user_ids as $user_id){
                             $check_notification_user_account_recipient_exist = $api->check_notification_user_account_recipient_exist($notification_setting_id, $user_id);
@@ -1374,14 +1374,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit notification channel
         case 'submit notification channel':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['channel']) && !empty($_POST['channel']) && isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
                         $error = '';
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $channels = explode(',', $_POST['channel']);
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $channels = explode(',', htmlspecialchars($_POST['channel'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($channels as $channel){
                             $check_notification_channel_exist = $api->check_notification_channel_exist($notification_setting_id, $channel);
@@ -1415,13 +1415,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['country_id']) && isset($_POST['country_name']) && !empty($_POST['country_name'])){
-                        $country_id = $_POST['country_id'];
-                        $country_name = $_POST['country_name'];
+                        $country_id = (int) htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
+                        $country_name = htmlspecialchars($_POST['country_name'], ENT_QUOTES, 'UTF-8');
             
                         $check_country_exist = $api->check_country_exist($country_id);
              
@@ -1471,14 +1471,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit country state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['state_name']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                        $state_id = $_POST['state_id'];
-                        $state_name = $_POST['state_name'];
-                        $country_id = $_POST['country_id'];
+                        $state_id = (int) htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
+                        $state_name = htmlspecialchars($_POST['state_name'], ENT_QUOTES, 'UTF-8');
+                        $country_id = (int) htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
     
                         $check_state_exist = $api->check_state_exist($state_id);
              
@@ -1515,14 +1515,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['state_id']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                        $state_id = $_POST['state_id'];
-                        $state_name = $_POST['state_name'];
-                        $country_id = $_POST['country_id'];
+                        $state_id = (int) htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
+                        $state_name = htmlspecialchars($_POST['state_name'], ENT_QUOTES, 'UTF-8');
+                        $country_id = (int) htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_state_exist = $api->check_state_exist($state_id);
              
@@ -1572,16 +1572,16 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && isset($_POST['zoom_api_name']) && !empty($_POST['zoom_api_name']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['api_key']) && !empty($_POST['api_key']) && isset($_POST['api_secret']) && !empty($_POST['api_secret'])){
-                        $zoom_api_id = $_POST['zoom_api_id'];
-                        $zoom_api_name = $_POST['zoom_api_name'];
-                        $description = $_POST['description'];
-                        $api_key = $_POST['api_key'];
-                        $api_secret = $_POST['api_secret'];
+                        $zoom_api_id = (int) htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
+                        $zoom_api_name = htmlspecialchars($_POST['zoom_api_name'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
+                        $api_key = htmlspecialchars($_POST['api_key'], ENT_QUOTES, 'UTF-8');
+                        $api_secret = htmlspecialchars($_POST['api_secret'], ENT_QUOTES, 'UTF-8');
             
                         $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
              
@@ -1631,14 +1631,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['file_as']) && !empty($_POST['file_as']) && isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['password']) && !empty($_POST['password'])){
-                        $file_as = $_POST['file_as'];
-                        $user_id = $_POST['user_id'];
-                        $password = $api->encrypt_data($_POST['password']);
+                        $file_as = htmlspecialchars($_POST['file_as'], ENT_QUOTES, 'UTF-8');
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $password = $api->encrypt_data(htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8'));
                         $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -1688,14 +1688,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit user account role
         case 'submit user account role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role']) && !empty($_POST['role'])){
                         $error = '';
-                        $user_id = $_POST['user_id'];
-                        $roles = explode(',', $_POST['role']);
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $roles = explode(',', htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8'));
             
                         foreach($roles as $role){
                             $check_role_user_account_exist = $api->check_role_user_account_exist($role, $user_id);
@@ -1729,15 +1729,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['parent_department']) && isset($_POST['manager'])){
-                        $department_id = $_POST['department_id'];
-                        $department = $_POST['department'];
-                        $parent_department = $_POST['parent_department'];
-                        $manager = $_POST['manager'];
+                        $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
+                        $department = htmlspecialchars($_POST['department'], ENT_QUOTES, 'UTF-8');
+                        $parent_department = htmlspecialchars($_POST['parent_department'], ENT_QUOTES, 'UTF-8');
+                        $manager = htmlspecialchars($_POST['manager'], ENT_QUOTES, 'UTF-8');
             
                         $check_department_exist = $api->check_department_exist($department_id);
              
@@ -1787,16 +1787,16 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && isset($_POST['job_position']) && !empty($_POST['job_position']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['expected_new_employees'])){
-                        $job_position_id = $_POST['job_position_id'];
-                        $job_position = $_POST['job_position'];
-                        $description = $_POST['description'];
-                        $department = $_POST['department'];
-                        $expected_new_employees = $_POST['expected_new_employees'] ?? 0;
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position = htmlspecialchars($_POST['job_position'], ENT_QUOTES, 'UTF-8');
+                        $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
+                        $department = htmlspecialchars($_POST['department'], ENT_QUOTES, 'UTF-8');
+                        $expected_new_employees = (int) htmlspecialchars($_POST['expected_new_employees'] ?? 0, ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_exist = $api->check_job_position_exist($job_position_id);
              
@@ -1846,14 +1846,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position responsibility':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['responsibility_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['responsibility']) && !empty($_POST['responsibility'])){
-                        $responsibility_id = $_POST['responsibility_id'];
-                        $job_position_id = $_POST['job_position_id'];
-                        $responsibility = $_POST['responsibility'];
+                        $responsibility_id = htmlspecialchars($_POST['responsibility_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $responsibility = htmlspecialchars($_POST['responsibility'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_responsibility_exist = $api->check_job_position_responsibility_exist($responsibility_id);
              
@@ -1890,14 +1890,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position requirement':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['requirement_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['requirement']) && !empty($_POST['requirement'])){
-                        $requirement_id = $_POST['requirement_id'];
-                        $job_position_id = $_POST['job_position_id'];
-                        $requirement = $_POST['requirement'];
+                        $requirement_id = htmlspecialchars($_POST['requirement_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $requirement = htmlspecialchars($_POST['requirement'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_requirement_exist = $api->check_job_position_requirement_exist($requirement_id);
              
@@ -1934,14 +1934,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position qualification':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['qualification_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['qualification']) && !empty($_POST['qualification'])){
-                        $qualification_id = $_POST['qualification_id'];
-                        $job_position_id = $_POST['job_position_id'];
-                        $qualification = $_POST['qualification'];
+                        $qualification_id = htmlspecialchars($_POST['qualification_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $qualification = htmlspecialchars($_POST['qualification'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_qualification_exist = $api->check_job_position_qualification_exist($qualification_id);
              
@@ -1978,15 +1978,15 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit job position attachment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['attachment_id']) && isset($_POST['job_position_id']) && !empty($_POST['job_position_id']) && isset($_POST['attachment_name']) && !empty($_POST['attachment_name'])){
                         $file_type = '';
-                        $attachment_id = $_POST['attachment_id'];
-                        $job_position_id = $_POST['job_position_id'];
-                        $attachment_name = $_POST['attachment_name'];
+                        $attachment_id = htmlspecialchars($_POST['attachment_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $attachment_name = htmlspecialchars($_POST['attachment_name'], ENT_QUOTES, 'UTF-8');
             
                         $attachment_file_name = $_FILES['attachment']['name'];
                         $attachment_size = $_FILES['attachment']['size'];
@@ -2093,18 +2093,18 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && isset($_POST['work_location']) && !empty($_POST['work_location']) && isset($_POST['work_location_address']) && !empty($_POST['work_location_address']) && isset($_POST['email']) && isset($_POST['telephone']) && isset($_POST['mobile']) && isset($_POST['location_number'])){
-                        $work_location_id = $_POST['work_location_id'];
-                        $work_location = $_POST['work_location'];
-                        $work_location_address = $_POST['work_location_address'];
-                        $email = $_POST['email'];
-                        $telephone = $_POST['telephone'];
-                        $mobile = $_POST['mobile'];
-                        $location_number = $_POST['location_number'] ?? 1;
+                        $work_location_id = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
+                        $work_location = htmlspecialchars($_POST['work_location'], ENT_QUOTES, 'UTF-8');
+                        $work_location_address = htmlspecialchars($_POST['work_location_address'], ENT_QUOTES, 'UTF-8');
+                        $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+                        $telephone = htmlspecialchars($_POST['telephone'], ENT_QUOTES, 'UTF-8');
+                        $mobile = htmlspecialchars($_POST['mobile'], ENT_QUOTES, 'UTF-8');
+                        $location_number = (int) htmlspecialchars($_POST['location_number'] ?? 1, ENT_QUOTES, 'UTF-8');
             
                         $check_work_location_exist = $api->check_work_location_exist($work_location_id);
              
@@ -2154,13 +2154,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['departure_reason_id']) && isset($_POST['departure_reason']) && !empty($_POST['departure_reason'])){
-                        $departure_reason_id = $_POST['departure_reason_id'];
-                        $departure_reason = $_POST['departure_reason'];
+                        $departure_reason_id = htmlspecialchars($_POST['departure_reason_id'], ENT_QUOTES, 'UTF-8');
+                        $departure_reason = htmlspecialchars($_POST['departure_reason'], ENT_QUOTES, 'UTF-8');
             
                         $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
              
@@ -2210,13 +2210,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['employee_type_id']) && isset($_POST['employee_type']) && !empty($_POST['employee_type'])){
-                        $employee_type_id = $_POST['employee_type_id'];
-                        $employee_type = $_POST['employee_type'];
+                        $employee_type_id = htmlspecialchars($_POST['employee_type_id'], ENT_QUOTES, 'UTF-8');
+                        $employee_type = htmlspecialchars($_POST['employee_type'], ENT_QUOTES, 'UTF-8');
             
                         $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
              
@@ -2266,13 +2266,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit id type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['id_type_id']) && isset($_POST['id_type']) && !empty($_POST['id_type'])){
-                        $id_type_id = $_POST['id_type_id'];
-                        $id_type = $_POST['id_type'];
+                        $id_type_id = htmlspecialchars($_POST['id_type_id'], ENT_QUOTES, 'UTF-8');
+                        $id_type = htmlspecialchars($_POST['id_type'], ENT_QUOTES, 'UTF-8');
             
                         $check_id_type_exist = $api->check_id_type_exist($id_type_id);
              
@@ -2322,13 +2322,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['wage_type_id']) && isset($_POST['wage_type']) && !empty($_POST['wage_type'])){
-                        $wage_type_id = $_POST['wage_type_id'];
-                        $wage_type = $_POST['wage_type'];
+                        $wage_type_id = htmlspecialchars($_POST['wage_type_id'], ENT_QUOTES, 'UTF-8');
+                        $wage_type = htmlspecialchars($_POST['wage_type'], ENT_QUOTES, 'UTF-8');
             
                         $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
              
@@ -2378,14 +2378,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_id']) && isset($_POST['working_schedule']) && !empty($_POST['working_schedule']) && isset($_POST['working_schedule_type']) && !empty($_POST['working_schedule_type'])){
-                        $working_schedule_id = $_POST['working_schedule_id'];
-                        $working_schedule = $_POST['working_schedule'];
-                        $working_schedule_type = $_POST['working_schedule_type'];
+                        $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule = htmlspecialchars($_POST['working_schedule'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_type = htmlspecialchars($_POST['working_schedule_type'], ENT_QUOTES, 'UTF-8');
             
                         $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
              
@@ -2434,19 +2434,19 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit fixed working hours
         case 'submit fixed working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_hours_id']) && isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id']) && isset($_POST['working_hours']) && !empty($_POST['working_hours']) && isset($_POST['day_of_week']) && !empty($_POST['day_of_week']) && isset($_POST['day_period']) && !empty($_POST['day_period']) && isset($_POST['work_from']) && !empty($_POST['work_from']) && isset($_POST['work_to']) && !empty($_POST['work_to'])){
                         $overlap = false;
-                        $working_hours_id = $_POST['working_hours_id'];
-                        $working_schedule_id = $_POST['working_schedule_id'];
-                        $working_hours = $_POST['working_hours'];
-                        $day_of_week = $_POST['day_of_week'];
-                        $day_period = $_POST['day_period'];
-                        $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
-                        $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
+                        $working_hours_id = htmlspecialchars($_POST['working_hours_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
+                        $working_hours = htmlspecialchars($_POST['working_hours'], ENT_QUOTES, 'UTF-8');
+                        $day_of_week = htmlspecialchars($_POST['day_of_week'], ENT_QUOTES, 'UTF-8');
+                        $day_period = htmlspecialchars($_POST['day_period'], ENT_QUOTES, 'UTF-8');
+                        $work_from = $api->check_date('empty', htmlspecialchars($_POST['work_from'], ENT_QUOTES, 'UTF-8'), '', 'H:i:s', '', '', '');
+                        $work_to = $api->check_date('empty', htmlspecialchars($_POST['work_to'], ENT_QUOTES, 'UTF-8'), '', 'H:i:s', '', '', '');
 
                         $check_overlap = $api->check_fixed_working_schedule_overlap($working_hours_id, $working_schedule_id, $day_of_week, $work_from, $work_to);
 
@@ -2489,19 +2489,19 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Submit flexible working hours
         case 'submit flexible working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_hours_id']) && isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id']) && isset($_POST['working_hours']) && !empty($_POST['working_hours']) && isset($_POST['working_date']) && !empty($_POST['working_date']) && isset($_POST['day_period']) && !empty($_POST['day_period']) && isset($_POST['work_from']) && !empty($_POST['work_from']) && isset($_POST['work_to']) && !empty($_POST['work_to'])){
-                        $working_hours_id = $_POST['working_hours_id'];
-                        $working_schedule_id = $_POST['working_schedule_id'];
-                        $working_hours = $_POST['working_hours'];
-                        $working_date = $api->check_date('empty', $_POST['working_date'], '', 'Y-m-d', '', '', '');
-                        $day_of_week = strtoupper(date("l", strtotime($working_date)));
-                        $day_period = $_POST['day_period'];
-                        $work_from = $api->check_date('empty', $_POST['work_from'], '', 'H:i:s', '', '', '');
-                        $work_to = $api->check_date('empty', $_POST['work_to'], '', 'H:i:s', '', '', '');
+                        $working_hours_id = htmlspecialchars($_POST['working_hours_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
+                        $working_hours = htmlspecialchars($_POST['working_hours'], ENT_QUOTES, 'UTF-8');
+                        $working_date = $api->check_date('empty', htmlspecialchars($_POST['working_date'], ENT_QUOTES, 'UTF-8'), '', 'Y-m-d', '', '', '');
+                        $day_of_week = strtoupper(date('l', strtotime($working_date)));
+                        $day_period = htmlspecialchars($_POST['day_period'], ENT_QUOTES, 'UTF-8');
+                        $work_from = $api->check_date('empty', htmlspecialchars($_POST['work_from'], ENT_QUOTES, 'UTF-8'), '', 'H:i:s', '', '', '');
+                        $work_to = $api->check_date('empty', htmlspecialchars($_POST['work_to'], ENT_QUOTES, 'UTF-8'), '', 'H:i:s', '', '', '');
 
                         $check_overlap = $api->check_flexible_working_schedule_overlap($working_hours_id, $working_schedule_id, $working_date, $work_from, $work_to);
 
@@ -2545,14 +2545,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         case 'submit working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
                 $response = array();
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_type_id']) && isset($_POST['working_schedule_type']) && !empty($_POST['working_schedule_type']) && isset($_POST['working_schedule_type_category']) && !empty($_POST['working_schedule_type_category'])){
-                        $working_schedule_type_id = $_POST['working_schedule_type_id'];
-                        $working_schedule_type = $_POST['working_schedule_type'];
-                        $working_schedule_type_category = $_POST['working_schedule_type_category'];
+                        $working_schedule_type_id = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_type = htmlspecialchars($_POST['working_schedule_type'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_type_category = htmlspecialchars($_POST['working_schedule_type_category'], ENT_QUOTES, 'UTF-8');
             
                         $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
              
@@ -2605,12 +2605,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete module
         case 'delete module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                        $module_id = $_POST['module_id'];
+                        $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_module_exist = $api->check_module_exist($module_id);
             
@@ -2646,12 +2646,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple module
         case 'delete multiple module':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                        $module_ids = $_POST['module_id'];
+                        $module_ids = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($module_ids as $module_id){
                             $check_module_exist = $api->check_module_exist($module_id);
@@ -2696,13 +2696,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete module access
         case 'delete module access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && !empty($_POST['module_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $module_id = $_POST['module_id'];
-                        $role_id = $_POST['role_id'];
+                        $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_module_access_exist = $api->check_module_access_exist($module_id, $role_id);
             
@@ -2731,12 +2731,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete page
         case 'delete page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
-                        $page_id = $_POST['page_id'];
+                        $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_page_exist = $api->check_page_exist($page_id);
             
@@ -2772,12 +2772,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple page
         case 'delete multiple page':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
-                        $page_ids = $_POST['page_id'];
+                        $page_ids = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($page_ids as $page_id){
                             $check_page_exist = $api->check_page_exist($page_id);
@@ -2822,13 +2822,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete page access
         case 'delete page access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
-                    if(isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $page_id = $_POST['page_id'];
-                        $role_id = $_POST['role_id'];
+                    if(isset($_POST['page_id']) && !empty($_POST['page_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){                
+                        $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_page_access_exist = $api->check_page_access_exist($page_id, $role_id);
             
@@ -2857,12 +2857,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete action
         case 'delete action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
-                        $action_id = $_POST['action_id'];
+                        $action_id = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_action_exist = $api->check_action_exist($action_id);
             
@@ -2898,12 +2898,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple action
         case 'delete multiple action':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
-                        $action_ids = $_POST['action_id'];
+                        $action_ids = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($action_ids as $action_id){
                             $check_action_exist = $api->check_action_exist($action_id);
@@ -2948,13 +2948,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete action access
         case 'delete action access':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && !empty($_POST['action_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $action_id = $_POST['action_id'];
-                        $role_id = $_POST['role_id'];
+                        $action_id = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_action_access_exist = $api->check_action_access_exist($action_id, $role_id);
             
@@ -2983,12 +2983,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete system parameter
         case 'delete system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
-                        $parameter_id = $_POST['parameter_id'];
+                        $parameter_id = (int) htmlspecialchars($_POST['parameter_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
             
@@ -3017,12 +3017,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple system parameter
         case 'delete multiple system parameter':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
-                        $parameter_ids = $_POST['parameter_id'];
+                        $parameter_ids = htmlspecialchars($_POST['parameter_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($parameter_ids as $parameter_id){
                             $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
@@ -3059,12 +3059,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role
         case 'delete role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $role_id = $_POST['role_id'];
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_role_exist = $api->check_role_exist($role_id);
             
@@ -3121,12 +3121,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple role
         case 'delete multiple role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $role_ids = $_POST['role_id'];
+                        $role_ids = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($role_ids as $role_id){
                             $check_role_exist = $api->check_role_exist($role_id);
@@ -3195,13 +3195,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role user account
         case 'delete role user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $user_id = $_POST['user_id'];
-                        $role_id = $_POST['role_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_role_user_account_exist = $api->check_role_user_account_exist($role_id, $user_id);
             
@@ -3230,12 +3230,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete system code
         case 'delete system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
-                        $system_code_id = $_POST['system_code_id'];
+                        $system_code_id = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_system_code_exist = $api->check_system_code_exist($system_code_id);
             
@@ -3264,12 +3264,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple system code
         case 'delete multiple system code':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
-                        $system_code_ids = $_POST['system_code_id'];
+                        $system_code_ids = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($system_code_ids as $system_code_id){
                             $check_system_code_exist = $api->check_system_code_exist($system_code_id);
@@ -3306,12 +3306,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete upload setting
         case 'delete upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
-                        $upload_setting_id = $_POST['upload_setting_id'];
+                        $upload_setting_id = (int) htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
             
@@ -3347,12 +3347,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple upload setting
         case 'delete multiple upload setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
-                        $upload_setting_ids = $_POST['upload_setting_id'];
+                        $upload_setting_ids = htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($upload_setting_ids as $upload_setting_id){
                             $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
@@ -3397,13 +3397,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete upload setting file type
         case 'delete upload setting file type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
-                        $upload_setting_id = $_POST['upload_setting_id'];
-                        $file_type = $_POST['file_type'];
+                        $upload_setting_id = (int) htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $file_type = htmlspecialchars($_POST['file_type'], ENT_QUOTES, 'UTF-8');
             
                         $check_upload_setting_file_type_exist = $api->check_upload_setting_file_type_exist($upload_setting_id, $file_type);
             
@@ -3432,12 +3432,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete company
         case 'delete company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
-                        $company_id = $_POST['company_id'];
+                        $company_id = htmlspecialchars($_POST['company_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_company_exist = $api->check_company_exist($company_id);
             
@@ -3466,12 +3466,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple company
         case 'delete multiple company':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
-                        $company_ids = $_POST['company_id'];
+                        $company_ids = htmlspecialchars($_POST['company_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($company_ids as $company_id){
                             $check_company_exist = $api->check_company_exist($company_id);
@@ -3508,12 +3508,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete interface setting
         case 'delete interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                        $interface_setting_id = $_POST['interface_setting_id'];
+                        $interface_setting_id = (int) htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
             
@@ -3542,12 +3542,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple interface setting
         case 'delete multiple interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                        $interface_setting_ids = $_POST['interface_setting_id'];
+                        $interface_setting_ids = htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($interface_setting_ids as $interface_setting_id){
                             $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
@@ -3584,12 +3584,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete email setting
         case 'delete email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                        $email_setting_id = $_POST['email_setting_id'];
+                        $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
             
@@ -3618,12 +3618,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple email setting
         case 'delete multiple email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                        $email_setting_ids = $_POST['email_setting_id'];
+                        $email_setting_ids = htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($email_setting_ids as $email_setting_id){
                             $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
@@ -3660,12 +3660,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification setting
         case 'delete notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
-                        $notification_setting_id = $_POST['notification_setting_id'];
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_notification_setting_exist = $api->check_notification_setting_exist($notification_setting_id);
             
@@ -3715,12 +3715,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple notification setting
         case 'delete multiple notification setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
-                        $notification_setting_ids = $_POST['notification_setting_id'];
+                        $notification_setting_ids = htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($notification_setting_ids as $notification_setting_id){
                             $check_notification_setting_exist = $api->check_notification_setting_exist($notification_setting_id);
@@ -3781,13 +3781,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification role recipient
         case 'delete notification role recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $role_id = $_POST['role_id'];
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_notification_role_recipient_exist = $api->check_notification_role_recipient_exist($notification_setting_id, $role_id);
             
@@ -3816,13 +3816,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification user account recipient
         case 'delete notification user account recipient':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['user_id']) && !empty($_POST['notification_setting_id'])){
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $user_id = $_POST['user_id'];
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_notification_user_account_recipient_exist = $api->check_notification_user_account_recipient_exist($notification_setting_id, $user_id);
             
@@ -3851,13 +3851,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete notification channel
         case 'delete notification channel':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id']) && isset($_POST['channel']) && !empty($_POST['channel'])){
-                        $notification_setting_id = $_POST['notification_setting_id'];
-                        $channel = $_POST['channel'];
+                        $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $channel = htmlspecialchars($_POST['channel'], ENT_QUOTES, 'UTF-8');
             
                         $check_notification_channel_exist = $api->check_notification_channel_exist($notification_setting_id, $channel);
             
@@ -3886,12 +3886,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete country
         case 'delete country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                        $country_id = $_POST['country_id'];
+                        $country_id = (int) htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_country_exist = $api->check_country_exist($country_id);
             
@@ -3927,12 +3927,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple country
         case 'delete multiple country':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                        $country_ids = $_POST['country_id'];
+                        $country_ids = htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($country_ids as $country_id){
                             $check_country_exist = $api->check_country_exist($country_id);
@@ -3977,12 +3977,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete state
         case 'delete state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
-                        $state_id = $_POST['state_id'];
+                        $state_id = (int) htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_state_exist = $api->check_state_exist($state_id);
             
@@ -4011,12 +4011,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple state
         case 'delete multiple state':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
-                        $state_ids = $_POST['state_id'];
+                        $state_ids = htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($state_ids as $state_id){
                             $check_state_exist = $api->check_state_exist($state_id);
@@ -4053,12 +4053,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete zoom api
         case 'delete zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                        $zoom_api_id = $_POST['zoom_api_id'];
+                        $zoom_api_id = (int) htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
             
@@ -4087,12 +4087,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple zoom api
         case 'delete multiple zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                        $zoom_api_ids = $_POST['zoom_api_id'];
+                        $zoom_api_ids = htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($zoom_api_ids as $zoom_api_id){
                             $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
@@ -4129,12 +4129,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete user account
         case 'delete user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_id = $_POST['user_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
             
@@ -4170,12 +4170,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple user account
         case 'delete multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = $_POST['user_id'];
+                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -4220,13 +4220,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete role user account
         case 'delete user account role':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id']) && isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $user_id = $_POST['user_id'];
-                        $role_id = $_POST['role_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_role_user_account_exist = $api->check_role_user_account_exist($role_id, $user_id);
             
@@ -4255,12 +4255,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete department
         case 'delete department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_id = $_POST['department_id'];
+                        $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_department_exist = $api->check_department_exist($department_id);
             
@@ -4289,12 +4289,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple department
         case 'delete multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = $_POST['department_id'];
+                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -4331,12 +4331,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position
         case 'delete job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                        $job_position_id = $_POST['job_position_id'];
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_exist = $api->check_job_position_exist($job_position_id);
             
@@ -4393,12 +4393,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple job position
         case 'delete multiple job position':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                        $job_position_ids = $_POST['job_position_id'];
+                        $job_position_ids = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($job_position_ids as $job_position_id){
                             $check_job_position_exist = $api->check_job_position_exist($job_position_id);
@@ -4467,12 +4467,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position responsibility
         case 'delete job position responsibility':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['responsibility_id']) && !empty($_POST['responsibility_id'])){
-                        $responsibility_id = $_POST['responsibility_id'];
+                        $responsibility_id = htmlspecialchars($_POST['responsibility_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_responsibility_exist = $api->check_job_position_responsibility_exist($responsibility_id);
             
@@ -4501,12 +4501,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position requirement
         case 'delete job position requirement':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['requirement_id']) && !empty($_POST['requirement_id'])){
-                        $requirement_id = $_POST['requirement_id'];
+                        $requirement_id = htmlspecialchars($_POST['requirement_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_requirement_exist = $api->check_job_position_requirement_exist($requirement_id);
             
@@ -4535,12 +4535,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position qualification
         case 'delete job position qualification':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['qualification_id']) && !empty($_POST['qualification_id'])){
-                        $qualification_id = $_POST['qualification_id'];
+                        $qualification_id = htmlspecialchars($_POST['qualification_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_qualification_exist = $api->check_job_position_qualification_exist($qualification_id);
             
@@ -4569,12 +4569,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete job position attachment
         case 'delete job position attachment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['attachment_id']) && !empty($_POST['attachment_id'])){
-                        $attachment_id = $_POST['attachment_id'];
+                        $attachment_id = htmlspecialchars($_POST['attachment_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_attachment_exist = $api->check_job_position_attachment_exist($attachment_id);
             
@@ -4603,12 +4603,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete work location
         case 'delete work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_id = $_POST['work_location_id'];
+                        $work_location_id = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_work_location_exist = $api->check_work_location_exist($work_location_id);
             
@@ -4637,12 +4637,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple work location
         case 'delete multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = $_POST['work_location_id'];
+                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -4679,12 +4679,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete departure reason
         case 'delete departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
-                        $departure_reason_id = $_POST['departure_reason_id'];
+                        $departure_reason_id = htmlspecialchars($_POST['departure_reason_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
             
@@ -4713,12 +4713,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple departure reason
         case 'delete multiple departure reason':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
-                        $departure_reason_ids = $_POST['departure_reason_id'];
+                        $departure_reason_ids = htmlspecialchars($_POST['departure_reason_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($departure_reason_ids as $departure_reason_id){
                             $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
@@ -4755,12 +4755,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete employee type
         case 'delete employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
-                        $employee_type_id = $_POST['employee_type_id'];
+                        $employee_type_id = htmlspecialchars($_POST['employee_type_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
             
@@ -4789,12 +4789,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple employee type
         case 'delete multiple employee type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
-                        $employee_type_ids = $_POST['employee_type_id'];
+                        $employee_type_ids = htmlspecialchars($_POST['employee_type_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($employee_type_ids as $employee_type_id){
                             $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
@@ -4831,12 +4831,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete id type
         case 'delete id type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
-                        $id_type_id = $_POST['id_type_id'];
+                        $id_type_id = htmlspecialchars($_POST['id_type_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_id_type_exist = $api->check_id_type_exist($id_type_id);
             
@@ -4865,12 +4865,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple id type
         case 'delete multiple id type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
-                        $id_type_ids = $_POST['id_type_id'];
+                        $id_type_ids = htmlspecialchars($_POST['id_type_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($id_type_ids as $id_type_id){
                             $check_id_type_exist = $api->check_id_type_exist($id_type_id);
@@ -4907,12 +4907,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete wage type
         case 'delete wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
-                        $wage_type_id = $_POST['wage_type_id'];
+                        $wage_type_id = htmlspecialchars($_POST['wage_type_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
             
@@ -4941,12 +4941,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple wage type
         case 'delete multiple wage type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
-                        $wage_type_ids = $_POST['wage_type_id'];
+                        $wage_type_ids = htmlspecialchars($_POST['wage_type_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($wage_type_ids as $wage_type_id){
                             $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
@@ -4983,12 +4983,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working schedule
         case 'delete working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-                        $working_schedule_id = $_POST['working_schedule_id'];
+                        $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
             
@@ -5025,12 +5025,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple working schedule
         case 'delete multiple working schedule':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-                        $working_schedule_ids = $_POST['working_schedule_id'];
+                        $working_schedule_ids = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($working_schedule_ids as $working_schedule_id){
                             $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
@@ -5075,12 +5075,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working hours
         case 'delete working hours':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
-                        $working_hours_id = $_POST['working_hours_id'];
+                        $working_hours_id = htmlspecialchars($_POST['working_hours_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_working_hours_exist = $api->check_working_hours_exist($working_hours_id);
             
@@ -5109,12 +5109,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete working schedule type
         case 'delete working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
-                        $working_schedule_type_id = $_POST['working_schedule_type_id'];
+                        $working_schedule_type_id = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
             
@@ -5143,12 +5143,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Delete multiple working schedule type
         case 'delete multiple working schedule type':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
-                        $working_schedule_type_ids = $_POST['working_schedule_type_id'];
+                        $working_schedule_type_ids = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($working_schedule_type_ids as $working_schedule_type_id){
                             $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
@@ -5189,12 +5189,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unlock user account
         case 'unlock user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_id = $_POST['user_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
             
@@ -5223,12 +5223,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unlock multiple user account
         case 'unlock multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = $_POST['user_id'];
+                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5269,12 +5269,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Lock user account
         case 'lock user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_id = $_POST['user_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
             
@@ -5303,12 +5303,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Lock multiple user account
         case 'lock multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = $_POST['user_id'];
+                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5349,12 +5349,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate interface setting
         case 'activate interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                        $interface_setting_id = $_POST['interface_setting_id'];
+                        $interface_setting_id = (int) htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
             
@@ -5390,12 +5390,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate email setting
         case 'activate email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                        $email_setting_id = $_POST['email_setting_id'];
+                        $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
             
@@ -5431,12 +5431,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate zoom api
         case 'activate zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                        $zoom_api_id = $_POST['zoom_api_id'];
+                        $zoom_api_id = (int) htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
             
@@ -5472,12 +5472,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate user account
         case 'activate user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_id = $_POST['user_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
             
@@ -5506,12 +5506,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Activate multiple user account
         case 'activate multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = $_POST['user_id'];
+                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5552,12 +5552,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate interface setting
         case 'deactivate interface setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                        $interface_setting_id = $_POST['interface_setting_id'];
+                        $interface_setting_id = (int) htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
             
@@ -5586,12 +5586,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate email setting
         case 'deactivate email setting':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                        $email_setting_id = $_POST['email_setting_id'];
+                        $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
             
@@ -5620,12 +5620,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate zoom api
         case 'deactivate zoom api':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                        $zoom_api_id = $_POST['zoom_api_id'];
+                        $zoom_api_id = (int) htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
             
@@ -5654,12 +5654,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate user account
         case 'deactivate user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_id = $_POST['user_id'];
+                        $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_user_account_exist = $api->check_user_account_exist($user_id);
             
@@ -5688,12 +5688,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Deactivate multiple user account
         case 'deactivate multiple user account':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = $_POST['user_id'];
+                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5734,12 +5734,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive department
         case 'archive department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_id = $_POST['department_id'];
+                        $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_department_exist = $api->check_department_exist($department_id);
             
@@ -5768,12 +5768,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive multiple department
         case 'archive multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = $_POST['department_id'];
+                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -5810,12 +5810,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive work location
         case 'archive work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_id = $_POST['work_location_id'];
+                        $work_location_id = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_work_location_exist = $api->check_work_location_exist($work_location_id);
             
@@ -5844,12 +5844,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Archive multiple work location
         case 'archive multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = $_POST['work_location_id'];
+                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -5890,12 +5890,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive department
         case 'unarchive department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_id = $_POST['department_id'];
+                        $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_department_exist = $api->check_department_exist($department_id);
             
@@ -5924,12 +5924,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive multiple department
         case 'unarchive multiple department':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = $_POST['department_id'];
+                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -5966,12 +5966,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive work location
         case 'unarchive work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_id = $_POST['work_location_id'];
+                        $work_location_id = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_work_location_exist = $api->check_work_location_exist($work_location_id);
             
@@ -6000,12 +6000,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Unarchive multiple work location
         case 'unarchive multiple work location':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = $_POST['work_location_id'];
+                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -6046,12 +6046,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Start job position recruitment
         case 'start job position recruitment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                        $job_position_id = $_POST['job_position_id'];
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_exist = $api->check_job_position_exist($job_position_id);
             
@@ -6084,12 +6084,12 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Stop job position recruitment
         case 'stop job position recruitment':
             if(isset($_POST['username']) && !empty($_POST['username'])){
-                $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $check_user_account_status = $api->check_user_account_status($username);
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                        $job_position_id = $_POST['job_position_id'];
+                        $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
             
                         $check_job_position_exist = $api->check_job_position_exist($job_position_id);
             
@@ -6158,7 +6158,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Module details
         case 'module details':
             if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                $module_id = filter_var($_POST['module_id'], FILTER_SANITIZE_STRING);
+                $module_id = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
 
                 $module_details = $api->get_module_details($module_id);
                 $module_icon_file_path = $module_details[0]['MODULE_ICON'] ?? null;
@@ -6186,7 +6186,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Page details
         case 'page details':
             if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
-                $page_id = filter_var($_POST['page_id'], FILTER_SANITIZE_STRING);
+                $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
 
                 $page_details = $api->get_page_details($page_id);
     
@@ -6204,7 +6204,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Action details
         case 'action details':
             if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
-                $action_id = filter_var($_POST['action_id'], FILTER_SANITIZE_STRING);
+                $action_id = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
 
                 $action_details = $api->get_action_details($action_id);
     
@@ -6221,7 +6221,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # System parameter details
         case 'system parameter details':
             if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
-                $parameter_id = filter_var($_POST['parameter_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $parameter_id = (int) htmlspecialchars($_POST['parameter_id'], ENT_QUOTES, 'UTF-8');
 
                 $system_parameter_details = $api->get_system_parameter_details($parameter_id);
     
@@ -6241,7 +6241,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Role details
         case 'role details':
             if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                $role_id = filter_var($_POST['role_id'], FILTER_SANITIZE_STRING);
+                $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
 
                 $role_details = $api->get_role_details($role_id);
     
@@ -6260,7 +6260,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # System code details
         case 'system code details':
             if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
-                $system_code_id = filter_var($_POST['system_code_id'], FILTER_SANITIZE_STRING);
+                $system_code_id = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
 
                 $system_code_details = $api->get_system_code_details($system_code_id, null, null);
     
@@ -6279,7 +6279,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Upload setting details
         case 'upload setting details':
             if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
-                $upload_setting_id = filter_var($_POST['upload_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $upload_setting_id = (int) htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
 
                 $upload_setting_details = $api->get_upload_setting_details($upload_setting_id);
     
@@ -6298,7 +6298,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Company details
         case 'company details':
             if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
-                $company_id = filter_var($_POST['company_id'], FILTER_SANITIZE_STRING);
+                $company_id = htmlspecialchars($_POST['company_id'], ENT_QUOTES, 'UTF-8');
 
                 $company_details = $api->get_company_details($company_id);
                 $company_logo_file_path = $company_details[0]['COMPANY_LOGO'] ?? null;
@@ -6327,7 +6327,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Interface setting details
         case 'interface setting details':
             if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                $interface_setting_id = filter_var($_POST['interface_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $interface_setting_id = (int) htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
 
                 $interface_setting_details = $api->get_interface_setting_details($interface_setting_id);
                 $login_background_file_path = $interface_setting_details[0]['LOGIN_BACKGROUND'] ?? null;
@@ -6370,7 +6370,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Email setting details
         case 'email setting details':
             if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                $email_setting_id = filter_var($_POST['email_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
 
                 $email_setting_details = $api->get_email_setting_details($email_setting_id);
     
@@ -6398,7 +6398,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Notification setting details
         case 'notification setting details':
             if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
-                $notification_setting_id = filter_var($_POST['notification_setting_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $notification_setting_id = (int) htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
 
                 $notification_setting_details = $api->get_notification_setting_details($notification_setting_id);
     
@@ -6420,7 +6420,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Country details
         case 'country details':
             if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $country_id = (int) htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
 
                 $country_details = $api->get_country_details($country_id);
     
@@ -6437,7 +6437,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # State details
         case 'state details':
             if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
-                $state_id = filter_var($_POST['state_id'], FILTER_VALIDATE_INT, FILTER_SANITIZE_NUMBER_INT);
+                $state_id = (int) htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
                 
                 $state_details = $api->get_state_details($state_id);
     
@@ -6455,7 +6455,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Zoom API details
         case 'zoom api details':
             if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                $zoom_api_id = filter_var($_POST['zoom_api_id'], FILTER_SANITIZE_STRING);
+                $zoom_api_id = htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
 
                 $zoom_api_details = $api->get_zoom_api_details($zoom_api_id);
     
@@ -6476,7 +6476,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # User account details
         case 'user account details':
             if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                $user_id = filter_var($_POST['user_id'], FILTER_SANITIZE_STRING);
+                $user_id = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
 
                 $user_account_details = $api->get_user_account_details($user_id);
                 $password_expiry_date = $user_account_details[0]['PASSWORD_EXPIRY_DATE'];
@@ -6504,7 +6504,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Department details
         case 'department details':
             if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                $department_id = filter_var($_POST['department_id'], FILTER_SANITIZE_STRING);
+                $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
 
                 $department_details = $api->get_department_details($department_id);
     
@@ -6524,7 +6524,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position details
         case 'job position details':
             if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                $job_position_id = filter_var($_POST['job_position_id'], FILTER_SANITIZE_STRING);
+                $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
 
                 $job_position_details = $api->get_job_position_details($job_position_id);
     
@@ -6545,7 +6545,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position responsibility details
         case 'job position responsibility details':
             if(isset($_POST['responsibility_id']) && !empty($_POST['responsibility_id'])){
-                $responsibility_id = filter_var($_POST['responsibility_id'], FILTER_SANITIZE_STRING);
+                $responsibility_id = htmlspecialchars($_POST['responsibility_id'], ENT_QUOTES, 'UTF-8');
 
                 $job_position_responsibility_details = $api->get_job_position_responsibility_details($responsibility_id);
     
@@ -6561,7 +6561,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position requirement details
         case 'job position requirement details':
             if(isset($_POST['requirement_id']) && !empty($_POST['requirement_id'])){
-                $requirement_id = filter_var($_POST['requirement_id'], FILTER_SANITIZE_STRING);
+                $requirement_id = htmlspecialchars($_POST['requirement_id'], ENT_QUOTES, 'UTF-8');
                 
                 $job_position_requirement_details = $api->get_job_position_requirement_details($requirement_id);
     
@@ -6577,7 +6577,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position qualification details
         case 'job position qualification details':
             if(isset($_POST['qualification_id']) && !empty($_POST['qualification_id'])){
-                $qualification_id = filter_var($_POST['qualification_id'], FILTER_SANITIZE_STRING);
+                $qualification_id = htmlspecialchars($_POST['qualification_id'], ENT_QUOTES, 'UTF-8');
 
                 $job_position_qualification_details = $api->get_job_position_qualification_details($qualification_id);
     
@@ -6593,7 +6593,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Job position attachment details
         case 'job position attachment details':
             if(isset($_POST['attachment_id']) && !empty($_POST['attachment_id'])){
-                $attachment_id = filter_var($_POST['attachment_id'], FILTER_SANITIZE_STRING);
+                $attachment_id = htmlspecialchars($_POST['attachment_id'], ENT_QUOTES, 'UTF-8');
 
                 $job_position_attachment_details = $api->get_job_position_attachment_details($attachment_id);
     
@@ -6609,7 +6609,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Work location details
         case 'work location details':
             if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                $work_location_id = filter_var($_POST['work_location_id'], FILTER_SANITIZE_STRING);
+                $work_location_id = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
 
                 $work_location_details = $api->get_work_location_details($work_location_id);
     
@@ -6632,7 +6632,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Departure reason details
         case 'departure reason details':
             if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
-                $departure_reason_id = filter_var($_POST['departure_reason_id'], FILTER_SANITIZE_STRING);
+                $departure_reason_id = htmlspecialchars($_POST['departure_reason_id'], ENT_QUOTES, 'UTF-8');
 
                 $departure_reason_details = $api->get_departure_reason_details($departure_reason_id);
     
@@ -6649,7 +6649,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Employee type details
         case 'employee type details':
             if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
-                $employee_type_id = filter_var($_POST['employee_type_id'], FILTER_SANITIZE_STRING);
+                $employee_type_id = htmlspecialchars($_POST['employee_type_id'], ENT_QUOTES, 'UTF-8');
 
                 $employee_type_details = $api->get_employee_type_details($employee_type_id);
     
@@ -6666,7 +6666,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # ID type details
         case 'id type details':
             if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
-                $id_type_id = filter_var($_POST['id_type_id'], FILTER_SANITIZE_STRING);
+                $id_type_id = htmlspecialchars($_POST['id_type_id'], ENT_QUOTES, 'UTF-8');
 
                 $id_type_details = $api->get_id_type_details($id_type_id);
     
@@ -6683,7 +6683,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Wage type details
         case 'wage type details':
             if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
-                $wage_type_id = filter_var($_POST['wage_type_id'], FILTER_SANITIZE_STRING);
+                $wage_type_id = htmlspecialchars($_POST['wage_type_id'], ENT_QUOTES, 'UTF-8');
 
                 $wage_type_details = $api->get_wage_type_details($wage_type_id);
     
@@ -6700,7 +6700,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Working schedule details
         case 'working schedule details':
             if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-                $working_schedule_id = filter_var($_POST['working_schedule_id'], FILTER_SANITIZE_STRING);
+                $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
 
                 $working_schedule_details = $api->get_working_schedule_details($working_schedule_id);
     
@@ -6718,7 +6718,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Fixed working hours details
         case 'fixed working hours details':
             if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
-                $working_hours_id = filter_var($_POST['working_hours_id'], FILTER_SANITIZE_STRING);
+                $working_hours_id = htmlspecialchars($_POST['working_hours_id'], ENT_QUOTES, 'UTF-8');
 
                 $working_hours_details = $api->get_working_hours_details($working_hours_id);
     
@@ -6738,7 +6738,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Flexible working hours details
         case 'flexible working hours details':
             if(isset($_POST['working_hours_id']) && !empty($_POST['working_hours_id'])){
-                $working_hours_id = filter_var($_POST['working_hours_id'], FILTER_SANITIZE_STRING);
+                $working_hours_id = htmlspecialchars($_POST['working_hours_id'], ENT_QUOTES, 'UTF-8');
 
                 $working_hours_details = $api->get_working_hours_details($working_hours_id);
     
@@ -6758,7 +6758,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Working schedule type details
         case 'working schedule type details':
             if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
-                $working_schedule_type_id = filter_var($_POST['working_schedule_type_id'], FILTER_SANITIZE_STRING);
+                $working_schedule_type_id = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
                 
                 $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type_id);
     

@@ -67,17 +67,15 @@ class Api{
         if ($this->databaseConnection()) {
             $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
 
-            try {
-                exec('C:\xampp\mysql\bin\mysqldump.exe --routines -u '. escapeshellarg(DB_USER) .' -p'. escapeshellarg(DB_PASS) .' '. escapeshellarg(DB_NAME) .' -r '. escapeshellarg($backup_file), $output, $return);
-            } 
-            catch (\Exception $e) {
-                return $e->getMessage();
-            }
-
+            $cmd = sprintf('C:\xampp\mysql\bin\mysqldump.exe --routines --single-transaction -u %s -p%s %s -r %s',
+                escapeshellarg(DB_USER), escapeshellarg(DB_PASS), escapeshellarg(DB_NAME), escapeshellarg($backup_file)
+            );
+            
+            exec($cmd, $output, $return);
+            
             if ($return === 0) {
                 return true;
-            }
-            else {
+            } else {
                 return 'Error: mysqldump command failed with error code ' . $return;
             }
         }

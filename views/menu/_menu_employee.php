@@ -9,6 +9,7 @@
         'working_schedules' => ['id' => '43', 'url' => 'working-schedules.php', 'label' => 'Working Schedules', 'group' => 'Configurations'],
         'working_schedule_types' => ['id' => '43', 'url' => 'working-schedule-types.php', 'label' => 'Working Schedule Types', 'group' => 'Configurations'],
         'id_types' => ['id' => '43', 'url' => 'id-types.php', 'label' => 'ID Types', 'group' => 'Configurations'],
+        'employees' => ['id' => '49', 'url' => 'employees.php', 'label' => 'Employees', 'group' => 'Employees'],
     ];
 
     ksort($menu_pages);
@@ -35,7 +36,7 @@
     if (!empty($employees_menu)) {
         $menu .= '<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="employeesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Employees
+                      Employee Management
                     </a>
                     <div class="dropdown-menu" aria-labelledby="employeesDropdown">' . $employees_menu . '</div>
                   </li>';
