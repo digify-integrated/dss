@@ -80,7 +80,7 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">employees List</h4>
+                                                        <h4 class="card-title">Employees List</h4>
                                                     </div>
                                                     <div class="flex-grow-1 align-self-center">
                                                         <?php
@@ -130,12 +130,44 @@
                                                         </div>
                                                         <div class="offcanvas-body">
                                                             <div class="mb-3">
-                                                                <p class="text-muted">Status</p>
+                                                                <p class="text-muted">Employee Status</p>
 
                                                                 <select class="form-control filter-select2" id="filter_status">
                                                                     <option value="">All</option>
-                                                                    <option value="1">Unarchived</option>
+                                                                    <option value="1" selected>Active</option>
                                                                     <option value="2">Archived</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Department</p>
+
+                                                                <select class="form-control filter-select2" id="filter_department">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_department_options('active'); ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Job Position</p>
+
+                                                                <select class="form-control filter-select2" id="filter_job_position">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_job_position_options('active'); ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Work Location</p>
+
+                                                                <select class="form-control filter-select2" id="filter_work_location">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_work_location_options('active'); ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <p class="text-muted">Employee Type</p>
+
+                                                                <select class="form-control filter-select2" id="filter_employee_type">
+                                                                    <option value="">All</option>
+                                                                    <?php echo $api->generate_employee_type_options(); ?>
                                                                 </select>
                                                             </div>
                                                             <div>
@@ -159,9 +191,9 @@
                                                             <th class="all">Employee</th>
                                                             <th class="all">Department</th>
                                                             <th class="all">Job Position</th>
+                                                            <th class="all">Work Location</th>
                                                             <th class="all">Status</th>
                                                             <th class="all">Employee Type</th>
-                                                            <th class="all">Employees</th>
                                                             <th class="all">View</th>
                                                         </tr>
                                                     </thead>

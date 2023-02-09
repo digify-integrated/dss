@@ -9422,6 +9422,104 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_employee_details
+    # Purpose    : Gets the employee details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_employee_details($employee_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_employee_details(:employee_id)');
+            $sql->bindValue(':employee_id', $employee_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'USERNAME' => $row['USERNAME'],
+                        'BADGE_ID' => $row['BADGE_ID'],
+                        'EMPLOYEE_IMAGE' => $row['EMPLOYEE_IMAGE'],
+                        'EMPLOYEE_DIGITAL_SIGNATURE' => $row['EMPLOYEE_DIGITAL_SIGNATURE'],
+                        'COMPANY' => $row['COMPANY'],
+                        'JOB_POSITION' => $row['JOB_POSITION'],
+                        'DEPARTMENT' => $row['DEPARTMENT'],
+                        'WORK_LOCATION' => $row['WORK_LOCATION'],
+                        'WORKING_HOURS' => $row['WORKING_HOURS'],
+                        'MANAGER' => $row['MANAGER'],
+                        'COACH' => $row['COACH'],
+                        'EMPLOYEE_TYPE' => $row['EMPLOYEE_TYPE'],
+                        'EMPLOYEE_STATUS' => $row['EMPLOYEE_STATUS'],
+                        'PERMANENCY_DATE' => $row['PERMANENCY_DATE'],
+                        'ONBOARD_DATE' => $row['ONBOARD_DATE'],
+                        'OFFBOARD_DATE' => $row['OFFBOARD_DATE'],
+                        'DEPARTURE_REASON' => $row['DEPARTURE_REASON'],
+                        'DETAILED_REASON' => $row['DETAILED_REASON'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_employee_personal_information_details
+    # Purpose    : Gets the employee personal information details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_employee_personal_information_details($employee_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_employee_personal_information_details(:employee_id)');
+            $sql->bindValue(':employee_id', $employee_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'FILE_AS' => $row['FILE_AS'],
+                        'FIRST_NAME' => $row['FIRST_NAME'],
+                        'MIDDLE_NAME' => $row['MIDDLE_NAME'],
+                        'LAST_NAME' => $row['LAST_NAME'],
+                        'SUFFIX' => $row['SUFFIX'],
+                        'NICKNAME' => $row['NICKNAME'],
+                        'CIVIL_STATUS' => $row['CIVIL_STATUS'],
+                        'NATIONALITY' => $row['NATIONALITY'],
+                        'WORKING_HOURS' => $row['WORKING_HOURS'],
+                        'GENDER' => $row['GENDER'],
+                        'BIRTHDAY' => $row['BIRTHDAY'],
+                        'PLACE_OF_BIRTH' => $row['PLACE_OF_BIRTH'],
+                        'BLOOD_TYPE' => $row['BLOOD_TYPE'],
+                        'HEIGHT' => $row['HEIGHT'],
+                        'WEIGHT' => $row['WEIGHT'],
+                        'RELIGION' => $row['RELIGION'],
+                        'CITIZENSHIP' => $row['CITIZENSHIP'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
 
@@ -9755,6 +9853,27 @@ class Api{
                 return $stmt->errorInfo()[2];
             }
         }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_employee_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_employee_status($stat){
+        $status = ($stat === 1) ? 'Active' : 'Archived';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
+        );
+
+        return $response;
     }
     # -------------------------------------------------------------
 

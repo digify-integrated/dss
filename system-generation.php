@@ -2674,6 +2674,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     else if($type == 'user accounts table'){
         if(isset($_POST['filter_user_account_lock_status']) && isset($_POST['filter_user_account_status']) && isset($_POST['filter_start_date']) && isset($_POST['filter_end_date']) && isset($_POST['filter_last_connection_start_date']) && isset($_POST['filter_last_connection_end_date'])){
             if ($api->databaseConnection()) {
+                $filter = [];
                 $filter_user_account_lock_status = $_POST['filter_user_account_lock_status'];
                 $filter_user_account_status = $_POST['filter_user_account_status'];
                 $filter_last_connection_start_date = $api->check_date('empty', $_POST['filter_last_connection_start_date'], '', 'Y-m-d', '', '', '');
@@ -2683,50 +2684,43 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
                 $query = 'SELECT USERNAME, FILE_AS, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_CONNECTION_DATE, TRANSACTION_LOG_ID FROM global_user_account';
 
-                if((!empty($filter_start_date) && !empty($filter_end_date)) || (!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)) || $filter_user_account_status != '' || !empty($filter_user_account_lock_status)){
-                    $query .= ' WHERE ';
+                if(!empty($filter_start_date) && !empty($filter_end_date)){
+                    $filter[] = 'PASSWORD_EXPIRY_DATE BETWEEN :filter_start_date AND :filter_end_date';
+                }
+                
+                if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
+                    $filter[] = 'LAST_CONNECTION_DATE BETWEEN :filter_last_connection_start_date AND :filter_last_connection_end_date';
+                }
 
-                    if(!empty($filter_start_date) && !empty($filter_end_date)){
-                        $filter[] = 'PASSWORD_EXPIRY_DATE BETWEEN :filter_start_date AND :filter_end_date';
-                    }
+                if($filter_user_account_lock_status == 'locked'){
+                    $filter[] = 'FAILED_LOGIN >= 5';
+                }
+                else {
+                    $filter[] = 'FAILED_LOGIN < 5';
+                }
 
-                    if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
-                        $filter[] = 'LAST_CONNECTION_DATE BETWEEN :filter_last_connection_start_date AND :filter_last_connection_end_date';
-                    }
-
-                    if($filter_user_account_lock_status == 'locked'){
-                        $filter[] = 'FAILED_LOGIN >= 5';
-                    }
-                    else {
-                        $filter[] = 'FAILED_LOGIN < 5';
-                    }
-
-                    if($filter_user_account_status != ''){
-                        $filter[] = 'USER_STATUS = :filter_user_account_status';
-                    }
-
-                    if(!empty($filter)){
-                        $query .= implode(' AND ', $filter);
-                    }
+                if($filter_user_account_status != ''){
+                    $filter[] = 'USER_STATUS = :filter_user_account_status';
+                }
+                
+                if(!empty($filter)) {
+                    $query .= ' WHERE ' . implode(' AND ', $filter);
                 }
     
                 $sql = $api->db_connection->prepare($query);
 
-                if((!empty($filter_start_date) && !empty($filter_end_date)) || (!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)) || $filter_user_account_status != ''){
+                if(!empty($filter_start_date) && !empty($filter_end_date)){
+                    $sql->bindValue(':filter_start_date', $filter_start_date);
+                    $sql->bindValue(':filter_end_date', $filter_end_date);
+                }
 
-                    if(!empty($filter_start_date) && !empty($filter_end_date)){
-                        $sql->bindValue(':filter_start_date', $filter_start_date);
-                        $sql->bindValue(':filter_end_date', $filter_end_date);
-                    }
+                if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
+                    $sql->bindValue(':filter_last_connection_start_date', $filter_last_connection_start_date);
+                    $sql->bindValue(':filter_last_connection_end_date', $filter_last_connection_end_date);
+                }
 
-                    if(!empty($filter_last_connection_start_date) && !empty($filter_last_connection_end_date)){
-                        $sql->bindValue(':filter_last_connection_start_date', $filter_last_connection_start_date);
-                        $sql->bindValue(':filter_last_connection_end_date', $filter_last_connection_end_date);
-                    }
-
-                    if($filter_user_account_status != ''){
-                        $sql->bindValue(':filter_user_account_status', $filter_user_account_status);
-                    }
+                if($filter_user_account_status != ''){
+                    $sql->bindValue(':filter_user_account_status', $filter_user_account_status);
                 }
     
                 if($sql->execute()){
@@ -2928,37 +2922,32 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     else if($type == 'job positions table'){
         if(isset($_POST['filter_status']) || isset($_POST['filter_department'])){
             if ($api->databaseConnection()) {
+                $filter = [];
                 $filter_status = $_POST['filter_status'];
                 $filter_department = $_POST['filter_department'];
 
                 $query = 'SELECT JOB_POSITION_ID, JOB_POSITION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES FROM employee_job_position';
 
-                if(!empty($filter_status) || !empty($filter_department)){
-                    $query .= ' WHERE ';
-
-                    if(!empty($filter_status)){
-                        $filter[] = 'RECRUITMENT_STATUS = :filter_status';
-                    }
-
-                    if(!empty($filter_department)){
-                        $filter[] = 'DEPARTMENT = :filter_department';
-                    }
-
-                    if(!empty($filter)){
-                        $query .= implode(' AND ', $filter);
-                    }
+                if(!empty($filter_status)) {
+                    $filter[] = ' RECRUITMENT_STATUS = :filter_status';
+                }
+                
+                if(!empty($filter_department)) {
+                    $filter[] = ' DEPARTMENT = :filter_department';
+                }
+                
+                if(!empty($filter)) {
+                    $query .= ' WHERE ' . implode(' AND ', $filter);
                 }
     
                 $sql = $api->db_connection->prepare($query);
 
-                if(!empty($filter_status) || !empty($filter_department)){
-                    if(!empty($filter_status)){
-                        $sql->bindValue(':filter_status', $filter_status);
-                    }
-
-                    if(!empty($filter_department)){
-                        $sql->bindValue(':filter_department', $filter_department);
-                    }
+                if(!empty($filter_status)) {
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+                
+                if(!empty($filter_department)){
+                    $sql->bindValue(':filter_department', $filter_department);
                 }
     
                 if($sql->execute()){
@@ -3582,6 +3571,118 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_category_name,
                             'VIEW' => '<div class="d-flex gap-2">
                                             <a href="working-schedule-type-form.php?id='. $working_schedule_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule Type">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Employees table
+    else if($type == 'employees table'){
+        if(isset($_POST['filter_status']) && isset($_POST['filter_department']) && isset($_POST['filter_job_position']) && isset($_POST['filter_work_location']) && isset($_POST['filter_employee_type'])){
+            if ($api->databaseConnection()) {
+                $filter = [];
+                $filter_status = $_POST['filter_status'];
+                $filter_department = $_POST['filter_department'];
+                $filter_job_position = $_POST['filter_job_position'];
+                $filter_work_location = $_POST['filter_work_location'];
+                $filter_employee_type = $_POST['filter_employee_type'];
+
+                $query = 'SELECT EMPLOYEE_ID, JOB_POSITION, DEPARTMENT, WORK_LOCATION, EMPLOYEE_STATUS, EMPLOYEE_TYPE FROM employees';
+
+                if(!empty($filter_status)) {
+                    $filter[] = ' EMPLOYEE_STATUS = :filter_status';
+                }
+                
+                if(!empty($filter_department)) {
+                    $filter[] = ' DEPARTMENT = :filter_department';
+                }
+                
+                if(!empty($filter_job_position)) {
+                    $filter[] = ' JOB_POSITION = :filter_job_position';
+                }
+                
+                if(!empty($filter_work_location)) {
+                    $filter[] = ' WORK_LOCATION = :filter_work_location';
+                }
+                
+                if(!empty($filter_employee_type)) {
+                    $filter[] = ' EMPLOYEE_TYPE = :filter_employee_type';
+                }
+                
+                if(!empty($filter)) {
+                    $query .= ' WHERE ' . implode(' AND ', $filter);
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_status)) {
+                    $sql->bindValue(':filter_status', $filter_status);
+                }
+                
+                if(!empty($filter_department)) {
+                    $sql->bindValue(':filter_department', $filter_department);
+                }
+                
+                if(!empty($filter_job_position)) {
+                    $sql->bindValue(':filter_job_position', $filter_job_position);
+                }
+                
+                if(!empty($filter_work_location)) {
+                    $sql->bindValue(':filter_work_location', $filter_work_location);
+                }
+                
+                if(!empty($filter_employee_type)) {
+                    $sql->bindValue(':filter_employee_type', $filter_employee_type);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $employee_id = $row['EMPLOYEE_ID'];
+                        $job_position = $row['JOB_POSITION'];
+                        $department = $row['DEPARTMENT'];
+                        $work_location = $row['WORK_LOCATION'];
+                        $employee_status = $row['EMPLOYEE_STATUS'];
+                        $employee_type = $row['EMPLOYEE_TYPE'];
+
+                        $employee_personal_information_details = $api->get_employee_personal_information_details($employee_id);
+                        $job_position_details = $api->get_job_position_details($job_position);
+                        $department_details = $api->get_department_details($department);
+                        $work_location_details = $api->get_work_location_details($work_location);
+                        $employee_type_details = $api->get_employee_type_details($employee_type);
+
+                        $status = $api->get_employee_status($employee_status)[0]['BADGE'];
+
+                        $employee_id_encrypted = $api->encrypt_data($employee_id);
+
+                        if($status == 1){
+                            $data_archive = '1';
+                        }
+                        else{
+                            $data_archive = '0';
+                        }
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $employee_id .'">',
+                            'EMPLOYEE_ID' =>  $employee_id,
+                            'FILE_AS' => $employee_personal_information_details[0]['FILE_AS'],
+                            'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
+                            'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
+                            'WORK_LOCATION' => $work_location_details[0]['WORK_LOCATION'],
+                            'EMPLOYEE_STATUS' => $status,
+                            'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="employee-form.php?id='. $employee_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee">
                                                 <i class="bx bx-show font-size-16 align-middle"></i>
                                             </a>
                                         </div>'
