@@ -1567,9 +1567,6 @@ CREATE TABLE global_zoom_api(
 
 CREATE INDEX global_zoom_api_index ON global_zoom_api(ZOOM_API_ID);
 
-DELIMITER //
-DROP PROCEDURE check_zoom_api_exist //
-
 CREATE PROCEDURE check_zoom_api_exist(IN zoom_api_id INT(50))
 BEGIN
 	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_zoom_api WHERE ZOOM_API_ID = ?';
@@ -1657,7 +1654,7 @@ CREATE TABLE employees(
 	MANAGER VARCHAR(100),
 	COACH VARCHAR(100),
 	EMPLOYEE_TYPE VARCHAR(100) NOT NULL,
-	EMPLOYEE_STATUS VARCHAR(100) NOT NULL,
+	EMPLOYEE_STATUS TINYINT(1) NOT NULL,
 	PERMANENCY_DATE DATE,
 	ONBOARD_DATE DATE NOT NULL,
 	OFFBOARD_DATE DATE,
@@ -1669,30 +1666,137 @@ CREATE TABLE employees(
 
 CREATE INDEX employees_index ON employees(EMPLOYEE_ID);
 
+CREATE PROCEDURE check_employee_exist(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employees WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee(IN employee_id VARCHAR(100), IN badge_id VARCHAR(100), IN company VARCHAR(50), IN job_position VARCHAR(50), IN department VARCHAR(50), IN work_location VARCHAR(50), IN working_hours VARCHAR(50), IN manager VARCHAR(100), IN coach VARCHAR(100), IN employee_type VARCHAR(100), IN permanency_date DATE, IN onboard_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employees SET BADGE_ID = ?, COMPANY = ?, JOB_POSITION = ?, DEPARTMENT = ?, WORK_LOCATION = ?, WORKING_HOURS = ?, MANAGER = ?, COACH = ?, EMPLOYEE_TYPE = ?, PERMANENCY_DATE = ?, ONBOARD_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING badge_id, company, job_position, department, work_location, working_hours, manager, coach, employee_type, permanency_date, onboard_date, transaction_log_id, record_log, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_status(IN employee_id VARCHAR(100), IN employee_status TINYINT(1), IN offboard_date DATE, IN departure_reason VARCHAR(50), IN details_reason VARCHAR(500), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employees SET EMPLOYEE_STATUS = ?, OFFBOARD_DATE = ?, DEPARTURE_REASON = ?, DETAILED_REASON = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_status, offboard_date, departure_reason, details_reason, record_log, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_image(IN employee_id VARCHAR(100), IN employee_image VARCHAR(500))
+BEGIN
+	SET @query = 'UPDATE employees SET EMPLOYEE_IMAGE = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_image, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_digital_signature(IN employee_id VARCHAR(100), IN employee_digital_signature VARCHAR(500))
+BEGIN
+	SET @query = 'UPDATE employees SET EMPLOYEE_DIGITAL_SIGNATURE = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_digital_signature, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee(IN employee_id VARCHAR(100), IN badge_id VARCHAR(100), IN company VARCHAR(50), IN job_position VARCHAR(50), IN department VARCHAR(50), IN work_location VARCHAR(50), IN working_hours VARCHAR(50), IN manager VARCHAR(100), IN coach VARCHAR(100), IN employee_type VARCHAR(100), IN permanency_date DATE, IN onboard_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employees (EMPLOYEE_ID, BADGE_ID, COMPANY, JOB_POSITION, DEPARTMENT, WORK_LOCATION, WORKING_HOURS, MANAGER, COACH, EMPLOYEE_TYPE, EMPLOYEE_STATUS, PERMANENCY_DATE, ONBOARD_DATE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "1", ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id, badge_id, company, job_position, department, work_location, working_hours, manager, coach, employee_type, permanency_date, onboard_date, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_details(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT USERNAME, BADGE_ID, EMPLOYEE_IMAGE, EMPLOYEE_DIGITAL_SIGNATURE, COMPANY, JOB_POSITION, DEPARTMENT, WORK_LOCATION, WORKING_HOURS, MANAGER, COACH, EMPLOYEE_TYPE, EMPLOYEE_STATUS, PERMANENCY_DATE, ONBOARD_DATE, OFFBOARD_DATE, DEPARTURE_REASON, DETAILED_REASON, TRANSACTION_LOG_ID, RECORD_LOG FROM employees WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employees WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Employee Personal Information */
 CREATE TABLE employee_personal_information(
 	EMPLOYEE_ID VARCHAR(100) NOT NULL,
 	FILE_AS VARCHAR(350) NOT NULL,
-	FIRST_NAME VARCHAR(100) NOT NULL,
-	MIDDLE_NAME VARCHAR(100) NOT NULL,
-	LAST_NAME VARCHAR(100) NOT NULL,
-	SUFFIX VARCHAR(5),
+	FIRST_NAME VARCHAR(100) NOT NULL,/
+	MIDDLE_NAME VARCHAR(100) NOT NULL,/
+	LAST_NAME VARCHAR(100) NOT NULL,/
+	SUFFIX VARCHAR(20),
 	NICKNAME VARCHAR(20),
 	CIVIL_STATUS VARCHAR(20),
 	NATIONALITY VARCHAR(20),
 	GENDER VARCHAR(20),
-	BIRTH_PLACE VARCHAR(1000),
 	BIRTHDAY DATE,
 	PLACE_OF_BIRTH VARCHAR(500),
-	BLOOD_TYPE VARCHAR(5),
-	HEIGHT VARCHAR(10),
-	WEIGHT VARCHAR(10),
+	BLOOD_TYPE VARCHAR(20),
+	HEIGHT DOUBLE,
+	WEIGHT DOUBLE,
 	RELIGION VARCHAR(20),
 	CITIZENSHIP VARCHAR(20),
 	RECORD_LOG VARCHAR(100)
 );
 
 CREATE INDEX employee_personal_information_index ON employee_personal_information(EMPLOYEE_ID);
+
+CREATE PROCEDURE update_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN citizenship VARCHAR(20), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_personal_information SET FILE_AS = ?, FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, SUFFIX = ?, NICKNAME = ?, CIVIL_STATUS = ?, NATIONALITY = ?, GENDER = ?, BIRTHDAY = ?, PLACE_OF_BIRTH = ?, BLOOD_TYPE = ?, HEIGHT = ?, WEIGHT = ?, RELIGION = ?, CITIZENSHIP = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, citizenship, record_log, employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN citizenship VARCHAR(20), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_personal_information (EMPLOYEE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, CITIZENSHIP, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id, file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, citizenship, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_personal_information_details(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, CITIZENSHIP, RECORD_LOG FROM employee_personal_information WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_personal_information(IN employee_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_personal_information WHERE EMPLOYEE_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Training Seminars */
 CREATE TABLE employee_training_seminars(
@@ -2404,6 +2508,8 @@ CREATE PROCEDURE generate_work_location_options(IN generation_type VARCHAR(10))
 BEGIN
 	IF generation_type = 'active' THEN
 		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "1" ORDER BY WORK_LOCATION';
+	ELSEIF generation_type = 'inactive' THEN
+		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location WHERE STATUS = "2" ORDER BY WORK_LOCATION';
 	ELSE
 		SET @query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION FROM employee_work_location ORDER BY WORK_LOCATION';
     END IF;
