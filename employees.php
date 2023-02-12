@@ -151,7 +151,7 @@
 
                                                                 <select class="form-control filter-select2" id="filter_job_position">
                                                                     <option value="">All</option>
-                                                                    <?php echo $api->generate_job_position_options('active'); ?>
+                                                                    <?php echo $api->generate_job_position_options('all'); ?>
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">

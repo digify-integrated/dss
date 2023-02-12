@@ -89,12 +89,24 @@ function initialize_global_functions(){
             validate: true
         });
     }
+
+    if ($('.form-date-picker').length) {
+        $('.form-date-picker').datepicker({
+            orientation: 'auto top'
+        });
+    }
+
+    if ($('.birthday-date-picker').length) {
+        $('.birthday-date-picker').datepicker({
+            orientation: 'auto top',
+            endDate: new Date()
+        });
+    }
 }
 
 function initialize_elements(){
     var form_max_length = $('.form-maxlength');
     var formSelect2 = $('.form-select2');
-    var birthdayDatePicker = $('.birthday-date-picker');
 
     if (form_max_length.length) {
         form_max_length.maxlength({
@@ -112,12 +124,6 @@ function initialize_elements(){
 
         formSelect2.on('select2:close', function (e) {  
             $(this).valid(); 
-        });
-    }
-
-    if (birthdayDatePicker.length) {
-        birthdayDatePicker.datepicker({
-            endDate: '-18y'
         });
     }
 }

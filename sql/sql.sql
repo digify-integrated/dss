@@ -1025,6 +1025,15 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
+CREATE PROCEDURE generate_company_options()
+BEGIN
+	SET @query = 'SELECT COMPANY_ID, COMPANY_NAME FROM global_company ORDER BY COMPANY_NAME';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+END //
+
 /* Global Interface Setting */
 CREATE TABLE global_interface_setting(
 	INTERFACE_SETTING_ID INT(50) PRIMARY KEY,
@@ -1745,44 +1754,43 @@ CREATE TABLE employee_personal_information(
 	FIRST_NAME VARCHAR(100) NOT NULL,/
 	MIDDLE_NAME VARCHAR(100) NOT NULL,/
 	LAST_NAME VARCHAR(100) NOT NULL,/
-	SUFFIX VARCHAR(20),
-	NICKNAME VARCHAR(20),
-	CIVIL_STATUS VARCHAR(20),
-	NATIONALITY VARCHAR(20),
-	GENDER VARCHAR(20),
-	BIRTHDAY DATE,
-	PLACE_OF_BIRTH VARCHAR(500),
-	BLOOD_TYPE VARCHAR(20),
-	HEIGHT DOUBLE,
-	WEIGHT DOUBLE,
+	SUFFIX VARCHAR(20),/
+	NICKNAME VARCHAR(20),/
+	CIVIL_STATUS VARCHAR(20),/
+	NATIONALITY VARCHAR(20), /
+	GENDER VARCHAR(20), /
+	BIRTHDAY DATE,/
+	PLACE_OF_BIRTH VARCHAR(500),/
+	BLOOD_TYPE VARCHAR(20),/
+	HEIGHT DOUBLE,/
+	WEIGHT DOUBLE,/
 	RELIGION VARCHAR(20),
-	CITIZENSHIP VARCHAR(20),
 	RECORD_LOG VARCHAR(100)
 );
 
 CREATE INDEX employee_personal_information_index ON employee_personal_information(EMPLOYEE_ID);
 
-CREATE PROCEDURE update_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN citizenship VARCHAR(20), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'UPDATE employee_personal_information SET FILE_AS = ?, FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, SUFFIX = ?, NICKNAME = ?, CIVIL_STATUS = ?, NATIONALITY = ?, GENDER = ?, BIRTHDAY = ?, PLACE_OF_BIRTH = ?, BLOOD_TYPE = ?, HEIGHT = ?, WEIGHT = ?, RELIGION = ?, CITIZENSHIP = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
+	SET @query = 'UPDATE employee_personal_information SET FILE_AS = ?, FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, SUFFIX = ?, NICKNAME = ?, CIVIL_STATUS = ?, NATIONALITY = ?, GENDER = ?, BIRTHDAY = ?, PLACE_OF_BIRTH = ?, BLOOD_TYPE = ?, HEIGHT = ?, WEIGHT = ?, RELIGION = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, citizenship, record_log, employee_id;
+	EXECUTE stmt USING file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, record_log, employee_id;
 	DEALLOCATE PREPARE stmt;
 END //
 
-CREATE PROCEDURE insert_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN citizenship VARCHAR(20), IN record_log VARCHAR(100))
+CREATE PROCEDURE insert_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'INSERT INTO employee_personal_information (EMPLOYEE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, CITIZENSHIP, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+	SET @query = 'INSERT INTO employee_personal_information (EMPLOYEE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING employee_id, file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, citizenship, record_log;
+	EXECUTE stmt USING employee_id, file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, record_log;
 	DEALLOCATE PREPARE stmt;
 END //
 
 CREATE PROCEDURE get_employee_personal_information_details(IN employee_id VARCHAR(100))
 BEGIN
-	SET @query = 'SELECT FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, CITIZENSHIP, RECORD_LOG FROM employee_personal_information WHERE EMPLOYEE_ID = ?';
+	SET @query = 'SELECT FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, RECORD_LOG FROM employee_personal_information WHERE EMPLOYEE_ID = ?';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt USING employee_id;
@@ -1795,6 +1803,21 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt USING employee_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_employee_options(IN generation_type VARCHAR(10))
+BEGIN
+	IF generation_type = 'active' THEN
+		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE STATUS = "1") ORDER BY FILE_AS';
+	ELSEIF generation_type = 'archived' THEN
+		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE STATUS = "2") ORDER BY FILE_AS';
+	ELSE
+		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information ORDER BY FILE_AS';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
 END //
 

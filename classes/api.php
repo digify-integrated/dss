@@ -9505,7 +9505,6 @@ class Api{
                         'HEIGHT' => $row['HEIGHT'],
                         'WEIGHT' => $row['WEIGHT'],
                         'RELIGION' => $row['RELIGION'],
-                        'CITIZENSHIP' => $row['CITIZENSHIP'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );
                 }
@@ -10208,6 +10207,41 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : generate_company_options
+    # Purpose    : Generates company options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_company_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_company_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $company_id = $row['COMPANY_ID'];
+                        $company_name = $row['COMPANY_NAME'];
+    
+                        $option .= "<option value='". htmlspecialchars($company_id, ENT_QUOTES) ."'>". htmlspecialchars($company_name, ENT_QUOTES) ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : generate_country_options
     # Purpose    : Generates country options of dropdown.
     #
@@ -10229,6 +10263,42 @@ class Api{
                         $country_name = $row['COUNTRY_NAME'];
     
                         $option .= "<option value='". htmlspecialchars($country_id, ENT_QUOTES) ."'>". htmlspecialchars($country_name, ENT_QUOTES) ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_employee_options
+    # Purpose    : Generates employee options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_employee_options($generation_type){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_department_options(:generation_type)');
+            $sql->bindValue(':generation_type', $generation_type);
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $employee_id = $row['EMPLOYEE_ID'];
+                        $file_as = $row['FILE_AS'];
+    
+                        $option .= "<option value='". htmlspecialchars($employee_id, ENT_QUOTES) ."'>". htmlspecialchars($file_as, ENT_QUOTES) ."</option>";
                     }
     
                     return $option;
