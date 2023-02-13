@@ -10287,7 +10287,7 @@ class Api{
         if ($this->databaseConnection()) {
             $option = '';
             
-            $sql = $this->db_connection->prepare('CALL generate_department_options(:generation_type)');
+            $sql = $this->db_connection->prepare('CALL generate_employee_options(:generation_type)');
             $sql->bindValue(':generation_type', $generation_type);
 
             if($sql->execute()){

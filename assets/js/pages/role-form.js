@@ -98,25 +98,38 @@
                     required: 'Please enter the role description',
                 }
             },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
+            errorPlacement: function(label) {                
+                toastr.error(label.text(), 'Validation Error', {
+                    closeButton: false,
+                    debug: false,
+                    newestOnTop: true,
+                    progressBar: true,
+                    positionClass: 'toast-top-right',
+                    preventDuplicates: true,
+                    showDuration: 300,
+                    hideDuration: 1000,
+                    timeOut: 3000,
+                    extendedTimeOut: 3000,
+                    showEasing: 'swing',
+                    hideEasing: 'linear',
+                    showMethod: 'fadeIn',
+                    hideMethod: 'fadeOut'
+                });
             },
             highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next().find('.select2-selection').addClass('is-invalid');
+                } 
+                else {
+                    $(element).addClass('is-invalid');
+                }
             },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
+            unhighlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next().find('.select2-selection').removeClass('is-invalid');
+                } else {
+                    $(element).removeClass('is-invalid');
+                }
             }
         });
 

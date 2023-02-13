@@ -1809,9 +1809,9 @@ END //
 CREATE PROCEDURE generate_employee_options(IN generation_type VARCHAR(10))
 BEGIN
 	IF generation_type = 'active' THEN
-		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE STATUS = "1") ORDER BY FILE_AS';
+		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE EMPLOYEE_STATUS = "1") ORDER BY FILE_AS';
 	ELSEIF generation_type = 'archived' THEN
-		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE STATUS = "2") ORDER BY FILE_AS';
+		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information WHERE EMPLOYEE_ID IN (SELECT EMPLOYEE_ID FROM employees WHERE EMPLOYEE_STATUS = "2") ORDER BY FILE_AS';
 	ELSE
 		SET @query = 'SELECT EMPLOYEE_ID, FILE_AS FROM employee_personal_information ORDER BY FILE_AS';
     END IF;

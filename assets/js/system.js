@@ -72,7 +72,9 @@ function initialize_global_functions(){
     });
 
     if ($('.select2').length) {
-        $('.select2').select2();
+        $('.select2').select2({}).on("change", function (e) {
+            $(this).valid()
+        });
     }
 
     if ($('.filter-select2').length) {
@@ -93,14 +95,18 @@ function initialize_global_functions(){
     if ($('.form-date-picker').length) {
         $('.form-date-picker').datepicker({
             orientation: 'auto top'
-        });
+        }).on('change', function (e) {
+            $(this).valid()
+        });;
     }
 
     if ($('.birthday-date-picker').length) {
         $('.birthday-date-picker').datepicker({
             orientation: 'auto top',
             endDate: new Date()
-        });
+        }).on('change', function (e) {
+            $(this).valid()
+        });;
     }
 }
 
