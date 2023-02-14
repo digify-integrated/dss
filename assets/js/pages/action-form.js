@@ -72,7 +72,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -212,6 +213,43 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     const username = $('#username').text();
 
+    $(document).on('click','#delete-action',() => {
+        const action_id = $('#action-id').text();
+        const transaction = 'delete action';
+
+        Swal.fire({
+            title: 'Delete Action',
+            text: 'Are you sure you want to delete this action?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, action_id : action_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success');
+                        }
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
+                        }
+                        else{
+                            show_toastr('Delete Action Error', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
     $(document).on('click','#add-action-access',() => {
         generate_modal('action access form', 'Action Access', 'LG' , '1', '1', 'form', 'action-access-form', '1', username);
     });
@@ -261,48 +299,6 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-action',() => {
-        const action_id = $('#action-id').text();
-        const transaction = 'delete action';
-
-        Swal.fire({
-            title: 'Delete Action',
-            text: 'Are you sure you want to delete this action?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, action_id : action_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success');
-                            }
-                            else{
-                                window.location.href = '404.php';
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = 'logout.php?logout';
-                        }
-                        else{
-                            show_toastr('Delete Action Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
     $(document).on('click','#discard-create',() => {
         Swal.fire({
             title: 'Discard Changes',
@@ -316,7 +312,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'actions.php';
+                window.location = 'actions.php';
             }
         });
     });

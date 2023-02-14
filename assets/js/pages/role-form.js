@@ -3,44 +3,23 @@
 
     $(function() {
         if($('#role-id').length){
-            const transaction = 'role details';
-            const role_id = $('#role-id').text();
+            display_details();
 
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {role_id : role_id, transaction : transaction},
-                success: function(response) {
-                    $('#role').val(response[0].ROLE);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#role_description').val(response[0].ROLE_DESCRIPTION);
-                    $('#role_id').val(role_id);
+            if($('#module-access-datatable').length){
+                initialize_role_module_access_table('#module-access-datatable');
+            }
 
-                    check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
-                },
-                complete: function(){
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
+            if($('#page-access-datatable').length){
+                initialize_role_page_access_table('#page-access-datatable');
+            }
 
-                    if($('#module-access-datatable').length){
-                        initialize_role_module_access_table('#module-access-datatable');
-                    }
+            if($('#action-access-datatable').length){
+                initialize_role_action_access_table('#action-access-datatable');
+            }
 
-                    if($('#page-access-datatable').length){
-                        initialize_role_page_access_table('#page-access-datatable');
-                    }
-
-                    if($('#action-access-datatable').length){
-                        initialize_role_action_access_table('#action-access-datatable');
-                    }
-
-                    if($('#user-account-datatable').length){
-                        initialize_role_user_account_table('#user-account-datatable');
-                    }
-                }
-            });
+            if($('#user-account-datatable').length){
+                initialize_role_user_account_table('#user-account-datatable');
+            }
         }
 
         $('#role-form').validate({
@@ -58,21 +37,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['ROLE_ID'];
-
-                                show_alert_event('Insert Role Success', 'The role has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Role Success', 'The role has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['ROLE_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The role has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Role Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Role Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -99,22 +77,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Form Submission Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -127,7 +90,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -137,62 +101,23 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'role details';
+    const role_id = $('#role-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {role_id : role_id, transaction : transaction},
+        success: function(response) {
+            $('#role').val(response[0].ROLE);
+            $('#role_description').val(response[0].ROLE_DESCRIPTION);
+            $('#role_id').val(role_id);
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_role_module_access_table(datatable_name, buttons = false, show_all = false){
@@ -651,19 +576,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete Role Success', 'The role has been deleted.', 'success', 'redirect', 'roles.php');
-                            }
-                            else{
-                                show_alert_event('Delete Role Error', 'The role does not exist.', 'info', 'redirect', 'roles.php');
-                            }
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Role Successful', 'The role has been deleted successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete Role Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Role', response, 'error');
+                            show_toastr('Delete Role Error', response, 'error');
                         }
                     }
                 });
@@ -712,19 +632,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Module Access Success', 'The module access has been deleted.', 'success');
+                                show_toastr('Delete Module Access Successful', 'The module access has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Module Access Error', 'The module access does not exist.', 'info');
+                                show_toastr('Delete Module Access Error', 'The module access does not exist.', 'warning');
                             }
 
                             reload_datatable('#module-access-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Module Access Error', response, 'error');
+                            show_toastr('Delete Module Access Error', response, 'error');
                         }
                     }
                 });
@@ -757,19 +677,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Page Access Success', 'The page access has been deleted.', 'success');
+                                show_toastr('Delete Page Access Successful', 'The page access has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Page Access Error', 'The page access does not exist.', 'info');
+                                show_toastr('Delete Page Access Error', 'The page access does not exist.', 'warning');
                             }
 
                             reload_datatable('#page-access-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Page Access Error', response, 'error');
+                            show_toastr('Delete Page Access Error', response, 'error');
                         }
                     }
                 });
@@ -802,19 +722,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Action Access Success', 'The action access has been deleted.', 'success');
+                                show_toastr('Delete Action Access Successful', 'The action access has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Action Access Error', 'The action access does not exist.', 'info');
+                                show_toastr('Delete Action Access Error', 'The action access does not exist.', 'warning');
                             }
 
                             reload_datatable('#action-access-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Action Access Error', response, 'error');
+                            show_toastr('Delete Action Access Error', response, 'error');
                         }
                     }
                 });
@@ -847,19 +767,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete User Account Success', 'The user account has been deleted.', 'success');
+                                show_toastr('Delete User Account Successful', 'The user account has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete User Account Error', 'The user account does not exist.', 'info');
+                                show_toastr('Delete User Account Error', 'The user account does not exist.', 'warning');
                             }
 
                             reload_datatable('#user-account-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete User Account Error', response, 'error');
+                            show_toastr('Delete User Account Error', response, 'error');
                         }
                     }
                 });
@@ -868,7 +788,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -881,7 +801,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'roles.php';
+                window.location = 'roles.php';
                 return false;
             }
         });

@@ -6194,7 +6194,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'MODULE_CATEGORY' => $module_details[0]['MODULE_CATEGORY'],
                     'MODULE_ICON' => '<img class="img-thumbnail" alt="module icon" width="200" src="'. $module_icon_file_path .'" data-holder-rendered="true">',
                     'DEFAULT_PAGE' => $module_details[0]['DEFAULT_PAGE'],
-                    'TRANSACTION_LOG_ID' => $module_details[0]['TRANSACTION_LOG_ID'],
                     'ORDER_SEQUENCE' => $module_details[0]['ORDER_SEQUENCE']
                 );
     
@@ -6212,8 +6211,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 $response[] = array(
                     'PAGE_NAME' => $page_details[0]['PAGE_NAME'],
-                    'MODULE_ID' => $page_details[0]['MODULE_ID'],
-                    'TRANSACTION_LOG_ID' => $page_details[0]['TRANSACTION_LOG_ID']
+                    'MODULE_ID' => $page_details[0]['MODULE_ID']
                 );
     
                 echo json_encode($response);
@@ -6248,8 +6246,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'PARAMETER' => $system_parameter_details[0]['PARAMETER'],
                     'PARAMETER_DESCRIPTION' => $system_parameter_details[0]['PARAMETER_DESCRIPTION'],
                     'PARAMETER_EXTENSION' => $system_parameter_details[0]['PARAMETER_EXTENSION'],
-                    'PARAMETER_NUMBER' => $system_parameter_details[0]['PARAMETER_NUMBER'],
-                    'TRANSACTION_LOG_ID' => $system_parameter_details[0]['TRANSACTION_LOG_ID']
+                    'PARAMETER_NUMBER' => $system_parameter_details[0]['PARAMETER_NUMBER']
                 );
     
                 echo json_encode($response);
@@ -6267,8 +6264,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $response[] = array(
                     'ROLE' => $role_details[0]['ROLE'],
                     'ROLE_DESCRIPTION' => $role_details[0]['ROLE_DESCRIPTION'],
-                    'ASSIGNABLE' => $role_details[0]['ASSIGNABLE'],
-                    'TRANSACTION_LOG_ID' => $role_details[0]['TRANSACTION_LOG_ID']
+                    'ASSIGNABLE' => $role_details[0]['ASSIGNABLE']
                 );
     
                 echo json_encode($response);
@@ -6286,8 +6282,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $response[] = array(
                     'SYSTEM_TYPE' => $system_code_details[0]['SYSTEM_TYPE'],
                     'SYSTEM_CODE' => $system_code_details[0]['SYSTEM_CODE'],
-                    'SYSTEM_DESCRIPTION' => $system_code_details[0]['SYSTEM_DESCRIPTION'],
-                    'TRANSACTION_LOG_ID' => $system_code_details[0]['TRANSACTION_LOG_ID']
+                    'SYSTEM_DESCRIPTION' => $system_code_details[0]['SYSTEM_DESCRIPTION']
                 );
     
                 echo json_encode($response);
@@ -6305,8 +6300,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $response[] = array(
                     'UPLOAD_SETTING' => $upload_setting_details[0]['UPLOAD_SETTING'],
                     'DESCRIPTION' => $upload_setting_details[0]['DESCRIPTION'],
-                    'MAX_FILE_SIZE' => $upload_setting_details[0]['MAX_FILE_SIZE'],
-                    'TRANSACTION_LOG_ID' => $upload_setting_details[0]['TRANSACTION_LOG_ID']
+                    'MAX_FILE_SIZE' => $upload_setting_details[0]['MAX_FILE_SIZE']
                 );
     
                 echo json_encode($response);
@@ -6373,7 +6367,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'INTERFACE_SETTING_NAME' => $interface_setting_details[0]['INTERFACE_SETTING_NAME'],
                     'DESCRIPTION' => $interface_setting_details[0]['DESCRIPTION'],
                     'STATUS' => $api->get_email_setting_status($interface_setting_details[0]['STATUS'])[0]['BADGE'],
-                    'TRANSACTION_LOG_ID' => $interface_setting_details[0]['TRANSACTION_LOG_ID'],
                     'LOGIN_BACKGROUND' => '<img class="img-thumbnail" alt="login background" width="200" src="'. $login_background_file_path .'" data-holder-rendered="true">',
                     'LOGIN_LOGO' => '<img class="img-thumbnail" alt="login logo" width="200" src="'. $login_logo_file_path .'" data-holder-rendered="true">',
                     'MENU_LOGO' => '<img class="img-thumbnail" alt="menu logo" width="200" src="'. $menu_logo_file_path .'" data-holder-rendered="true">',
@@ -6404,8 +6397,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'MAIL_PASSWORD' => $email_setting_details[0]['MAIL_PASSWORD'],
                     'MAIL_ENCRYPTION' => $email_setting_details[0]['MAIL_ENCRYPTION'],
                     'MAIL_FROM_NAME' => $email_setting_details[0]['MAIL_FROM_NAME'],
-                    'MAIL_FROM_EMAIL' => $email_setting_details[0]['MAIL_FROM_EMAIL'],
-                    'TRANSACTION_LOG_ID' => $email_setting_details[0]['TRANSACTION_LOG_ID']
+                    'MAIL_FROM_EMAIL' => $email_setting_details[0]['MAIL_FROM_EMAIL']
                 );
     
                 echo json_encode($response);
@@ -6426,8 +6418,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'NOTIFICATION_TITLE' => $notification_setting_details[0]['NOTIFICATION_TITLE'],
                     'NOTIFICATION_MESSAGE' => $notification_setting_details[0]['NOTIFICATION_MESSAGE'],
                     'SYSTEM_LINK' => $notification_setting_details[0]['SYSTEM_LINK'],
-                    'EMAIL_LINK' => $notification_setting_details[0]['EMAIL_LINK'],
-                    'TRANSACTION_LOG_ID' => $notification_setting_details[0]['TRANSACTION_LOG_ID']
+                    'EMAIL_LINK' => $notification_setting_details[0]['EMAIL_LINK']
                 );
     
                 echo json_encode($response);
@@ -6443,8 +6434,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $country_details = $api->get_country_details($country_id);
     
                 $response[] = array(
-                    'COUNTRY_NAME' => $country_details[0]['COUNTRY_NAME'],
-                    'TRANSACTION_LOG_ID' => $country_details[0]['TRANSACTION_LOG_ID']
+                    'COUNTRY_NAME' => $country_details[0]['COUNTRY_NAME']
                 );
     
                 echo json_encode($response);
@@ -6461,8 +6451,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 $response[] = array(
                     'STATE_NAME' => $state_details[0]['STATE_NAME'],
-                    'COUNTRY_ID' => $state_details[0]['COUNTRY_ID'],
-                    'TRANSACTION_LOG_ID' => $state_details[0]['TRANSACTION_LOG_ID']
+                    'COUNTRY_ID' => $state_details[0]['COUNTRY_ID']
                 );
     
                 echo json_encode($response);
@@ -6482,8 +6471,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'DESCRIPTION' => $zoom_api_details[0]['DESCRIPTION'],
                     'API_KEY' => $zoom_api_details[0]['API_KEY'],
                     'API_SECRET' => $zoom_api_details[0]['API_SECRET'],
-                    'STATUS' =>  $api->get_zoom_api_status($zoom_api_details[0]['STATUS'])[0]['BADGE'],
-                    'TRANSACTION_LOG_ID' => $zoom_api_details[0]['TRANSACTION_LOG_ID']
+                    'STATUS' =>  $api->get_zoom_api_status($zoom_api_details[0]['STATUS'])[0]['BADGE']
                 );
     
                 echo json_encode($response);
@@ -6510,8 +6498,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'LAST_CONNECTION_DATE' => $api->check_date('summary', $user_account_details[0]['LAST_CONNECTION_DATE'], '', 'F d, Y h:i:s a', '', '', ''),
                     'LAST_FAILED_LOGIN' => $api->check_date('summary', $user_account_details[0]['LAST_FAILED_LOGIN'], '', 'F d, Y h:i:s a', '', '', ''),
                     'USER_STATUS' =>  $api->get_user_account_status($user_account_details[0]['USER_STATUS'])[0]['BADGE'],
-                    'LOCK_STATUS' =>  $api->get_user_account_lock_status($user_account_details[0]['FAILED_LOGIN'])[0]['BADGE'],
-                    'TRANSACTION_LOG_ID' => $user_account_details[0]['TRANSACTION_LOG_ID']
+                    'LOCK_STATUS' =>  $api->get_user_account_lock_status($user_account_details[0]['FAILED_LOGIN'])[0]['BADGE']
                 );
     
                 echo json_encode($response);
@@ -6530,8 +6517,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
                     'PARENT_DEPARTMENT' => $department_details[0]['PARENT_DEPARTMENT'],
                     'MANAGER' => $department_details[0]['MANAGER'],
-                    'STATUS' =>  $api->get_department_status($department_details[0]['STATUS'])[0]['BADGE'],
-                    'TRANSACTION_LOG_ID' => $department_details[0]['TRANSACTION_LOG_ID']
+                    'STATUS' =>  $api->get_department_status($department_details[0]['STATUS'])[0]['BADGE']
                 );
     
                 echo json_encode($response);
@@ -6551,8 +6537,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'DESCRIPTION' => $job_position_details[0]['DESCRIPTION'],
                     'EXPECTED_NEW_EMPLOYEES' => $job_position_details[0]['EXPECTED_NEW_EMPLOYEES'],
                     'RECRUITMENT_STATUS' =>  $api->get_job_position_recruitment_status($job_position_details[0]['RECRUITMENT_STATUS'])[0]['BADGE'],
-                    'DEPARTMENT' => $job_position_details[0]['DEPARTMENT'],
-                    'TRANSACTION_LOG_ID' => $job_position_details[0]['TRANSACTION_LOG_ID']
+                    'DEPARTMENT' => $job_position_details[0]['DEPARTMENT']
                 );
     
                 echo json_encode($response);
@@ -6638,8 +6623,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'TELEPHONE' => $work_location_details[0]['TELEPHONE'],
                     'MOBILE' => $work_location_details[0]['MOBILE'],
                     'LOCATION_NUMBER' => $work_location_details[0]['LOCATION_NUMBER'],
-                    'STATUS' =>  $api->get_work_location_status($work_location_details[0]['STATUS'])[0]['BADGE'],
-                    'TRANSACTION_LOG_ID' => $work_location_details[0]['TRANSACTION_LOG_ID']
+                    'STATUS' =>  $api->get_work_location_status($work_location_details[0]['STATUS'])[0]['BADGE']
                 );
     
                 echo json_encode($response);
@@ -6655,8 +6639,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $departure_reason_details = $api->get_departure_reason_details($departure_reason_id);
     
                 $response[] = array(
-                    'DEPARTURE_REASON' => $departure_reason_details[0]['DEPARTURE_REASON'],
-                    'TRANSACTION_LOG_ID' => $departure_reason_details[0]['TRANSACTION_LOG_ID']
+                    'DEPARTURE_REASON' => $departure_reason_details[0]['DEPARTURE_REASON']
                 );
     
                 echo json_encode($response);
@@ -6672,8 +6655,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $employee_type_details = $api->get_employee_type_details($employee_type_id);
     
                 $response[] = array(
-                    'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
-                    'TRANSACTION_LOG_ID' => $employee_type_details[0]['TRANSACTION_LOG_ID']
+                    'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE']
                 );
     
                 echo json_encode($response);
@@ -6689,8 +6671,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $id_type_details = $api->get_id_type_details($id_type_id);
     
                 $response[] = array(
-                    'ID_TYPE' => $id_type_details[0]['ID_TYPE'],
-                    'TRANSACTION_LOG_ID' => $id_type_details[0]['TRANSACTION_LOG_ID']
+                    'ID_TYPE' => $id_type_details[0]['ID_TYPE']
                 );
     
                 echo json_encode($response);
@@ -6706,8 +6687,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $wage_type_details = $api->get_wage_type_details($wage_type_id);
     
                 $response[] = array(
-                    'WAGE_TYPE' => $wage_type_details[0]['WAGE_TYPE'],
-                    'TRANSACTION_LOG_ID' => $wage_type_details[0]['TRANSACTION_LOG_ID']
+                    'WAGE_TYPE' => $wage_type_details[0]['WAGE_TYPE']
                 );
     
                 echo json_encode($response);
@@ -6724,8 +6704,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 $response[] = array(
                     'WORKING_SCHEDULE' => $working_schedule_details[0]['WORKING_SCHEDULE'],
-                    'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE'],
-                    'TRANSACTION_LOG_ID' => $working_schedule_details[0]['TRANSACTION_LOG_ID']
+                    'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE']
                 );
     
                 echo json_encode($response);
@@ -6782,8 +6761,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 $response[] = array(
                     'WORKING_SCHEDULE_TYPE' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'],
-                    'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY'],
-                    'TRANSACTION_LOG_ID' => $working_schedule_type_details[0]['TRANSACTION_LOG_ID']
+                    'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY']
                 );
     
                 echo json_encode($response);

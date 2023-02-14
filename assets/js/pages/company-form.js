@@ -27,21 +27,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['COMPANY_ID'];
-
-                                show_alert_event('Insert Company Success', 'The company has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Company Success', 'The company has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['COMPANY_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The company has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Company Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Company Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -75,7 +74,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -134,19 +134,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, company_id : company_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete Company Success', 'The company has been deleted.', 'success', 'redirect', 'company.php');
-                            }
-                            else{
-                                show_alert_event('Delete Company Error', 'The company does not exist.', 'info', 'redirect', 'company.php');
-                            }
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Company Successful', 'The company has been deleted successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete Company Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Company Error', response, 'error');
+                            show_toastr('Delete Company Error', response, 'error');
                         }
                     }
                 });

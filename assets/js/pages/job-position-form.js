@@ -3,48 +3,23 @@
 
     $(function() {
         if($('#job-position-id').length){
-            const transaction = 'job position details';
-            const job_position_id = $('#job-position-id').text();
+            display_details();
 
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {job_position_id : job_position_id, transaction : transaction},
-                success: function(response) {
-                    $('#job_position').val(response[0].JOB_POSITION);
-                    $('#description').val(response[0].DESCRIPTION);
-                    $('#expected_new_employees').val(response[0].EXPECTED_NEW_EMPLOYEES);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
+            if($('#job-position-attachment-datatable').length){
+                initialize_job_position_attachment_table('#job-position-attachment-datatable');
+            }
 
-                    document.getElementById('job_position_recruitment_status').innerHTML = response[0].RECRUITMENT_STATUS;
+            if($('#job-position-responsibility-datatable').length){
+                initialize_job_position_responsibility_table('#job-position-responsibility-datatable');
+            }
 
-                    check_empty(response[0].DEPARTMENT, '#department', 'select');
+            if($('#job-position-requirement-datatable').length){
+                initialize_job_position_requirement_table('#job-position-requirement-datatable');
+            }
 
-                    $('#job_position_id').val(job_position_id);
-                },
-                complete: function(){
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-
-                    if($('#job-position-attachment-datatable').length){
-                        initialize_job_position_attachment_table('#job-position-attachment-datatable');
-                    }
-
-                    if($('#job-position-responsibility-datatable').length){
-                        initialize_job_position_responsibility_table('#job-position-responsibility-datatable');
-                    }
-
-                    if($('#job-position-requirement-datatable').length){
-                        initialize_job_position_requirement_table('#job-position-requirement-datatable');
-                    }
-
-                    if($('#job-position-qualification-datatable').length){
-                        initialize_job_position_qualification_table('#job-position-qualification-datatable');
-                    }
-                }
-            });
+            if($('#job-position-qualification-datatable').length){
+                initialize_job_position_qualification_table('#job-position-qualification-datatable');
+            }
         }
 
         $('#job-position-form').validate({
@@ -109,22 +84,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Form Submission Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -137,7 +97,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -147,62 +108,27 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'job position details';
+    const job_position_id = $('#job-position-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+     $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {job_position_id : job_position_id, transaction : transaction},
+        success: function(response) {
+            $('#job_position').val(response[0].JOB_POSITION);
+            $('#description').val(response[0].DESCRIPTION);
+            $('#expected_new_employees').val(response[0].EXPECTED_NEW_EMPLOYEES);
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
+            document.getElementById('job_position_recruitment_status').innerHTML = response[0].RECRUITMENT_STATUS;
 
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
+            check_empty(response[0].DEPARTMENT, '#department', 'select');
 
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            $('#job_position_id').val(job_position_id);
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_job_position_attachment_table(datatable_name, buttons = false, show_all = false){
@@ -436,6 +362,43 @@ function initialize_click_events(){
         generate_modal('job position attachment form', 'Attachment', 'R' , '1', '1', 'form', 'job-position-attachment-form', '0', username);
     });
 
+    $(document).on('click','#delete-job-position',function() {
+        const job_position_id = $(this).data('job-position-id');
+        const transaction = 'delete job position';
+
+        Swal.fire({
+            title: 'Delete Job Position',
+            text: 'Are you sure you want to delete this job position?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, job_position_id : job_position_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Job Position Successful', 'The job position has been deleted successfully.', 'success');
+                        }
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
+                        }
+                        else{
+                            show_toastr('Delete Job Position Error', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
     $(document).on('click','.delete-attachment',function() {
         const attachment_id = $(this).data('attachment-id');
         const transaction = 'delete job position attachment';
@@ -459,19 +422,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Attachment Success', 'The attachment has been deleted.', 'success');
+                                show_toastr('Delete Attachment Successful', 'The attachment has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Attachment Error', 'The attachment does not exist.', 'info');
+                                show_toastr('Delete Attachment Error', 'The attachment does not exist.', 'warning');
                             }
 
                             reload_datatable('#job-position-attachment-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Attachment Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Attachment Error', response, 'error');
+                            show_toastr('Delete Attachment Error', response, 'error');
                         }
                     }
                 });
@@ -515,19 +478,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Responsibility Success', 'The responsibility has been deleted.', 'success');
+                                show_toastr('Delete Responsibility Successful', 'The responsibility has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Responsibility Error', 'The responsibility does not exist.', 'info');
+                                show_toastr('Delete Responsibility Error', 'The responsibility does not exist.', 'warning');
                             }
 
                             reload_datatable('#job-position-responsibility-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Responsibility Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Responsibility Error', response, 'error');
+                            show_toastr('Delete Responsibility Error', response, 'error');
                         }
                     }
                 });
@@ -571,19 +534,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Requirement Success', 'The requirement has been deleted.', 'success');
+                                show_toastr('Delete Requirement Successful', 'The requirement has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Requirement Error', 'The requirement does not exist.', 'info');
+                                show_toastr('Delete Requirement Error', 'The requirement does not exist.', 'warning');
                             }
 
                             reload_datatable('#job-position-requirement-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Requirement Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Requirement Error', response, 'error');
+                            show_toastr('Delete Requirement Error', response, 'error');
                         }
                     }
                 });
@@ -627,19 +590,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Qualification Success', 'The qualification has been deleted.', 'success');
+                                show_toastr('Delete Qualification Successful', 'The qualification has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Qualification Error', 'The qualification does not exist.', 'info');
+                                show_toastr('Delete Qualification Error', 'The qualification does not exist.', 'warning');
                             }
 
                             reload_datatable('#job-position-qualification-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Qualification Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Qualification Error', response, 'error');
+                            show_toastr('Delete Qualification Error', response, 'error');
                         }
                     }
                 });
@@ -669,19 +632,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Started' || response === 'Not Found'){
-                            if(response === 'Started'){
-                                show_alert_event('Start Job Position Recruitment Success', 'The job position recruitment has been started.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Start Job Position Recruitment Error', 'The job position does not exist.', 'info', 'redirect', 'job-positions.php');
-                            }
+                        if(response === 'Started'){
+                            show_toastr('Start Job Position Recruitment Successful', 'The job position recruitment has been started successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Start Job Position Recruitment Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Start Job Position Recruitment Error', response, 'error');
+                            show_toastr('Start Job Position Recruitment Error', response, 'error');
                         }
                     }
                 });
@@ -711,19 +669,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Stopped' || response === 'Not Found'){
-                            if(response === 'Stopped'){
-                                show_alert_event('Stop Job Position Recruitment Success', 'The job position recruitment has been stopped.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Stop Job Position Recruitment Error', 'The job position does not exist.', 'info', 'redirect', 'job-positions.php');
-                            }
+                        if(response === 'Stopped'){
+                            show_toastr('Stop Job Position Recruitment Successful', 'The job position recruitment has been stopped successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Stop Job Position Recruitment Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Stop Job Position Recruitment Error', response, 'error');
+                            show_toastr('Stop Job Position Recruitment Error', response, 'error');
                         }
                     }
                 });
@@ -732,49 +685,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-job-position',function() {
-        const job_position_id = $(this).data('job-position-id');
-        const transaction = 'delete job position';
-
-        Swal.fire({
-            title: 'Delete Job Position',
-            text: 'Are you sure you want to delete this job position?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, job_position_id : job_position_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete Job Position Success', 'The job position has been deleted.', 'success', 'redirect', 'job-positions.php');
-                            }
-                            else{
-                                show_alert_event('Delete Job Position Error', 'The job position does not exist.', 'info', 'redirect', 'job-positions.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete Job Position Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Delete Job Position Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -787,7 +698,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'job-positions.php';
+                window.location = 'job-positions.php';
                 return false;
             }
         });

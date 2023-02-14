@@ -3,33 +3,7 @@
 
     $(function() {
         if($('#interface-setting-id').length){
-            const transaction = 'interface setting details';
-            const interface_setting_id = $('#interface-setting-id').text();
-
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {interface_setting_id : interface_setting_id, transaction : transaction},
-                success: function(response) {
-                    $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#description').val(response[0].DESCRIPTION);
-                    
-                    document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
-                    document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
-                    document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
-                    document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
-                    document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
-
-                    $('#interface_setting_id').val(interface_setting_id);
-                },
-                complete: function(){                    
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-                }
-            });
+            display_details();
         }
 
         $('#interface-setting-form').validate({
@@ -53,21 +27,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
-
-                                show_alert_event('Insert Interface Setting Success', 'The interface setting has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Interface Setting Success', 'The interface setting has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The interface setting has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Interface Setting Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -94,22 +67,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Form Submission Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -122,7 +80,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -132,66 +91,69 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'interface setting details';
+    const interface_setting_id = $('#interface-setting-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {interface_setting_id : interface_setting_id, transaction : transaction},
+        success: function(response) {
+            $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
+            $('#description').val(response[0].DESCRIPTION);
+                    
+            document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
+            document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
+            document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
+            document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
+            document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            $('#interface_setting_id').val(interface_setting_id);
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_click_events(){
     const username = $('#username').text();
+
+    $(document).on('click','#delete-interface-setting',function() {
+        const interface_setting_id = $(this).data('interface-setting-id');
+        const transaction = 'delete interface setting';
+
+        Swal.fire({
+            title: 'Delete Interface Setting',
+            text: 'Are you sure you want to delete this interface setting?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Interface Setting Successful', 'The interface setting has been deleted successfully.', 'success');
+                        }
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
+                        }
+                        else{
+                            show_toastr('Delete Interface Setting Error', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
 
     $(document).on('click','#activate-interface-setting',function() {
         const interface_setting_id = $(this).data('interface-setting-id');
@@ -214,19 +176,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated' || response === 'Not Found'){
-                            if(response === 'Activated'){
-                                show_alert_event('Activate Interface Setting Success', 'The interface setting has been activated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Activate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
-                            }
+                        if(response === 'Activated'){
+                            show_toastr('Activate Interface Setting Successful', 'The interface setting has been activated successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Activate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Activate Interface Setting Error', response, 'error');
+                            show_toastr('Deactivate Interface Setting Error', response, 'error');
                         }
                     }
                 });
@@ -256,19 +213,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated' || response === 'Not Found'){
-                            if(response === 'Deactivated'){
-                                show_alert_event('Deactivate Interface Setting Success', 'The interface setting has been deactivated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Deactivate Interface Setting Error', 'The interface setting does not exist.', 'info', 'redirect', 'interface-settings.php');
-                            }
+                        if(response === 'Deactivated'){
+                            show_toastr('Deactivate Interface Setting Successful', 'The interface setting has been deactivated successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Deactivate Interface Setting Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Deactivate Interface Setting Error', response, 'error');
+                            show_toastr('Deactivate Interface Setting Error', response, 'error');
                         }
                     }
                 });
@@ -277,49 +229,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-interface-setting',function() {
-        const interface_setting_id = $(this).data('interface-setting-id');
-        const transaction = 'delete interface setting';
-
-        Swal.fire({
-            title: 'Delete Interface Setting',
-            text: 'Are you sure you want to delete this interface setting?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete Interface Settings Success', 'The interface settings has been deleted.', 'success', 'redirect', 'interface-settings.php');
-                            }
-                            else{
-                                show_alert_event('Delete Interface Settings Error', 'The interface settings does not exist.', 'info', 'redirect', 'interface-settings.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete Interface Settings Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Delete Interface Settings Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -332,7 +242,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'interface-settings.php';
+                window.location = 'interface-settings.php';
                 return false;
             }
         });

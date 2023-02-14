@@ -3,36 +3,11 @@
 
     $(function() {
         if($('#user-id').length){
-            const transaction = 'user account details';
-            const user_id = $('#user_id').val();
+            display_details();
 
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {user_id : user_id, transaction : transaction},
-                success: function(response) {
-                    $('#file_as').val(response[0].FILE_AS);
-                    $('#password').val(response[0].PASSWORD);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-
-                    document.getElementById('last_connection_date').innerHTML = response[0].LAST_CONNECTION_DATE;
-                    document.getElementById('password_expiry_date').innerHTML = response[0].PASSWORD_EXPIRY_DATE;
-                    document.getElementById('last_failed_login_date').innerHTML = response[0].LAST_FAILED_LOGIN;
-                    document.getElementById('user_status').innerHTML = response[0].USER_STATUS;
-                    document.getElementById('failed_login').innerHTML = response[0].FAILED_LOGIN;
-                    document.getElementById('lock_status').innerHTML = response[0].LOCK_STATUS;
-                },
-                complete: function(){                    
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-
-                    if($('#user-account-role-datatable').length){
-                        initialize_user_account_role_table('#user-account-role-datatable');
-                    }
-                }
-            });
+            if($('#user-account-role-datatable').length){
+                initialize_user_account_role_table('#user-account-role-datatable');
+            }
         }
 
         $('#user-account-form').validate({
@@ -50,21 +25,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['USER_ID'];
-
-                                show_alert_event('Insert User Account Success', 'The user account has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update User Account Success', 'The user account has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['USER_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The user account has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('User Account Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -98,22 +72,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Form Submission Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -126,7 +85,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -136,62 +96,27 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'user account details';
+    const user_id = $('#user_id').val();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {user_id : user_id, transaction : transaction},
+        success: function(response) {
+            $('#file_as').val(response[0].FILE_AS);
+            $('#password').val(response[0].PASSWORD);
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            document.getElementById('last_connection_date').innerHTML = response[0].LAST_CONNECTION_DATE;
+            document.getElementById('password_expiry_date').innerHTML = response[0].PASSWORD_EXPIRY_DATE;
+            document.getElementById('last_failed_login_date').innerHTML = response[0].LAST_FAILED_LOGIN;
+            document.getElementById('user_status').innerHTML = response[0].USER_STATUS;
+            document.getElementById('failed_login').innerHTML = response[0].FAILED_LOGIN;
+            document.getElementById('lock_status').innerHTML = response[0].LOCK_STATUS;
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_role_assignment_table(datatable_name, buttons = false, show_all = false){
@@ -305,6 +230,43 @@ function initialize_user_account_role_table(datatable_name, buttons = false, sho
 function initialize_click_events(){
     const username = $('#username').text();
 
+    $(document).on('click','#delete-user-account',function() {
+        const user_id = $(this).data('user-id');
+        const transaction = 'delete user account';
+
+        Swal.fire({
+            title: 'Delete User Account',
+            text: 'Are you sure you want to delete this user account?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, user_id : user_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted'){
+                            show_toastr('Delete User Account Successful', 'The user account has been deleted successfully.', 'success');
+                        }
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
+                        }
+                        else{
+                            show_toastr('Delete User Account Error', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
     $(document).on('click','#add-user-account-role',function() {
         generate_modal('user account role form', 'User Account Role', 'LG' , '1', '1', 'form', 'user-account-role-form', '1', username);
     });
@@ -333,19 +295,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete User Account Role Success', 'The user account role has been deleted.', 'success');
+                                show_toastr('Delete User Account Role Successful', 'The user account role has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete User Account Role Error', 'The user account role does not exist.', 'info');
+                                show_toastr('Delete User Account Role Error', 'The user account role does not exist.', 'warning');
                             }
 
                             reload_datatable('#user-account-role-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete User Account Role Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete User Account Role Error', response, 'error');
+                            show_toastr('Delete User Account Role Error', response, 'error');
                         }
                     }
                 });
@@ -375,19 +337,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated' || response === 'Not Found'){
-                            if(response === 'Activated'){
-                                show_alert_event('Activate User Account Success', 'The user account has been activated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Activate User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
-                            }
+                        if(response === 'Activated'){
+                            show_toastr('Activate User Account Successful', 'The user account has been activated successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Activate User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Activate User Account Error', response, 'error');
+                            show_toastr('Activate User Account Error', response, 'error');
                         }
                     }
                 });
@@ -417,19 +374,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated' || response === 'Not Found'){
-                            if(response === 'Deactivated'){
-                                show_alert_event('Deactivate User Account Success', 'The user account has been deactivated.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Deactivate User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
-                            }
+                        if(response === 'Deactivated'){
+                            show_toastr('Deactivate User Account Successful', 'The user account has been deactivated successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Deactivate User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Deactivate User Account Error', response, 'error');
+                            show_toastr('Deactivate User Account Error', response, 'error');
                         }
                     }
                 });
@@ -459,19 +411,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Unlocked' || response === 'Not Found'){
-                            if(response === 'Unlocked'){
-                                show_alert_event('Unlock User Account Success', 'The user account has been unlocked.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Unlock User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
-                            }
+                        if(response === 'Unlocked'){
+                            show_toastr('Unlock User Account Successful', 'The user account has been unlocked successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Unlock User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Unlock User Account Error', response, 'error');
+                            show_toastr('Unlock User Account Error', response, 'error');
                         }
                     }
                 });
@@ -501,19 +448,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Locked' || response === 'Not Found'){
-                            if(response === 'Locked'){
-                                show_alert_event('Lock User Account Sucecess', 'The user account has been locked.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Lock User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
-                            }
+                        if(response === 'Locked'){
+                            show_toastr('Lock User Account Successful', 'The user account has been locked successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Lock User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Lock User Account Error', response, 'error');
+                            show_toastr('Lock User Account Error', response, 'error');
                         }
                     }
                 });
@@ -522,49 +464,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-user-account',function() {
-        const user_id = $(this).data('user-id');
-        const transaction = 'delete user account';
-
-        Swal.fire({
-            title: 'Delete User Account',
-            text: 'Are you sure you want to delete this user account?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, user_id : user_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete User Account Success', 'The user account has been deleted.', 'success', 'redirect', 'user-accounts.php');
-                            }
-                            else{
-                                show_alert_event('Delete User Account Error', 'The user account does not exist.', 'info', 'redirect', 'user-accounts.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Delete User Account Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -577,7 +477,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'user-accounts.php';
+                window.location = 'user-accounts.php';
                 return false;
             }
         });

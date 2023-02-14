@@ -3,33 +3,7 @@
 
     $(function() {
         if($('#department-id').length){
-            const transaction = 'department details';
-            const department_id = $('#department-id').text();
-
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {department_id : department_id, transaction : transaction},
-                success: function(response) {
-                    $('#department').val(response[0].DEPARTMENT);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-
-                    document.getElementById('department_status').innerHTML = response[0].STATUS;
-
-                    check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
-                    check_empty(response[0].MANAGER, '#manager', 'select');
-                },
-                complete: function(){                    
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-
-                    /*if($('#department-employee-datatable').length){
-                        initialize_department_employee_table('#department-employee-datatable');
-                    }*/
-                }
-            });
+            display_details();
         }
 
         $('#department-form').validate({
@@ -47,21 +21,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
-
-                                show_alert_event('Insert Department Success', 'The department has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Department Success', 'The department has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The department has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Department Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -82,22 +55,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Form Submission Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -110,7 +68,8 @@
             unhighlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
                     $(element).next().find('.select2-selection').removeClass('is-invalid');
-                } else {
+                }
+                else {
                     $(element).removeClass('is-invalid');
                 }
             }
@@ -120,66 +79,65 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'department details';
+    const department_id = $('#department-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {department_id : department_id, transaction : transaction},
+        success: function(response) {
+            $('#department').val(response[0].DEPARTMENT);
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
+            document.getElementById('department_status').innerHTML = response[0].STATUS;
 
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
+            check_empty(response[0].MANAGER, '#manager', 'select');
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_click_events(){
     const username = $('#username').text();
+
+    $(document).on('click','#delete-department',function() {
+        const department_id = $(this).data('department-id');
+        const transaction = 'delete department';
+
+        Swal.fire({
+            title: 'Delete Department',
+            text: 'Are you sure you want to delete this department?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, department_id : department_id, transaction : transaction},
+                    success: function (response) {
+                        if(response === 'Deleted'){
+                            show_toastr('Delete Department Successful', 'The department has been deleted successfully.', 'success');
+                        }
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
+                        }
+                        else{
+                            show_toastr('Delete Department Error', response, 'error');
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
 
     $(document).on('click','#unarchive-department',function() {
         const department_id = $(this).data('department-id');
@@ -202,19 +160,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Unarchived' || response === 'Not Found'){
-                            if(response === 'Unarchived'){
-                                show_alert_event('Unarchive Department Success', 'The department has been unarchived.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Unarchive Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
-                            }
+                        if(response === 'Unarchived'){
+                            show_toastr('Unarchived Department Successful', 'The department has been unarchived successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Unarchive Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Unarchive Department Error', response, 'error');
+                            show_toastr('Unarchived Department Error', response, 'error');
                         }
                     }
                 });
@@ -244,19 +197,14 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Archived' || response === 'Not Found'){
-                            if(response === 'Archived'){
-                                show_alert_event('Archive Department Success', 'The department has been archived.', 'success', 'reload');
-                            }
-                            else{
-                                show_alert_event('Archive Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
-                            }
+                        if(response === 'Archived'){
+                            show_toastr('Archived Department Successful', 'The department has been archived successfully.', 'success');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Archive Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                        else if(response === 'Inactive User' || response === 'Not Found'){
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Archive Department Error', response, 'error');
+                            show_toastr('Archived Department Error', response, 'error');
                         }
                     }
                 });
@@ -265,49 +213,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#delete-department',function() {
-        const department_id = $(this).data('department-id');
-        const transaction = 'delete department';
-
-        Swal.fire({
-            title: 'Delete Department',
-            text: 'Are you sure you want to delete this department?',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: {username : username, department_id : department_id, transaction : transaction},
-                    success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_alert_event('Delete Department Success', 'The department has been deleted.', 'success', 'redirect', 'departments.php');
-                            }
-                            else{
-                                show_alert_event('Delete Department Error', 'The department does not exist.', 'info', 'redirect', 'departments.php');
-                            }
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Delete Department Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Delete Department Error', response, 'error');
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
-
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
@@ -320,7 +226,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'departments.php';
+                window.location = 'departments.php';
                 return false;
             }
         });
