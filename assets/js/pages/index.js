@@ -10,32 +10,33 @@
                     type: 'POST',
                     url: 'controller.php',
                     data: $(form).serialize() + '&transaction=' + transaction,
+                    dataType: 'JSON',
                     beforeSend: function(){
                         document.getElementById('signin').disabled = true;
                         $('#signin').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response === 'Authenticated'){
+                        if(response[0]['RESPONSE'] === 'Authenticated'){
                             var username = $('#username').val();
                             sessionStorage.setItem('username', username);
 
                             window.location = 'apps.php';
                         }
                         else{
-                            if(response === 'Incorrect'){
-                                show_alert('Authentication Error', 'Your username or password is incorrect.', 'error');
+                            if(response[0]['RESPONSE'] === 'Incorrect'){
+                                show_toastr('Authentication Error', 'The username or password you entered is incorrect. Please double-check your credentials and try again.', 'error');
                             }
-                            else if(response === 'Locked'){
-                                show_alert('Authentication Error', 'Your user account is locked. Please contact your administrator.', 'error');
+                            else if(response[0]['RESPONSE'] === 'Locked'){
+                                show_toastr('Account Locked', 'Your account has been locked. Please contact your administrator for assistance.', 'warning');
                             }
-                            else if(response === 'Inactive'){
-                                show_alert('Authentication Error', 'Your user account is inactive. Please contact your administrator.', 'error');
+                            else if(response[0]['RESPONSE'] === 'Inactive'){
+                                show_toastr('Account Inactive', 'Your user account is currently inactive. Please contact your administrator for assistance.', 'warning');
                             }
-                            else if(response === 'Password Expired'){
-                                show_alert_confirmation('User Account Password Expired', 'Your password has expired. Do you want to update your password?', 'info', 'Update Password', 'primary', 'expired password');
+                            else if(response[0]['RESPONSE'] === 'Password Expired'){
+                                window.location = 'change-password.php?id=' + response[0]['USERNAME'];
                             }
                             else{
-                                show_alert('Authentication Error', response, 'error');
+                                show_toastr('Authentication Error', response, 'error');
                             }
                         }
                     },
@@ -63,25 +64,23 @@
                     required: 'Please enter your password',
                 }
             },
-            errorPlacement: function(label, element) {
-                if(element.hasClass('web-select2') && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.input-group'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
+            errorPlacement: function(label) {
+                show_toastr('Authentication Error', label.text(), 'error');
             },
             highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next().find('.select2-selection').addClass('is-invalid');
+                } 
+                else {
+                    $(element).addClass('is-invalid');
+                }
             },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
+            unhighlight: function(element) {
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next().find('.select2-selection').removeClass('is-invalid');
+                } else {
+                    $(element).removeClass('is-invalid');
+                }
             }
         });
     });

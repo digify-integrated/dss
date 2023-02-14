@@ -13,6 +13,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         # Authenticate
         case 'authenticate':
             if(isset($_POST['password']) && !empty($_POST['password'])){
+                $response = array();
                 $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
                 $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     
@@ -24,35 +25,54 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     $_SESSION['username'] = $username;
                 }
     
-                echo $authenticate;
+                $response[] = array(
+                    'RESPONSE' => $authenticate,
+                    'USERNAME' => $api->encrypt_data($username)
+                );
+
+                echo json_encode($response);
             }
         break;
         # -------------------------------------------------------------
 
         # Change password
         case 'change password':
-            if(isset($_POST['change_username']) && !empty($_POST['change_username']) && isset($_POST['change_password']) && !empty($_POST['change_password'])){
-                $username = htmlspecialchars($_POST['change_username'], ENT_QUOTES, 'UTF-8');
-                $password = $api->encrypt_data(htmlspecialchars($_POST['change_password'], ENT_QUOTES, 'UTF-8'));
+            if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['password']) && !empty($_POST['password'])){
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $password = htmlspecialchars($api->encrypt_data($_POST['password']), ENT_QUOTES, 'UTF-8');
                 $password_expiry_date = $api->format_date('Y-m-d', htmlspecialchars($system_date, ENT_QUOTES, 'UTF-8'), '+6 months');
     
                 $check_user_account_exist = $api->check_user_account_exist($username);
-    
+     
                 if($check_user_account_exist){
-                    $update_user_account_password = $api->update_user_account_password($username, $password, $password_expiry_date);
+                    $check_password_history_exist = $api->check_password_history_exist($username, $_POST['password']);
+
+                    if($check_password_history_exist == 0){
+                        $update_user_account_password = $api->update_user_account_password($username, $password, $password_expiry_date);
     
-                    if($update_user_account_password){
-                        $update_login_attempt = $api->update_login_attempt($username, '', 0, NULL);
+                        if($update_user_account_password){
+                            $insert_password_history = $api->insert_password_history($username, $password);
     
-                        if($update_login_attempt){
-                            echo 'Updated';
+                            if($insert_password_history){
+                                $update_login_attempt = $api->update_login_attempt($username, '', 0, NULL);
+            
+                                if($update_login_attempt){
+                                    echo 'Updated';
+                                }
+                                else{
+                                    echo $update_login_attempt;
+                                }
+                            }
+                            else{
+                                echo $insert_password_history;
+                            }
                         }
                         else{
-                            echo $update_login_attempt;
+                            echo $update_user_account_password;
                         }
                     }
                     else{
-                        echo $update_user_account_password;
+                        echo 'Password Exist';
                     }
                 }
                 else{
@@ -6209,8 +6229,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $action_details = $api->get_action_details($action_id);
     
                 $response[] = array(
-                    'ACTION_NAME' => $action_details[0]['ACTION_NAME'],
-                    'TRANSACTION_LOG_ID' => $action_details[0]['TRANSACTION_LOG_ID']
+                    'ACTION_NAME' => $action_details[0]['ACTION_NAME']
                 );
     
                 echo json_encode($response);
@@ -6315,8 +6334,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'TELEPHONE' => $company_details[0]['TELEPHONE'],
                     'MOBILE' => $company_details[0]['MOBILE'],
                     'WEBSITE' => $company_details[0]['WEBSITE'],
-                    'TAX_ID' => $company_details[0]['TAX_ID'],
-                    'TRANSACTION_LOG_ID' => $company_details[0]['TRANSACTION_LOG_ID']
+                    'TAX_ID' => $company_details[0]['TAX_ID']
                 );
     
                 echo json_encode($response);

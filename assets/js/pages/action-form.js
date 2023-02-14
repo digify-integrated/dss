@@ -3,29 +3,11 @@
 
     $(() => {
         if($('#action-id').length){
-            const transaction = 'action details';
-            const action_id = $('#action-id').text();
+            display_details();
 
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {action_id : action_id, transaction : transaction},
-                success: function(response) {
-                    $('#action_name').val(response[0].ACTION_NAME);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#action_id').val(action_id);
-                },
-                complete: function(){
-                    if($('#action-access-datatable').length){
-                        initialize_action_access_table('#action-access-datatable');
-                    }
-                    
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-                }
-            });
+            if($('#action-access-datatable').length){
+                initialize_action_access_table('#action-access-datatable');
+            }
         }
 
         $('#action-form').validate({
@@ -43,21 +25,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['ACTION_ID'];
-
-                                show_alert_event('Insert Action Success', 'The action has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Action Success', 'The action has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['ACTION_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The action has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Action Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Action Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -77,23 +58,8 @@
                     required: 'Please enter the action name',
                 },
             },
-            errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Validation Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+            errorPlacement: function(label) {     
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -116,62 +82,23 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'action details';
+    const action_id = $('#action-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {action_id : action_id, transaction : transaction},
+        success: function(response) {
+            $('#action_name').val(response[0].ACTION_NAME);
+            
+            $('#action_name_label').text(response[0].ACTION_NAME);
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            $('#action_id').val(action_id);
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_action_access_table(datatable_name, buttons = false, show_all = false){
@@ -313,19 +240,19 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert('Delete Action Access Success', 'The action access has been deleted.', 'success');
+                                show_toastr('Delete Action Access Successful', 'The action access has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert('Delete Action Access Error', 'The action access does not exist.', 'info');
+                                show_toastr('Delete Action Access Error', 'The action access does not exist.', 'warning');
                             }
 
                             reload_datatable('#action-access-datatable');
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Delete Action Access Error', response, 'error');
+                            show_toastr('Delete Action Access Error', response, 'error');
                         }
                     }
                 });
@@ -335,7 +262,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#delete-action',() => {
-        const action_id = $(this).data('action-id');
+        const action_id = $('#action-id').text();
         const transaction = 'delete action';
 
         Swal.fire({
@@ -357,17 +284,17 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_alert_event('Delete Action Success', 'The action has been deleted.', 'success', 'redirect', 'actions.php');
+                                show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success');
                             }
                             else{
-                                show_alert_event('Delete Action Error', 'The action does not exist.', 'info', 'redirect', 'actions.php');
+                                window.location.href = '404.php';
                             }
                         }
                         else if(response === 'Inactive User'){
-                            show_alert_event('Delete Action Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = 'logout.php?logout';
                         }
                         else{
-                            show_alert('Delete Action Error', response, 'error');
+                            show_toastr('Delete Action Error', response, 'error');
                         }
                     }
                 });
@@ -376,7 +303,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',() => {
+    $(document).on('click','#discard-create',() => {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',

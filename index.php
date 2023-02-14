@@ -13,7 +13,7 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
-        <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
+        <link rel="stylesheet" type="text/css" href="assets/libs/toastr/build/toastr.min.css">
         <?php require('views/_required_css.php'); ?>
     </head>
 
@@ -79,8 +79,8 @@
         <?php require('views/_script.php'); ?>
         
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
-        <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/pages/index.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/libs/toastr/build/toastr.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/form-validation-rules.js?v=<?php echo rand(); ?>"></script>
     </body>

@@ -117,7 +117,7 @@ class Api{
         
         if (!$ciphertext) return false;
         
-        return urlencode(base64_encode($iv . $ciphertext));
+        return rawurlencode(base64_encode($iv . $ciphertext));
     }
     # -------------------------------------------------------------
     
@@ -130,13 +130,14 @@ class Api{
     #
     # -------------------------------------------------------------
     public function decrypt_data($ciphertext) {
-        $ciphertext = base64_decode($ciphertext);
+        $ciphertext = base64_decode(rawurldecode($ciphertext));
 
         if (!$ciphertext) {
             return false;
         }
         
         $iv_length = openssl_cipher_iv_length('aes-256-cbc');
+
         if (strlen($ciphertext) < $iv_length) {
             return false;
         }
@@ -492,6 +493,39 @@ class Api{
                 $row = $sql->fetch();
 
                 return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_password_history_exist
+    # Purpose    : Checks if the password history exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_password_history_exist($username, $password){
+        if ($this->databaseConnection()) {
+            $total = 0;
+
+            $sql = $this->db_connection->prepare('SELECT PASSWORD FROM global_password_history WHERE USERNAME = :username');
+            $sql->bindValue(':username', $username);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $password_history = $this->decrypt_data($row['PASSWORD']);
+                    
+                    if($password_history === $password){
+                        $total = $total + 1;
+                    }
+                }
+                
+                return (int) $total;
             }
             else{
                 return $stmt->errorInfo()[2];
@@ -3092,6 +3126,31 @@ class Api{
             $sql->bindValue(':zoom_api_id', $zoom_api_id);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+     # -------------------------------------------------------------
+    #
+    # Name       : update_user_account_password
+    # Purpose    : Updates user account's password.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account_password($username, $password, $password_expiry_date){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL update_user_account_password(:username, :password, :password_expiry_date)');
+            $sql->bindValue(':username', $username);
+            $sql->bindValue(':password', $password);
+            $sql->bindValue(':password_expiry_date', $password_expiry_date);
         
             if($sql->execute()){
                 return true;
@@ -5891,6 +5950,30 @@ class Api{
                 else{
                     return $update_system_parameter_value;
                 }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_password_history
+    # Purpose    : Insert password history.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_password_history($username, $password){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL insert_password_history(:username, :password)');
+            $sql->bindValue(':username', $username);
+            $sql->bindValue(':password', $password);
+        
+            if($sql->execute()){
+                return true;
             }
             else{
                 return $stmt->errorInfo()[2];
@@ -10092,6 +10175,68 @@ class Api{
         }) . uniqid('', true);
 
         return $key;        
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_transaction_log_timeline
+    # Purpose    : generates transaction log timeline.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_transaction_log_timeline($transaction_log_id) {
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('SELECT USERNAME, LOG_TYPE, LOG_DATE, LOG FROM global_transaction_log WHERE TRANSACTION_LOG_ID = :transaction_log_id');
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+
+                if($count > 0){
+                    $timeline = '<ul class="verti-timeline list-unstyled">';
+
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+                        $log_type = $row['LOG_TYPE'];
+                        $log = $row['LOG'];
+                        $log_date = $this->check_date('empty', $row['LOG_DATE'], '', 'm/d/Y h:i:s a', '', '', '');
+
+                        $user_account_details = $this->get_user_account_details($username);
+                        $file_as = $user_account_details[0]['FILE_AS'];
+
+                        $timeline .= '<li class="event-list">
+                                        <div class="event-timeline-dot">
+                                            <i class="bx bx-right-arrow-circle"></i>
+                                        </div>
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1">
+                                                <div>
+                                                    <h6 class="font-size-14 mb-1">'. $log_type .'</h6>
+                                                    <p class="text-muted">'. $file_as .' '. $log_date .'</p>
+                                                    
+                                                    <p class="text-muted mb-0">'. $log .'</p>
+                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>';
+
+                    }
+
+                    $timeline .= '</ul>';
+                }
+                else{
+                    $timeline .= '';
+                }
+               
+                echo $timeline;
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
     }
     # -------------------------------------------------------------
 

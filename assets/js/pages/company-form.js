@@ -3,34 +3,7 @@
 
     $(function() {
         if($('#company-id').length){
-            const transaction = 'company details';
-            const company_id = $('#company-id').text();
-
-            $.ajax({
-                url: 'controller.php',
-                method: 'POST',
-                dataType: 'JSON',
-                data: {company_id : company_id, transaction : transaction},
-                success: function(response) {
-                    $('#company_name').val(response[0].COMPANY_NAME);
-                    $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
-                    $('#company_address').val(response[0].COMPANY_ADDRESS);
-                    $('#tax_id').val(response[0].TAX_ID);
-                    $('#email').val(response[0].EMAIL);
-                    $('#mobile').val(response[0].MOBILE);
-                    $('#telephone').val(response[0].TELEPHONE);
-                    $('#website').val(response[0].WEBSITE);
-                    
-                    document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
-
-                    $('#company_id').val(company_id);
-                },
-                complete: function(){                    
-                    if($('#transaction-log-datatable').length){
-                        initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-                }
-            });
+            display_details();
         }
 
         $('#company-form').validate({
@@ -89,22 +62,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Validation Error', {
-                    closeButton: false,
-                    debug: false,
-                    newestOnTop: true,
-                    progressBar: true,
-                    positionClass: 'toast-top-right',
-                    preventDuplicates: true,
-                    showDuration: 300,
-                    hideDuration: 1000,
-                    timeOut: 3000,
-                    extendedTimeOut: 3000,
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut'
-                });
+                show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {
@@ -127,62 +85,29 @@
     });
 })(jQuery);
 
-function initialize_transaction_log_table(datatable_name, buttons = false, show_all = false){
-    const username = $('#username').text();
-    const transaction_log_id = $('#transaction_log_id').val();
-    const type = 'transaction log table';
-    var settings;
+function display_details(){
+    const transaction = 'company details';
+    const company_id = $('#company-id').text();
 
-    const column = [ 
-        { 'data' : 'LOG_TYPE' },
-        { 'data' : 'LOG' },
-        { 'data' : 'LOG_DATE' },
-        { 'data' : 'LOG_BY' }
-    ];
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {company_id : company_id, transaction : transaction},
+        success: function(response) {
+            $('#company_name').val(response[0].COMPANY_NAME);
+            $('#company_address').val(response[0].COMPANY_ADDRESS);
+            $('#tax_id').val(response[0].TAX_ID);
+            $('#email').val(response[0].EMAIL);
+            $('#mobile').val(response[0].MOBILE);
+            $('#telephone').val(response[0].TELEPHONE);
+            $('#website').val(response[0].WEBSITE);
+                    
+            document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
 
-    const column_definition = [
-        { 'width': '15%', 'aTargets': 0 },
-        { 'width': '45%', 'aTargets': 1 },
-        { 'width': '20%', 'aTargets': 2 },
-        { 'width': '20%', 'aTargets': 3 },
-    ];
-
-    const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
-
-    settings = {
-        'ajax': { 
-            'url' : 'system-generation.php',
-            'method' : 'POST',
-            'dataType': 'JSON',
-            'data': {'type' : type, 'username' : username, 'transaction_log_id' : transaction_log_id},
-            'dataSrc' : ''
-        },
-        'order': [[ 0, 'asc' ]],
-        'columns' : column,
-        'scrollY': false,
-        'scrollX': true,
-        'scrollCollapse': true,
-        'fnDrawCallback': function( oSettings ) {
-            readjust_datatable_column();
-        },
-        'aoColumnDefs': column_definition,
-        'lengthMenu': length_menu,
-        'language': {
-            'emptyTable': 'No data found',
-            'searchPlaceholder': 'Search...',
-            'search': '',
-            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+            $('#company_id').val(company_id);
         }
-    };
-
-    if (buttons) {
-        settings.dom = "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +  "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>";
-        settings.buttons = ['csv', 'excel', 'pdf'];
-    }
-
-    destroy_datatable(datatable_name);
-
-    $(datatable_name).dataTable(settings);
+    });
 }
 
 function initialize_click_events(){
@@ -230,7 +155,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard',function() {
+    $(document).on('click','#discard-create',function() {
         Swal.fire({
             title: 'Discard Changes',
             text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',

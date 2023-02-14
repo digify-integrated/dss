@@ -16,12 +16,15 @@
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
-            header('location: apps.php');
+            header('location: 404.php');
         }
         else{
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $action_id = $api->decrypt_data($id);
+
+                $action_details = $api->get_action_details($action_id);
+                $transaction_log_id = $action_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $action_id = null;
@@ -136,17 +139,56 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_action > 0 || ($update_action > 0 && !empty($action_id)))){
-                                                                    echo '<button type="submit" for="action-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($action_id) && $add_action > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($action_id) && $update_action > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($action_id) && $update_action <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
+                                                        </div>
+                                                        <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
+                                                            <div class="offcanvas-header">
+                                                                <h5 class="offcanvas-title" id="filter-off-canvas-label">Transaction Log</h5>
+                                                                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="offcanvas-body">
+                                                                <div class="mb-3">
+                                                                   <?php
+                                                                        if(!empty($action_id) && !empty($transaction_log_id)){
+                                                                            echo $api->generate_transaction_log_timeline($transaction_log_id);
+                                                                        }
+                                                                   ?>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -155,11 +197,21 @@
                                                 <div class="col-md-12">
                                                     <div class="row mb-4">
                                                         <input type="hidden" id="action_id" name="action_id">
-                                                        <input type="hidden" id="transaction_log_id" name="transaction_log_id">
-                                                        <label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
-                                                        <div class="col-md-10">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="action_name" name="action_name" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
+                                                        <?php
+                                                            if(empty($action_id) && $add_action > 0){
+                                                                echo ' <label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="action_name" name="action_name" maxlength="200" '. $disabled .'>
+                                                                </div>';
+                                                            }
+                                                            else if(!empty($action_id) && $update_action > 0){
+                                                                echo '<label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
+                                                                <div class="col-md-10">
+                                                                    <label class="col-form-label form-details" id="action_name_label"></label>
+                                                                    <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="action_name" name="action_name" maxlength="200" '. $disabled .'>
+                                                                </div>';
+                                                            }
+                                                        ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -175,12 +227,6 @@
                                                                     <span class="d-none d-sm-block">Action Access</span>    
                                                                 </a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="action-access" role="tabpanel">
@@ -191,23 +237,6 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

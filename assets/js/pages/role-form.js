@@ -99,7 +99,7 @@
                 }
             },
             errorPlacement: function(label) {                
-                toastr.error(label.text(), 'Validation Error', {
+                toastr.error(label.text(), 'Form Submission Error', {
                     closeButton: false,
                     debug: false,
                     newestOnTop: true,

@@ -679,12 +679,12 @@ BEGIN
 	SET @query = 'UPDATE global_user_account SET';
 
 	IF password IS NOT NULL OR password <> '' THEN
-		SET @query = CONCAT(@query, 'FILE_AS = ?, PASSWORD = ?, PASSWORD_EXPIRY_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
+		SET @query = CONCAT(@query, ' FILE_AS = ?, PASSWORD = ?, PASSWORD_EXPIRY_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
 
 		PREPARE stmt FROM @query;
 		EXECUTE stmt USING file_as, password, password_expiry_date, transaction_log_id, record_log, username;
 	ELSE
-		SET @query = CONCAT(@query, 'FILE_AS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
+		SET @query = CONCAT(@query, ' FILE_AS = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE USERNAME = ?');
 
 		PREPARE stmt FROM @query;
 		EXECUTE stmt USING file_as, transaction_log_id, record_log, username;
@@ -739,6 +739,23 @@ BEGIN
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt USING user_status, record_log, username;
+	DEALLOCATE PREPARE stmt;
+END //
+
+/* Global Password History */
+CREATE TABLE global_password_history(
+	USERNAME VARCHAR(50) NOT NULL,
+	PASSWORD VARCHAR(200) NOT NULL
+);
+
+CREATE INDEX global_password_history_index ON global_password_history(USERNAME);
+
+CREATE PROCEDURE insert_password_history(IN username VARCHAR(50), IN password VARCHAR(200))
+BEGIN
+	SET @query = 'INSERT INTO global_password_history (USERNAME, PASSWORD) VALUES(?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING username, password;
 	DEALLOCATE PREPARE stmt;
 END //
 

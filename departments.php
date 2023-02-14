@@ -124,25 +124,25 @@
                                                 </div>
 
                                                 <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                        <div class="offcanvas-header">
-                                                            <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
-                                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="offcanvas-body">
-                                                            <div class="mb-3">
-                                                                <p class="text-muted">Status</p>
+                                                    <div class="offcanvas-header">
+                                                        <h5 class="offcanvas-title" id="filter-off-canvas-label">Filter</h5>
+                                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="offcanvas-body">
+                                                        <div class="mb-3">
+                                                            <p class="text-muted">Status</p>
 
-                                                                <select class="form-control filter-select2" id="filter_status">
-                                                                    <option value="">All</option>
-                                                                    <option value="1">Unarchived</option>
-                                                                    <option value="2">Archived</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
-                                                            </div>
+                                                            <select class="form-control filter-select2" id="filter_status">
+                                                                <option value="">All</option>
+                                                                <option value="1">Unarchived</option>
+                                                                <option value="2">Archived</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="apply-filter" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">Apply Filter</button>
                                                         </div>
                                                     </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row mt-4">

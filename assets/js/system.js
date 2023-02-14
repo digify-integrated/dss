@@ -71,6 +71,29 @@ function initialize_global_functions(){
         generate_modal('backup database form', 'Backup Database', 'R' , '1', '1', 'form', 'backup-database-form', '1', username);
     });
 
+    $(document).on('click','#form-edit',function() {
+       $('.form-details').addClass('d-none');
+       $('.form-edit').removeClass('d-none');
+    });
+
+    $(document).on('click','#discard',() => {
+        Swal.fire({
+            title: 'Discard Changes',
+            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-danger mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                reset_form();
+            }
+        });
+    });
+
     if ($('.select2').length) {
         $('.select2').select2({}).on("change", function (e) {
             $(this).valid()
@@ -1695,6 +1718,12 @@ function display_form_details(form_type){
     }
 }
 
+// Reset form
+function reset_form(){
+    $('.form-details').removeClass('d-none');
+    $('.form-edit').addClass('d-none');
+}
+
 // Get location function
 function get_location(map_div) {
     if(!map_div){
@@ -2328,6 +2357,38 @@ function check_table_multiple_button(){
 }
 
 // Show alert
+function show_toastr(title, message, toastr_type){
+    const toastr_options = {
+        closeButton: false,
+        debug: false,
+        newestOnTop: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        preventDuplicates: true,
+        showDuration: 300,
+        hideDuration: 1000,
+        timeOut: 3000,
+        extendedTimeOut: 3000,
+        showEasing: 'swing',
+        hideEasing: 'linear',
+        showMethod: 'fadeIn',
+        hideMethod: 'fadeOut'
+    };
+
+    if(toastr_type == 'success'){
+        toastr.success(message, title, toastr_options);
+    }
+    else if(toastr_type == 'info'){
+        toastr.info(message, title, toastr_options);
+    }
+    else if(toastr_type == 'warning'){
+        toastr.warning(message, title, toastr_options);
+    }
+    else{
+        toastr.error(message, title, toastr_options);
+    }
+}
+
 function show_alert(title, message, type){
     Swal.fire(title, message, type);
 }
