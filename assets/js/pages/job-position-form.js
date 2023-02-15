@@ -37,21 +37,20 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Updated' || response[0]['RESPONSE'] === 'Inserted'){
-                            if(response[0]['RESPONSE'] === 'Inserted'){
-                                var redirect_link = window.location.href + '?id=' + response[0]['JOB_POSITION_ID'];
-
-                                show_alert_event('Insert Job Position Success', 'The job position has been inserted.', 'success', 'redirect', redirect_link);
-                            }
-                            else{
-                                show_alert_event('Update Job Position Success', 'The job position has been updated.', 'success', 'reload');
-                            }
+                        if(response[0]['RESPONSE'] === 'Inserted'){
+                            window.location = window.location.href + '?id=' + response[0]['JOB_POSITION_ID'];
+                        }
+                        else if(response[0]['RESPONSE'] === 'Updated'){
+                            display_details();
+                            reset_form();
+                            
+                            show_toastr('Update Successful', 'The job position has been updated successfully.', 'success');
                         }
                         else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            show_alert_event('Job Position Error', 'Your job position is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                            window.location = '404.php';
                         }
                         else{
-                            show_alert('Job Position Error', response, 'error');
+                            show_toastr('Transaction Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -122,11 +121,19 @@ function display_details(){
             $('#description').val(response[0].DESCRIPTION);
             $('#expected_new_employees').val(response[0].EXPECTED_NEW_EMPLOYEES);
 
+            $('#job_position_label').text(response[0].JOB_POSITION);
+            $('#description_label').text(response[0].DESCRIPTION);
+            $('#expected_new_employees_label').text(response[0].EXPECTED_NEW_EMPLOYEES);
+            $('#department_label').text(response[0].DEPARTMENT_NAME);
+
             document.getElementById('job_position_recruitment_status').innerHTML = response[0].RECRUITMENT_STATUS;
 
             check_empty(response[0].DEPARTMENT, '#department', 'select');
 
             $('#job_position_id').val(job_position_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -384,7 +391,7 @@ function initialize_click_events(){
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Job Position Successful', 'The job position has been deleted successfully.', 'success');
+                            window.location = 'job-positions.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

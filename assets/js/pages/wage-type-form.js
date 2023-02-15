@@ -90,8 +90,13 @@ function display_details(){
         data: {wage_type_id : wage_type_id, transaction : transaction},
         success: function(response) {
             $('#wage_type').val(response[0].WAGE_TYPE);
+            
+            $('#wage_type_label').text(response[0].WAGE_TYPE);
                     
             $('#wage_type_id').val(wage_type_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -121,7 +126,7 @@ function initialize_click_events(){
                     data: {username : username, wage_type_id : wage_type_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Wage Type Successful', 'The wage type has been deleted successfully.', 'success');
+                            window.location = 'wage-types.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

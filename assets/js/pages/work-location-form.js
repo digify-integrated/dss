@@ -108,7 +108,17 @@ function display_details(){
             $('#mobile').val(response[0].MOBILE);
             $('#location_number').val(response[0].LOCATION_NUMBER);
 
+            $('#work_location_label').text(response[0].WORK_LOCATION);
+            $('#work_location_address_label').text(response[0].WORK_LOCATION_ADDRESS);
+            $('#email_label').text(response[0].EMAIL);
+            $('#telephone_label').text(response[0].TELEPHONE);
+            $('#mobile_label').text(response[0].MOBILE);
+            $('#location_number_label').text(response[0].LOCATION_NUMBER);
+
             document.getElementById('work_location_status').innerHTML = response[0].STATUS;
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -138,7 +148,7 @@ function initialize_click_events(){
                     data: {username : username, work_location_id : work_location_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Work Location Successful', 'The work location has been deleted successfully.', 'success');
+                            window.location = 'work-locations.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

@@ -135,11 +135,21 @@ function display_details(){
             $('#default_page').val(response[0].DEFAULT_PAGE);
             $('#order_sequence').val(response[0].ORDER_SEQUENCE);
 
+            $('#module_name_label').text(response[0].MODULE_NAME);
+            $('#module_description_label').text(response[0].MODULE_DESCRIPTION);
+            $('#module_version_label').text(response[0].MODULE_VERSION);
+            $('#default_page_label').text(response[0].DEFAULT_PAGE);
+            $('#order_sequence_label').text(response[0].ORDER_SEQUENCE);
+            $('#module_category_label').text(response[0].MODULE_CATEGORY_NAME);
+
             document.getElementById('module_icon_image').innerHTML = response[0].MODULE_ICON;
                     
             $('#module_id').val(module_id);
 
             check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -281,7 +291,7 @@ function initialize_click_events(){
                     data: {username : username, module_id : module_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Module Successful', 'The module has been deleted successfully.', 'success');
+                            window.location = 'modules.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

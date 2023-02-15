@@ -22,6 +22,9 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $page_id = $api->decrypt_data($id);
+
+                $page_details = $api->get_page_details($page_id);
+                $transaction_log_id = $page_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $page_id = null;
@@ -136,43 +139,97 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_page > 0 || ($update_page > 0 && !empty($page_id)))){
-                                                                    echo '<button type="submit" for="page-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($page_id) && $add_page > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($page_id) && $update_page > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($page_id) && $update_page <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="page_id" name="page_id">
-                                                        <input type="hidden" id="transaction_log_id" name="transaction_log_id">
-                                                        <label for="page_name" class="col-md-3 col-form-label">Page Name <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="page_name" name="page_name" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="module_id" class="col-md-3 col-form-label">Module <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <select class="form-control select2" id="module_id" name="module_id" <?php echo $disabled; ?>>
-                                                                <option value="">--</option>
-                                                                <?php echo $api->generate_module_options(); ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input type="hidden" id="page_id" name="page_id" value="<?php echo $page_id; ?>">
+                                                <?php
+                                                    if(empty($page_id) && $add_page > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="page_name" class="col-md-3 col-form-label">Page Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="page_name" name="page_name" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="module_id" class="col-md-3 col-form-label">Module <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <select class="form-control select2" id="module_id" name="module_id" '. $disabled .'>
+                                                                            <option value="">--</option>
+                                                                            '. $api->generate_module_options() .'
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                    else if(!empty($page_id) && $update_page > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="page_name" class="col-md-3 col-form-label">Page Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="page_name_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="page_name" name="page_name" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="module_id" class="col-md-3 col-form-label">Module <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="module_id_label"></label>
+                                                                        <div class="d-none form-edit">
+                                                                            <select class="form-control select2" id="module_id" name="module_id" '. $disabled .'>
+                                                                                <option value="">--</option>
+                                                                                '. $api->generate_module_options() .'
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
                                             </div>
                                         </form>
                                         <?php
@@ -186,12 +243,6 @@
                                                                     <span class="d-none d-sm-block">Page Access</span>    
                                                                 </a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="page-access" role="tabpanel">
@@ -202,23 +253,6 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

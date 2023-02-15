@@ -3699,6 +3699,18 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     }
     # -------------------------------------------------------------
 
+    # Transaction logs
+    else if($type == 'transaction logs'){
+        if(isset($_POST['transaction_log_id']) && !empty($_POST['transaction_log_id'])){
+            if ($api->databaseConnection()) {
+                $transaction_log_id = $_POST['transaction_log_id'];
+
+                echo $api->generate_transaction_log_timeline($transaction_log_id);
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>

@@ -97,9 +97,15 @@ function display_details(){
         success: function(response) {
             $('#state_name').val(response[0].STATE_NAME);
 
+            $('#state_name_label').text(response[0].STATE_NAME);
+            $('#country_id_label').text(response[0].COUNTRY_NAME);
+
             check_empty(response[0].COUNTRY_ID, '#country_id', 'select');
 
             $('#state_id').val(state_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -129,7 +135,7 @@ function initialize_click_events(){
                     data: {username : username, state_id : state_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete State Successful', 'The state has been deleted successfully.', 'success');
+                            window.location = 'state.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

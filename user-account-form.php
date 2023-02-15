@@ -26,6 +26,7 @@
                 $user_account_details = $api->get_user_account_details($user_id);
                 $user_status = $user_account_details[0]['USER_STATUS'];
                 $failed_login = $user_account_details[0]['FAILED_LOGIN'];
+                $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
                 $readonly = 'readonly';
             }
             else{
@@ -164,48 +165,106 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_user_account > 0 || ($update_user_account > 0 && !empty($user_id)))){
-                                                                    echo '<button type="submit" for="user-account-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($user_id) && $add_user_account > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($user_id) && $update_user_account > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($user_id) && $update_user_account <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="file_as" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="file_as" name="file_as" maxlength="300" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="<?php echo $user_id; ?>" <?php echo $disabled . ' ' . $readonly; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <div class="input-group auth-pass-inputgroup">
-                                                                <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" <?php echo $disabled; ?>>
-                                                                <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+                                            <?php
+                                                    if(empty($user_id) && $add_user_account > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="file_as" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="file_as" name="file_as" maxlength="300" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="'. $user_id .'" '. $disabled .' '. $readonly .'>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <div class="input-group auth-pass-inputgroup">
+                                                                            <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" '. $disabled .'>
+                                                                            <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                    else if(!empty($user_id) && $update_user_account > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="file_as" class="col-md-3 col-form-label">Full Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="file_as_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="file_as" name="file_as" maxlength="300" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="user_id" class="col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="user_id_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="user_id" name="user_id" maxlength="50" value="'. $user_id .'" '. $disabled .' '. $readonly .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 d-none form-edit">
+                                                                <div class="row mb-4">
+                                                                    <label for="password" class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <div class="input-group auth-pass-inputgroup">
+                                                                            <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon" '. $disabled .'>
+                                                                            <button class="btn btn-light " type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
                                             </div>
                                         </form>
                                         <?php
@@ -223,12 +282,6 @@
                                                                 <a class="nav-link" data-bs-toggle="tab" href="#user-account-role" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-house-user"></i></span>
                                                                     <span class="d-none d-sm-block">Roles</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>
                                                                 </a>
                                                             </li>
                                                         </ul>
@@ -269,23 +322,6 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

@@ -154,7 +154,7 @@
                                                                             <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
                                                                             <span class="d-none d-sm-block">Edit</span>
                                                                         </button>
-                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
                                                                             <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>
@@ -168,35 +168,21 @@
                                                                         </button>';
                                                                 }
                                                                 else if(!empty($action_id) && $update_action <= 0){
-                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#filter-off-canvas" aria-controls="filter-off-canvas">
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
                                                                             <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
                                                         </div>
-                                                        <div class="offcanvas offcanvas-end" tabindex="-1" id="filter-off-canvas" data-bs-backdrop="true" aria-labelledby="filter-off-canvas-label">
-                                                            <div class="offcanvas-header">
-                                                                <h5 class="offcanvas-title" id="filter-off-canvas-label">Transaction Log</h5>
-                                                                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="offcanvas-body">
-                                                                <div class="mb-3">
-                                                                   <?php
-                                                                        if(!empty($action_id) && !empty($transaction_log_id)){
-                                                                            echo $api->generate_transaction_log_timeline($transaction_log_id);
-                                                                        }
-                                                                   ?>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
                                                 <div class="col-md-12">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="action_id" name="action_id">
+                                                        <input type="hidden" id="action_id" name="action_id" value="<?php echo $action_id; ?>">
                                                         <?php
                                                             if(empty($action_id) && $add_action > 0){
                                                                 echo ' <label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
@@ -207,6 +193,7 @@
                                                             else if(!empty($action_id) && $update_action > 0){
                                                                 echo '<label for="action_name" class="col-md-2 col-form-label">Action Name <span class="text-danger">*</span></label>
                                                                 <div class="col-md-10">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
                                                                     <label class="col-form-label form-details" id="action_name_label"></label>
                                                                     <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="action_name" name="action_name" maxlength="200" '. $disabled .'>
                                                                 </div>';

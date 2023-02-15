@@ -102,15 +102,15 @@ function initialize_click_events(){
                         data: {username : username, id_type_id : id_type_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple ID Types Success', 'The ID types have been deleted.', 'success');
+                                show_toastr('Delete Multiple ID Types Successful', 'The ID types have been deleted successfully.', 'success');
     
                                 reload_datatable('#id-types-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple ID Types Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple ID Types Error', response, 'error');
+                                show_toastr('Delete Multiple ID Types Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +124,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple ID Types', 'Please select the ID types you want to delete.', 'error');
+            show_toastr('Delete Multiple ID Types Error', 'Please select the ID types you want to delete.', 'error');
         }
     });
 

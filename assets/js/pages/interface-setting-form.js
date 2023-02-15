@@ -103,6 +103,9 @@ function display_details(){
         success: function(response) {
             $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
             $('#description').val(response[0].DESCRIPTION);
+
+            $('#interface_setting_name_label').text(response[0].INTERFACE_SETTING_NAME);
+            $('#description_label').text(response[0].DESCRIPTION);
                     
             document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
             document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
@@ -111,6 +114,9 @@ function display_details(){
             document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
 
             $('#interface_setting_id').val(interface_setting_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -140,7 +146,7 @@ function initialize_click_events(){
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Interface Setting Successful', 'The interface setting has been deleted successfully.', 'success');
+                            window.location = 'interface-settings.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

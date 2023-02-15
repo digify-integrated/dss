@@ -106,16 +106,15 @@ function initialize_click_events(){
                         data: {username : username, system_code_id : system_code_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple System Codes Success', 'The system codes have been deleted.', 'success');
+                                show_toastr('Delete Multiple System Codes Successful', 'The system code have been deleted successfully.', 'success');
     
                                 reload_datatable('#system-codes-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple System Codes Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
-    
                             else{
-                                show_alert('Delete Multiple System Codes Error', response, 'error');
+                                show_toastr('Delete Multiple System Codes Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -129,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple System Codes Error', 'Please select the system codes you want to delete.', 'error');
+            show_toastr('Delete Multiple System Codes Error', 'Please select the system codes you want to delete.', 'error');
         }
     });
 

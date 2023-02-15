@@ -74,6 +74,8 @@ function initialize_global_functions(){
     $(document).on('click','#form-edit',function() {
        $('.form-details').addClass('d-none');
        $('.form-edit').removeClass('d-none');
+
+       display_details();
     });
 
     $(document).on('click','#discard',() => {
@@ -2033,6 +2035,24 @@ function generate_city_option(province, selected){
     });
 }
 
+function generate_transaction_logs(){
+    const username = $('#username').text();
+    const transaction_log_id = $('#transaction_log_id').val();
+    const type = 'transaction logs';
+
+    $.ajax({
+        url: 'system-generation.php',
+        method: 'POST',
+        data: {type : type, transaction_log_id : transaction_log_id, username : username},
+        beforeSend: function(){
+            $('#transaction-logs').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+        },
+        success: function(response) {
+            $('#transaction-logs').html(response);
+        }
+    });
+}
+
 // Reset validation functions
 function reset_element_validation(element){
     $(element)
@@ -2072,7 +2092,7 @@ function check_option_exist(element, option, return_value){
     const $element = $(element);
     const $option = $element.find(`option[value="${option}"]`);
 
-    $element.val($option.length ? option : returnValue).trigger('change');
+    $element.val($option.length ? option : return_value).trigger('change');
 }
 
 function check_empty(value, id, type){
@@ -2356,15 +2376,15 @@ function check_table_multiple_button(){
     }
 }
 
-// Show alert
-function show_toastr(title, message, toastr_type){
+// Show toastr
+function show_toastr(title, message, toastr_type, redirect_page = null){
     const toastr_options = {
         closeButton: false,
         debug: false,
         newestOnTop: true,
         progressBar: true,
         positionClass: 'toast-top-right',
-        preventDuplicates: true,
+        preventDuplicates: false,
         showDuration: 300,
         hideDuration: 1000,
         timeOut: 3000,
@@ -2375,23 +2395,25 @@ function show_toastr(title, message, toastr_type){
         hideMethod: 'fadeOut'
     };
 
-    if(toastr_type == 'success'){
-        toastr.success(message, title, toastr_options);
+    const toastr_types = {
+        success: toastr.success,
+        info: toastr.info,
+        warning: toastr.warning,
+        error: toastr.error
+    };
+      
+    if (toastr_type in toastr_types) {
+        toastr_types[toastr_type](message, title, toastr_options);
     }
-    else if(toastr_type == 'info'){
-        toastr.info(message, title, toastr_options);
-    }
-    else if(toastr_type == 'warning'){
-        toastr.warning(message, title, toastr_options);
-    }
-    else{
-        toastr.error(message, title, toastr_options);
-    }
+
+    setTimeout(function(){
+        if (redirect_page) {
+            window.location.href = redirect_page;
+        }
+    }, 3000);   
 }
 
-function show_alert(title, message, type){
-    Swal.fire(title, message, type);
-}
+// Show alert
 
 function show_alert_event(title, message, type, event, rederict_link){
     const handle_event = (event, rederict_link) => {

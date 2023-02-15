@@ -94,8 +94,13 @@ function display_details(){
         data: {country_id : country_id, transaction : transaction},
         success: function(response) {
             $('#country_name').val(response[0].COUNTRY_NAME);
+            
+            $('#country_name_label').text(response[0].COUNTRY_NAME);
 
             $('#country_id').val(country_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -179,7 +184,7 @@ function initialize_click_events(){
                     data: {username : username, country_id : country_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Country Successful', 'The country has been deleted successfully.', 'success');
+                            window.location = 'country.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

@@ -101,15 +101,15 @@ function initialize_click_events(){
                         data: {username : username, company_id : company_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Companies Success', 'The companies have been deleted.', 'success');
+                                show_toastr('Delete Multiple Companies Successful', 'The companies have been deleted successfully.', 'success');
     
                                 reload_datatable('#company-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Companies Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Companies Error', response, 'error');
+                                show_toastr('Delete Multiple Companies Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -123,7 +123,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Companies Error', 'Please select the companies you want to delete.', 'error');
+            show_toastr('Delete Multiple Companies Error', 'Please select the companies you want to delete.', 'error');
         }
     });
 

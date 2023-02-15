@@ -97,9 +97,13 @@ function display_details(){
         success: function(response) {
             $('#working_schedule_type').val(response[0].WORKING_SCHEDULE_TYPE);
 
+            $('#working_schedule_type_label').text(response[0].WORKING_SCHEDULE_TYPE);
+            $('#working_schedule_type_category_label').text(response[0].WORKING_SCHEDULE_TYPE_CATEGORY_NAME);
+
             check_empty(response[0].WORKING_SCHEDULE_TYPE_CATEGORY, '#working_schedule_type_category', 'select');
-            
-            $('#working_schedule_type_id').val(working_schedule_type_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -129,7 +133,7 @@ function initialize_click_events(){
                     data: {username : username, working_schedule_type_id : working_schedule_type_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Working Schedule Type Successful', 'The working schedule type has been deleted successfully.', 'success');
+                            window.location = 'working-schedule-types.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

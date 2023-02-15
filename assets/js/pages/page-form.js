@@ -100,9 +100,14 @@ function display_details(){
         data: {page_id : page_id, transaction : transaction},
         success: function(response) {
             $('#page_name').val(response[0].PAGE_NAME);
-            $('#page_id').val(page_id);
+
+            $('#page_name_label').text(response[0].PAGE_NAME);
+            $('#module_id_label').text(response[0].MODULE_NAME);
 
             check_empty(response[0].MODULE_ID, '#module_id', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -244,7 +249,7 @@ function initialize_click_events(){
                     data: {username : username, page_id : page_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Page Successful', 'The page has been deleted successfully.', 'success');
+                            window.location = 'pages.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

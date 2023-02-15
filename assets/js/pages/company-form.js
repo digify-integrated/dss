@@ -102,10 +102,21 @@ function display_details(){
             $('#mobile').val(response[0].MOBILE);
             $('#telephone').val(response[0].TELEPHONE);
             $('#website').val(response[0].WEBSITE);
+
+            $('#company_name_label').text(response[0].COMPANY_NAME);
+            $('#company_address_label').text(response[0].COMPANY_ADDRESS);
+            $('#tax_id_label').text(response[0].TAX_ID);
+            $('#email_label').text(response[0].EMAIL);
+            $('#mobile_label').text(response[0].MOBILE);
+            $('#telephone_label').text(response[0].TELEPHONE);
+            $('#website_label').text(response[0].WEBSITE);
                     
             document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
 
             $('#company_id').val(company_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -135,7 +146,7 @@ function initialize_click_events(){
                     data: {username : username, company_id : company_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Company Successful', 'The company has been deleted successfully.', 'success');
+                            window.location = 'company.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -163,7 +174,7 @@ function initialize_click_events(){
             buttonsStyling: !1
         }).then(function(result) {
             if (result.value) {
-                window.location.href = 'company.php';
+                window.location = 'company.php';
             }
         });
     });

@@ -157,12 +157,14 @@ function display_details(){
         data: {employee_id : employee_id, transaction : transaction},
         success: function(response) {
             $('#employee').val(response[0].DEPARTMENT);
-            $('#transaction_log_id').val(response[0].TRANSACTION_LOG_ID);
 
             document.getElementById('employee_status').innerHTML = response[0].STATUS;
 
             check_empty(response[0].PARENT_DEPARTMENT, '#parent_employee', 'select');
             check_empty(response[0].MANAGER, '#manager', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -192,7 +194,7 @@ function initialize_click_events(){
                     data: {username : username, employee_id : employee_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Employee Successful', 'The employee has been deleted successfully.', 'success');
+                            window.location = 'employees.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

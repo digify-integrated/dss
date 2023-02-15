@@ -105,15 +105,15 @@ function initialize_click_events(){
                         data: {username : username, working_schedule_type_id : working_schedule_type_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Working Schedule Types Success', 'The working schedule types have been deleted.', 'success');
+                                show_toastr('Delete Multiple Working Schedule Types Successful', 'The working schedule types have been deleted successfully.', 'success');
     
                                 reload_datatable('#working-schedule-types-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Working Schedule Types Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Working Schedule Types Error', response, 'error');
+                                show_toastr('Delete Multiple Working Schedule Types Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +127,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Working Schedule Types', 'Please select the working schedule types you want to delete.', 'error');
+            show_toastr('Delete Multiple Working Schedule Types Error', 'Please select the working schedule types you want to delete.', 'error');
         }
     });
 

@@ -90,8 +90,13 @@ function display_details(){
         data: {departure_reason_id : departure_reason_id, transaction : transaction},
         success: function(response) {
             $('#departure_reason').val(response[0].DEPARTURE_REASON);
+            
+            $('#departure_reason_label').text(response[0].DEPARTURE_REASON);
                     
             $('#departure_reason_id').val(departure_reason_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -121,7 +126,7 @@ function initialize_click_events(){
                     data: {username : username, departure_reason_id : departure_reason_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Departure Reason Successful', 'The departure reason has been deleted successfully.', 'success');
+                            window.location = 'departure-reasons.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

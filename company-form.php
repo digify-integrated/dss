@@ -22,6 +22,9 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $company_id = $api->decrypt_data($id);
+
+                $company_details = $api->get_company_details($company_id);
+                $transaction_log_id = $company_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $company_id = null;
@@ -128,18 +131,43 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                 if(($add_company > 0 || ($update_company > 0 && !empty($company_id)))){
-                                                                    echo '<button type="submit" for="company-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($company_id) && $add_company > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($company_id) && $update_company > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($company_id) && $update_company <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -151,97 +179,127 @@
                                                 }
                                             ?>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="company_id" name="company_id">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="company_name" class="col-md-3 col-form-label">Company <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="company_logo" class="col-md-3 col-form-label">Company Logo</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="company_logo" id="company_logo" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="company_address" class="col-md-3 col-form-label">Company Address</label>
-                                                        <div class="col-md-9">
-                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_address" name="company_address" maxlength="500" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="tax_id" class="col-sm-3 col-form-label">Tax ID</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="tax_id" name="tax_id" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="email" class="col-sm-3 col-form-label">Email</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="email" id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="website" class="col-sm-3 col-form-label">Website</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="url" class="form-control form-maxlength" autocomplete="off" id="website" name="website" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                        <?php
-                                            if(!empty($company_id)){
-                                                echo ' <div class="row mt-4">
-                                                    <div class="col-md-12">
-                                                        <ul class="nav nav-tabs" role="tablist">
-                                                            <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
+                                                <input type="hidden" id="company_id" name="company_id" value="<?php echo $company_id; ?>">
+                                                <?php
+                                                    if(empty($company_id) && $add_company > 0){
+                                                        echo '<div class="col-md-6">
+                                                                    <div class="row mb-4">
+                                                                        <label for="company_name" class="col-md-3 col-form-label">Company <span class="text-danger">*</span></label>
+                                                                        <div class="col-md-9">
+                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="company_logo" class="col-md-3 col-form-label">Company Logo</label>
+                                                                        <div class="col-md-9">
+                                                                            <input class="form-control" type="file" name="company_logo" id="company_logo" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="company_address" class="col-md-3 col-form-label">Company Address</label>
+                                                                        <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_address" name="company_address" maxlength="500" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="tax_id" class="col-sm-3 col-form-label">Tax ID</label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="tax_id" name="tax_id" maxlength="100" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="row mb-4">
+                                                                        <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="email" id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="website" class="col-sm-3 col-form-label">Website</label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="url" class="form-control form-maxlength" autocomplete="off" id="website" name="website" maxlength="100" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>';
+                                                    }
+                                                    else if(!empty($company_id) && $update_company > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="company_name" class="col-md-3 col-form-label">Company <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="company_name_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="company_name" name="company_name" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4 d-none form-edit">
+                                                                    <label for="company_logo" class="col-md-3 col-form-label">Company Logo</label>
+                                                                    <div class="col-md-9">
+                                                                        <input class="form-control" type="file" name="company_logo" id="company_logo" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="company_address" class="col-md-3 col-form-label">Company Address</label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="company_address_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="company_address" name="company_address" maxlength="500" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="tax_id" class="col-sm-3 col-form-label">Tax ID</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="tax_id_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="tax_id" name="tax_id" maxlength="100" '. $disabled .'>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>';
-                                            }
-                                        ?>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="email_label"></label>
+                                                                        <input type="email" id="email" name="email" class="form-control form-maxlength d-none form-edit" maxlength="100" autocomplete="off" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="mobile_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="mobile" name="mobile" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="telephone_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="telephone" name="telephone" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="website" class="col-sm-3 col-form-label">Website</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="website_label"></label>
+                                                                        <input type="url" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="website" name="website" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

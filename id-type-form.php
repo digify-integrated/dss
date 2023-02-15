@@ -22,6 +22,9 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $id_type_id = $api->decrypt_data($id);
+
+                $id_type_details = $api->get_id_type_details($id_type_id);
+                $transaction_log_id = $id_type_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $id_type_id = null;
@@ -129,69 +132,70 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_id_type > 0 || ($update_id_type > 0 && !empty($id_type_id)))){
-                                                                    echo '<button type="submit" for="id-type-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($id_type_id) && $add_id_type > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($id_type_id) && $update_id_type > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($id_type_id) && $update_id_type <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
                                                 <div class="col-md-12">
                                                     <div class="row mb-4">
-                                                        <input type="hidden" id="id_type_id" name="id_type_id">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="id_type" class="col-md-2 col-form-label">ID Type <span class="text-danger">*</span></label>
-                                                        <div class="col-md-10">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="id_type" name="id_type" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
+                                                        <input type="hidden" id="id_type_id" name="id_type_id" value="<?php echo $id_type_id; ?>">
+                                                        <?php
+                                                            if(empty($id_type_id) && $add_id_type > 0){
+                                                                echo '<label for="id_type" class="col-md-2 col-form-label">ID Type <span class="text-danger">*</span></label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="id_type" name="id_type" maxlength="100" '. $disabled .'>
+                                                                </div>';
+                                                            }
+                                                            else if(!empty($id_type_id) && $update_id_type > 0){
+                                                                echo '<label for="id_type" class="col-md-2 col-form-label">ID Type <span class="text-danger">*</span></label>
+                                                                <div class="col-md-10">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label class="col-form-label form-details" id="id_type_label"></label>
+                                                                    <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="id_type" name="id_type" maxlength="100" '. $disabled .'>
+                                                                </div>';
+                                                            }
+                                                        ?>
                                                     </div>
                                                 </div>
                                             </div>
                                         </form>
-                                        <?php
-                                            if(!empty($id_type_id)){
-                                                echo ' <div class="row mt-4">
-                                                    <div class="col-md-12">
-                                                        <ul class="nav nav-tabs" role="tablist">
-                                                            <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <div class="tab-content p-3 text-muted">
-                                                            <div class="tab-pane active" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>';
-                                            }
-                                        ?>
                                     </div>
                                 </div>
                             </div>

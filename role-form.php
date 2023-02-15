@@ -22,6 +22,9 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $role_id = $api->decrypt_data($id);
+
+                $role_details = $api->get_role_details($role_id);
+                $transaction_log_id = $role_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $role_id = null;
@@ -153,49 +156,110 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                 if(($add_role > 0 || ($update_role > 0 && !empty($role_id)))){
-                                                                    echo '<button type="submit" for="role-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($role_id) && $add_role > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($role_id) && $update_role > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($role_id) && $update_role <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="role_id" name="role_id">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="role" class="col-md-3 col-form-label">Role <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role" name="role" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="role_description" class="col-md-3 col-form-label">Role Description <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="role_description" name="role_description" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
-                                                        <div class="col-md-9">
-                                                            <select class="form-control select2" id="assignable" name="assignable" <?php echo $disabled; ?>>
-                                                                <option value="2">False</option>
-                                                                <option value="1">True</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input type="hidden" id="role_id" name="role_id" value="<?php echo $role_id; ?>">
+                                                <?php
+                                                    if(empty($role_id) && $add_role > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="role" class="col-md-3 col-form-label">Role <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="role" name="role" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="role_description" class="col-md-3 col-form-label">Role Description <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="role_description" name="role_description" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
+                                                                    <div class="col-md-9">
+                                                                        <select class="form-control select2" id="assignable" name="assignable" '. $disabled .'>
+                                                                            <option value="2">False</option>
+                                                                            <option value="1">True</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                    else if(!empty($role_id) && $update_role > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="role" class="col-md-3 col-form-label">Role <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="role_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="role" name="role" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="role_description" class="col-md-3 col-form-label">Role Description <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="role_description_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit"  autocomplete="off" id="role_description" name="role_description" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="assignable" class="col-md-3 col-form-label">Assignable?</label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="assignable_label"></label>
+                                                                        <div class="d-none form-edit">
+                                                                            <select class="form-control select2" id="assignable" name="assignable" '. $disabled .'>
+                                                                                <option value="2">False</option>
+                                                                                <option value="1">True</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
                                             </div>
                                         </form>
                                         <?php
@@ -225,12 +289,6 @@
                                                                 <a class="nav-link" data-bs-toggle="tab" href="#user-accounts" role="tab">
                                                                     <span class="d-block d-sm-none"><i class="fas fa-user-alt"></i></span>
                                                                     <span class="d-none d-sm-block">User Accounts</span>    
-                                                                </a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
                                                                 </a>
                                                             </li>
                                                         </ul>
@@ -288,23 +346,6 @@
                                                                                 <tr>
                                                                                     <th class="all">User Account</th>
                                                                                     <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

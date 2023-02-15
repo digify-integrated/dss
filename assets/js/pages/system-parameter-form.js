@@ -100,7 +100,13 @@ function display_details(){
             $('#parameter_extension').val(response[0].PARAMETER_EXTENSION);
             $('#parameter_number').val(response[0].PARAMETER_NUMBER);
 
-            $('#parameter_id').val(parameter_id);
+            $('#parameter_label').text(response[0].PARAMETER);
+            $('#parameter_description_label').text(response[0].PARAMETER_DESCRIPTION);
+            $('#parameter_extension_label').text(response[0].PARAMETER_EXTENSION);
+            $('#parameter_number_label').text(response[0].PARAMETER_NUMBER);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -130,7 +136,7 @@ function initialize_click_events(){
                     data: {username : username, parameter_id : parameter_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete System Parameter Successful', 'The system parameter has been deleted successfully.', 'success');
+                            window.location = 'system-parameters.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

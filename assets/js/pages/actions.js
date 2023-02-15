@@ -101,15 +101,15 @@ function initialize_click_events(){
                         data: {username : username, action_id : action_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Actions Success', 'The actions have been deleted.', 'success');
+                                show_toastr('Delete Multiple Actions Successful', 'The actions have been deleted successfully.', 'success');
     
                                 reload_datatable('#actions-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Actions Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Actions Error', response, 'error');
+                                show_toastr('Delete Multiple Actions Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -123,7 +123,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Actions Error', 'Please select the actions you want to delete.', 'error');
+            show_toastr('Delete Multiple Actions Error', 'Please select the actions you want to delete.', 'error');
         }
     });
 

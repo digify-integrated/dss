@@ -125,8 +125,16 @@ function display_details(){
             $('#description').val(response[0].DESCRIPTION);
             $('#notification_message').val(response[0].NOTIFICATION_MESSAGE);
             $('#email_link').val(response[0].EMAIL_LINK);
-                    
-            $('#notification_setting_id').val(notification_setting_id);
+
+            $('#notification_setting_label').text(response[0].NOTIFICATION_SETTING);
+            $('#notification_title_label').text(response[0].NOTIFICATION_TITLE);
+            $('#system_link_label').text(response[0].SYSTEM_LINK);
+            $('#description_label').text(response[0].DESCRIPTION);
+            $('#notification_message_label').text(response[0].NOTIFICATION_MESSAGE);
+            $('#email_link_label').text(response[0].EMAIL_LINK);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -480,7 +488,7 @@ function initialize_click_events(){
                     data: {username : username, notification_setting_id : notification_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Notification Setting Successful', 'The notification setting has been deleted successfully.', 'success');
+                            window.location = 'notification-settings.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

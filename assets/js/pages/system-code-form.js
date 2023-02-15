@@ -104,9 +104,14 @@ function display_details(){
             $('#system_description').val(response[0].SYSTEM_DESCRIPTION);
             $('#system_code').val(response[0].SYSTEM_CODE);
 
-            $('#system_code_id').val(system_code_id);
+            $('#system_description_label').text(response[0].SYSTEM_DESCRIPTION);
+            $('#system_code_label').text(response[0].SYSTEM_CODE);
+            $('#system_type_label').text(response[0].SYSTEM_TYPE_NAME);
 
             check_empty(response[0].SYSTEM_TYPE, '#system_type', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -136,7 +141,7 @@ function initialize_click_events(){
                     data: {username : username, system_code_id : system_code_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete System Code Successful', 'The system code has been deleted successfully.', 'success');
+                            window.location = 'system-codes.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

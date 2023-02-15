@@ -102,15 +102,15 @@ function initialize_click_events(){
                         data: {username : username, employee_type_id : employee_type_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Employee Types Success', 'The employee types have been deleted.', 'success');
+                                show_toastr('Delete Multiple Employee Types Successful', 'The employee types have been deleted successfully.', 'success');
     
                                 reload_datatable('#employee-types-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Employee Types Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Employee Types Error', response, 'error');
+                                show_toastr('Delete Multiple Employee Types Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +124,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Employee Types', 'Please select the employee types you want to delete.', 'error');
+            show_toastr('Delete Multiple Employee Types Error', 'Please select the employee types you want to delete.', 'error');
         }
     });
 

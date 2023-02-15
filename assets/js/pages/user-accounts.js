@@ -114,15 +114,15 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple User Accounts Success', 'The user accounts have been deleted.', 'success');
+                                show_toastr('Delete Multiple User Accounts Successful', 'The user accounts have been deleted successfully.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple User Accounts Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple User Accounts Error', response, 'error');
+                                show_toastr('Delete Multiple User Accounts Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -136,7 +136,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple User Accounts Error', 'Please select the user accounts you want to delete.', 'error');
+            show_toastr('Delete Multiple User Accounts Error', 'Please select the user accounts you want to delete.', 'error');
         }
     });
 
@@ -169,20 +169,15 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Locked' || response === 'Not Found'){
-                                if(response === 'Locked'){
-                                    show_alert('Lock Multiple User Accounts Success', 'The user accounts have been locked.', 'success');
-                                }
-                                else{
-                                    show_alert('Lock Multiple User Accounts Error', 'The user account does not exist.', 'info');
-                                }
+                                show_toastr('Lock Multiple User Accounts Successful', 'The user accounts have been locked successfully.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Lock Multiple User Accounts Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Lock Multiple User Accounts Error', response, 'error');
+                                show_toastr('Lock Multiple User Accounts Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -195,7 +190,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Lock Multiple User Accounts Error', 'Please select the user accounts you want to lock.', 'error');
+            show_toastr('Lock Multiple User Accounts Error', 'Please select the user accounts you want to lock.', 'error');
         }
     });
 
@@ -228,20 +223,15 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Unlocked' || response === 'Not Found'){
-                                if(response === 'Unlocked'){
-                                    show_alert('Unlock Multiple User Accounts Success', 'The user accounts have been unlocked.', 'success');
-                                }
-                                else{
-                                    show_alert('Unlock Multiple User Accounts Error', 'The user account does not exist.', 'info');
-                                }
+                                show_toastr('Unlock Multiple User Accounts Successful', 'The user accounts have been unlocked successfully.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Unlock Multiple User Accounts Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Unlock Multiple User Accounts Error', response, 'error');
+                                show_toastr('Unlock Multiple User Accounts Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -254,7 +244,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Unlock Multiple User Accounts Error', 'Please select the user accounts you want to unlock.', 'error');
+            show_toastr('Unlock Multiple User Accounts Error', 'Please select the user accounts you want to unlock.', 'error');
         }
     });
 
@@ -287,20 +277,15 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Activated' || response === 'Not Found'){
-                                if(response === 'Activated'){
-                                    show_alert('Activate Multiple User Accounts Success', 'The user accounts have been activated.', 'success');
-                                }
-                                else{
-                                    show_alert('Activate Multiple User Accounts Error', 'The user account does not exist.', 'info');
-                                }
+                                show_toastr('Activate Multiple User Accounts Successful', 'The user accounts have been activated successfully.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Activate Multiple User Accounts Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Activate Multiple User Accounts Error', response, 'error');
+                                show_toastr('Activate Multiple User Accounts Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -313,7 +298,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Activate Multiple User Accounts Error', 'Please select the user accounts you want to activate.', 'error');
+            show_toastr('Activate Multiple User Accounts Error', 'Please select the user accounts you want to activate.', 'error');
         }
     });
 
@@ -346,20 +331,15 @@ function initialize_click_events(){
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deactivated' || response === 'Not Found'){
-                                if(response === 'Deactivated'){
-                                    show_alert('Deactivate Multiple User Accounts Success', 'The user accounts have been deactivated.', 'success');
-                                }
-                                else{
-                                    show_alert('Deactivate Multiple User Accounts Error', 'The user account does not exist.', 'info');
-                                }
+                                show_toastr('Deactivate Multiple User Accounts Successful', 'The user accounts have been deactivated successfully.', 'success');
     
                                 reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Deactivate Multiple User Accounts Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Deactivate Multiple User Accounts Error', response, 'error');
+                                show_toastr('Deactivate Multiple User Accounts Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -372,7 +352,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Deactivate Multiple User Accounts Error', 'Please select the user accounts you want to deactivate.', 'error');
+            show_toastr('Deactivate Multiple User Accounts Error', 'Please select the user accounts you want to deactivate.', 'error');
         }
     });
 

@@ -114,15 +114,15 @@ function initialize_click_events(){
                         data: {username : username, job_position_id : job_position_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Job Positions Success', 'The job positions have been deleted.', 'success');
+                                show_toastr('Delete Multiple Job Positions Successful', 'The job positions have been deleted successfully.', 'success');
     
                                 reload_datatable('#job-positions-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Job Positions Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Job Positions Error', response, 'error');
+                                show_toastr('Delete Multiple Job Positions Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -136,7 +136,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Job Positions', 'Please select the job positions you want to delete.', 'error');
+            show_toastr('Delete Multiple Job Positions Error', 'Please select the job positions you want to delete.', 'error');
         }
     });
 

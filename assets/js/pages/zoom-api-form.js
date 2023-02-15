@@ -112,9 +112,15 @@ function display_details(){
             $('#api_secret').val(response[0].API_SECRET);
             $('#description').val(response[0].DESCRIPTION);
 
-            document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
+            $('#zoom_api_name_label').text(response[0].ZOOM_API_NAME);
+            $('#api_key_label').text(response[0].API_KEY);
+            $('#api_secret_label').text(response[0].API_SECRET);
+            $('#description_label').text(response[0].DESCRIPTION);
 
-            $('#zoom_api_id').val(zoom_api_id);
+            document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -144,7 +150,7 @@ function initialize_click_events(){
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Zoom API Successful', 'The Zoom API has been deleted successfully.', 'success');
+                            window.location = 'zoom-api.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

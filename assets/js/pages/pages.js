@@ -105,15 +105,15 @@ function initialize_click_events(){
                         data: {username : username, page_id : page_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Pages Success', 'The pages have been deleted.', 'success');
+                                show_toastr('Delete Multiple Pages Successful', 'The pages have been deleted successfully.', 'success');
     
                                 reload_datatable('#pages-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Pages Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Pages Error', response, 'error');
+                                show_toastr('Delete Multiple Pages Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +127,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Pages Error', 'Please select the pages you want to delete.', 'error');
+            show_toastr('Delete Multiple Pages Error', 'Please select the pages you want to delete.', 'error');
         }
     });
 

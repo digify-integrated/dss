@@ -113,9 +113,15 @@ function display_details(){
         success: function(response) {
             $('#role').val(response[0].ROLE);
             $('#role_description').val(response[0].ROLE_DESCRIPTION);
-            $('#role_id').val(role_id);
+
+            $('#role_label').text(response[0].ROLE);
+            $('#role_description_label').text(response[0].ROLE_DESCRIPTION);
+            $('#assignable_label').text(response[0].ASSIGNABLE_NAME);
 
             check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -577,7 +583,7 @@ function initialize_click_events(){
                     data: {username : username, role_id : role_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Role Successful', 'The role has been deleted successfully.', 'success');
+                            window.location = 'roles.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

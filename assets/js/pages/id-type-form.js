@@ -90,8 +90,13 @@ function display_details(){
         data: {id_type_id : id_type_id, transaction : transaction},
         success: function(response) {
             $('#id_type').val(response[0].ID_TYPE);
+            
+            $('#id_type_label').text(response[0].ID_TYPE);
                     
             $('#id_type_id').val(id_type_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -121,7 +126,7 @@ function initialize_click_events(){
                     data: {username : username, id_type_id : id_type_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete ID Type Successful', 'The ID type has been deleted successfully.', 'success');
+                            window.location.href = 'id-types.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

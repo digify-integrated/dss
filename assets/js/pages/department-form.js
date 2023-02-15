@@ -91,10 +91,17 @@ function display_details(){
         success: function(response) {
             $('#department').val(response[0].DEPARTMENT);
 
+            $('#department_label').text(response[0].DEPARTMENT);
+            $('#parent_department_label').text(response[0].PARENT_DEPARTMENT_NAME);
+            $('#manager_label').text(response[0].MANAGER_NAME);
+
             document.getElementById('department_status').innerHTML = response[0].STATUS;
 
             check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
             check_empty(response[0].MANAGER, '#manager', 'select');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -124,7 +131,7 @@ function initialize_click_events(){
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Department Successful', 'The department has been deleted successfully.', 'success');
+                            window.location = 'departments.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

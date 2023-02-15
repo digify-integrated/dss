@@ -111,15 +111,15 @@ function initialize_click_events(){
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Departments Success', 'The Departments have been deleted.', 'success');
+                                show_toastr('Delete Multiple Departments Successful', 'The departments have been deleted successfully.', 'success');
     
                                 reload_datatable('#departments-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Departments Error', 'Your department is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Departments Error', response, 'error');
+                                show_toastr('Delete Multiple Departments Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -133,7 +133,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Departments', 'Please select the Departments you want to delete.', 'error');
+            show_toastr('Delete Multiple Departments Error', 'Please select the departments you want to delete.', 'error');
         }
     });
 
@@ -166,20 +166,15 @@ function initialize_click_events(){
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Unarchived' || response === 'Not Found'){
-                                if(response === 'Unarchived'){
-                                    show_alert('Unarchive Multiple Departments Success', 'The departments have been unarchived.', 'success');
-                                }
-                                else{
-                                    show_alert('Unarchive Multiple Departments Error', 'The department does not exist.', 'info');
-                                }
+                                show_toastr('Unarchive Multiple Departments Successful', 'The departments have been unarchived successfully.', 'success');
     
                                 reload_datatable('#departments-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Unarchive Multiple Departments Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Unarchive Multiple Departments Error', response, 'error');
+                                show_toastr('Unarchive Multiple Departments Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -192,7 +187,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Unarchive Multiple Departments Error', 'Please select the departments you want to unarchive.', 'error');
+            show_toastr('Unarchive Multiple Departments Error', 'Please select the departments you want to unarchive.', 'error');
         }
     });
 
@@ -225,20 +220,15 @@ function initialize_click_events(){
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Archived' || response === 'Not Found'){
-                                if(response === 'Archived'){
-                                    show_alert('Archive Multiple Departments Success', 'The departments have been archived.', 'success');
-                                }
-                                else{
-                                    show_alert('Archive Multiple Departments Error', 'The department does not exist.', 'info');
-                                }
+                                show_toastr('Archive Multiple Departments Successful', 'The departments have been archived successfully.', 'success');
     
                                 reload_datatable('#departments-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Archive Multiple Departments Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Archive Multiple Departments Error', response, 'error');
+                                show_toastr('Archive Multiple Departments Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -251,7 +241,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Archive Multiple Departments Error', 'Please select the departments you want to archive.', 'error');
+            show_toastr('Archive Multiple Departments Error', 'Please select the departments you want to archive.', 'error');
         }
     });
 

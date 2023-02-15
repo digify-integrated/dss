@@ -106,15 +106,15 @@ function initialize_click_events(){
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Work Locations Success', 'The work locations have been deleted.', 'success');
+                                show_toastr('Delete Multiple Work Locations Successful', 'The work locations have been deleted successfully.', 'success');
     
                                 reload_datatable('#work-locations-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Work Locations Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Work Locations Error', response, 'error');
+                                show_toastr('Delete Multiple Work Locations Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -128,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Work Locations', 'Please select the work locations you want to delete.', 'error');
+            show_toastr('Delete Multiple Work Locations Error', 'Please select the work locations you want to delete.', 'error');
         }
     });
 
@@ -161,20 +161,15 @@ function initialize_click_events(){
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Unarchived' || response === 'Not Found'){
-                                if(response === 'Unarchived'){
-                                    show_alert('Unarchive Multiple Work Locations Success', 'The work locations have been unarchived.', 'success');
-                                }
-                                else{
-                                    show_alert('Unarchive Multiple Work Locations Error', 'The work location does not exist.', 'info');
-                                }
+                                show_toastr('Unarchive Multiple Work Locations Successful', 'The work locations have been unarchived successfully.', 'success');
     
                                 reload_datatable('#work-locations-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Unarchive Multiple Work Locations Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Unarchive Multiple Work Locations Error', response, 'error');
+                                show_toastr('Unarchive Multiple Work Locations Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -187,7 +182,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Unarchive Multiple Work Locations Error', 'Please select the work locations you want to unarchive.', 'error');
+            show_toastr('Unarchive Multiple Work Locations Error', 'Please select the work locations you want to unarchive.', 'error');
         }
     });
 
@@ -220,20 +215,15 @@ function initialize_click_events(){
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Archived' || response === 'Not Found'){
-                                if(response === 'Archived'){
-                                    show_alert('Archive Multiple Work Locations Success', 'The work locations have been archived.', 'success');
-                                }
-                                else{
-                                    show_alert('Archive Multiple Work Locations Error', 'The work location does not exist.', 'info');
-                                }
+                                show_toastr('Archive Multiple Work Locations Successful', 'The work locations have been archived successfully.', 'success');
     
                                 reload_datatable('#work-locations-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Archive Multiple Work Locations Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                              show_alert('Archive Multiple Work Locations Error', response, 'error');
+                                show_toastr('Archive Multiple Work Locations Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -246,7 +236,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Archive Multiple Work Locations Error', 'Please select the work locations you want to archive.', 'error');
+            show_toastr('Archive Multiple Work Locations Error', 'Please select the work locations you want to archive.', 'error');
         }
     });
 

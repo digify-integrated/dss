@@ -12,7 +12,7 @@
         $module_id = $page_details[0]['MODULE_ID'];
         $page_title = $page_details[0]['PAGE_NAME'];
     
-        $page_access_right = $api->check_role_access_rights($username, '2', 'page');
+        $page_access_right = $api->check_role_access_rights($username, 2, 'page');
         $module_access_right = $api->check_role_access_rights($username, $module_id, 'module');
 
         if($module_access_right == 0 || $page_access_right == 0){
@@ -22,6 +22,9 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $module_id = $api->decrypt_data($id);
+
+                $module_details = $api->get_module_details($module_id);
+                $transaction_log_id = $module_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $module_id = null;
@@ -136,18 +139,43 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_module > 0 || ($update_module > 0 && !empty($module_id)))){
-                                                                    echo '<button type="submit" for="module-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($module_id) && $add_module > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($module_id) && $update_module > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($module_id) && $update_module <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -159,57 +187,120 @@
                                                 }
                                             ?>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="module_id" name="module_id">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_name" name="module_name" maxlength="200" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_description" class="col-md-3 col-form-label">Module Description <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_description" name="module_description" maxlength="500" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_category" class="col-md-3 col-form-label">Module Category <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <select class="form-control select2" id="module_category" name="module_category" <?php echo $disabled; ?>>
-                                                                <option value="">--</option>
-                                                                <?php echo $api->generate_system_code_options('MODULECAT'); ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="order_sequence" class="col-md-3 col-form-label">Order Sequence</label>
-                                                        <div class="col-md-9">
-                                                            <input id="order_sequence" name="order_sequence" class="form-control" type="number" min="0" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="module_version" class="col-md-3 col-form-label">Module Version <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_version" name="module_version" maxlength="20" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
-                                                        <div class="col-md-9">
-                                                            <input class="form-control" type="file" name="module_icon" id="module_icon" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="default_page" class="col-md-3 col-form-label">Default Page <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="default_page" name="default_page" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input type="hidden" id="module_id" name="module_id" value="<?php echo $module_id; ?>">
+                                                <?php
+                                                    if(empty($module_id) && $add_module > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_name" name="module_name" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="module_description" class="col-md-3 col-form-label">Module Description <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_description" name="module_description" maxlength="500" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="module_category" class="col-md-3 col-form-label">Module Category <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <select class="form-control select2" id="module_category" name="module_category" '. $disabled .'>
+                                                                            <option value="">--</option>
+                                                                            '. $api->generate_system_code_options('MODULECAT') .'
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="order_sequence" class="col-md-3 col-form-label">Order Sequence</label>
+                                                                    <div class="col-md-9">
+                                                                        <input id="order_sequence" name="order_sequence" class="form-control" type="number" min="0" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="module_version" class="col-md-3 col-form-label">Module Version <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="module_version" name="module_version" maxlength="20" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
+                                                                    <div class="col-md-9">
+                                                                        <input class="form-control" type="file" name="module_icon" id="module_icon" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="default_page" class="col-md-3 col-form-label">Default Page <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="default_page" name="default_page" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                    else if(!empty($module_id) && $update_module > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="module_name" class="col-md-3 col-form-label">Module Name <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="module_name_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="module_name" name="module_name" maxlength="200" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="module_description" class="col-md-3 col-form-label">Module Description <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="module_description_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="module_description" name="module_description" maxlength="500" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="module_category" class="col-md-3 col-form-label">Module Category <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="module_category_label"></label>
+                                                                        <div class="d-none form-edit">
+                                                                            <select class="form-control select2" id="module_category" name="module_category" '. $disabled .'>
+                                                                                <option value="">--</option>
+                                                                                '. $api->generate_system_code_options('MODULECAT') .'
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="order_sequence" class="col-md-3 col-form-label">Order Sequence</label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="order_sequence_label"></label>
+                                                                        <input id="order_sequence" name="order_sequence" class="form-control d-none form-edit" type="number" min="0" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="module_version" class="col-md-3 col-form-label">Module Version <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="module_version_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="module_version" name="module_version" maxlength="20" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4 d-none form-edit">
+                                                                    <label for="module_icon" class="col-md-3 col-form-label">Module Icon</label>
+                                                                    <div class="col-md-9">
+                                                                        <input class="form-control" type="file" name="module_icon" id="module_icon" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="default_page" class="col-md-3 col-form-label">Default Page <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="default_page_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="default_page" name="default_page" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
                                             </div>
                                         </form>
                                         <?php
@@ -223,12 +314,6 @@
                                                                     <span class="d-none d-sm-block">Module Access</span>    
                                                                 </a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="module-access" role="tabpanel">
@@ -239,23 +324,6 @@
                                                                                 <tr>
                                                                                     <th class="all">Role</th>
                                                                                     <th class="all">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

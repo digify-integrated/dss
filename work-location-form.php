@@ -22,8 +22,10 @@
             if(isset($_GET['id']) && !empty($_GET['id'])){
                 $id = $_GET['id'];
                 $work_location_id = $api->decrypt_data($id);
+
                 $work_location_details = $api->get_work_location_details($work_location_id);
                 $work_location_status = $work_location_details[0]['STATUS'];
+                $transaction_log_id = $work_location_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 $work_location_id = null;
@@ -145,18 +147,43 @@
                                                         </div>
                                                         <div class="d-flex gap-2 flex-wrap">
                                                             <?php
-                                                                if(($add_work_location > 0 || ($update_work_location > 0 && !empty($work_location_id)))){
-                                                                    echo '<button type="submit" for="work-location-form" id="submit-data" class="btn btn-primary">
+                                                                if(empty($work_location_id) && $add_work_location > 0){
+                                                                    echo ' <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light form-edit">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
                                                                             <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard-create" class="btn btn-outline-danger waves-effect waves-light form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($work_location_id) && $update_work_location > 0){
+                                                                    echo '<button type="button" id="form-edit" class="btn btn-primary waves-effect waves-light form-details">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-edit"></i></span>
+                                                                            <span class="d-none d-sm-block">Edit</span>
+                                                                        </button>
+                                                                        <button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
+                                                                        </button>
+                                                                        <button type="submit" for="action-form" id="submit-data" class="btn btn-primary waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-save"></i></span>
+                                                                            <span class="d-none d-sm-block">Save</span>
+                                                                        </button>
+                                                                        <button type="button" id="discard" class="btn btn-outline-danger waves-effect waves-light d-none form-edit">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
+                                                                            <span class="d-none d-sm-block">Discard</span>
+                                                                        </button>';
+                                                                }
+                                                                else if(!empty($work_location_id) && $update_work_location <= 0){
+                                                                    echo '<button type="button" id="view-transaction-log" class="btn btn-info waves-effect waves-light form-details" data-bs-toggle="offcanvas" data-bs-target="#transaction-log-filter-off-canvas" aria-controls="transaction-log-filter-off-canvas">
+                                                                            <span class="d-block d-sm-none"><i class="bx bx-notepad"></i></span>
+                                                                            <span class="d-none d-sm-block">Transaction Log</span>
                                                                         </button>';
                                                                 }
                                                             ?>
-                                                             <button type="button" id="discard" class="btn btn-outline-danger">
-                                                                <span class="d-block d-sm-none"><i class="bx bx-trash"></i></span>
-                                                                <span class="d-none d-sm-block">Discard</span>
-                                                            </button>
                                                         </div>
+                                                        <?php require('views/_transaction_log_canvas.php'); ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -168,48 +195,100 @@
                                                 }
                                             ?>
                                             <div class="row mt-4">
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <input type="hidden" id="work_location_id" name="work_location_id">
-                                                        <input type="hidden" id="transaction_log_id">
-                                                        <label for="work_location" class="col-md-3 col-form-label">Work Location <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="work_location" name="work_location" maxlength="100" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="work_location_address" class="col-md-3 col-form-label">Work Location Address <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="work_location_address" name="work_location_address" maxlength="500" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="location_number" class="col-md-3 col-form-label">Location Number <span class="text-danger">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <input id="location_number" name="location_number" class="form-control" type="number" min="1" value="1" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row mb-4">
-                                                        <label for="email" class="col-sm-3 col-form-label">Email</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="email" id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-4">
-                                                        <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30" <?php echo $disabled; ?>>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <input type="hidden" id="work_location_id" name="work_location_id" value="<?php echo $work_location_id; ?>">
+                                                <?php
+                                                    if(empty($work_location_id) && $add_work_location > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="work_location" class="col-md-3 col-form-label">Work Location <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="work_location" name="work_location" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="work_location_address" class="col-md-3 col-form-label">Work Location Address <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="work_location_address" name="work_location_address" maxlength="500" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="location_number" class="col-md-3 col-form-label">Location Number <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <input id="location_number" name="location_number" class="form-control" type="number" min="1" value="1" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="email" id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                    else if(!empty($work_location_id) && $update_work_location > 0){
+                                                        echo '<div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">
+                                                                    <label for="work_location" class="col-md-3 col-form-label">Work Location <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="work_location_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="work_location" name="work_location" maxlength="100" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="work_location_address" class="col-md-3 col-form-label">Work Location Address <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="work_location_address_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="work_location_address" name="work_location_address" maxlength="500" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="location_number" class="col-md-3 col-form-label">Location Number <span class="text-danger">*</span></label>
+                                                                    <div class="col-md-9">
+                                                                        <label class="col-form-label form-details" id="location_number_label"></label>
+                                                                        <input id="location_number" name="location_number" class="form-control d-none form-edit" type="number" min="1" value="1" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="email_label"></label>
+                                                                        <input type="email" id="email" name="email" class="form-control form-maxlength d-none form-edit" maxlength="100" autocomplete="off" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="mobile_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="mobile" name="mobile" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-4">
+                                                                    <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+                                                                    <div class="col-sm-9">
+                                                                        <label class="col-form-label form-details" id="telephone_label"></label>
+                                                                        <input type="text" class="form-control form-maxlength d-none form-edit" autocomplete="off" id="telephone" name="telephone" maxlength="30" '. $disabled .'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>';
+                                                    }
+                                                ?>
                                             </div>
                                         </form>
                                         <?php
@@ -223,12 +302,6 @@
                                                                     <span class="d-none d-sm-block">Employee</span>    
                                                                 </a>
                                                             </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#transaction-log" role="tab">
-                                                                    <span class="d-block d-sm-none"><i class="fas fa-list"></i></span>
-                                                                    <span class="d-none d-sm-block">Transaction Log</span>    
-                                                                </a>
-                                                            </li>
                                                         </ul>
                                                         <div class="tab-content p-3 text-muted">
                                                             <div class="tab-pane active" id="work-location-employee" role="tabpanel">
@@ -238,23 +311,6 @@
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th class="all">Employee</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody></tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="tab-pane" id="transaction-log" role="tabpanel">
-                                                                <div class="row mt-4">
-                                                                    <div class="col-md-12">
-                                                                        <table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th class="all">Log Type</th>
-                                                                                    <th class="all">Log</th>
-                                                                                    <th class="all">Log Date</th>
-                                                                                    <th class="all">Log By</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody></tbody>

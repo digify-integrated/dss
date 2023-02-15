@@ -103,7 +103,12 @@ function display_details(){
             $('#description').val(response[0].DESCRIPTION);
             $('#max_file_size').val(response[0].MAX_FILE_SIZE);
 
-            $('#upload_setting_id').val(upload_setting_id);
+            $('#upload_setting_label').text(response[0].UPLOAD_SETTING);
+            $('#description_label').text(response[0].DESCRIPTION);
+            $('#max_file_size_label').text(response[0].MAX_FILE_SIZE + ' mb');
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -245,7 +250,7 @@ function initialize_click_events(){
                     data: {username : username, upload_setting_id : upload_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Upload Setting Successful', 'The upload setting has been deleted successfully.', 'success');
+                            window.location = 'upload-settings.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

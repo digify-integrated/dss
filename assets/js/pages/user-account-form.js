@@ -109,12 +109,18 @@ function display_details(){
             $('#file_as').val(response[0].FILE_AS);
             $('#password').val(response[0].PASSWORD);
 
+            $('#file_as_label').text(response[0].FILE_AS);
+            $('#user_id_label').text(user_id);
+
             document.getElementById('last_connection_date').innerHTML = response[0].LAST_CONNECTION_DATE;
             document.getElementById('password_expiry_date').innerHTML = response[0].PASSWORD_EXPIRY_DATE;
             document.getElementById('last_failed_login_date').innerHTML = response[0].LAST_FAILED_LOGIN;
             document.getElementById('user_status').innerHTML = response[0].USER_STATUS;
             document.getElementById('failed_login').innerHTML = response[0].FAILED_LOGIN;
             document.getElementById('lock_status').innerHTML = response[0].LOCK_STATUS;
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -252,7 +258,7 @@ function initialize_click_events(){
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete User Account Successful', 'The user account has been deleted successfully.', 'success');
+                            window.location = 'user-accounts.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

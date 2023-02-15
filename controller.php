@@ -2671,7 +2671,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['module_id']) && !empty($_POST['module_id'])){
-                        $module_ids = htmlspecialchars($_POST['module_id'], ENT_QUOTES, 'UTF-8');
+                        $module_ids = $_POST['module_id'];
             
                         foreach($module_ids as $module_id){
                             $check_module_exist = $api->check_module_exist($module_id);
@@ -2797,7 +2797,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['page_id']) && !empty($_POST['page_id'])){
-                        $page_ids = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
+                        $page_ids = $_POST['page_id'];
             
                         foreach($page_ids as $page_id){
                             $check_page_exist = $api->check_page_exist($page_id);
@@ -2923,7 +2923,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['action_id']) && !empty($_POST['action_id'])){
-                        $action_ids = htmlspecialchars($_POST['action_id'], ENT_QUOTES, 'UTF-8');
+                        $action_ids = $_POST['action_id'];
             
                         foreach($action_ids as $action_id){
                             $check_action_exist = $api->check_action_exist($action_id);
@@ -3042,7 +3042,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
-                        $parameter_ids = htmlspecialchars($_POST['parameter_id'], ENT_QUOTES, 'UTF-8');
+                        $parameter_ids = $_POST['parameter_id'];
             
                         foreach($parameter_ids as $parameter_id){
                             $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
@@ -3146,7 +3146,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['role_id']) && !empty($_POST['role_id'])){
-                        $role_ids = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
+                        $role_ids = $_POST['role_id'];
             
                         foreach($role_ids as $role_id){
                             $check_role_exist = $api->check_role_exist($role_id);
@@ -3289,7 +3289,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['system_code_id']) && !empty($_POST['system_code_id'])){
-                        $system_code_ids = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
+                        $system_code_ids = $_POST['system_code_id'];
             
                         foreach($system_code_ids as $system_code_id){
                             $check_system_code_exist = $api->check_system_code_exist($system_code_id);
@@ -3372,7 +3372,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
-                        $upload_setting_ids = htmlspecialchars($_POST['upload_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $upload_setting_ids = $_POST['upload_setting_id'];
             
                         foreach($upload_setting_ids as $upload_setting_id){
                             $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
@@ -3491,7 +3491,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
-                        $company_ids = htmlspecialchars($_POST['company_id'], ENT_QUOTES, 'UTF-8');
+                        $company_ids = $_POST['company_id'];
             
                         foreach($company_ids as $company_id){
                             $check_company_exist = $api->check_company_exist($company_id);
@@ -3567,7 +3567,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['interface_setting_id']) && !empty($_POST['interface_setting_id'])){
-                        $interface_setting_ids = htmlspecialchars($_POST['interface_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $interface_setting_ids = $_POST['interface_setting_id'];
             
                         foreach($interface_setting_ids as $interface_setting_id){
                             $check_interface_setting_exist = $api->check_interface_setting_exist($interface_setting_id);
@@ -3643,7 +3643,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['email_setting_id']) && !empty($_POST['email_setting_id'])){
-                        $email_setting_ids = htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $email_setting_ids = $_POST['email_setting_id'];
             
                         foreach($email_setting_ids as $email_setting_id){
                             $check_email_setting_exist = $api->check_email_setting_exist($email_setting_id);
@@ -3740,7 +3740,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['notification_setting_id']) && !empty($_POST['notification_setting_id'])){
-                        $notification_setting_ids = htmlspecialchars($_POST['notification_setting_id'], ENT_QUOTES, 'UTF-8');
+                        $notification_setting_ids = $_POST['notification_setting_id'];
             
                         foreach($notification_setting_ids as $notification_setting_id){
                             $check_notification_setting_exist = $api->check_notification_setting_exist($notification_setting_id);
@@ -3952,7 +3952,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
-                        $country_ids = htmlspecialchars($_POST['country_id'], ENT_QUOTES, 'UTF-8');
+                        $country_ids = $_POST['country_id'];
             
                         foreach($country_ids as $country_id){
                             $check_country_exist = $api->check_country_exist($country_id);
@@ -4036,7 +4036,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
-                        $state_ids = htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
+                        $state_ids = $_POST['state_id'];
             
                         foreach($state_ids as $state_id){
                             $check_state_exist = $api->check_state_exist($state_id);
@@ -4112,7 +4112,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['zoom_api_id']) && !empty($_POST['zoom_api_id'])){
-                        $zoom_api_ids = htmlspecialchars($_POST['zoom_api_id'], ENT_QUOTES, 'UTF-8');
+                        $zoom_api_ids = $_POST['zoom_api_id'];
             
                         foreach($zoom_api_ids as $zoom_api_id){
                             $check_zoom_api_exist = $api->check_zoom_api_exist($zoom_api_id);
@@ -4195,7 +4195,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = $_POST['user_id'];
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -4314,7 +4314,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
+                        $department_ids = $_POST['department_id'];
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -4418,7 +4418,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-                        $job_position_ids = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
+                        $job_position_ids = $_POST['job_position_id'];
             
                         foreach($job_position_ids as $job_position_id){
                             $check_job_position_exist = $api->check_job_position_exist($job_position_id);
@@ -4662,7 +4662,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
+                        $work_location_ids = $_POST['work_location_id'];
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -4738,7 +4738,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['departure_reason_id']) && !empty($_POST['departure_reason_id'])){
-                        $departure_reason_ids = htmlspecialchars($_POST['departure_reason_id'], ENT_QUOTES, 'UTF-8');
+                        $departure_reason_ids = $_POST['departure_reason_id'];
             
                         foreach($departure_reason_ids as $departure_reason_id){
                             $check_departure_reason_exist = $api->check_departure_reason_exist($departure_reason_id);
@@ -4814,7 +4814,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['employee_type_id']) && !empty($_POST['employee_type_id'])){
-                        $employee_type_ids = htmlspecialchars($_POST['employee_type_id'], ENT_QUOTES, 'UTF-8');
+                        $employee_type_ids = $_POST['employee_type_id'];
             
                         foreach($employee_type_ids as $employee_type_id){
                             $check_employee_type_exist = $api->check_employee_type_exist($employee_type_id);
@@ -4890,7 +4890,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['id_type_id']) && !empty($_POST['id_type_id'])){
-                        $id_type_ids = htmlspecialchars($_POST['id_type_id'], ENT_QUOTES, 'UTF-8');
+                        $id_type_ids = $_POST['id_type_id'];
             
                         foreach($id_type_ids as $id_type_id){
                             $check_id_type_exist = $api->check_id_type_exist($id_type_id);
@@ -4966,7 +4966,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['wage_type_id']) && !empty($_POST['wage_type_id'])){
-                        $wage_type_ids = htmlspecialchars($_POST['wage_type_id'], ENT_QUOTES, 'UTF-8');
+                        $wage_type_ids = $_POST['wage_type_id'];
             
                         foreach($wage_type_ids as $wage_type_id){
                             $check_wage_type_exist = $api->check_wage_type_exist($wage_type_id);
@@ -5050,7 +5050,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-                        $working_schedule_ids = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_ids = $_POST['working_schedule_id'];
             
                         foreach($working_schedule_ids as $working_schedule_id){
                             $check_working_schedule_exist = $api->check_working_schedule_exist($working_schedule_id);
@@ -5168,7 +5168,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['working_schedule_type_id']) && !empty($_POST['working_schedule_type_id'])){
-                        $working_schedule_type_ids = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
+                        $working_schedule_type_ids = $_POST['working_schedule_type_id'];
             
                         foreach($working_schedule_type_ids as $working_schedule_type_id){
                             $check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
@@ -5248,7 +5248,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = $_POST['user_id'];
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5328,7 +5328,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = $_POST['user_id'];
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5531,7 +5531,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = $_POST['user_id'];
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5713,7 +5713,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-                        $user_ids = htmlspecialchars($_POST['user_id'], ENT_QUOTES, 'UTF-8');
+                        $user_ids = $_POST['user_id'];
             
                         foreach($user_ids as $user_id){
                             $check_user_account_exist = $api->check_user_account_exist($user_id);
@@ -5793,7 +5793,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
+                        $department_ids = $_POST['department_id'];
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -5869,7 +5869,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
+                        $work_location_ids = $_POST['work_location_id'];
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -5949,7 +5949,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['department_id']) && !empty($_POST['department_id'])){
-                        $department_ids = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
+                        $department_ids = $_POST['department_id'];
             
                         foreach($department_ids as $department_id){
                             $check_department_exist = $api->check_department_exist($department_id);
@@ -6025,7 +6025,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     
                 if($check_user_account_status){
                     if(isset($_POST['work_location_id']) && !empty($_POST['work_location_id'])){
-                        $work_location_ids = htmlspecialchars($_POST['work_location_id'], ENT_QUOTES, 'UTF-8');
+                        $work_location_ids = $_POST['work_location_id'];
             
                         foreach($work_location_ids as $work_location_id){
                             $check_work_location_exist = $api->check_work_location_exist($work_location_id);
@@ -6186,12 +6186,16 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 if(empty($module_icon_file_path)){
                     $module_icon_file_path = $api->check_image($module_icon_file_path, 'module icon');
                 }
+
+                $system_code_details = $api->get_system_code_details(null, 'MODULECAT', $module_details[0]['MODULE_CATEGORY']);
+                $module_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
     
                 $response[] = array(
                     'MODULE_NAME' => $module_details[0]['MODULE_NAME'],
                     'MODULE_VERSION' => $module_details[0]['MODULE_VERSION'],
                     'MODULE_DESCRIPTION' => $module_details[0]['MODULE_DESCRIPTION'],
                     'MODULE_CATEGORY' => $module_details[0]['MODULE_CATEGORY'],
+                    'MODULE_CATEGORY_NAME' => $module_category_name,
                     'MODULE_ICON' => '<img class="img-thumbnail" alt="module icon" width="200" src="'. $module_icon_file_path .'" data-holder-rendered="true">',
                     'DEFAULT_PAGE' => $module_details[0]['DEFAULT_PAGE'],
                     'ORDER_SEQUENCE' => $module_details[0]['ORDER_SEQUENCE']
@@ -6208,10 +6212,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $page_id = htmlspecialchars($_POST['page_id'], ENT_QUOTES, 'UTF-8');
 
                 $page_details = $api->get_page_details($page_id);
+
+                $module_details = $api->get_module_details($page_details[0]['MODULE_ID']);
+                $module_name = $module_details[0]['MODULE_NAME'];
     
                 $response[] = array(
                     'PAGE_NAME' => $page_details[0]['PAGE_NAME'],
-                    'MODULE_ID' => $page_details[0]['MODULE_ID']
+                    'MODULE_ID' => $page_details[0]['MODULE_ID'],
+                    'MODULE_NAME' => $module_name
                 );
     
                 echo json_encode($response);
@@ -6260,11 +6268,19 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $role_id = htmlspecialchars($_POST['role_id'], ENT_QUOTES, 'UTF-8');
 
                 $role_details = $api->get_role_details($role_id);
+
+                if($role_details[0]['ASSIGNABLE'] == 1){
+                    $assignable_name = 'True';
+                }
+                else{
+                    $assignable_name = 'False';
+                }
     
                 $response[] = array(
                     'ROLE' => $role_details[0]['ROLE'],
                     'ROLE_DESCRIPTION' => $role_details[0]['ROLE_DESCRIPTION'],
-                    'ASSIGNABLE' => $role_details[0]['ASSIGNABLE']
+                    'ASSIGNABLE' => $role_details[0]['ASSIGNABLE'],
+                    'ASSIGNABLE_NAME' => $assignable_name
                 );
     
                 echo json_encode($response);
@@ -6278,9 +6294,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $system_code_id = htmlspecialchars($_POST['system_code_id'], ENT_QUOTES, 'UTF-8');
 
                 $system_code_details = $api->get_system_code_details($system_code_id, null, null);
+
+                $system_type_details = $api->get_system_code_details(null, 'SYSTYPE', $system_code_details[0]['SYSTEM_TYPE']);
+                $system_type_name = $system_type_details[0]['SYSTEM_DESCRIPTION'] ?? null;
     
                 $response[] = array(
                     'SYSTEM_TYPE' => $system_code_details[0]['SYSTEM_TYPE'],
+                    'SYSTEM_TYPE_NAME' => $system_type_name,
                     'SYSTEM_CODE' => $system_code_details[0]['SYSTEM_CODE'],
                     'SYSTEM_DESCRIPTION' => $system_code_details[0]['SYSTEM_DESCRIPTION']
                 );
@@ -6384,6 +6404,23 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $email_setting_id = (int) htmlspecialchars($_POST['email_setting_id'], ENT_QUOTES, 'UTF-8');
 
                 $email_setting_details = $api->get_email_setting_details($email_setting_id);
+
+                $system_code_details = $api->get_system_code_details(null, 'MAILENCRYPTION', $email_setting_details[0]['MAIL_ENCRYPTION']);
+                $mail_encryption_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+                
+                if($email_setting_details[0]['SMTP_AUTH'] == 1){
+                    $smtp_auth = 'True';
+                }
+                else{
+                    $smtp_auth = 'False';
+                }
+                
+                if($email_setting_details[0]['SMTP_AUTO_TLS'] == 1){
+                    $smtp_auto_tls_name = 'True';
+                }
+                else{
+                    $smtp_auto_tls_name = 'False';
+                }
     
                 $response[] = array(
                     'EMAIL_SETTING_NAME' => $email_setting_details[0]['EMAIL_SETTING_NAME'],
@@ -6392,10 +6429,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'MAIL_HOST' => $email_setting_details[0]['MAIL_HOST'],
                     'PORT' => $email_setting_details[0]['PORT'],
                     'SMTP_AUTH' => $email_setting_details[0]['SMTP_AUTH'],
+                    'SMTP_AUTH_NAME' => $smtp_auth,
                     'SMTP_AUTO_TLS' => $email_setting_details[0]['SMTP_AUTO_TLS'],
+                    'SMTP_AUTO_TLS_NAME' => $smtp_auto_tls_name,
                     'MAIL_USERNAME' => $email_setting_details[0]['MAIL_USERNAME'],
                     'MAIL_PASSWORD' => $email_setting_details[0]['MAIL_PASSWORD'],
                     'MAIL_ENCRYPTION' => $email_setting_details[0]['MAIL_ENCRYPTION'],
+                    'MAIL_ENCRYPTION_NAME' => $mail_encryption_name,
                     'MAIL_FROM_NAME' => $email_setting_details[0]['MAIL_FROM_NAME'],
                     'MAIL_FROM_EMAIL' => $email_setting_details[0]['MAIL_FROM_EMAIL']
                 );
@@ -6448,10 +6488,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $state_id = (int) htmlspecialchars($_POST['state_id'], ENT_QUOTES, 'UTF-8');
                 
                 $state_details = $api->get_state_details($state_id);
-    
+
+                $country_details = $api->get_country_details($state_details[0]['COUNTRY_ID']);
+                $country_name = $country_details[0]['COUNTRY_NAME'];
+
                 $response[] = array(
                     'STATE_NAME' => $state_details[0]['STATE_NAME'],
-                    'COUNTRY_ID' => $state_details[0]['COUNTRY_ID']
+                    'COUNTRY_ID' => $state_details[0]['COUNTRY_ID'],
+                    'COUNTRY_NAME' => $country_name
                 );
     
                 echo json_encode($response);
@@ -6512,11 +6556,19 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $department_id = htmlspecialchars($_POST['department_id'], ENT_QUOTES, 'UTF-8');
 
                 $department_details = $api->get_department_details($department_id);
+
+                $parent_department_details = $api->get_department_details($department_details[0]['PARENT_DEPARTMENT']);
+                $parent_department_name = $parent_department_details[0]['DEPARTMENT'] ?? null;
+
+                $employee_personal_information_details = $api->get_employee_personal_information_details($department_details[0]['MANAGER']);
+                $manager_name = $employee_personal_information_details[0]['FILE_AS'] ?? null;
     
                 $response[] = array(
                     'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
                     'PARENT_DEPARTMENT' => $department_details[0]['PARENT_DEPARTMENT'],
+                    'PARENT_DEPARTMENT_NAME' => $parent_department_name,
                     'MANAGER' => $department_details[0]['MANAGER'],
+                    'MANAGER_NAME' => $manager_name,
                     'STATUS' =>  $api->get_department_status($department_details[0]['STATUS'])[0]['BADGE']
                 );
     
@@ -6531,13 +6583,17 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $job_position_id = htmlspecialchars($_POST['job_position_id'], ENT_QUOTES, 'UTF-8');
 
                 $job_position_details = $api->get_job_position_details($job_position_id);
+
+                $department_details = $api->get_department_details($job_position_details[0]['DEPARTMENT']);
+                $department_name = $department_details[0]['DEPARTMENT'] ?? null;
     
                 $response[] = array(
                     'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
                     'DESCRIPTION' => $job_position_details[0]['DESCRIPTION'],
                     'EXPECTED_NEW_EMPLOYEES' => $job_position_details[0]['EXPECTED_NEW_EMPLOYEES'],
                     'RECRUITMENT_STATUS' =>  $api->get_job_position_recruitment_status($job_position_details[0]['RECRUITMENT_STATUS'])[0]['BADGE'],
-                    'DEPARTMENT' => $job_position_details[0]['DEPARTMENT']
+                    'DEPARTMENT' => $job_position_details[0]['DEPARTMENT'],
+                    'DEPARTMENT_NAME' => $department_name
                 );
     
                 echo json_encode($response);
@@ -6701,10 +6757,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $working_schedule_id = htmlspecialchars($_POST['working_schedule_id'], ENT_QUOTES, 'UTF-8');
 
                 $working_schedule_details = $api->get_working_schedule_details($working_schedule_id);
+
+                $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_details[0]['WORKING_SCHEDULE_TYPE']);
+                $working_schedule_type_name = $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'];
     
                 $response[] = array(
                     'WORKING_SCHEDULE' => $working_schedule_details[0]['WORKING_SCHEDULE'],
-                    'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE']
+                    'WORKING_SCHEDULE_TYPE' => $working_schedule_details[0]['WORKING_SCHEDULE_TYPE'],
+                    'WORKING_SCHEDULE_TYPE_NAME' => $working_schedule_type_name
                 );
     
                 echo json_encode($response);
@@ -6758,10 +6818,14 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $working_schedule_type_id = htmlspecialchars($_POST['working_schedule_type_id'], ENT_QUOTES, 'UTF-8');
                 
                 $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type_id);
+
+                $system_code_details = $api->get_system_code_details(null, 'WORKINGSCHEDTYPECAT', $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY']);
+                $working_schedule_type_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
     
                 $response[] = array(
                     'WORKING_SCHEDULE_TYPE' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'],
-                    'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY']
+                    'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY'],
+                    'WORKING_SCHEDULE_TYPE_CATEGORY_NAME' => $working_schedule_type_category_name
                 );
     
                 echo json_encode($response);

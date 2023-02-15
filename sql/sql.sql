@@ -999,10 +999,10 @@ END //
 
 CREATE PROCEDURE update_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN company_address VARCHAR(500), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'UPDATE global_company SET COMPANY_NAME = ?, COMPANY_ADDRESS = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, WEBSITE = ?website, TAX_ID = ?tax_id, TRANSACTION_LOG_ID = ?transaction_log_id, RECORD_LOG = ?record_log WHERE COMPANY_ID = ?';
+	SET @query = 'UPDATE global_company SET COMPANY_NAME = ?, COMPANY_ADDRESS = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, WEBSITE = ?, TAX_ID = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE COMPANY_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING company_name, company_address, email, telephone, mobile, company_id;
+	EXECUTE stmt USING company_name, company_address, email, telephone, mobile, website, tax_id, transaction_log_id, record_log, company_id;
 	DEALLOCATE PREPARE stmt;
 END //
 

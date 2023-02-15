@@ -106,15 +106,15 @@ function initialize_click_events(){
                         data: {username : username, parameter_id : parameter_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple System Parameters Success', 'The system parameters have been deleted.', 'success');
+                                show_toastr('Delete Multiple System Parameters Successful', 'The system parameters have been deleted successfully.', 'success');
     
                                 reload_datatable('#system-parameters-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple System Parameters Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple System Parameters Error', response, 'error');
+                                show_toastr('Delete Multiple System Parameters Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -128,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple System Parameters Error', 'Please select the system parameters you want to delete.', 'error');
+            show_toastr('Delete Multiple System Parameters Error', 'Please select the system parameters you want to delete.', 'error');
         }
     });
 

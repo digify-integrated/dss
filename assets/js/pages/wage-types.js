@@ -102,15 +102,15 @@ function initialize_click_events(){
                         data: {username : username, wage_type_id : wage_type_id, transaction : transaction},
                         success: function (response) {
                             if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Wage Types Success', 'The wage types have been deleted.', 'success');
+                                show_toastr('Delete Multiple Wage Types Successful', 'The wage tyoes have been deleted successfully.', 'success');
     
-                                reload_datatable('#wage-types-datatable');
+                                reload_datatable('#user-accounts-datatable');
                             }
                             else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Wage Types Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Delete Multiple Wage Types Error', response, 'error');
+                                show_toastr('Delete Multiple Wage Types Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +124,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Wage Types', 'Please select the wage types you want to delete.', 'error');
+            show_toastr('Delete Multiple Wage Types Error', 'Please select the wage types you want to delete.', 'error');
         }
     });
 

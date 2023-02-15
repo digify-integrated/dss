@@ -6061,6 +6061,81 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : insert_departure_reason
+    # Purpose    : Insert departure reason.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_departure_reason($departure_reason, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(23, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_departure_reason(:id, :departure_reason, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':departure_reason', $departure_reason);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 23, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted departure reason.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'DEPARTURE_REASON_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : insert_job_position
     # Purpose    : Insert job position.
     #
@@ -6570,7 +6645,7 @@ class Api{
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
 
             # Get system parameter id
-            $system_parameter = $this->get_system_parameter(2, 1);
+            $system_parameter = $this->get_system_parameter(29, 1);
             $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
             $id = $system_parameter[0]['ID'];
 
@@ -10170,6 +10245,9 @@ class Api{
     #
     # -------------------------------------------------------------
     public function generate_file_name($length, $prefix = '') {
+        $keys = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+        $maxIndex = count($keys) - 1;
+
         $key = $prefix . array_reduce(array_fill(0, $length, null), function ($carry, $val) use ($keys, $maxIndex) {
             return $carry . $keys[random_int(0, $maxIndex)];
         }) . uniqid('', true);
@@ -10188,7 +10266,7 @@ class Api{
     # -------------------------------------------------------------
     public function generate_transaction_log_timeline($transaction_log_id) {
         if ($this->databaseConnection()) {
-            $sql = $this->db_connection->prepare('SELECT USERNAME, LOG_TYPE, LOG_DATE, LOG FROM global_transaction_log WHERE TRANSACTION_LOG_ID = :transaction_log_id');
+            $sql = $this->db_connection->prepare('SELECT USERNAME, LOG_TYPE, LOG_DATE, LOG FROM global_transaction_log WHERE TRANSACTION_LOG_ID = :transaction_log_id ORDER BY LOG_DATE DESC LIMIT 50');
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
 
             if($sql->execute()){
@@ -10215,9 +10293,7 @@ class Api{
                                                 <div>
                                                     <h6 class="font-size-14 mb-1">'. $log_type .'</h6>
                                                     <p class="text-muted">'. $file_as .' '. $log_date .'</p>
-                                                    
                                                     <p class="text-muted mb-0">'. $log .'</p>
-                                
                                                 </div>
                                             </div>
                                         </div>
@@ -10228,7 +10304,7 @@ class Api{
                     $timeline .= '</ul>';
                 }
                 else{
-                    $timeline .= '';
+                    $timeline = '<div class="alert alert-info" role="alert">No transaction log found.</div>';
                 }
                
                 echo $timeline;

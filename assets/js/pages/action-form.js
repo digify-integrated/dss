@@ -96,8 +96,9 @@ function display_details(){
             $('#action_name').val(response[0].ACTION_NAME);
             
             $('#action_name_label').text(response[0].ACTION_NAME);
-
-            $('#action_id').val(action_id);
+        },
+        complete: function(){
+            generate_transaction_logs();
         }
     });
 }
@@ -235,7 +236,7 @@ function initialize_click_events(){
                     data: {username : username, action_id : action_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success');
+                            show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success', 'actions.php');
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -278,7 +279,7 @@ function initialize_click_events(){
                     success: function (response) {
                         if(response === 'Deleted' || response === 'Not Found'){
                             if(response === 'Deleted'){
-                                show_toastr('Delete Action Access Successful', 'The action access has been deleted successfully.', 'success');
+                                window.location = 'actions.php';
                             }
                             else{
                                 show_toastr('Delete Action Access Error', 'The action access does not exist.', 'warning');
