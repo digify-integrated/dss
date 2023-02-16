@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#wage-type-id').length){
-            display_details();
+            display_details('wage type details');
         }
 
         $('#wage-type-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['WAGE_TYPE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('wage type details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The wage type has been updated successfully.', 'success');
@@ -78,28 +78,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'wage type details';
-    const wage_type_id = $('#wage-type-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {wage_type_id : wage_type_id, transaction : transaction},
-        success: function(response) {
-            $('#wage_type').val(response[0].WAGE_TYPE);
-            
-            $('#wage_type_label').text(response[0].WAGE_TYPE);
-                    
-            $('#wage_type_id').val(wage_type_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

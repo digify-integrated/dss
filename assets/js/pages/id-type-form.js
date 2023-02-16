@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#id-type-id').length){
-            display_details();
+            display_details('id type details');
         }
 
         $('#id-type-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['ID_TYPE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('id type details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The ID type has been updated successfully.', 'success');
@@ -78,28 +78,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'id type details';
-    const id_type_id = $('#id-type-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {id_type_id : id_type_id, transaction : transaction},
-        success: function(response) {
-            $('#id_type').val(response[0].ID_TYPE);
-            
-            $('#id_type_label').text(response[0].ID_TYPE);
-                    
-            $('#id_type_id').val(id_type_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

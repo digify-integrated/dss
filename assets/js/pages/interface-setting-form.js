@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#interface-setting-id').length){
-            display_details();
+            display_details('interface setting details');
         }
 
         $('#interface-setting-form').validate({
@@ -31,7 +31,7 @@
                             window.location = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('interface setting details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The interface setting has been updated successfully.', 'success');
@@ -90,36 +90,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'interface setting details';
-    const interface_setting_id = $('#interface-setting-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {interface_setting_id : interface_setting_id, transaction : transaction},
-        success: function(response) {
-            $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
-            $('#description').val(response[0].DESCRIPTION);
-
-            $('#interface_setting_name_label').text(response[0].INTERFACE_SETTING_NAME);
-            $('#description_label').text(response[0].DESCRIPTION);
-                    
-            document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
-            document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
-            document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
-            document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
-            document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
-
-            $('#interface_setting_id').val(interface_setting_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

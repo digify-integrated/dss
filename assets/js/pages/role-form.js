@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#role-id').length){
-            display_details();
+            display_details('role details');
 
             if($('#module-access-datatable').length){
                 initialize_role_module_access_table('#module-access-datatable');
@@ -41,7 +41,7 @@
                             window.location = window.location.href + '?id=' + response[0]['ROLE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('role details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The role has been updated successfully.', 'success');
@@ -100,31 +100,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'role details';
-    const role_id = $('#role-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {role_id : role_id, transaction : transaction},
-        success: function(response) {
-            $('#role').val(response[0].ROLE);
-            $('#role_description').val(response[0].ROLE_DESCRIPTION);
-
-            $('#role_label').text(response[0].ROLE);
-            $('#role_description_label').text(response[0].ROLE_DESCRIPTION);
-            $('#assignable_label').text(response[0].ASSIGNABLE_NAME);
-
-            check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_role_module_access_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

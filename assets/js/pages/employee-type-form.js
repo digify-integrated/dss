@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#employee-type-id').length){
-            display_details();
+            display_details('employee type details');
         }
 
         $('#employee-type-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['EMPLOYEE_TYPE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('employee type details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The employee type has been updated successfully.', 'success');
@@ -78,28 +78,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'employee type details';
-    const employee_type_id = $('#employee-type-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {employee_type_id : employee_type_id, transaction : transaction},
-        success: function(response) {
-            $('#employee_type').val(response[0].EMPLOYEE_TYPE);
-            
-            $('#employee_type_label').text(response[0].EMPLOYEE_TYPE);
-                    
-            $('#employee_type_id').val(employee_type_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#module-id').length){
-            display_details();
+            display_details('module details');
 
             if($('#module-access-datatable').length){
                 initialize_module_access_table('#module-access-datatable');
@@ -35,7 +35,7 @@
                             window.location = window.location.href + '?id=' + response[0]['MODULE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('module details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The module has been updated successfully.', 'success');
@@ -118,41 +118,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'module details';
-    const module_id = $('#module-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {module_id : module_id, transaction : transaction},
-        success: function(response) {
-            $('#module_name').val(response[0].MODULE_NAME);
-            $('#module_description').val(response[0].MODULE_DESCRIPTION);
-            $('#module_version').val(response[0].MODULE_VERSION);
-            $('#default_page').val(response[0].DEFAULT_PAGE);
-            $('#order_sequence').val(response[0].ORDER_SEQUENCE);
-
-            $('#module_name_label').text(response[0].MODULE_NAME);
-            $('#module_description_label').text(response[0].MODULE_DESCRIPTION);
-            $('#module_version_label').text(response[0].MODULE_VERSION);
-            $('#default_page_label').text(response[0].DEFAULT_PAGE);
-            $('#order_sequence_label').text(response[0].ORDER_SEQUENCE);
-            $('#module_category_label').text(response[0].MODULE_CATEGORY_NAME);
-
-            document.getElementById('module_icon_image').innerHTML = response[0].MODULE_ICON;
-                    
-            $('#module_id').val(module_id);
-
-            check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_module_access_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

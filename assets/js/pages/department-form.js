@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#department-id').length){
-            display_details();
+            display_details('department details');
         }
 
         $('#department-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('department details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The department has been updated successfully.', 'success');
@@ -78,33 +78,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'department details';
-    const department_id = $('#department-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {department_id : department_id, transaction : transaction},
-        success: function(response) {
-            $('#department').val(response[0].DEPARTMENT);
-
-            $('#department_label').text(response[0].DEPARTMENT);
-            $('#parent_department_label').text(response[0].PARENT_DEPARTMENT_NAME);
-            $('#manager_label').text(response[0].MANAGER_NAME);
-
-            document.getElementById('department_status').innerHTML = response[0].STATUS;
-
-            check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
-            check_empty(response[0].MANAGER, '#manager', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

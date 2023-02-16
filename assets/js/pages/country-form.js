@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#country-id').length){
-            display_details();
+            display_details('country details');
 
             if($('#state-datatable').length){
                 initialize_state_table('#state-datatable');
@@ -29,7 +29,7 @@
                             window.location = window.location.href + '?id=' + response[0]['COUNTRY_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('country details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The country has been updated successfully.', 'success');
@@ -82,28 +82,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'country details';
-    const country_id = $('#country-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {country_id : country_id, transaction : transaction},
-        success: function(response) {
-            $('#country_name').val(response[0].COUNTRY_NAME);
-            
-            $('#country_name_label').text(response[0].COUNTRY_NAME);
-
-            $('#country_id').val(country_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_state_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#zoom-api-id').length){
-            display_details();
+            display_details('zoom api details');
         }
 
         $('#zoom-api-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['ZOOM_API_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('zoom api details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The Zoom API has been updated successfully.', 'success');
@@ -96,34 +96,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'zoom api details';
-    const zoom_api_id = $('#zoom-api-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {zoom_api_id : zoom_api_id, transaction : transaction},
-        success: function(response) {
-            $('#zoom_api_name').val(response[0].ZOOM_API_NAME);
-            $('#api_key').val(response[0].API_KEY);
-            $('#api_secret').val(response[0].API_SECRET);
-            $('#description').val(response[0].DESCRIPTION);
-
-            $('#zoom_api_name_label').text(response[0].ZOOM_API_NAME);
-            $('#api_key_label').text(response[0].API_KEY);
-            $('#api_secret_label').text(response[0].API_SECRET);
-            $('#description_label').text(response[0].DESCRIPTION);
-
-            document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#parameter-id').length){
-            display_details();
+            display_details('system parameter details');
         }
 
         $('#system-parameter-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['PARAMETER_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('system parameter details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The system parameter has been updated successfully.', 'success');
@@ -84,32 +84,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'system parameter details';
-    const parameter_id = $('#parameter-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {parameter_id : parameter_id, transaction : transaction},
-        success: function(response) {
-            $('#parameter').val(response[0].PARAMETER);
-            $('#parameter_description').val(response[0].PARAMETER_DESCRIPTION);
-            $('#parameter_extension').val(response[0].PARAMETER_EXTENSION);
-            $('#parameter_number').val(response[0].PARAMETER_NUMBER);
-
-            $('#parameter_label').text(response[0].PARAMETER);
-            $('#parameter_description_label').text(response[0].PARAMETER_DESCRIPTION);
-            $('#parameter_extension_label').text(response[0].PARAMETER_EXTENSION);
-            $('#parameter_number_label').text(response[0].PARAMETER_NUMBER);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

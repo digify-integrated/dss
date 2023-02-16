@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#upload-setting-id').length){
-            display_details();
+            display_details('upload setting details');
 
             if($('#upload-setting-file-type-datatable').length){
                 initialize_upload_setting_file_type_table('#upload-setting-file-type-datatable');
@@ -29,7 +29,7 @@
                             window.location = window.location.href + '?id=' + response[0]['UPLOAD_SETTING_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('upload setting details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The upload setting has been updated successfully.', 'success');
@@ -88,30 +88,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'upload setting details';
-    const upload_setting_id = $('#upload-setting-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {upload_setting_id : upload_setting_id, transaction : transaction},
-        success: function(response) {
-            $('#upload_setting').val(response[0].UPLOAD_SETTING);
-            $('#description').val(response[0].DESCRIPTION);
-            $('#max_file_size').val(response[0].MAX_FILE_SIZE);
-
-            $('#upload_setting_label').text(response[0].UPLOAD_SETTING);
-            $('#description_label').text(response[0].DESCRIPTION);
-            $('#max_file_size_label').text(response[0].MAX_FILE_SIZE + ' mb');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_upload_setting_file_type_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

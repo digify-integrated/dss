@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#system-code-id').length){
-            display_details();
+            display_details('system code details');
         }
 
         $('#system-code-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['SYSTEM_CODE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('system code details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The system code has been updated successfully.', 'success');
@@ -90,31 +90,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'system code details';
-    const system_code_id = $('#system-code-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {system_code_id : system_code_id, transaction : transaction},
-        success: function(response) {
-            $('#system_description').val(response[0].SYSTEM_DESCRIPTION);
-            $('#system_code').val(response[0].SYSTEM_CODE);
-
-            $('#system_description_label').text(response[0].SYSTEM_DESCRIPTION);
-            $('#system_code_label').text(response[0].SYSTEM_CODE);
-            $('#system_type_label').text(response[0].SYSTEM_TYPE_NAME);
-
-            check_empty(response[0].SYSTEM_TYPE, '#system_type', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

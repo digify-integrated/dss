@@ -3,7 +3,7 @@
 
     $(() => {
         if($('#action-id').length){
-            display_details();
+            display_details('action details');
 
             if($('#action-access-datatable').length){
                 initialize_action_access_table('#action-access-datatable');
@@ -29,7 +29,7 @@
                             window.location = window.location.href + '?id=' + response[0]['ACTION_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('action details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The action has been updated successfully.', 'success');
@@ -82,26 +82,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'action details';
-    const action_id = $('#action-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {action_id : action_id, transaction : transaction},
-        success: function(response) {
-            $('#action_name').val(response[0].ACTION_NAME);
-            
-            $('#action_name_label').text(response[0].ACTION_NAME);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_action_access_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

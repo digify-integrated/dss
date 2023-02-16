@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#email-setting-id').length){
-            display_details();
+            display_details('email setting details');
         }
 
         $('#email-setting-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['EMAIL_SETTING_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('email setting details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The email setting has been updated successfully.', 'success');
@@ -120,51 +120,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'email setting details';
-    const email_setting_id = $('#email-setting-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {email_setting_id : email_setting_id, transaction : transaction},
-        success: function(response) {
-            $('#email_setting_name').val(response[0].EMAIL_SETTING_NAME);
-            $('#mail_host').val(response[0].MAIL_HOST);
-            $('#description').val(response[0].DESCRIPTION);
-            $('#mail_username').val(response[0].MAIL_USERNAME);
-            $('#mail_from_name').val(response[0].MAIL_FROM_NAME);
-            $('#port').val(response[0].PORT);
-            $('#mail_password').val(response[0].MAIL_PASSWORD);
-            $('#mail_from_email').val(response[0].MAIL_FROM_EMAIL);
-
-            $('#email_setting_name_label').text(response[0].EMAIL_SETTING_NAME);
-            $('#mail_host_label').text(response[0].MAIL_HOST);
-            $('#description_label').text(response[0].DESCRIPTION);
-            $('#mail_username_label').text(response[0].MAIL_USERNAME);
-            $('#mail_from_name_label').text(response[0].MAIL_FROM_NAME);
-            $('#port_label').text(response[0].PORT);
-            $('#mail_password_label').text(response[0].MAIL_PASSWORD);
-            $('#mail_from_email_label').text(response[0].MAIL_FROM_EMAIL);
-            $('#mail_encryption_label').text(response[0].MAIL_ENCRYPTION_NAME);
-            $('#smtp_auth_label').text(response[0].SMTP_AUTH_NAME);
-            $('#smtp_auto_tls_label').text(response[0].SMTP_AUTO_TLS_NAME);
-
-            document.getElementById('email_setting_status').innerHTML = response[0].STATUS;
-
-            check_empty(response[0].MAIL_ENCRYPTION, '#mail_encryption', 'select');
-            check_empty(response[0].SMTP_AUTH, '#smtp_auth', 'select');
-            check_empty(response[0].SMTP_AUTO_TLS, '#smtp_auto_tls', 'select');
-
-            $('#email_setting_id').val(email_setting_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

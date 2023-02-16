@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#company-id').length){
-            display_details();
+            display_details('company details');
         }
 
         $('#company-form').validate({
@@ -31,7 +31,7 @@
                             window.location = window.location.href + '?id=' + response[0]['COMPANY_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('company details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The company has been updated successfully.', 'success');
@@ -84,42 +84,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'company details';
-    const company_id = $('#company-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {company_id : company_id, transaction : transaction},
-        success: function(response) {
-            $('#company_name').val(response[0].COMPANY_NAME);
-            $('#company_address').val(response[0].COMPANY_ADDRESS);
-            $('#tax_id').val(response[0].TAX_ID);
-            $('#email').val(response[0].EMAIL);
-            $('#mobile').val(response[0].MOBILE);
-            $('#telephone').val(response[0].TELEPHONE);
-            $('#website').val(response[0].WEBSITE);
-
-            $('#company_name_label').text(response[0].COMPANY_NAME);
-            $('#company_address_label').text(response[0].COMPANY_ADDRESS);
-            $('#tax_id_label').text(response[0].TAX_ID);
-            $('#email_label').text(response[0].EMAIL);
-            $('#mobile_label').text(response[0].MOBILE);
-            $('#telephone_label').text(response[0].TELEPHONE);
-            $('#website_label').text(response[0].WEBSITE);
-                    
-            document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
-
-            $('#company_id').val(company_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

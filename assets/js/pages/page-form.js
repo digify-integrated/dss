@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#page-id').length){
-            display_details();
+            display_details('page details');
 
             if($('#page-access-datatable').length){
                 initialize_page_access_table('#page-access-datatable');
@@ -29,7 +29,7 @@
                             window.location = window.location.href + '?id=' + response[0]['PAGE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('page details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The page has been updated successfully.', 'success');
@@ -88,29 +88,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'page details';
-    const page_id = $('#page-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {page_id : page_id, transaction : transaction},
-        success: function(response) {
-            $('#page_name').val(response[0].PAGE_NAME);
-
-            $('#page_name_label').text(response[0].PAGE_NAME);
-            $('#module_id_label').text(response[0].MODULE_NAME);
-
-            check_empty(response[0].MODULE_ID, '#module_id', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_page_access_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

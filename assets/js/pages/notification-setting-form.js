@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#notification-setting-id').length){
-            display_details();
+            display_details('notification setting details');
 
             if($('#notification-role-recipients-datatable').length){
                 initialize_notification_role_recipient_table('#notification-role-recipients-datatable');
@@ -37,7 +37,7 @@
                             window.location = window.location.href + '?id=' + response[0]['NOTIFICATION_SETTING_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('notification setting details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The notification setting has been updated successfully.', 'success');
@@ -108,36 +108,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'notification setting details';
-    const notification_setting_id = $('#notification-setting-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {notification_setting_id : notification_setting_id, transaction : transaction},
-        success: function(response) {
-            $('#notification_setting').val(response[0].NOTIFICATION_SETTING);
-            $('#notification_title').val(response[0].NOTIFICATION_TITLE);
-            $('#system_link').val(response[0].SYSTEM_LINK);
-            $('#description').val(response[0].DESCRIPTION);
-            $('#notification_message').val(response[0].NOTIFICATION_MESSAGE);
-            $('#email_link').val(response[0].EMAIL_LINK);
-
-            $('#notification_setting_label').text(response[0].NOTIFICATION_SETTING);
-            $('#notification_title_label').text(response[0].NOTIFICATION_TITLE);
-            $('#system_link_label').text(response[0].SYSTEM_LINK);
-            $('#description_label').text(response[0].DESCRIPTION);
-            $('#notification_message_label').text(response[0].NOTIFICATION_MESSAGE);
-            $('#email_link_label').text(response[0].EMAIL_LINK);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_notification_role_recipient_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

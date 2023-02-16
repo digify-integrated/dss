@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#work-location-id').length){
-            display_details();
+            display_details('work location details');
         }
 
         $('#work-location-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['WORK_LOCATION_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('work location details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The work location has been updated successfully.', 'success');
@@ -90,38 +90,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'work location details';
-    const work_location_id = $('#work-location-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {work_location_id : work_location_id, transaction : transaction},
-        success: function(response) {
-            $('#work_location').val(response[0].WORK_LOCATION);
-            $('#work_location_address').val(response[0].WORK_LOCATION_ADDRESS);
-            $('#email').val(response[0].EMAIL);
-            $('#telephone').val(response[0].TELEPHONE);
-            $('#mobile').val(response[0].MOBILE);
-            $('#location_number').val(response[0].LOCATION_NUMBER);
-
-            $('#work_location_label').text(response[0].WORK_LOCATION);
-            $('#work_location_address_label').text(response[0].WORK_LOCATION_ADDRESS);
-            $('#email_label').text(response[0].EMAIL);
-            $('#telephone_label').text(response[0].TELEPHONE);
-            $('#mobile_label').text(response[0].MOBILE);
-            $('#location_number_label').text(response[0].LOCATION_NUMBER);
-
-            document.getElementById('work_location_status').innerHTML = response[0].STATUS;
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

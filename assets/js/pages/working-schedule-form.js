@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#working-schedule-id').length){
-            display_details();
+            display_details('working schedule details');
 
             if($('#working-hours-datatable').length){
                 initialize_working_hours_table('#working-hours-datatable');
@@ -29,7 +29,7 @@
                             window.location = window.location.href + '?id=' + response[0]['WORKING_SCHEDULE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('working schedule details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The working schedule has been updated successfully.', 'success');
@@ -88,29 +88,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'working schedule details';
-    const working_schedule_id = $('#working-schedule-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {working_schedule_id : working_schedule_id, transaction : transaction},
-        success: function(response) {
-            $('#working_schedule').val(response[0].WORKING_SCHEDULE);
-
-            $('#working_schedule_label').text(response[0].WORKING_SCHEDULE);
-            $('#working_schedule_type_label').text(response[0].WORKING_SCHEDULE_TYPE_NAME);
-
-            check_empty(response[0].WORKING_SCHEDULE_TYPE, '#working_schedule_type', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_working_hours_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#job-position-id').length){
-            display_details();
+            display_details('job position details');
 
             if($('#job-position-attachment-datatable').length){
                 initialize_job_position_attachment_table('#job-position-attachment-datatable');
@@ -41,7 +41,7 @@
                             window.location = window.location.href + '?id=' + response[0]['JOB_POSITION_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('job position details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The job position has been updated successfully.', 'success');
@@ -106,37 +106,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'job position details';
-    const job_position_id = $('#job-position-id').text();
-
-     $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {job_position_id : job_position_id, transaction : transaction},
-        success: function(response) {
-            $('#job_position').val(response[0].JOB_POSITION);
-            $('#description').val(response[0].DESCRIPTION);
-            $('#expected_new_employees').val(response[0].EXPECTED_NEW_EMPLOYEES);
-
-            $('#job_position_label').text(response[0].JOB_POSITION);
-            $('#description_label').text(response[0].DESCRIPTION);
-            $('#expected_new_employees_label').text(response[0].EXPECTED_NEW_EMPLOYEES);
-            $('#department_label').text(response[0].DEPARTMENT_NAME);
-
-            document.getElementById('job_position_recruitment_status').innerHTML = response[0].RECRUITMENT_STATUS;
-
-            check_empty(response[0].DEPARTMENT, '#department', 'select');
-
-            $('#job_position_id').val(job_position_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_job_position_attachment_table(datatable_name, buttons = false, show_all = false){
     const username = $('#username').text();

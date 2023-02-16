@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#departure-reason-id').length){
-            display_details();
+            display_details('departure reason details');
         }
 
         $('#departure-reason-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['DEPARTURE_REASON_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('departure reason details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The departure reason has been updated successfully.', 'success');
@@ -78,28 +78,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'departure reason details';
-    const departure_reason_id = $('#departure-reason-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {departure_reason_id : departure_reason_id, transaction : transaction},
-        success: function(response) {
-            $('#departure_reason').val(response[0].DEPARTURE_REASON);
-            
-            $('#departure_reason_label').text(response[0].DEPARTURE_REASON);
-                    
-            $('#departure_reason_id').val(departure_reason_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();

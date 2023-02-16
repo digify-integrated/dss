@@ -3,7 +3,7 @@
 
     $(function() {
         if($('#state-id').length){
-            display_details();
+            display_details('state details');
         }
 
         $('#state-form').validate({
@@ -25,7 +25,7 @@
                             window.location = window.location.href + '?id=' + response[0]['STATE_ID'];
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
+                            display_details('state details');
                             reset_form();
                             
                             show_toastr('Update Successful', 'The state has been updated successfully.', 'success');
@@ -84,31 +84,6 @@
         initialize_click_events();
     });
 })(jQuery);
-
-function display_details(){
-    const transaction = 'state details';
-    const state_id = $('#state-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {state_id : state_id, transaction : transaction},
-        success: function(response) {
-            $('#state_name').val(response[0].STATE_NAME);
-
-            $('#state_name_label').text(response[0].STATE_NAME);
-            $('#country_id_label').text(response[0].COUNTRY_NAME);
-
-            check_empty(response[0].COUNTRY_ID, '#country_id', 'select');
-
-            $('#state_id').val(state_id);
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
 
 function initialize_click_events(){
     const username = $('#username').text();
