@@ -1736,7 +1736,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
-                    generate_actions('action details');
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1771,6 +1771,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1791,6 +1792,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1816,6 +1818,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1836,6 +1839,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1879,6 +1883,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1899,6 +1904,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1919,6 +1925,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1947,6 +1954,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -1976,6 +1984,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2009,6 +2018,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2037,6 +2047,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2058,6 +2069,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2081,6 +2093,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2104,6 +2117,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2127,6 +2141,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2151,6 +2166,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2173,6 +2189,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2200,6 +2217,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2220,6 +2238,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2250,6 +2269,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2271,6 +2291,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2292,6 +2313,7 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
@@ -2318,11 +2340,642 @@ function display_details(transaction){
                 },
                 complete: function(){
                     generate_transaction_logs();
+                    generate_action_dropdown(transaction);
                 }
             });
             break;
     }
 }
+
+function generate_action_dropdown(dropdown_type){
+    const transaction = 'system dropdown';
+
+    switch (dropdown_type) {
+        case 'action details':
+            const action_id = $('#action-id').text();
+        
+            $.ajax({
+                url: 'system-generation.php',
+                method: 'POST',
+                data: {action_id : action_id, transaction : transaction},
+                success: function(response) {
+                    $('#action_name').val(response[0].ACTION_NAME);
+                    
+                    $('#action_name_label').text(response[0].ACTION_NAME);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_actions('action details');
+                }
+            });
+            break;
+        case 'company details':
+            const company_id = $('#company-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {company_id : company_id, transaction : transaction},
+                success: function(response) {
+                    $('#company_name').val(response[0].COMPANY_NAME);
+                    $('#company_address').val(response[0].COMPANY_ADDRESS);
+                    $('#tax_id').val(response[0].TAX_ID);
+                    $('#email').val(response[0].EMAIL);
+                    $('#mobile').val(response[0].MOBILE);
+                    $('#telephone').val(response[0].TELEPHONE);
+                    $('#website').val(response[0].WEBSITE);
+
+                    $('#company_name_label').text(response[0].COMPANY_NAME);
+                    $('#company_address_label').text(response[0].COMPANY_ADDRESS);
+                    $('#tax_id_label').text(response[0].TAX_ID);
+                    $('#email_label').text(response[0].EMAIL);
+                    $('#mobile_label').text(response[0].MOBILE);
+                    $('#telephone_label').text(response[0].TELEPHONE);
+                    $('#website_label').text(response[0].WEBSITE);
+                            
+                    document.getElementById('company_logo_image').innerHTML = response[0].COMPANY_LOGO;
+
+                    $('#company_id').val(company_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'country details':
+            const country_id = $('#country-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {country_id : country_id, transaction : transaction},
+                success: function(response) {
+                    $('#country_name').val(response[0].COUNTRY_NAME);
+                    
+                    $('#country_name_label').text(response[0].COUNTRY_NAME);
+
+                    $('#country_id').val(country_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'department details':
+            const department_id = $('#department-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {department_id : department_id, transaction : transaction},
+                success: function(response) {
+                    $('#department').val(response[0].DEPARTMENT);
+
+                    $('#department_label').text(response[0].DEPARTMENT);
+                    $('#parent_department_label').text(response[0].PARENT_DEPARTMENT_NAME);
+                    $('#manager_label').text(response[0].MANAGER_NAME);
+
+                    document.getElementById('department_status').innerHTML = response[0].STATUS;
+
+                    check_empty(response[0].PARENT_DEPARTMENT, '#parent_department', 'select');
+                    check_empty(response[0].MANAGER, '#manager', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'departure reason details':
+            const departure_reason_id = $('#departure-reason-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {departure_reason_id : departure_reason_id, transaction : transaction},
+                success: function(response) {
+                    $('#departure_reason').val(response[0].DEPARTURE_REASON);
+                    
+                    $('#departure_reason_label').text(response[0].DEPARTURE_REASON);
+                            
+                    $('#departure_reason_id').val(departure_reason_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'email setting details':
+            const email_setting_id = $('#email-setting-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {email_setting_id : email_setting_id, transaction : transaction},
+                success: function(response) {
+                    $('#email_setting_name').val(response[0].EMAIL_SETTING_NAME);
+                    $('#mail_host').val(response[0].MAIL_HOST);
+                    $('#description').val(response[0].DESCRIPTION);
+                    $('#mail_username').val(response[0].MAIL_USERNAME);
+                    $('#mail_from_name').val(response[0].MAIL_FROM_NAME);
+                    $('#port').val(response[0].PORT);
+                    $('#mail_password').val(response[0].MAIL_PASSWORD);
+                    $('#mail_from_email').val(response[0].MAIL_FROM_EMAIL);
+
+                    $('#email_setting_name_label').text(response[0].EMAIL_SETTING_NAME);
+                    $('#mail_host_label').text(response[0].MAIL_HOST);
+                    $('#description_label').text(response[0].DESCRIPTION);
+                    $('#mail_username_label').text(response[0].MAIL_USERNAME);
+                    $('#mail_from_name_label').text(response[0].MAIL_FROM_NAME);
+                    $('#port_label').text(response[0].PORT);
+                    $('#mail_password_label').text(response[0].MAIL_PASSWORD);
+                    $('#mail_from_email_label').text(response[0].MAIL_FROM_EMAIL);
+                    $('#mail_encryption_label').text(response[0].MAIL_ENCRYPTION_NAME);
+                    $('#smtp_auth_label').text(response[0].SMTP_AUTH_NAME);
+                    $('#smtp_auto_tls_label').text(response[0].SMTP_AUTO_TLS_NAME);
+
+                    document.getElementById('email_setting_status').innerHTML = response[0].STATUS;
+
+                    check_empty(response[0].MAIL_ENCRYPTION, '#mail_encryption', 'select');
+                    check_empty(response[0].SMTP_AUTH, '#smtp_auth', 'select');
+                    check_empty(response[0].SMTP_AUTO_TLS, '#smtp_auto_tls', 'select');
+
+                    $('#email_setting_id').val(email_setting_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'employee type details':
+            const employee_type_id = $('#employee-type-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {employee_type_id : employee_type_id, transaction : transaction},
+                success: function(response) {
+                    $('#employee_type').val(response[0].EMPLOYEE_TYPE);
+                    
+                    $('#employee_type_label').text(response[0].EMPLOYEE_TYPE);
+                            
+                    $('#employee_type_id').val(employee_type_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'id type details':
+            const id_type_id = $('#id-type-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {id_type_id : id_type_id, transaction : transaction},
+                success: function(response) {
+                    $('#id_type').val(response[0].ID_TYPE);
+                    
+                    $('#id_type_label').text(response[0].ID_TYPE);
+                            
+                    $('#id_type_id').val(id_type_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'interface setting details':
+            const interface_setting_id = $('#interface-setting-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {interface_setting_id : interface_setting_id, transaction : transaction},
+                success: function(response) {
+                    $('#interface_setting_name').val(response[0].INTERFACE_SETTING_NAME);
+                    $('#description').val(response[0].DESCRIPTION);
+        
+                    $('#interface_setting_name_label').text(response[0].INTERFACE_SETTING_NAME);
+                    $('#description_label').text(response[0].DESCRIPTION);
+                            
+                    document.getElementById('interface_setting_status').innerHTML = response[0].STATUS;
+                    document.getElementById('login_background_image').innerHTML = response[0].LOGIN_BACKGROUND;
+                    document.getElementById('login_logo_image').innerHTML = response[0].LOGIN_LOGO;
+                    document.getElementById('menu_logo_image').innerHTML = response[0].MENU_LOGO;
+                    document.getElementById('favicon_image').innerHTML = response[0].FAVICON;
+        
+                    $('#interface_setting_id').val(interface_setting_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'job position details':
+            const job_position_id = $('#job-position-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {job_position_id : job_position_id, transaction : transaction},
+                success: function(response) {
+                    $('#job_position').val(response[0].JOB_POSITION);
+                    $('#description').val(response[0].DESCRIPTION);
+                    $('#expected_new_employees').val(response[0].EXPECTED_NEW_EMPLOYEES);
+
+                    $('#job_position_label').text(response[0].JOB_POSITION);
+                    $('#description_label').text(response[0].DESCRIPTION);
+                    $('#expected_new_employees_label').text(response[0].EXPECTED_NEW_EMPLOYEES);
+                    $('#department_label').text(response[0].DEPARTMENT_NAME);
+
+                    document.getElementById('job_position_recruitment_status').innerHTML = response[0].RECRUITMENT_STATUS;
+
+                    check_empty(response[0].DEPARTMENT, '#department', 'select');
+
+                    $('#job_position_id').val(job_position_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'module details':
+            const module_id = $('#module-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {module_id : module_id, transaction : transaction},
+                success: function(response) {
+                    $('#module_name').val(response[0].MODULE_NAME);
+                    $('#module_description').val(response[0].MODULE_DESCRIPTION);
+                    $('#module_version').val(response[0].MODULE_VERSION);
+                    $('#default_page').val(response[0].DEFAULT_PAGE);
+                    $('#order_sequence').val(response[0].ORDER_SEQUENCE);
+
+                    $('#module_name_label').text(response[0].MODULE_NAME);
+                    $('#module_description_label').text(response[0].MODULE_DESCRIPTION);
+                    $('#module_version_label').text(response[0].MODULE_VERSION);
+                    $('#default_page_label').text(response[0].DEFAULT_PAGE);
+                    $('#order_sequence_label').text(response[0].ORDER_SEQUENCE);
+                    $('#module_category_label').text(response[0].MODULE_CATEGORY_NAME);
+
+                    document.getElementById('module_icon_image').innerHTML = response[0].MODULE_ICON;
+                            
+                    $('#module_id').val(module_id);
+
+                    check_empty(response[0].MODULE_CATEGORY, '#module_category', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'notification setting details':
+            const notification_setting_id = $('#notification-setting-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {notification_setting_id : notification_setting_id, transaction : transaction},
+                success: function(response) {
+                    $('#notification_setting').val(response[0].NOTIFICATION_SETTING);
+                    $('#notification_title').val(response[0].NOTIFICATION_TITLE);
+                    $('#system_link').val(response[0].SYSTEM_LINK);
+                    $('#description').val(response[0].DESCRIPTION);
+                    $('#notification_message').val(response[0].NOTIFICATION_MESSAGE);
+                    $('#email_link').val(response[0].EMAIL_LINK);
+        
+                    $('#notification_setting_label').text(response[0].NOTIFICATION_SETTING);
+                    $('#notification_title_label').text(response[0].NOTIFICATION_TITLE);
+                    $('#system_link_label').text(response[0].SYSTEM_LINK);
+                    $('#description_label').text(response[0].DESCRIPTION);
+                    $('#notification_message_label').text(response[0].NOTIFICATION_MESSAGE);
+                    $('#email_link_label').text(response[0].EMAIL_LINK);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'page details':
+            const page_id = $('#page-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {page_id : page_id, transaction : transaction},
+                success: function(response) {
+                    $('#page_name').val(response[0].PAGE_NAME);
+
+                    $('#page_name_label').text(response[0].PAGE_NAME);
+                    $('#module_id_label').text(response[0].MODULE_NAME);
+
+                    check_empty(response[0].MODULE_ID, '#module_id', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'role details':
+            const role_id = $('#role-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {role_id : role_id, transaction : transaction},
+                success: function(response) {
+                    $('#role').val(response[0].ROLE);
+                    $('#role_description').val(response[0].ROLE_DESCRIPTION);
+        
+                    $('#role_label').text(response[0].ROLE);
+                    $('#role_description_label').text(response[0].ROLE_DESCRIPTION);
+                    $('#assignable_label').text(response[0].ASSIGNABLE_NAME);
+        
+                    check_empty(response[0].ASSIGNABLE, '#assignable', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'state details':
+            const state_id = $('#state-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {state_id : state_id, transaction : transaction},
+                success: function(response) {
+                    $('#state_name').val(response[0].STATE_NAME);
+        
+                    $('#state_name_label').text(response[0].STATE_NAME);
+                    $('#country_id_label').text(response[0].COUNTRY_NAME);
+        
+                    check_empty(response[0].COUNTRY_ID, '#country_id', 'select');
+        
+                    $('#state_id').val(state_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'system code details':
+            const system_code_id = $('#system-code-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {system_code_id : system_code_id, transaction : transaction},
+                success: function(response) {
+                    $('#system_description').val(response[0].SYSTEM_DESCRIPTION);
+                    $('#system_code').val(response[0].SYSTEM_CODE);
+
+                    $('#system_description_label').text(response[0].SYSTEM_DESCRIPTION);
+                    $('#system_code_label').text(response[0].SYSTEM_CODE);
+                    $('#system_type_label').text(response[0].SYSTEM_TYPE_NAME);
+
+                    check_empty(response[0].SYSTEM_TYPE, '#system_type', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'system parameter details':
+            const parameter_id = $('#parameter-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {parameter_id : parameter_id, transaction : transaction},
+                success: function(response) {
+                    $('#parameter').val(response[0].PARAMETER);
+                    $('#parameter_description').val(response[0].PARAMETER_DESCRIPTION);
+                    $('#parameter_extension').val(response[0].PARAMETER_EXTENSION);
+                    $('#parameter_number').val(response[0].PARAMETER_NUMBER);
+        
+                    $('#parameter_label').text(response[0].PARAMETER);
+                    $('#parameter_description_label').text(response[0].PARAMETER_DESCRIPTION);
+                    $('#parameter_extension_label').text(response[0].PARAMETER_EXTENSION);
+                    $('#parameter_number_label').text(response[0].PARAMETER_NUMBER);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'upload setting details':
+            const upload_setting_id = $('#upload-setting-id').text();
+        
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {upload_setting_id : upload_setting_id, transaction : transaction},
+                success: function(response) {
+                    $('#upload_setting').val(response[0].UPLOAD_SETTING);
+                    $('#description').val(response[0].DESCRIPTION);
+                    $('#max_file_size').val(response[0].MAX_FILE_SIZE);
+        
+                    $('#upload_setting_label').text(response[0].UPLOAD_SETTING);
+                    $('#description_label').text(response[0].DESCRIPTION);
+                    $('#max_file_size_label').text(response[0].MAX_FILE_SIZE + ' mb');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'user account details':
+            const user_id = $('#user_id').val();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {user_id : user_id, transaction : transaction},
+                success: function(response) {
+                    $('#file_as').val(response[0].FILE_AS);
+                    $('#password').val(response[0].PASSWORD);
+
+                    $('#file_as_label').text(response[0].FILE_AS);
+                    $('#user_id_label').text(user_id);
+
+                    document.getElementById('last_connection_date').innerHTML = response[0].LAST_CONNECTION_DATE;
+                    document.getElementById('password_expiry_date').innerHTML = response[0].PASSWORD_EXPIRY_DATE;
+                    document.getElementById('last_failed_login_date').innerHTML = response[0].LAST_FAILED_LOGIN;
+                    document.getElementById('user_status').innerHTML = response[0].USER_STATUS;
+                    document.getElementById('failed_login').innerHTML = response[0].FAILED_LOGIN;
+                    document.getElementById('lock_status').innerHTML = response[0].LOCK_STATUS;
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'wage type details':
+            const wage_type_id = $('#wage-type-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {wage_type_id : wage_type_id, transaction : transaction},
+                success: function(response) {
+                    $('#wage_type').val(response[0].WAGE_TYPE);
+                    
+                    $('#wage_type_label').text(response[0].WAGE_TYPE);
+                            
+                    $('#wage_type_id').val(wage_type_id);
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'work location details':
+            const work_location_id = $('#work-location-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {work_location_id : work_location_id, transaction : transaction},
+                success: function(response) {
+                    $('#work_location').val(response[0].WORK_LOCATION);
+                    $('#work_location_address').val(response[0].WORK_LOCATION_ADDRESS);
+                    $('#email').val(response[0].EMAIL);
+                    $('#telephone').val(response[0].TELEPHONE);
+                    $('#mobile').val(response[0].MOBILE);
+                    $('#location_number').val(response[0].LOCATION_NUMBER);
+
+                    $('#work_location_label').text(response[0].WORK_LOCATION);
+                    $('#work_location_address_label').text(response[0].WORK_LOCATION_ADDRESS);
+                    $('#email_label').text(response[0].EMAIL);
+                    $('#telephone_label').text(response[0].TELEPHONE);
+                    $('#mobile_label').text(response[0].MOBILE);
+                    $('#location_number_label').text(response[0].LOCATION_NUMBER);
+
+                    document.getElementById('work_location_status').innerHTML = response[0].STATUS;
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'working schedule details':
+            const working_schedule_id = $('#working-schedule-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {working_schedule_id : working_schedule_id, transaction : transaction},
+                success: function(response) {
+                    $('#working_schedule').val(response[0].WORKING_SCHEDULE);
+
+                    $('#working_schedule_label').text(response[0].WORKING_SCHEDULE);
+                    $('#working_schedule_type_label').text(response[0].WORKING_SCHEDULE_TYPE_NAME);
+
+                    check_empty(response[0].WORKING_SCHEDULE_TYPE, '#working_schedule_type', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'working schedule type details':
+            const working_schedule_type_id = $('#working-schedule-type-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {working_schedule_type_id : working_schedule_type_id, transaction : transaction},
+                success: function(response) {
+                    $('#working_schedule_type').val(response[0].WORKING_SCHEDULE_TYPE);
+
+                    $('#working_schedule_type_label').text(response[0].WORKING_SCHEDULE_TYPE);
+                    $('#working_schedule_type_category_label').text(response[0].WORKING_SCHEDULE_TYPE_CATEGORY_NAME);
+
+                    check_empty(response[0].WORKING_SCHEDULE_TYPE_CATEGORY, '#working_schedule_type_category', 'select');
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+        case 'zoom api details':
+            const zoom_api_id = $('#zoom-api-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {zoom_api_id : zoom_api_id, transaction : transaction},
+                success: function(response) {
+                    $('#zoom_api_name').val(response[0].ZOOM_API_NAME);
+                    $('#api_key').val(response[0].API_KEY);
+                    $('#api_secret').val(response[0].API_SECRET);
+                    $('#description').val(response[0].DESCRIPTION);
+
+                    $('#zoom_api_name_label').text(response[0].ZOOM_API_NAME);
+                    $('#api_key_label').text(response[0].API_KEY);
+                    $('#api_secret_label').text(response[0].API_SECRET);
+                    $('#description_label').text(response[0].DESCRIPTION);
+
+                    document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                    generate_action_dropdown(transaction);
+                }
+            });
+            break;
+    }
+}
+
 
 // Reset form
 function reset_form(){
