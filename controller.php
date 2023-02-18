@@ -4,7 +4,7 @@ require('config/config.php');
 require('classes/api.php');
 
 if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
-    $transaction = $_POST['transaction'];
+    $transaction = htmlspecialchars($_POST['transaction'], ENT_QUOTES, 'UTF-8');
     $api = new Api;
     $system_date = date('Y-m-d');
     $current_time = date('H:i:s');
@@ -2474,9 +2474,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             echo 'Overlap';
                         }
                         else{
-                            $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+                            $check_working_hours_exist = $api->check_working_hours_exist($working_hours_id);
              
-                            if($check_working_schedule_exist > 0){
+                            if($check_working_hours_exist > 0){
                                 $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, null, $day_of_week, $day_period, $work_from, $work_to, $username);
                 
                                 if($update_working_hours){
@@ -2529,9 +2529,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             echo 'Overlap';
                         }
                         else{
-                            $check_working_schedule_exist = $api->check_working_schedule_exist($working_hours_id);
+                            $check_working_hours_exist = $api->check_working_hours_exist($working_hours_id);
              
-                            if($check_working_schedule_exist > 0){
+                            if($check_working_hours_exist > 0){
                                 $update_working_hours = $api->update_working_hours($working_hours_id, $working_schedule_id, $working_hours, $working_date, $day_of_week, $day_period, $work_from, $work_to, $username);
                 
                                 if($update_working_hours){

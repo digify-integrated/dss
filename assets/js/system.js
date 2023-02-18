@@ -163,1430 +163,1347 @@ function initialize_form_validation(form_type){
     var transaction;
     const username = $('#username').text();
 
-    if(form_type == 'change password form'){
-        $('#change-password-form').validate({
-            submitHandler: function (form) {
-                transaction = 'change password';
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&transaction=' + transaction,
-                    beforeSend: function(){
-                        document.getElementById('signin').disabled = true;
-                        $('#signin').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated'){
-                            show_alert('Change User Account Password Success', 'The user account password has been updated. You can now sign in your account.', 'success');
-                            $('#System-Modal').modal('hide');
-
-                            document.getElementById('signin').disabled = false;
-                            $('#signin').html('Log In');
+    switch (form_type) {
+        case 'module access form':
+            $('#module-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit module access';
+                    let role = [];
+                    const module_id = $('#module_id').val();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            role.push(element.value);  
                         }
-                        else{
-                            if(response === 'Not Found'){
-                                show_alert('Change User Account Password Error', 'The user account does not exist.', 'error');
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&module_id=' + module_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Inserted'){
+                                show_toastr('Insert Successful', 'The module access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#module-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Change User Account Password Error', response, 'error');
-                            }                            
-
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
                             document.getElementById('submit-form').disabled = false;
                             $('#submit-form').html('Submit');
                         }
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-
-                return false;
-            },
-            rules: {
-                change_password: {
-                    required: true,
-                    password_strength : true
-                }
-            },
-            messages: {
-                change_password: {
-                    required: 'Please enter your password',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if(element.hasClass('web-select2') && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.input-group'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'module access form'){
-        $('#module-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit module access';
-                let role = [];
-                const module_id = $('#module_id').val();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        role.push(element.value);  
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
                     }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&module_id=' + module_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Module Access Success', 'The module access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#module-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Module Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    else {
+                        $(element).removeClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
                 }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'page access form'){
-        $('#page-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit page access';
-                let role = [];
-                const page_id = $('#page_id').val();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        role.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&page_id=' + page_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Page Access Success', 'The page access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#page-access-datatable');
+            });
+          break;
+        case 'page access form':
+            $('#page-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit page access';
+                    let role = [];
+                    const page_id = $('#page_id').val();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            role.push(element.value);  
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Page Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'action access form'){
-        $('#action-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit action access';
-                let role = [];
-                const action_id = $('#action_id').val();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        role.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&action_id=' + action_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Action Access Success', 'The action access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#action-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Action Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'role module access form'){
-        $('#role-module-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit role module access';
-                let module_id = [];
-                const role_id = $('#role-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        module_id.push(element.value);  
-                    }
-                });
-
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&module_id=' + module_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Module Access Success', 'The module access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#module-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Module Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Module Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'role page access form'){
-        $('#role-page-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit role page access';
-                let page_id = [];
-                const role_id = $('#role-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        page_id.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&page_id=' + page_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Page Access Success', 'The page access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#page-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Page Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Page Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'role action access form'){
-        $('#role-action-access-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit role action access';
-                let action_id = [];
-                const role_id = $('#role-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        action_id.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&action_id=' + action_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Action Access Success', 'The action access has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#action-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Action Access Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Action Access Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'role user account form'){
-        $('#role-user-account-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit role user account';
-                let user_id = [];
-                const role_id = $('#role-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        user_id.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&user_id=' + user_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Role User Account Success', 'The user account has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#user-account-assignment');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Role User Account Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Role User Account Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'upload setting file type form'){
-        $('#upload-setting-file-type-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit upload setting file type';
-                let file_type = [];
-                const upload_setting_id = $('#upload-setting-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        file_type.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&upload_setting_id=' + upload_setting_id + '&file_type=' + file_type,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Upload Setting File Type Success', 'The file type has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#upload-setting-file-type-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Upload setting File Type Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Upload Setting File Type Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'notification role recipient form'){
-        $('#notification-role-recipient-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit notification role recipient';
-                let role_id = [];
-                const notification_setting_id = $('#notification-setting-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        role_id.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&role_id=' + role_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Notification Role Recipient Success', 'The notification role recipient has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#notification-role-recipients-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Notification Role Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Notification Role Recipient Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'notification user account recipient form'){
-        $('#notification-user-account-recipient-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit notification user account recipient';
-                let user_id = [];
-                const notification_setting_id = $('#notification-setting-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        user_id.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&user_id=' + user_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Notification User Account Recipient Success', 'The notification user account recipient has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#notification-user-account-recipients-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Notification User Account Recipient Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Notification User Account Recipient Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'notification channel form'){
-        $('#notification-channel-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit notification channel';
-                let channel = [];
-                const notification_setting_id = $('#notification-setting-id').text();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        channel.push(element.value);  
-                    }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&channel=' + channel,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert Notification Channel Success', 'The notification channel has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#notification-channel-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Notification Channel Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Notification Channel Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'state form'){
-        $('#state-form').validate({
-            submitHandler: function (form) {
-                const country_id = $('#country-id').text();
-                transaction = 'submit country state'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&country_id=' + country_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&page_id=' + page_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert State Success', 'The state has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The page access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#page-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update State Success', 'The state has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#state-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('State Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('State Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                state_name: {
-                    required: true
-                }
-            },
-            messages: {
-                state_name: {
-                    required: 'Please enter the state',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'user account role form'){
-        $('#user-account-role-form').validate({
-            submitHandler: function (form) {
-                transaction = 'submit user account role';
-                let role = [];
-                const user_id = $('#user_id').val();
-
-                $('.datatable-checkbox-children').each((index, element) => {
-                    if ($(element).is(':checked')) {
-                        role.push(element.value);  
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
                     }
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&user_id=' + user_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Inserted'){
-                            show_alert('Insert User Account Role Success', 'The user account role has been inserted.', 'success');
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#user-account-role-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('User Account Role Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('User Account Role Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    else {
+                        $(element).removeClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
                 }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'job position responsibility form'){
-        $('#job-position-responsibility-form').validate({
-            submitHandler: function (form) {
-                const job_position_id = $('#job-position-id').text();
-                transaction = 'submit job position responsibility'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'action access form':
+            $('#action-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit action access';
+                    let role = [];
+                    const action_id = $('#action_id').val();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            role.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&action_id=' + action_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Responsibility Success', 'The responsibility has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The action access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#action-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Responsibility Success', 'The responsibility has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#job-position-responsibility-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Responsibility Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Responsibility Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                responsibility: {
-                    required: true
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            messages: {
-                responsibility: {
-                    required: 'Please enter the responsibility',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'job position requirement form'){
-        $('#job-position-requirement-form').validate({
-            submitHandler: function (form) {
-                const job_position_id = $('#job-position-id').text();
-                transaction = 'submit job position requirement'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'role module access form':
+            $('#role-module-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit role module access';
+                    let module_id = [];
+                    const role_id = $('#role-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            module_id.push(element.value);  
+                        }
+                    });
+    
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&module_id=' + module_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Requirement Success', 'The requirement has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The module access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#module-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Requirement Success', 'The requirement has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#job-position-requirement-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Requirement Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Requirement Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                requirement: {
-                    required: true
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            messages: {
-                requirement: {
-                    required: 'Please enter the requirement',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'job position qualification form'){
-        $('#job-position-qualification-form').validate({
-            submitHandler: function (form) {
-                const job_position_id = $('#job-position-id').text();
-                transaction = 'submit job position qualification'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'role page access form':
+            $('#role-page-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit role page access';
+                    let page_id = [];
+                    const role_id = $('#role-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            page_id.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&page_id=' + page_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Qualification Success', 'The qualification has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The page access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#page-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Qualification Success', 'The qualification has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#job-position-qualification-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Qualification Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Qualification Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                qualification: {
-                    required: true
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            messages: {
-                qualification: {
-                    required: 'Please enter the qualification',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'job position attachment form'){
-        $('#job-position-attachment-form').validate({
-            submitHandler: function (form) {
-                const job_position_id = $('#job-position-id').text();
-                transaction = 'submit job position attachment'; 
-
-                var formData = new FormData(form);
-                formData.append('username', username);
-                formData.append('transaction', transaction);
-                formData.append('job_position_id', job_position_id);
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'role action access form':
+            $('#role-action-access-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit role action access';
+                    let action_id = [];
+                    const role_id = $('#role-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            action_id.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&action_id=' + action_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Attachment Success', 'The attachment has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The action access been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#action-access-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Attachment Success', 'The attachment has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#job-position-attachment-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'File Size'){
-                            show_alert('Attachment Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                        }
-                        else if(response === 'File Type'){
-                            show_alert('Attachment Error', 'The file uploaded is not supported.', 'error');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Attachment Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Attachment Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
-                    }
-                });
-                return false;
-            },
-            rules: {
-                attachment_name: {
-                    required: true
+                    });
+                    return false;
                 },
-                attachment: {
-                    required: function(element){
-                        var update = $('#update').val();
-
-                        if(update == '0'){
-                            return true;
-                        }
-                        else{
-                            return false;
-                        }
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
                     }
                 }
-            },
-            messages: {
-                attachment_name: {
-                    required: 'Please enter the attachment name',
-                },
-                attachment: {
-                    required: 'Please choose the attachment',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'fixed working hours form'){
-        $('#fixed-working-hours-form').validate({
-            submitHandler: function (form) {
-                const working_schedule_id = $('#working-schedule-id').text();
-                transaction = 'submit fixed working hours'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'role user account form':
+            $('#role-user-account-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit role user account';
+                    let user_id = [];
+                    const role_id = $('#role-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            user_id.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role_id=' + role_id + '&user_id=' + user_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Working Hours Success', 'The working hours has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The user account been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#user-account-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Working Hours Success', 'The working hours has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#working-hours-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Overlap'){
-                            show_alert('Working Hours Error', 'Working hours cannot overlap with other wokring hours', 'error');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Working Hours Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                working_hours: {
-                    required: true
                 },
-                day_of_week: {
-                    required: true
-                },
-                day_period: {
-                    required: true
-                },
-                work_from: {
-                    required: true
-                },
-                work_to: {
-                    required: true
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            messages: {
-                working_hours: {
-                    required: 'Please enter the name',
-                },
-                day_of_week: {
-                    required: 'Please choose the day of week',
-                },
-                day_period: {
-                    required: 'Please choose the day period',
-                },
-                work_from: {
-                    required: 'Please choose the work from',
-                },
-                work_to: {
-                    required: 'Please choose the work to',
-                }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
-                }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
-                }
-                else{
-                    label.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
-    }
-    else if(form_type == 'flexible working hours form'){
-        $('#flexible-working-hours-form').validate({
-            submitHandler: function (form) {
-                const working_schedule_id = $('#working-schedule-id').text();
-                transaction = 'submit flexible working hours'; 
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'controller.php',
-                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
-                    beforeSend: function(){
-                        document.getElementById('submit-form').disabled = true;
-                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                    },
-                    success: function (response) {
-                        if(response === 'Updated' || response === 'Inserted'){
+            });
+          break;
+        case 'upload setting file type form':
+            $('#upload-setting-file-type-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit upload setting file type';
+                    let file_type = [];
+                    const upload_setting_id = $('#upload-setting-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            file_type.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&upload_setting_id=' + upload_setting_id + '&file_type=' + file_type,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
                             if(response === 'Inserted'){
-                                show_alert('Insert Working Hours Success', 'The working hours has been inserted.', 'success');
+                                show_toastr('Insert Successful', 'The file type been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#upload-setting-file-type-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
                             }
                             else{
-                                show_alert('Update Working Hours Success', 'The working hours has been updated.', 'success');
+                                show_toastr('Transaction Error', response, 'error');
                             }
-                          
-                            $('#System-Modal').modal('hide');
-                            reload_datatable('#working-hours-datatable');
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
                         }
-                        else if(response === 'Overlap'){
-                            show_alert('Working Hours Error', 'Working hours cannot overlap with other wokring hours', 'error');
-                        }
-                        else if(response === 'Inactive User'){
-                            show_alert_event('Working Hours Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                        }
-                        else{
-                            show_alert('Working Hours Error', response, 'error');
-                        }
-                    },
-                    complete: function(){
-                        document.getElementById('submit-form').disabled = false;
-                        $('#submit-form').html('Submit');
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
                     }
-                });
-                return false;
-            },
-            rules: {
-                working_hours: {
-                    required: true
                 },
-                working_date: {
-                    required: true
-                },
-                day_period: {
-                    required: true
-                },
-                work_from: {
-                    required: true
-                },
-                work_to: {
-                    required: true
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            messages: {
-                working_hours: {
-                    required: 'Please enter the name',
+            });
+          break;
+        case 'notification role recipient form':
+            $('#notification-role-recipient-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit notification role recipient';
+                    let role_id = [];
+                    const notification_setting_id = $('#notification-setting-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            role_id.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&role_id=' + role_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Inserted'){
+                                show_toastr('Insert Successful', 'The notification role recipient been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#notification-role-recipients-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
                 },
-                working_date: {
-                    required: 'Please choose the working date',
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
                 },
-                day_period: {
-                    required: 'Please choose the day period',
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
                 },
-                work_from: {
-                    required: 'Please choose the work from',
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'notification user account recipient form':
+            $('#notification-user-account-recipient-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit notification user account recipient';
+                    let user_id = [];
+                    const notification_setting_id = $('#notification-setting-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            user_id.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&user_id=' + user_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Inserted'){
+                                show_toastr('Insert Successful', 'The notification user account recipient been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#notification-user-account-recipients-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
                 },
-                work_to: {
-                    required: 'Please choose the work to',
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            errorPlacement: function(label, element) {
-                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
-                    label.insertAfter(element.next('.select2-container'));
+            });
+          break;
+        case 'notification channel form':
+            $('#notification-channel-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit notification channel';
+                    let channel = [];
+                    const notification_setting_id = $('#notification-setting-id').text();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            channel.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&notification_setting_id=' + notification_setting_id + '&channel=' + channel,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Inserted'){
+                                show_toastr('Insert Successful', 'The notification channel been inserted successfully.', 'success');
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#notification-channel-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-                else if(element.parent('.input-group').length){
-                    label.insertAfter(element.parent());
+            });
+          break;
+        case 'state form':
+            $('#state-form').validate({
+                submitHandler: function (form) {
+                    const country_id = $('#country-id').text();
+                    transaction = 'submit country state'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&country_id=' + country_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The state has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The state has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    state_name: {
+                        required: true
+                    }
+                },
+                messages: {
+                    state_name: {
+                        required: 'Please enter the state',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-                else{
-                    label.insertAfter(element);
+            });
+          break;
+        case 'user account role form':
+            $('#user-account-role-form').validate({
+                submitHandler: function (form) {
+                    transaction = 'submit user account role';
+                    let role = [];
+                    const user_id = $('#user_id').val();
+    
+                    $('.datatable-checkbox-children').each((index, element) => {
+                        if ($(element).is(':checked')) {
+                            role.push(element.value);  
+                        }
+                    });
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role + '&user_id=' + user_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The user account role has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The user account role has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#user-account-role-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
                 }
-            },
-            highlight: function(element) {
-                $(element).parent().addClass('has-danger');
-                $(element).addClass('form-control-danger');
-            },
-            success: function(label,element) {
-                $(element).parent().removeClass('has-danger')
-                $(element).removeClass('form-control-danger')
-                label.remove();
-            }
-        });
+            });
+          break;
+        case 'job position responsibility form':
+            $('#job-position-responsibility-form').validate({
+                submitHandler: function (form) {
+                    const job_position_id = $('#job-position-id').text();
+                    transaction = 'submit job position responsibility'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The responsibility has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The responsibility has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#job-position-responsibility-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    responsibility: {
+                        required: true
+                    }
+                },
+                messages: {
+                    responsibility: {
+                        required: 'Please enter the responsibility',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'job position requirement form':
+            $('#job-position-requirement-form').validate({
+                submitHandler: function (form) {
+                    const job_position_id = $('#job-position-id').text();
+                    transaction = 'submit job position requirement'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The requirement has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The requirement has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#job-position-requirement-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    requirement: {
+                        required: true
+                    }
+                },
+                messages: {
+                    requirement: {
+                        required: 'Please enter the requirement',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'job position qualification form':
+            $('#job-position-qualification-form').validate({
+                submitHandler: function (form) {
+                    const job_position_id = $('#job-position-id').text();
+                    transaction = 'submit job position qualification'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&job_position_id=' + job_position_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The qualification has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The qualification has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#job-position-qualification-datatable');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    qualification: {
+                        required: true
+                    }
+                },
+                messages: {
+                    qualification: {
+                        required: 'Please enter the qualification',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'job position attachment form':
+            $('#job-position-attachment-form').validate({
+                submitHandler: function (form) {
+                    const job_position_id = $('#job-position-id').text();
+                    transaction = 'submit job position attachment'; 
+    
+                    var formData = new FormData(form);
+                    formData.append('username', username);
+                    formData.append('transaction', transaction);
+                    formData.append('job_position_id', job_position_id);
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The attachment has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The attachment has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#job-position-attachment-datatable');
+                            }
+                            else if(response === 'File Size'){
+                                show_toastr('Transaction Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                            }
+                            else if(response === 'File Type'){
+                                show_toastr('Transaction Error', 'The file uploaded is not supported.', 'error');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    attachment_name: {
+                        required: true
+                    },
+                    attachment: {
+                        required: function(element){
+                            var update = $('#update').val();
+    
+                            if(update == '0'){
+                                return true;
+                            }
+                            else{
+                                return false;
+                            }
+                        }
+                    }
+                },
+                messages: {
+                    attachment_name: {
+                        required: 'Please enter the attachment name',
+                    },
+                    attachment: {
+                        required: 'Please choose the attachment',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'fixed working hours form':
+            $('#fixed-working-hours-form').validate({
+                submitHandler: function (form) {
+                    const working_schedule_id = $('#working-schedule-id').text();
+                    transaction = 'submit fixed working hours'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The working hours has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The working hours has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#working-hours-datatable');
+                            }
+                            else if(response === 'Overlap'){
+                                show_toastr('Transaction Error', 'Working hours cannot overlap with other wokring hours.', 'error');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    working_hours: {
+                        required: true
+                    },
+                    day_of_week: {
+                        required: true
+                    },
+                    day_period: {
+                        required: true
+                    },
+                    work_from: {
+                        required: true
+                    },
+                    work_to: {
+                        required: true
+                    }
+                },
+                messages: {
+                    working_hours: {
+                        required: 'Please enter the name',
+                    },
+                    day_of_week: {
+                        required: 'Please choose the day of week',
+                    },
+                    day_period: {
+                        required: 'Please choose the day period',
+                    },
+                    work_from: {
+                        required: 'Please choose the work from',
+                    },
+                    work_to: {
+                        required: 'Please choose the work to',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
+        case 'flexible working hours form':
+            $('#flexible-working-hours-form').validate({
+                submitHandler: function (form) {
+                    const working_schedule_id = $('#working-schedule-id').text();
+                    transaction = 'submit flexible working hours'; 
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&working_schedule_id=' + working_schedule_id,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            if(response === 'Updated' || response === 'Inserted'){
+                                if(response === 'Inserted'){
+                                    show_toastr('Insert Successful', 'The working hours has been inserted successfully.', 'success');
+                                }
+                                else{
+                                    show_toastr('Update Successful', 'The working hours has been updated successfully.', 'success');
+                                }
+                              
+                                $('#System-Modal').modal('hide');
+                                reload_datatable('#working-hours-datatable');
+                            }
+                            else if(response === 'Overlap'){
+                                show_toastr('Transaction Error', 'Working hours cannot overlap with other wokring hours.', 'error');
+                            }
+                            else if(response === 'Inactive User'){
+                                window.location = '404.php';
+                            }
+                            else{
+                                show_toastr('Transaction Error', response, 'error');
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    working_hours: {
+                        required: true
+                    },
+                    working_date: {
+                        required: true
+                    },
+                    day_period: {
+                        required: true
+                    },
+                    work_from: {
+                        required: true
+                    },
+                    work_to: {
+                        required: true
+                    }
+                },
+                messages: {
+                    working_hours: {
+                        required: 'Please enter the name',
+                    },
+                    working_date: {
+                        required: 'Please choose the working date',
+                    },
+                    day_period: {
+                        required: 'Please choose the day period',
+                    },
+                    work_from: {
+                        required: 'Please choose the work from',
+                    },
+                    work_to: {
+                        required: 'Please choose the work to',
+                    }
+                },
+                errorPlacement: function(label) {                
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+          break;
     }
 }
 
@@ -3355,19 +3272,19 @@ function check_option_exist(element, option, return_value){
 function check_empty(value, id, type){
     const $element = $(id);
 
-if (value && value !== null) {
-    switch (type) {
-        case 'select':
-            $element.val(value).change();
-            break;
-        case 'text':
-            $element.text(value);
-            break;
-        default:
-            $element.val(value);
-            break;
+    if (value && value !== null) {
+        switch (type) {
+            case 'select':
+                $element.val(value).change();
+                break;
+            case 'text':
+                $element.text(value);
+                break;
+            default:
+                $element.val(value);
+                break;
+        }
     }
-}
 }
 
 function check_table_check_box(){
@@ -3634,18 +3551,18 @@ function check_table_multiple_button(){
 }
 
 // Show toastr
-function show_toastr(title, message, toastr_type, redirect_page = null){
+function show_toastr(title, message, toastr_type, redirect_page = null) {
     const toastr_options = {
-        closeButton: false,
+        closeButton: true,
         debug: false,
-        newestOnTop: true,
+        newestOnTop: false,
         progressBar: true,
         positionClass: 'toast-top-right',
-        preventDuplicates: false,
+        preventDuplicates: true,
         showDuration: 300,
-        hideDuration: 1000,
-        timeOut: 3000,
-        extendedTimeOut: 3000,
+        hideDuration: 300,
+        timeOut: 5000,
+        extendedTimeOut: 1000,
         showEasing: 'swing',
         hideEasing: 'linear',
         showMethod: 'fadeIn',
@@ -3658,17 +3575,36 @@ function show_toastr(title, message, toastr_type, redirect_page = null){
         warning: toastr.warning,
         error: toastr.error
     };
-      
+
+    // Check if message has already been displayed
+    if (show_toastr.displayedMessages.includes(message)) {
+        return;
+    }
+
+    // Add message to displayed messages array
+    show_toastr.displayedMessages.push(message);
+
+    // Show toastr message
     if (toastr_type in toastr_types) {
         toastr_types[toastr_type](message, title, toastr_options);
     }
 
-    setTimeout(function(){
-        if (redirect_page) {
+    // Redirect after toastr message is hidden
+    if (redirect_page) {
+        toastr.options.onHidden = function() {
             window.location.href = redirect_page;
+            toastr.options.onHidden = null;
         }
-    }, 3000);   
+    }
+
+    // Clear displayed messages array after toastr message is hidden
+    toastr.options.onHidden = function() {
+        show_toastr.displayedMessages = [];
+        toastr.options.onHidden = null;
+    };
 }
+
+show_toastr.displayedMessages = [];
 
 // Show alert
 

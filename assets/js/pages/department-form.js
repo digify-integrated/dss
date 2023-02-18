@@ -141,7 +141,7 @@ function initialize_click_events(){
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Unarchived'){
-                            show_toastr('Unarchived Department Successful', 'The department has been unarchived successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -178,7 +178,7 @@ function initialize_click_events(){
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Archived'){
-                            show_toastr('Archived Department Successful', 'The department has been archived successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

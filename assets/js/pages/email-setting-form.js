@@ -96,7 +96,7 @@
                     required: 'Please enter the mail from email',
                 }
             },
-            errorPlacement: function(label) {                
+            errorPlacement: function(label) {
                 show_toastr('Form Validation', label.text(), 'error');
             },
             highlight: function(element) {
@@ -183,7 +183,7 @@ function initialize_click_events(){
                     data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Activated'){
-                            show_toastr('Activate Email Setting Successful', 'The email setting has been activated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -220,7 +220,7 @@ function initialize_click_events(){
                     data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deactivated'){
-                            show_toastr('Deactivate Email Setting Successful', 'The email setting has been deactivated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

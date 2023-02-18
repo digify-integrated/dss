@@ -153,7 +153,7 @@ function initialize_click_events(){
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Activated'){
-                            show_toastr('Activate Interface Setting Successful', 'The interface setting has been activated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -190,7 +190,7 @@ function initialize_click_events(){
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deactivated'){
-                            show_toastr('Deactivate Interface Setting Successful', 'The interface setting has been deactivated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

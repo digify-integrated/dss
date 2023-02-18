@@ -1120,6 +1120,18 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         break;
         # -------------------------------------------------------------
 
+        # Transaction logs
+        case 'transaction logs':
+            if(isset($_POST['transaction_log_id']) && !empty($_POST['transaction_log_id'])){
+                if ($api->databaseConnection()) {
+                    $transaction_log_id = $_POST['transaction_log_id'];
+    
+                    echo $api->generate_transaction_log_timeline($transaction_log_id);
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Generate table functions
         # -------------------------------------------------------------
@@ -2746,945 +2758,927 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         break;
         # -------------------------------------------------------------
 
-        # 
-        case '':
-            
+        # User account role table
+        case 'user account role table':
+            if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
+                if ($api->databaseConnection()) {
+                    $user_id = $_POST['user_id'];
+    
+                    $update_user_account = $api->check_role_access_rights($username, '73', 'action');
+                    $delete_user_account_role = $api->check_role_access_rights($username, '80', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id');
+                    $sql->bindValue(':user_id', $user_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $role_id = $row['ROLE_ID'];
+    
+                            $role_details = $api->get_role_details($role_id);
+                            $role = $role_details[0]['ROLE'] ?? null;
+    
+                            if($delete_user_account_role > 0 && $update_user_account > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-user-account-role" data-user-id="'. $user_id .'" data-role-id="'. $role_id .'" title="Delete User Account Role">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'ROLE' => $role,
+                                'ACTION' => $delete
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # User account role assignment table
+        case 'user account role assignment table':
+            if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
+                if ($api->databaseConnection()) {
+                    $user_id = $_POST['user_id'];
+        
+                    $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id)');
+                    $sql->bindValue(':user_id', $user_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $role_id = $row['ROLE_ID'];
+                            $role = $row['ROLE'];
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
+                                'ROLE' => $role
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Departments table
+        case 'departments table':
+            if(isset($_POST['filter_status'])){
+                if ($api->databaseConnection()) {
+                    $filter_status = $_POST['filter_status'];
+    
+                    $query = 'SELECT DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS FROM employee_department';
+    
+                    if(!empty($filter_status)){
+                        $query .= ' WHERE STATUS = :filter_status';
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_status)){
+                        $sql->bindValue(':filter_status', $filter_status);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $department_id = $row['DEPARTMENT_ID'];
+                            $department = $row['DEPARTMENT'];
+                            $parent_department = $row['PARENT_DEPARTMENT'];
+                            $manager = $row['MANAGER'];
+                            $status = $row['STATUS'];
+    
+                            if($status == 1){
+                                $data_archive = '1';
+                            }
+                            else{
+                                $data_archive = '0';
+                            }
+        
+                            $department_status = $api->get_department_status($status)[0]['BADGE'];
+    
+                            $department_details = $api->get_department_details($parent_department);
+                            $parent_department_name = $department_details[0]['DEPARTMENT'] ?? null;
+        
+                            $department_id_encrypted = $api->encrypt_data($department_id);
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $department_id .'">',
+                                'DEPARTMENT_ID' => $department_id,
+                                'DEPARTMENT' => $department,
+                                'STATUS' => $department_status,
+                                'MANAGER' => $manager,
+                                'EMPLOYEES' => 0,
+                                'PARENT_DEPARTMENT' => $parent_department_name,
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="department-form.php?id='. $department_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Department">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Job positions table
+        case 'job positions table':
+            if(isset($_POST['filter_status']) || isset($_POST['filter_department'])){
+                if ($api->databaseConnection()) {
+                    $filter = [];
+                    $filter_status = $_POST['filter_status'];
+                    $filter_department = $_POST['filter_department'];
+    
+                    $query = 'SELECT JOB_POSITION_ID, JOB_POSITION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES FROM employee_job_position';
+    
+                    if(!empty($filter_status)) {
+                        $filter[] = ' RECRUITMENT_STATUS = :filter_status';
+                    }
+                    
+                    if(!empty($filter_department)) {
+                        $filter[] = ' DEPARTMENT = :filter_department';
+                    }
+                    
+                    if(!empty($filter)) {
+                        $query .= ' WHERE ' . implode(' AND ', $filter);
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_status)) {
+                        $sql->bindValue(':filter_status', $filter_status);
+                    }
+                    
+                    if(!empty($filter_department)){
+                        $sql->bindValue(':filter_department', $filter_department);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $job_position_id = $row['JOB_POSITION_ID'];
+                            $job_position = $row['JOB_POSITION'];
+                            $recruitment_status = $row['RECRUITMENT_STATUS'];
+                            $department = $row['DEPARTMENT'];
+                            $expected_new_employees = $row['EXPECTED_NEW_EMPLOYEES'];
+    
+                            if($recruitment_status == '1'){
+                                $data_start = '0';
+                            }
+                            else{
+                                $data_start = '1';
+                            }
+        
+                            $job_position_recruitment_status = $api->get_job_position_recruitment_status($recruitment_status)[0]['BADGE'];
+    
+                            $department_details = $api->get_department_details($department);
+                            $department_name = $department_details[0]['DEPARTMENT'] ?? null;
+        
+                            $job_position_id_encrypted = $api->encrypt_data($job_position_id);
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-start="'. $data_start .'" type="checkbox" value="'. $job_position_id .'">',
+                                'JOB_POSITION_ID' => $job_position_id,
+                                'JOB_POSITION' => $job_position,
+                                'DEPARTMENT' => $department_name,
+                                'NUMBER_OF_EMPLOYEE' => 0,
+                                'EXPECTED_NEW_EMPLOYEES' => $expected_new_employees,
+                                'FORECASTED_EMPLOYEE' => 0,
+                                'RECRUITMENT_STATUS' => $job_position_recruitment_status,
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="job-position-form.php?id='. $job_position_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Job Position">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Job position responsibility table
+        case 'job position responsibility table':
+            if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                if ($api->databaseConnection()) {
+                    $job_position_id = $_POST['job_position_id'];
+    
+                    $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                    $update_job_position_responsibility = $api->check_role_access_rights($username, '92', 'action');
+                    $delete_job_position_responsibility = $api->check_role_access_rights($username, '93', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT RESPONSIBILITY_ID, RESPONSIBILITY FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = :job_position_id');
+                    $sql->bindValue(':job_position_id', $job_position_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $responsibility_id = $row['RESPONSIBILITY_ID'];
+                            $responsibility = $row['RESPONSIBILITY'];
+    
+                            if($update_job_position_responsibility > 0 && $update_job_position > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Responsibility">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_job_position_responsibility > 0 && $update_job_position > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Responsibility">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'RESPONSIBILITY' => $responsibility,
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Job position requirement table
+        case 'job position requirement table':
+            if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                if ($api->databaseConnection()) {
+                    $job_position_id = $_POST['job_position_id'];
+    
+                    $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                    $update_job_position_requirement = $api->check_role_access_rights($username, '92', 'action');
+                    $delete_job_position_requirement = $api->check_role_access_rights($username, '93', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT REQUIREMENT_ID, REQUIREMENT FROM employee_job_position_requirement WHERE JOB_POSITION_ID = :job_position_id');
+                    $sql->bindValue(':job_position_id', $job_position_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $requirement_id = $row['REQUIREMENT_ID'];
+                            $requirement = $row['REQUIREMENT'];
+    
+                            if($update_job_position_requirement > 0 && $update_job_position > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Requirement">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_job_position_requirement > 0 && $update_job_position > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Requirement">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'REQUIREMENT' => $requirement,
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Job position qualification table
+        case 'job position qualification table':
+            if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                if ($api->databaseConnection()) {
+                    $job_position_id = $_POST['job_position_id'];
+    
+                    $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                    $update_job_position_qualification = $api->check_role_access_rights($username, '92', 'action');
+                    $delete_job_position_qualification = $api->check_role_access_rights($username, '93', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT QUALIFICATION_ID, QUALIFICATION FROM employee_job_position_qualification WHERE JOB_POSITION_ID = :job_position_id');
+                    $sql->bindValue(':job_position_id', $job_position_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $qualification_id = $row['QUALIFICATION_ID'];
+                            $qualification = $row['QUALIFICATION'];
+    
+                            if($update_job_position_qualification > 0 && $update_job_position > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Qualification">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_job_position_qualification > 0 && $update_job_position > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Qualification">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'QUALIFICATION' => $qualification,
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Job position attachment table
+        case 'job position attachment table':
+            if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
+                if ($api->databaseConnection()) {
+                    $job_position_id = $_POST['job_position_id'];
+    
+                    $update_job_position = $api->check_role_access_rights($username, '87', 'action');
+                    $update_job_position_attachment = $api->check_role_access_rights($username, '101', 'action');
+                    $delete_job_position_attachment = $api->check_role_access_rights($username, '102', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT ATTACHMENT_ID, ATTACHMENT_NAME, ATTACHMENT FROM employee_job_position_attachment WHERE JOB_POSITION_ID = :job_position_id');
+                    $sql->bindValue(':job_position_id', $job_position_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $attachment_id = $row['ATTACHMENT_ID'];
+                            $attachment_name = $row['ATTACHMENT_NAME'];
+                            $attachment = $row['ATTACHMENT'];
+    
+                            if($update_job_position_attachment > 0 && $update_job_position > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Attachment">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_job_position_attachment > 0 && $update_job_position > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Attachment">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'ATTACHMENT' => '<a href="'. $attachment .'" target="_blank">' . $attachment_name . '</a>',
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Work locations table
+        case 'work locations table':
+            if(isset($_POST['filter_status'])){
+                if ($api->databaseConnection()) {
+                    $filter_status = $_POST['filter_status'];
+    
+                    $query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, STATUS FROM employee_work_location';
+    
+                    if(!empty($filter_status)){
+                        $query .= ' WHERE STATUS = :filter_status';
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_status)){
+                        $sql->bindValue(':filter_status', $filter_status);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $work_location_id = $row['WORK_LOCATION_ID'];
+                            $work_location = $row['WORK_LOCATION'];
+                            $work_location_address = $row['WORK_LOCATION_ADDRESS'];
+                            $status = $row['STATUS'];
+    
+                            if($status == '1'){
+                                $data_archive = '1';
+                            }
+                            else{
+                                $data_archive = '0';
+                            }
+        
+                            $work_location_status = $api->get_work_location_status($status)[0]['BADGE'];
+        
+                            $work_location_id_encrypted = $api->encrypt_data($work_location_id);
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $work_location_id .'">',
+                                'WORK_LOCATION_ID' => $work_location_id,
+                                'WORK_LOCATION' => $work_location . '<p class="text-muted mb-0">'. $work_location_address .'</p>',
+                                'STATUS' => $work_location_status,
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="work-location-form.php?id='. $work_location_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Work Location">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Departure reasons table
+        case 'departure reasons table':
+            if ($api->databaseConnection()) {
+                $sql = $api->db_connection->prepare('SELECT DEPARTURE_REASON_ID, DEPARTURE_REASON FROM employee_departure_reason');
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $departure_reason_id = $row['DEPARTURE_REASON_ID'];
+                        $departure_reason = $row['DEPARTURE_REASON'];
+    
+                        $departure_reason_id_encrypted = $api->encrypt_data($departure_reason_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $departure_reason_id .'">',
+                            'DEPARTURE_REASON_ID' => $departure_reason_id,
+                            'DEPARTURE_REASON' => $departure_reason,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="departure-reason-form.php?id='. $departure_reason_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Departure Reason">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Employee types table
+        case 'employee types table':
+            if ($api->databaseConnection()) {
+                $sql = $api->db_connection->prepare('SELECT EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE FROM employee_employee_type');
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $employee_type_id = $row['EMPLOYEE_TYPE_ID'];
+                        $employee_type = $row['EMPLOYEE_TYPE'];
+    
+                        $employee_type_id_encrypted = $api->encrypt_data($employee_type_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $employee_type_id .'">',
+                            'EMPLOYEE_TYPE_ID' => $employee_type_id,
+                            'EMPLOYEE_TYPE' => $employee_type,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="employee-type-form.php?id='. $employee_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee Type">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # ID types table
+        case 'id types table':
+            if ($api->databaseConnection()) {
+                $sql = $api->db_connection->prepare('SELECT ID_TYPE_ID, ID_TYPE FROM employee_id_type');
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $id_type_id = $row['ID_TYPE_ID'];
+                        $id_type = $row['ID_TYPE'];
+    
+                        $id_type_id_encrypted = $api->encrypt_data($id_type_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $id_type_id .'">',
+                            'ID_TYPE_ID' => $id_type_id,
+                            'ID_TYPE' => $id_type,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="id-type-form.php?id='. $id_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View ID Type">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Wage types table
+        case 'wage types table':
+            if ($api->databaseConnection()) {
+                $sql = $api->db_connection->prepare('SELECT WAGE_TYPE_ID, WAGE_TYPE FROM employee_wage_type');
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $wage_type_id = $row['WAGE_TYPE_ID'];
+                        $wage_type = $row['WAGE_TYPE'];
+    
+                        $wage_type_id_encrypted = $api->encrypt_data($wage_type_id);
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $wage_type_id .'">',
+                            'WAGE_TYPE_ID' => $wage_type_id,
+                            'WAGE_TYPE' => $wage_type,
+                            'VIEW' => '<div class="d-flex gap-2">
+                                            <a href="wage-type-form.php?id='. $wage_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Wage Type">
+                                                <i class="bx bx-show font-size-16 align-middle"></i>
+                                            </a>
+                                        </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Working schedules table
+        case 'working schedules table':
+            if(isset($_POST['filter_working_schedule_type'])){
+                if ($api->databaseConnection()) {
+                    $filter_working_schedule_type = $_POST['filter_working_schedule_type'];
+    
+                    $query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE, WORKING_SCHEDULE_TYPE FROM employee_working_schedule';
+    
+                    if(!empty($filter_working_schedule_type)){
+                        $query .= ' WHERE WORKING_SCHEDULE_TYPE = :filter_working_schedule_type';
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_working_schedule_type)){
+                        $sql->bindValue(':filter_working_schedule_type', $filter_working_schedule_type);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
+                            $working_schedule = $row['WORKING_SCHEDULE'];
+                            $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
+    
+                            $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type);
+                            $working_schedule_type_name = $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'] ?? null;
+        
+                            $working_schedule_id_encrypted = $api->encrypt_data($working_schedule_id);
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_id .'">',
+                                'WORKING_SCHEDULE_ID' => $working_schedule_id,
+                                'WORKING_SCHEDULE' => $working_schedule,
+                                'WORKING_SCHEDULE_TYPE' => $working_schedule_type_name,
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="working-schedule-form.php?id='. $working_schedule_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Working hours table
+        case 'working hours table':
+            if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
+                if ($api->databaseConnection()) {
+                    $working_schedule_id = $_POST['working_schedule_id'];
+                    $working_schedule_type_category = $api->get_working_schedule_type_category($working_schedule_id);
+    
+                    $update_working_schedule = $api->check_role_access_rights($username, '118', 'action');
+                    $update_working_hours = $api->check_role_access_rights($username, '121', 'action');
+                    $delete_working_hours = $api->check_role_access_rights($username, '122', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT WORKING_HOURS_ID, WORKING_HOURS, WORKING_DATE, DAY_OF_WEEK, DAY_PERIOD, WORK_FROM, WORK_TO FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = :working_schedule_id');
+                    $sql->bindValue(':working_schedule_id', $working_schedule_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $working_hours_id = $row['WORKING_HOURS_ID'];
+                            $working_hours = $row['WORKING_HOURS'];
+                            $day_of_week = $row['DAY_OF_WEEK'];
+                            $day_period = $row['DAY_PERIOD'];
+                            $working_date = $api->check_date('empty', $row['WORKING_DATE'], '', 'm/d/Y', '', '', '');
+                            $work_from = $api->check_date('empty', $row['WORK_FROM'], '', 'h:i:s a', '', '', '');
+                            $work_to = $api->check_date('empty', $row['WORK_TO'], '', 'h:i:s a', '', '', '');
+    
+                            $system_code_details = $api->get_system_code_details(null, 'DAYOFWEEK', $day_of_week);
+                            $day_of_week_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                            $system_code_details = $api->get_system_code_details(null, 'DAYPERIOD', $day_period);
+                            $day_period_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                            if($update_working_hours > 0 && $update_working_schedule > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-working-hours" data-working-hours-id="'. $working_hours_id .'" data-category="'. $working_schedule_type_category .'" title="Edit Working Hours">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_working_hours > 0 && $update_working_schedule > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-working-hours" data-working-hours-id="'. $working_hours_id .'" title="Delete Working Hours">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'WORKING_HOURS' => $working_hours,
+                                'WORKING_DATE' => $working_date,
+                                'DAY_OF_WEEK' => $day_of_week_name,
+                                'DAY_PERIOD' => $day_period_name,
+                                'WORK_FROM' => $work_from,
+                                'WORK_TO' => $work_to,
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Working schedule types table
+        case 'working schedule types table':
+            if(isset($_POST['filter_category'])){
+                if ($api->databaseConnection()) {
+                    $filter_category = $_POST['filter_category'];
+    
+                    $query = 'SELECT WORKING_SCHEDULE_TYPE_ID, WORKING_SCHEDULE_TYPE, WORKING_SCHEDULE_TYPE_CATEGORY FROM employee_working_schedule_type';
+    
+                    if(!empty($filter_category)){
+                        $query .= ' WHERE WORKING_SCHEDULE_TYPE_CATEGORY = :filter_category';
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_category)){
+                        $sql->bindValue(':filter_category', $filter_category);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $working_schedule_type_id = $row['WORKING_SCHEDULE_TYPE_ID'];
+                            $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
+                            $working_schedule_type_category = $row['WORKING_SCHEDULE_TYPE_CATEGORY'];
+    
+                            $system_code_details = $api->get_system_code_details(null, 'WORKINGSCHEDTYPECAT', $working_schedule_type_category);
+                            $working_schedule_type_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+        
+                            $working_schedule_type_id_encrypted = $api->encrypt_data($working_schedule_type_id);
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_type_id .'">',
+                                'WORKING_SCHEDULE_TYPE_ID' => $working_schedule_type_id,
+                                'WORKING_SCHEDULE_TYPE' => $working_schedule_type,
+                                'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_category_name,
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="working-schedule-type-form.php?id='. $working_schedule_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule Type">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Employees table
+        case 'employees table':
+            if(isset($_POST['filter_status']) && isset($_POST['filter_department']) && isset($_POST['filter_job_position']) && isset($_POST['filter_work_location']) && isset($_POST['filter_employee_type'])){
+                if ($api->databaseConnection()) {
+                    $filter = [];
+                    $filter_status = $_POST['filter_status'];
+                    $filter_department = $_POST['filter_department'];
+                    $filter_job_position = $_POST['filter_job_position'];
+                    $filter_work_location = $_POST['filter_work_location'];
+                    $filter_employee_type = $_POST['filter_employee_type'];
+    
+                    $query = 'SELECT EMPLOYEE_ID, JOB_POSITION, DEPARTMENT, WORK_LOCATION, EMPLOYEE_STATUS, EMPLOYEE_TYPE FROM employees';
+    
+                    if(!empty($filter_status)) {
+                        $filter[] = ' EMPLOYEE_STATUS = :filter_status';
+                    }
+                    
+                    if(!empty($filter_department)) {
+                        $filter[] = ' DEPARTMENT = :filter_department';
+                    }
+                    
+                    if(!empty($filter_job_position)) {
+                        $filter[] = ' JOB_POSITION = :filter_job_position';
+                    }
+                    
+                    if(!empty($filter_work_location)) {
+                        $filter[] = ' WORK_LOCATION = :filter_work_location';
+                    }
+                    
+                    if(!empty($filter_employee_type)) {
+                        $filter[] = ' EMPLOYEE_TYPE = :filter_employee_type';
+                    }
+                    
+                    if(!empty($filter)) {
+                        $query .= ' WHERE ' . implode(' AND ', $filter);
+                    }
+        
+                    $sql = $api->db_connection->prepare($query);
+    
+                    if(!empty($filter_status)) {
+                        $sql->bindValue(':filter_status', $filter_status);
+                    }
+                    
+                    if(!empty($filter_department)) {
+                        $sql->bindValue(':filter_department', $filter_department);
+                    }
+                    
+                    if(!empty($filter_job_position)) {
+                        $sql->bindValue(':filter_job_position', $filter_job_position);
+                    }
+                    
+                    if(!empty($filter_work_location)) {
+                        $sql->bindValue(':filter_work_location', $filter_work_location);
+                    }
+                    
+                    if(!empty($filter_employee_type)) {
+                        $sql->bindValue(':filter_employee_type', $filter_employee_type);
+                    }
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $employee_id = $row['EMPLOYEE_ID'];
+                            $job_position = $row['JOB_POSITION'];
+                            $department = $row['DEPARTMENT'];
+                            $work_location = $row['WORK_LOCATION'];
+                            $employee_status = $row['EMPLOYEE_STATUS'];
+                            $employee_type = $row['EMPLOYEE_TYPE'];
+    
+                            $employee_personal_information_details = $api->get_employee_personal_information_details($employee_id);
+                            $job_position_details = $api->get_job_position_details($job_position);
+                            $department_details = $api->get_department_details($department);
+                            $work_location_details = $api->get_work_location_details($work_location);
+                            $employee_type_details = $api->get_employee_type_details($employee_type);
+    
+                            $status = $api->get_employee_status($employee_status)[0]['BADGE'];
+    
+                            $employee_id_encrypted = $api->encrypt_data($employee_id);
+    
+                            if($status == 1){
+                                $data_archive = '1';
+                            }
+                            else{
+                                $data_archive = '0';
+                            }
+        
+                            $response[] = array(
+                                'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $employee_id .'">',
+                                'EMPLOYEE_ID' =>  $employee_id,
+                                'FILE_AS' => $employee_personal_information_details[0]['FILE_AS'],
+                                'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
+                                'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
+                                'WORK_LOCATION' => $work_location_details[0]['WORK_LOCATION'],
+                                'EMPLOYEE_STATUS' => $status,
+                                'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
+                                'VIEW' => '<div class="d-flex gap-2">
+                                                <a href="employee-form.php?id='. $employee_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </a>
+                                            </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
         break;
         # -------------------------------------------------------------
     }
-
-    # User account role table
-    else if($type == 'user account role table'){
-        if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-            if ($api->databaseConnection()) {
-                $user_id = $_POST['user_id'];
-
-                $update_user_account = $api->check_role_access_rights($username, '73', 'action');
-                $delete_user_account_role = $api->check_role_access_rights($username, '80', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id');
-                $sql->bindValue(':user_id', $user_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $role_id = $row['ROLE_ID'];
-
-                        $role_details = $api->get_role_details($role_id);
-                        $role = $role_details[0]['ROLE'] ?? null;
-
-                        if($delete_user_account_role > 0 && $update_user_account > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-user-account-role" data-user-id="'. $user_id .'" data-role-id="'. $role_id .'" title="Delete User Account Role">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'ROLE' => $role,
-                            'ACTION' => $delete
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # User account role assignment table
-    else if($type == 'user account role assignment table'){
-        if(isset($_POST['user_id']) && !empty($_POST['user_id'])){
-            if ($api->databaseConnection()) {
-                $user_id = $_POST['user_id'];
-    
-                $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE FROM global_role WHERE ROLE_ID NOT IN (SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :user_id)');
-                $sql->bindValue(':user_id', $user_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $role_id = $row['ROLE_ID'];
-                        $role = $row['ROLE'];
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $role_id .'">',
-                            'ROLE' => $role
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Departments table
-    else if($type == 'departments table'){
-        if(isset($_POST['filter_status'])){
-            if ($api->databaseConnection()) {
-                $filter_status = $_POST['filter_status'];
-
-                $query = 'SELECT DEPARTMENT_ID, DEPARTMENT, PARENT_DEPARTMENT, MANAGER, STATUS FROM employee_department';
-
-                if(!empty($filter_status)){
-                    $query .= ' WHERE STATUS = :filter_status';
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_status)){
-                    $sql->bindValue(':filter_status', $filter_status);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $department_id = $row['DEPARTMENT_ID'];
-                        $department = $row['DEPARTMENT'];
-                        $parent_department = $row['PARENT_DEPARTMENT'];
-                        $manager = $row['MANAGER'];
-                        $status = $row['STATUS'];
-
-                        if($status == 1){
-                            $data_archive = '1';
-                        }
-                        else{
-                            $data_archive = '0';
-                        }
-    
-                        $department_status = $api->get_department_status($status)[0]['BADGE'];
-
-                        $department_details = $api->get_department_details($parent_department);
-                        $parent_department_name = $department_details[0]['DEPARTMENT'] ?? null;
-    
-                        $department_id_encrypted = $api->encrypt_data($department_id);
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $department_id .'">',
-                            'DEPARTMENT_ID' => $department_id,
-                            'DEPARTMENT' => $department,
-                            'STATUS' => $department_status,
-                            'MANAGER' => $manager,
-                            'EMPLOYEES' => 0,
-                            'PARENT_DEPARTMENT' => $parent_department_name,
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="department-form.php?id='. $department_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Department">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Job positions table
-    else if($type == 'job positions table'){
-        if(isset($_POST['filter_status']) || isset($_POST['filter_department'])){
-            if ($api->databaseConnection()) {
-                $filter = [];
-                $filter_status = $_POST['filter_status'];
-                $filter_department = $_POST['filter_department'];
-
-                $query = 'SELECT JOB_POSITION_ID, JOB_POSITION, RECRUITMENT_STATUS, DEPARTMENT, EXPECTED_NEW_EMPLOYEES FROM employee_job_position';
-
-                if(!empty($filter_status)) {
-                    $filter[] = ' RECRUITMENT_STATUS = :filter_status';
-                }
-                
-                if(!empty($filter_department)) {
-                    $filter[] = ' DEPARTMENT = :filter_department';
-                }
-                
-                if(!empty($filter)) {
-                    $query .= ' WHERE ' . implode(' AND ', $filter);
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_status)) {
-                    $sql->bindValue(':filter_status', $filter_status);
-                }
-                
-                if(!empty($filter_department)){
-                    $sql->bindValue(':filter_department', $filter_department);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $job_position_id = $row['JOB_POSITION_ID'];
-                        $job_position = $row['JOB_POSITION'];
-                        $recruitment_status = $row['RECRUITMENT_STATUS'];
-                        $department = $row['DEPARTMENT'];
-                        $expected_new_employees = $row['EXPECTED_NEW_EMPLOYEES'];
-
-                        if($recruitment_status == '1'){
-                            $data_start = '0';
-                        }
-                        else{
-                            $data_start = '1';
-                        }
-    
-                        $job_position_recruitment_status = $api->get_job_position_recruitment_status($recruitment_status)[0]['BADGE'];
-
-                        $department_details = $api->get_department_details($department);
-                        $department_name = $department_details[0]['DEPARTMENT'] ?? null;
-    
-                        $job_position_id_encrypted = $api->encrypt_data($job_position_id);
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-start="'. $data_start .'" type="checkbox" value="'. $job_position_id .'">',
-                            'JOB_POSITION_ID' => $job_position_id,
-                            'JOB_POSITION' => $job_position,
-                            'DEPARTMENT' => $department_name,
-                            'NUMBER_OF_EMPLOYEE' => 0,
-                            'EXPECTED_NEW_EMPLOYEES' => $expected_new_employees,
-                            'FORECASTED_EMPLOYEE' => 0,
-                            'RECRUITMENT_STATUS' => $job_position_recruitment_status,
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="job-position-form.php?id='. $job_position_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Job Position">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Job position responsibility table
-    else if($type == 'job position responsibility table'){
-        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-            if ($api->databaseConnection()) {
-                $job_position_id = $_POST['job_position_id'];
-
-                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
-                $update_job_position_responsibility = $api->check_role_access_rights($username, '92', 'action');
-                $delete_job_position_responsibility = $api->check_role_access_rights($username, '93', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT RESPONSIBILITY_ID, RESPONSIBILITY FROM employee_job_position_responsibility WHERE JOB_POSITION_ID = :job_position_id');
-                $sql->bindValue(':job_position_id', $job_position_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $responsibility_id = $row['RESPONSIBILITY_ID'];
-                        $responsibility = $row['RESPONSIBILITY'];
-
-                        if($update_job_position_responsibility > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Responsibility">
-                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
-                                        </button>';
-                        }
-                        else{
-                            $update = null;
-                        }
-
-                        if($delete_job_position_responsibility > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-responsibility" data-responsibility-id="'. $responsibility_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Responsibility">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'RESPONSIBILITY' => $responsibility,
-                            'ACTION' => '<div class="d-flex gap-2">
-                                '. $update .'
-                                '. $delete .'
-                            </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Job position requirement table
-    else if($type == 'job position requirement table'){
-        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-            if ($api->databaseConnection()) {
-                $job_position_id = $_POST['job_position_id'];
-
-                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
-                $update_job_position_requirement = $api->check_role_access_rights($username, '92', 'action');
-                $delete_job_position_requirement = $api->check_role_access_rights($username, '93', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT REQUIREMENT_ID, REQUIREMENT FROM employee_job_position_requirement WHERE JOB_POSITION_ID = :job_position_id');
-                $sql->bindValue(':job_position_id', $job_position_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $requirement_id = $row['REQUIREMENT_ID'];
-                        $requirement = $row['REQUIREMENT'];
-
-                        if($update_job_position_requirement > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Requirement">
-                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
-                                        </button>';
-                        }
-                        else{
-                            $update = null;
-                        }
-
-                        if($delete_job_position_requirement > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-requirement" data-requirement-id="'. $requirement_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Requirement">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'REQUIREMENT' => $requirement,
-                            'ACTION' => '<div class="d-flex gap-2">
-                                '. $update .'
-                                '. $delete .'
-                            </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Job position qualification table
-    else if($type == 'job position qualification table'){
-        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-            if ($api->databaseConnection()) {
-                $job_position_id = $_POST['job_position_id'];
-
-                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
-                $update_job_position_qualification = $api->check_role_access_rights($username, '92', 'action');
-                $delete_job_position_qualification = $api->check_role_access_rights($username, '93', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT QUALIFICATION_ID, QUALIFICATION FROM employee_job_position_qualification WHERE JOB_POSITION_ID = :job_position_id');
-                $sql->bindValue(':job_position_id', $job_position_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $qualification_id = $row['QUALIFICATION_ID'];
-                        $qualification = $row['QUALIFICATION'];
-
-                        if($update_job_position_qualification > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Qualification">
-                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
-                                        </button>';
-                        }
-                        else{
-                            $update = null;
-                        }
-
-                        if($delete_job_position_qualification > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-qualification" data-qualification-id="'. $qualification_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Qualification">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'QUALIFICATION' => $qualification,
-                            'ACTION' => '<div class="d-flex gap-2">
-                                '. $update .'
-                                '. $delete .'
-                            </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Job position attachment table
-    else if($type == 'job position attachment table'){
-        if(isset($_POST['job_position_id']) && !empty($_POST['job_position_id'])){
-            if ($api->databaseConnection()) {
-                $job_position_id = $_POST['job_position_id'];
-
-                $update_job_position = $api->check_role_access_rights($username, '87', 'action');
-                $update_job_position_attachment = $api->check_role_access_rights($username, '101', 'action');
-                $delete_job_position_attachment = $api->check_role_access_rights($username, '102', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT ATTACHMENT_ID, ATTACHMENT_NAME, ATTACHMENT FROM employee_job_position_attachment WHERE JOB_POSITION_ID = :job_position_id');
-                $sql->bindValue(':job_position_id', $job_position_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $attachment_id = $row['ATTACHMENT_ID'];
-                        $attachment_name = $row['ATTACHMENT_NAME'];
-                        $attachment = $row['ATTACHMENT'];
-
-                        if($update_job_position_attachment > 0 && $update_job_position > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Edit Job Position Attachment">
-                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
-                                        </button>';
-                        }
-                        else{
-                            $update = null;
-                        }
-
-                        if($delete_job_position_attachment > 0 && $update_job_position > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-attachment" data-attachment-id="'. $attachment_id .'" data-job-position-id="'. $job_position_id .'" title="Delete Job Position Attachment">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'ATTACHMENT' => '<a href="'. $attachment .'" target="_blank">' . $attachment_name . '</a>',
-                            'ACTION' => '<div class="d-flex gap-2">
-                                '. $update .'
-                                '. $delete .'
-                            </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Work locations table
-    else if($type == 'work locations table'){
-        if(isset($_POST['filter_status'])){
-            if ($api->databaseConnection()) {
-                $filter_status = $_POST['filter_status'];
-
-                $query = 'SELECT WORK_LOCATION_ID, WORK_LOCATION, WORK_LOCATION_ADDRESS, STATUS FROM employee_work_location';
-
-                if(!empty($filter_status)){
-                    $query .= ' WHERE STATUS = :filter_status';
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_status)){
-                    $sql->bindValue(':filter_status', $filter_status);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $work_location_id = $row['WORK_LOCATION_ID'];
-                        $work_location = $row['WORK_LOCATION'];
-                        $work_location_address = $row['WORK_LOCATION_ADDRESS'];
-                        $status = $row['STATUS'];
-
-                        if($status == '1'){
-                            $data_archive = '1';
-                        }
-                        else{
-                            $data_archive = '0';
-                        }
-    
-                        $work_location_status = $api->get_work_location_status($status)[0]['BADGE'];
-    
-                        $work_location_id_encrypted = $api->encrypt_data($work_location_id);
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $work_location_id .'">',
-                            'WORK_LOCATION_ID' => $work_location_id,
-                            'WORK_LOCATION' => $work_location . '<p class="text-muted mb-0">'. $work_location_address .'</p>',
-                            'STATUS' => $work_location_status,
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="work-location-form.php?id='. $work_location_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Work Location">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Departure reasons table
-    else if($type == 'departure reasons table'){
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare('SELECT DEPARTURE_REASON_ID, DEPARTURE_REASON FROM employee_departure_reason');
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $departure_reason_id = $row['DEPARTURE_REASON_ID'];
-                    $departure_reason = $row['DEPARTURE_REASON'];
-
-                    $departure_reason_id_encrypted = $api->encrypt_data($departure_reason_id);
-
-                    $response[] = array(
-                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $departure_reason_id .'">',
-                        'DEPARTURE_REASON_ID' => $departure_reason_id,
-                        'DEPARTURE_REASON' => $departure_reason,
-                        'VIEW' => '<div class="d-flex gap-2">
-                                        <a href="departure-reason-form.php?id='. $departure_reason_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Departure Reason">
-                                            <i class="bx bx-show font-size-16 align-middle"></i>
-                                        </a>
-                                    </div>'
-                    );
-                }
-
-                echo json_encode($response);
-            }
-            else{
-                echo $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Employee types table
-    else if($type == 'employee types table'){
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare('SELECT EMPLOYEE_TYPE_ID, EMPLOYEE_TYPE FROM employee_employee_type');
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $employee_type_id = $row['EMPLOYEE_TYPE_ID'];
-                    $employee_type = $row['EMPLOYEE_TYPE'];
-
-                    $employee_type_id_encrypted = $api->encrypt_data($employee_type_id);
-
-                    $response[] = array(
-                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $employee_type_id .'">',
-                        'EMPLOYEE_TYPE_ID' => $employee_type_id,
-                        'EMPLOYEE_TYPE' => $employee_type,
-                        'VIEW' => '<div class="d-flex gap-2">
-                                        <a href="employee-type-form.php?id='. $employee_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee Type">
-                                            <i class="bx bx-show font-size-16 align-middle"></i>
-                                        </a>
-                                    </div>'
-                    );
-                }
-
-                echo json_encode($response);
-            }
-            else{
-                echo $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # ID types table
-    else if($type == 'id types table'){
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare('SELECT ID_TYPE_ID, ID_TYPE FROM employee_id_type');
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $id_type_id = $row['ID_TYPE_ID'];
-                    $id_type = $row['ID_TYPE'];
-
-                    $id_type_id_encrypted = $api->encrypt_data($id_type_id);
-
-                    $response[] = array(
-                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $id_type_id .'">',
-                        'ID_TYPE_ID' => $id_type_id,
-                        'ID_TYPE' => $id_type,
-                        'VIEW' => '<div class="d-flex gap-2">
-                                        <a href="id-type-form.php?id='. $id_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View ID Type">
-                                            <i class="bx bx-show font-size-16 align-middle"></i>
-                                        </a>
-                                    </div>'
-                    );
-                }
-
-                echo json_encode($response);
-            }
-            else{
-                echo $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Wage types table
-    else if($type == 'wage types table'){
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare('SELECT WAGE_TYPE_ID, WAGE_TYPE FROM employee_wage_type');
-
-            if($sql->execute()){
-                while($row = $sql->fetch()){
-                    $wage_type_id = $row['WAGE_TYPE_ID'];
-                    $wage_type = $row['WAGE_TYPE'];
-
-                    $wage_type_id_encrypted = $api->encrypt_data($wage_type_id);
-
-                    $response[] = array(
-                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $wage_type_id .'">',
-                        'WAGE_TYPE_ID' => $wage_type_id,
-                        'WAGE_TYPE' => $wage_type,
-                        'VIEW' => '<div class="d-flex gap-2">
-                                        <a href="wage-type-form.php?id='. $wage_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Wage Type">
-                                            <i class="bx bx-show font-size-16 align-middle"></i>
-                                        </a>
-                                    </div>'
-                    );
-                }
-
-                echo json_encode($response);
-            }
-            else{
-                echo $sql->errorInfo()[2];
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Working schedules table
-    else if($type == 'working schedules table'){
-        if(isset($_POST['filter_working_schedule_type'])){
-            if ($api->databaseConnection()) {
-                $filter_working_schedule_type = $_POST['filter_working_schedule_type'];
-
-                $query = 'SELECT WORKING_SCHEDULE_ID, WORKING_SCHEDULE, WORKING_SCHEDULE_TYPE FROM employee_working_schedule';
-
-                if(!empty($filter_working_schedule_type)){
-                    $query .= ' WHERE WORKING_SCHEDULE_TYPE = :filter_working_schedule_type';
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_working_schedule_type)){
-                    $sql->bindValue(':filter_working_schedule_type', $filter_working_schedule_type);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $working_schedule_id = $row['WORKING_SCHEDULE_ID'];
-                        $working_schedule = $row['WORKING_SCHEDULE'];
-                        $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
-
-                        $working_schedule_type_details = $api->get_working_schedule_type_details($working_schedule_type);
-                        $working_schedule_type_name = $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'] ?? null;
-    
-                        $working_schedule_id_encrypted = $api->encrypt_data($working_schedule_id);
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_id .'">',
-                            'WORKING_SCHEDULE_ID' => $working_schedule_id,
-                            'WORKING_SCHEDULE' => $working_schedule,
-                            'WORKING_SCHEDULE_TYPE' => $working_schedule_type_name,
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="working-schedule-form.php?id='. $working_schedule_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Working hours table
-    else if($type == 'working hours table'){
-        if(isset($_POST['working_schedule_id']) && !empty($_POST['working_schedule_id'])){
-            if ($api->databaseConnection()) {
-                $working_schedule_id = $_POST['working_schedule_id'];
-                $working_schedule_type_category = $api->get_working_schedule_type_category($working_schedule_id);
-
-                $update_working_schedule = $api->check_role_access_rights($username, '118', 'action');
-                $update_working_hours = $api->check_role_access_rights($username, '121', 'action');
-                $delete_working_hours = $api->check_role_access_rights($username, '122', 'action');
-    
-                $sql = $api->db_connection->prepare('SELECT WORKING_HOURS_ID, WORKING_HOURS, WORKING_DATE, DAY_OF_WEEK, DAY_PERIOD, WORK_FROM, WORK_TO FROM employee_working_hours WHERE WORKING_SCHEDULE_ID = :working_schedule_id');
-                $sql->bindValue(':working_schedule_id', $working_schedule_id);
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $working_hours_id = $row['WORKING_HOURS_ID'];
-                        $working_hours = $row['WORKING_HOURS'];
-                        $day_of_week = $row['DAY_OF_WEEK'];
-                        $day_period = $row['DAY_PERIOD'];
-                        $working_date = $api->check_date('empty', $row['WORKING_DATE'], '', 'm/d/Y', '', '', '');
-                        $work_from = $api->check_date('empty', $row['WORK_FROM'], '', 'h:i:s a', '', '', '');
-                        $work_to = $api->check_date('empty', $row['WORK_TO'], '', 'h:i:s a', '', '', '');
-
-                        $system_code_details = $api->get_system_code_details(null, 'DAYOFWEEK', $day_of_week);
-                        $day_of_week_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
-
-                        $system_code_details = $api->get_system_code_details(null, 'DAYPERIOD', $day_period);
-                        $day_period_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
-
-                        if($update_working_hours > 0 && $update_working_schedule > 0){
-                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-working-hours" data-working-hours-id="'. $working_hours_id .'" data-category="'. $working_schedule_type_category .'" title="Edit Working Hours">
-                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
-                                        </button>';
-                        }
-                        else{
-                            $update = null;
-                        }
-
-                        if($delete_working_hours > 0 && $update_working_schedule > 0){
-                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-working-hours" data-working-hours-id="'. $working_hours_id .'" title="Delete Working Hours">
-                                <i class="bx bx-trash font-size-16 align-middle"></i>
-                            </button>';
-                        }
-                        else{
-                            $delete = null;
-                        }
-    
-                        $response[] = array(
-                            'WORKING_HOURS' => $working_hours,
-                            'WORKING_DATE' => $working_date,
-                            'DAY_OF_WEEK' => $day_of_week_name,
-                            'DAY_PERIOD' => $day_period_name,
-                            'WORK_FROM' => $work_from,
-                            'WORK_TO' => $work_to,
-                            'ACTION' => '<div class="d-flex gap-2">
-                                '. $update .'
-                                '. $delete .'
-                            </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Working schedule types table
-    else if($type == 'working schedule types table'){
-        if(isset($_POST['filter_category'])){
-            if ($api->databaseConnection()) {
-                $filter_category = $_POST['filter_category'];
-
-                $query = 'SELECT WORKING_SCHEDULE_TYPE_ID, WORKING_SCHEDULE_TYPE, WORKING_SCHEDULE_TYPE_CATEGORY FROM employee_working_schedule_type';
-
-                if(!empty($filter_category)){
-                    $query .= ' WHERE WORKING_SCHEDULE_TYPE_CATEGORY = :filter_category';
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_category)){
-                    $sql->bindValue(':filter_category', $filter_category);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $working_schedule_type_id = $row['WORKING_SCHEDULE_TYPE_ID'];
-                        $working_schedule_type = $row['WORKING_SCHEDULE_TYPE'];
-                        $working_schedule_type_category = $row['WORKING_SCHEDULE_TYPE_CATEGORY'];
-
-                        $system_code_details = $api->get_system_code_details(null, 'WORKINGSCHEDTYPECAT', $working_schedule_type_category);
-                        $working_schedule_type_category_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
-    
-                        $working_schedule_type_id_encrypted = $api->encrypt_data($working_schedule_type_id);
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $working_schedule_type_id .'">',
-                            'WORKING_SCHEDULE_TYPE_ID' => $working_schedule_type_id,
-                            'WORKING_SCHEDULE_TYPE' => $working_schedule_type,
-                            'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_category_name,
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="working-schedule-type-form.php?id='. $working_schedule_type_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Working Schedule Type">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Employees table
-    else if($type == 'employees table'){
-        if(isset($_POST['filter_status']) && isset($_POST['filter_department']) && isset($_POST['filter_job_position']) && isset($_POST['filter_work_location']) && isset($_POST['filter_employee_type'])){
-            if ($api->databaseConnection()) {
-                $filter = [];
-                $filter_status = $_POST['filter_status'];
-                $filter_department = $_POST['filter_department'];
-                $filter_job_position = $_POST['filter_job_position'];
-                $filter_work_location = $_POST['filter_work_location'];
-                $filter_employee_type = $_POST['filter_employee_type'];
-
-                $query = 'SELECT EMPLOYEE_ID, JOB_POSITION, DEPARTMENT, WORK_LOCATION, EMPLOYEE_STATUS, EMPLOYEE_TYPE FROM employees';
-
-                if(!empty($filter_status)) {
-                    $filter[] = ' EMPLOYEE_STATUS = :filter_status';
-                }
-                
-                if(!empty($filter_department)) {
-                    $filter[] = ' DEPARTMENT = :filter_department';
-                }
-                
-                if(!empty($filter_job_position)) {
-                    $filter[] = ' JOB_POSITION = :filter_job_position';
-                }
-                
-                if(!empty($filter_work_location)) {
-                    $filter[] = ' WORK_LOCATION = :filter_work_location';
-                }
-                
-                if(!empty($filter_employee_type)) {
-                    $filter[] = ' EMPLOYEE_TYPE = :filter_employee_type';
-                }
-                
-                if(!empty($filter)) {
-                    $query .= ' WHERE ' . implode(' AND ', $filter);
-                }
-    
-                $sql = $api->db_connection->prepare($query);
-
-                if(!empty($filter_status)) {
-                    $sql->bindValue(':filter_status', $filter_status);
-                }
-                
-                if(!empty($filter_department)) {
-                    $sql->bindValue(':filter_department', $filter_department);
-                }
-                
-                if(!empty($filter_job_position)) {
-                    $sql->bindValue(':filter_job_position', $filter_job_position);
-                }
-                
-                if(!empty($filter_work_location)) {
-                    $sql->bindValue(':filter_work_location', $filter_work_location);
-                }
-                
-                if(!empty($filter_employee_type)) {
-                    $sql->bindValue(':filter_employee_type', $filter_employee_type);
-                }
-    
-                if($sql->execute()){
-                    while($row = $sql->fetch()){
-                        $employee_id = $row['EMPLOYEE_ID'];
-                        $job_position = $row['JOB_POSITION'];
-                        $department = $row['DEPARTMENT'];
-                        $work_location = $row['WORK_LOCATION'];
-                        $employee_status = $row['EMPLOYEE_STATUS'];
-                        $employee_type = $row['EMPLOYEE_TYPE'];
-
-                        $employee_personal_information_details = $api->get_employee_personal_information_details($employee_id);
-                        $job_position_details = $api->get_job_position_details($job_position);
-                        $department_details = $api->get_department_details($department);
-                        $work_location_details = $api->get_work_location_details($work_location);
-                        $employee_type_details = $api->get_employee_type_details($employee_type);
-
-                        $status = $api->get_employee_status($employee_status)[0]['BADGE'];
-
-                        $employee_id_encrypted = $api->encrypt_data($employee_id);
-
-                        if($status == 1){
-                            $data_archive = '1';
-                        }
-                        else{
-                            $data_archive = '0';
-                        }
-    
-                        $response[] = array(
-                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $employee_id .'">',
-                            'EMPLOYEE_ID' =>  $employee_id,
-                            'FILE_AS' => $employee_personal_information_details[0]['FILE_AS'],
-                            'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
-                            'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
-                            'WORK_LOCATION' => $work_location_details[0]['WORK_LOCATION'],
-                            'EMPLOYEE_STATUS' => $status,
-                            'EMPLOYEE_TYPE' => $employee_type_details[0]['EMPLOYEE_TYPE'],
-                            'VIEW' => '<div class="d-flex gap-2">
-                                            <a href="employee-form.php?id='. $employee_id_encrypted .'" class="btn btn-primary waves-effect waves-light" title="View Employee">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </a>
-                                        </div>'
-                        );
-                    }
-    
-                    echo json_encode($response);
-                }
-                else{
-                    echo $sql->errorInfo()[2];
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Transaction logs
-    else if($type == 'transaction logs'){
-        if(isset($_POST['transaction_log_id']) && !empty($_POST['transaction_log_id'])){
-            if ($api->databaseConnection()) {
-                $transaction_log_id = $_POST['transaction_log_id'];
-
-                echo $api->generate_transaction_log_timeline($transaction_log_id);
-            }
-        }
-    }
-    # -------------------------------------------------------------
 
 }
 

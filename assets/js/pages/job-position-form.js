@@ -609,7 +609,7 @@ function initialize_click_events(){
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Started'){
-                            show_toastr('Start Job Position Recruitment Successful', 'The job position recruitment has been started successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -646,7 +646,7 @@ function initialize_click_events(){
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Stopped'){
-                            show_toastr('Stop Job Position Recruitment Successful', 'The job position recruitment has been stopped successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

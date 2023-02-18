@@ -159,7 +159,7 @@ function initialize_click_events(){
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Activated'){
-                            show_toastr('Activate Zoom API Successful', 'The Zoom API has been activated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -196,7 +196,7 @@ function initialize_click_events(){
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deactivated'){
-                            show_toastr('Deactivate Zoom API Successful', 'The Zoom API has been deactivated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

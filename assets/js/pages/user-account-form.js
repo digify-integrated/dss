@@ -315,7 +315,7 @@ function initialize_click_events(){
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Activated'){
-                            show_toastr('Activate User Account Successful', 'The user account has been activated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -352,7 +352,7 @@ function initialize_click_events(){
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deactivated'){
-                            show_toastr('Deactivate User Account Successful', 'The user account has been deactivated successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -389,7 +389,7 @@ function initialize_click_events(){
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Unlocked'){
-                            show_toastr('Unlock User Account Successful', 'The user account has been unlocked successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -426,7 +426,7 @@ function initialize_click_events(){
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Locked'){
-                            show_toastr('Lock User Account Successful', 'The user account has been locked successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

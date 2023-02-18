@@ -216,7 +216,7 @@ function initialize_click_events(){
                     data: {username : username, action_id : action_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Deleted'){
-                            show_toastr('Delete Action Successful', 'The action has been deleted successfully.', 'success', 'actions.php');
+                            window.location = 'actions.php';
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';

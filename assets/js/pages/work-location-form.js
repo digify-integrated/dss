@@ -153,7 +153,7 @@ function initialize_click_events(){
                     data: {username : username, work_location_id : work_location_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Unarchived'){
-                            show_toastr('Unarchived Work Location Successful', 'The work location has been unarchived successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
@@ -190,7 +190,7 @@ function initialize_click_events(){
                     data: {username : username, work_location_id : work_location_id, transaction : transaction},
                     success: function (response) {
                         if(response === 'Archived'){
-                            show_toastr('Archived Work Location Successful', 'The work location has been archived successfully.', 'success');
+                            location.reload();
                         }
                         else if(response === 'Inactive User' || response === 'Not Found'){
                             window.location = '404.php';
