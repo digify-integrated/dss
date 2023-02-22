@@ -2618,6 +2618,107 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit employee
+        case 'submit employee':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && isset($_POST['first_name']) && !empty($_POST['first_name']) && isset($_POST['middle_name']) && isset($_POST['last_name']) && !empty($_POST['last_name']) && isset($_POST['suffix']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['job_position']) && !empty($_POST['job_position']) && isset($_POST['manager']) && isset($_POST['coach']) && isset($_POST['company']) && !empty($_POST['company']) && isset($_POST['badge_id']) && !empty($_POST['badge_id']) && isset($_POST['work_location']) && !empty($_POST['work_location']) && isset($_POST['work_schedule']) && !empty($_POST['work_schedule']) && isset($_POST['birthday']) && !empty($_POST['birthday']) && isset($_POST['blood_type']) && isset($_POST['height']) && isset($_POST['civil_status']) && isset($_POST['gender']) && !empty($_POST['gender']) && isset($_POST['birth_place']) && isset($_POST['religion']) && isset($_POST['weight']) && isset($_POST['employee_type']) && !empty($_POST['employee_type']) && isset($_POST['permanency_date']) && isset($_POST['onboard_date']) && !empty($_POST['onboard_date'])){
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+                        $first_name = htmlspecialchars($_POST['first_name'], ENT_QUOTES, 'UTF-8');
+                        $middle_name = htmlspecialchars($_POST['middle_name'], ENT_QUOTES, 'UTF-8');
+                        $last_name = htmlspecialchars($_POST['last_name'], ENT_QUOTES, 'UTF-8');
+                        $suffix = htmlspecialchars($_POST['suffix'], ENT_QUOTES, 'UTF-8');
+                        $file_as = $api->get_file_as_format($first_name, $middle_name, $last_name, $suffix);
+                        $department = htmlspecialchars($_POST['department'], ENT_QUOTES, 'UTF-8');
+                        $job_position = htmlspecialchars($_POST['job_position'], ENT_QUOTES, 'UTF-8');
+                        $manager = htmlspecialchars($_POST['manager'], ENT_QUOTES, 'UTF-8');
+                        $coach = htmlspecialchars($_POST['coach'], ENT_QUOTES, 'UTF-8');
+                        $company = htmlspecialchars($_POST['company'], ENT_QUOTES, 'UTF-8');
+                        $badge_id = htmlspecialchars($_POST['badge_id'], ENT_QUOTES, 'UTF-8');
+                        $work_location = htmlspecialchars($_POST['work_location'], ENT_QUOTES, 'UTF-8');
+                        $work_schedule = htmlspecialchars($_POST['work_schedule'], ENT_QUOTES, 'UTF-8');
+                        $nickname = htmlspecialchars($_POST['nickname'], ENT_QUOTES, 'UTF-8');
+                        $nationality = htmlspecialchars($_POST['nationality'], ENT_QUOTES, 'UTF-8');
+                        $birthday = $api->check_date('empty', htmlspecialchars($_POST['birthday'], ENT_QUOTES, 'UTF-8'), '', 'Y-m-d', '', '', '');
+                        $blood_type = htmlspecialchars($_POST['blood_type'], ENT_QUOTES, 'UTF-8');
+                        $height = htmlspecialchars($_POST['height'], ENT_QUOTES, 'UTF-8');
+                        $civil_status = htmlspecialchars($_POST['civil_status'], ENT_QUOTES, 'UTF-8');
+                        $gender = htmlspecialchars($_POST['gender'], ENT_QUOTES, 'UTF-8');
+                        $birth_place = htmlspecialchars($_POST['birth_place'], ENT_QUOTES, 'UTF-8');
+                        $religion = htmlspecialchars($_POST['religion'], ENT_QUOTES, 'UTF-8');
+                        $weight = htmlspecialchars($_POST['weight'], ENT_QUOTES, 'UTF-8');
+                        $employee_type = htmlspecialchars($_POST['employee_type'], ENT_QUOTES, 'UTF-8');
+                        $permanency_date = $api->check_date('empty', htmlspecialchars($_POST['permanency_date'], ENT_QUOTES, 'UTF-8'), '', 'Y-m-d', '', '', '');
+                        $onboard_date = $api->check_date('empty', htmlspecialchars($_POST['onboard_date'], ENT_QUOTES, 'UTF-8'), '', 'Y-m-d', '', '', '');
+            
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
+             
+                        if($check_employee_exist > 0){
+                            $update_employee = $api->update_employee($employee_id, $badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
+            
+                            if($update_employee){
+                                $update_employee_personal_information = $api->update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username);
+            
+                                if($update_employee_personal_information){
+                                    $response[] = array(
+                                        'RESPONSE' => 'Updated'
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $update_employee_personal_information
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $update_employee
+                                );
+                            }
+                        }
+                        else{
+                            $insert_employee = $api->insert_employee($badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
+                
+                            if($insert_employee[0]['RESPONSE']){
+                                $employee_id = $insert_employee[0]['EMPLOYEE_ID'];
+
+                                $insert_employee_personal_information = $api->insert_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username);
+            
+                                if($insert_employee_personal_information){
+                                    $response[] = array(
+                                        'RESPONSE' => 'Inserted',
+                                        'EMPLOYEE_ID' => $employee_id
+                                    );
+                                }
+                                else{
+                                    $response[] = array(
+                                        'RESPONSE' => $insert_employee_personal_information
+                                    );
+                                }
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $insert_employee[0]['RESPONSE']
+                                );
+                            }
+                        }
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => 'Inactive User'
+                    );
+                }
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Delete transactions
         # -------------------------------------------------------------

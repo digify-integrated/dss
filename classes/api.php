@@ -9682,6 +9682,29 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : get_file_as_format
+    # Purpose    : Returns the file as name format
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_file_as_format($first_name, $middle_name = null, $last_name, $suffix = null){
+        $suffix = $suffix ? $this->get_system_code_details('SUFFIX', $suffix)[0]['SYSTEM_DESCRIPTION'] : null;
+
+        $name_parts = [$last_name, $first_name];
+        if (!empty($middle_name)) {
+            $name_parts[] = $middle_name;
+        }
+        if (!empty($suffix)) {
+            $name_parts[] = $suffix;
+        }
+
+        return implode(', ', $name_parts);
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : get_default_image
     # Purpose    : returns the default image.
     #

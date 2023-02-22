@@ -111,7 +111,7 @@
                                                         <div class="flex-grow-1 align-self-center">
                                                             <?php
                                                                 if(!empty($action_id)){
-                                                                    $dropdown_action = '<div class="btn-group form-details">
+                                                                    $dropdown_action = '<div class="btn-group">
                                                                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                                                             <span class="d-block d-sm-none"><i class="bx bx-wrench"></i> <i class="mdi mdi-chevron-down"></i></span>
                                                                             <span class="d-none d-sm-block">Action <i class="mdi mdi-chevron-down"></i></span>
