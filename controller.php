@@ -2658,7 +2658,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $check_employee_exist = $api->check_employee_exist($employee_id);
              
                         if($check_employee_exist > 0){
-                            $update_employee = $api->update_employee($employee_id, $badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
+                            $update_employee = $api->update_employee($employee_id, $badge_id, $company, $job_position, $department, $work_location, $work_schedule, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
             
                             if($update_employee){
                                 $update_employee_personal_information = $api->update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username);
@@ -2681,7 +2681,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             }
                         }
                         else{
-                            $insert_employee = $api->insert_employee($badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
+                            $insert_employee = $api->insert_employee($badge_id, $company, $job_position, $department, $work_location, $work_schedule, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
                 
                             if($insert_employee[0]['RESPONSE']){
                                 $employee_id = $insert_employee[0]['EMPLOYEE_ID'];

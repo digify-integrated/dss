@@ -3601,6 +3601,12 @@ function show_toastr(title, message, toastr_type, redirect_page = null) {
     toastr.options.onHidden = function() {
         show_toastr.displayedMessages = [];
         toastr.options.onHidden = null;
+
+        const url = new URL(window.location.href);
+        url.searchParams.delete('state');
+        const newUrl = url.toString();
+
+        window.history.replaceState({ path: newUrl }, '', newUrl);
     };
 }
 

@@ -5,6 +5,9 @@
         if($('#action-id').length){
             display_details('action details');
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('state');
+
             if($('#action-access-datatable').length){
                 initialize_action_access_table('#action-access-datatable');
             }
@@ -26,7 +29,7 @@
                     },
                     success: function (response) {
                         if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['ACTION_ID'];
+                            window.location = window.location.href + '?id=' + response[0]['ACTION_ID'] + '&state=insert';
                         }
                         else if(response[0]['RESPONSE'] === 'Updated'){
                             display_details('action details');

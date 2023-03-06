@@ -1443,6 +1443,31 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_employee_exist
+    # Purpose    : Checks if the employee exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_employee_exist($employee_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_employee_exist(:employee_id)');
+            $sql->bindValue(':employee_id', $employee_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return (int) $row['TOTAL'];
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -4526,6 +4551,82 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_employee
+    # Purpose    : Updates employee.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee($employee_id, $badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $employee_details = $this->get_employee_details($employee_id);
+            
+            if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_employee(:employee_id, :badge_id, :company, :job_position, :department, :work_location, :working_hours, :manager, :coach, :employee_type, :permanency_date, :onboard_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':employee_id', $employee_id);
+            $sql->bindValue(':badge_id', $badge_id);
+            $sql->bindValue(':company', $company);
+            $sql->bindValue(':job_position', $job_position);
+            $sql->bindValue(':department', $department);
+            $sql->bindValue(':work_location', $work_location);
+            $sql->bindValue(':working_hours', $working_hours);
+            $sql->bindValue(':manager', $manager);
+            $sql->bindValue(':coach', $coach);
+            $sql->bindValue(':employee_type', $employee_type);
+            $sql->bindValue(':permanency_date', $permanency_date);
+            $sql->bindValue(':onboard_date', $onboard_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -6895,6 +6996,91 @@ class Api{
                             $response[] = array(
                                 'RESPONSE' => true,
                                 'WORKING_SCHEDULE_TYPE_ID' => $this->encrypt_data($id)
+                            );
+                        }
+                        else{
+                            $response[] = array(
+                                'RESPONSE' => $insert_transaction_log
+                            );
+                        }
+                    }
+                    else{
+                        $response[] = array(
+                            'RESPONSE' => $update_system_parameter_value
+                        );
+                    }
+                }
+                else{
+                    $response[] = array(
+                        'RESPONSE' => $update_system_parameter_value
+                    );
+                }
+            }
+            else{
+                $response[] = array(
+                    'RESPONSE' => $sql->errorInfo()[2]
+                );
+            }
+
+            return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_employee
+    # Purpose    : Insert employee.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_employee($badge_id, $company, $job_position, $department, $work_location, $working_hours, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username){
+        if ($this->databaseConnection()) {
+            $response = array();
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(30, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL update_employee(:id, :badge_id, :company, :job_position, :department, :work_location, :working_hours, :manager, :coach, :employee_type, :permanency_date, :onboard_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':badge_id', $badge_id);
+            $sql->bindValue(':company', $company);
+            $sql->bindValue(':job_position', $job_position);
+            $sql->bindValue(':department', $department);
+            $sql->bindValue(':work_location', $work_location);
+            $sql->bindValue(':working_hours', $working_hours);
+            $sql->bindValue(':manager', $manager);
+            $sql->bindValue(':coach', $coach);
+            $sql->bindValue(':employee_type', $employee_type);
+            $sql->bindValue(':permanency_date', $permanency_date);
+            $sql->bindValue(':onboard_date', $onboard_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 30, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted employee.');
+                                    
+                        if($insert_transaction_log){
+                            $response[] = array(
+                                'RESPONSE' => true,
+                                'EMPLOYEE_ID' => $this->encrypt_data($id)
                             );
                         }
                         else{
@@ -9689,7 +9875,7 @@ class Api{
     #
     # -------------------------------------------------------------
     public function get_file_as_format($first_name, $middle_name = null, $last_name, $suffix = null){
-        $suffix = $suffix ? $this->get_system_code_details('SUFFIX', $suffix)[0]['SYSTEM_DESCRIPTION'] : null;
+        $suffix = $suffix ? $this->get_system_code_details(null, 'SUFFIX', $suffix)[0]['SYSTEM_DESCRIPTION'] : null;
 
         $name_parts = [$last_name, $first_name];
         if (!empty($middle_name)) {
