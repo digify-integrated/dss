@@ -80,8 +80,8 @@ function initialize_global_functions(){
 
     $(document).on('click','#discard',() => {
         Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
+            title: 'Discard Changes Confirmation',
+            text: 'Are you sure you want to discard the changes made to this item? The changes will be lost permanently once discarded.',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Discard',
@@ -2893,7 +2893,6 @@ function generate_action_dropdown(dropdown_type){
     }
 }
 
-
 // Reset form
 function reset_form(){
     $('.form-details').removeClass('d-none');
@@ -3550,7 +3549,42 @@ function check_table_multiple_button(){
     }
 }
 
-// Show toastr
+function check_toastr(){
+    const { 
+        'toastr-title': toastr_title, 
+        'toastr-message': toastr_message, 
+        'toastr-type': toastr_type 
+    } = sessionStorage;
+    
+    if (toastr_title && toastr_message && toastr_type) {
+        sessionStorage.removeItem('toastr-title');
+        sessionStorage.removeItem('toastr-message');
+        sessionStorage.removeItem('toastr-type');
+
+        show_toastr(toastr_title, toastr_message, toastr_type);
+    }
+}
+
+// Discard function
+function discard(windows_location){
+    Swal.fire({
+        title: 'Discard Changes Confirmation',
+        text: 'Are you sure you want to discard the changes made to this item? The changes will be lost permanently once discarded.',
+        icon: 'warning',
+        showCancelButton: !0,
+        confirmButtonText: 'Discard',
+        cancelButtonText: 'Cancel',
+        confirmButtonClass: 'btn btn-danger mt-2',
+        cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+        buttonsStyling: !1
+    }).then(function(result) {
+        if (result.value) {
+            window.location = windows_location;
+        }
+    });
+}
+
+// toastr
 function show_toastr(title, message, toastr_type, redirect_page = null) {
     const toastr_options = {
         closeButton: true,
@@ -3576,20 +3610,16 @@ function show_toastr(title, message, toastr_type, redirect_page = null) {
         error: toastr.error
     };
 
-    // Check if message has already been displayed
     if (show_toastr.displayedMessages.includes(message)) {
         return;
     }
 
-    // Add message to displayed messages array
     show_toastr.displayedMessages.push(message);
 
-    // Show toastr message
     if (toastr_type in toastr_types) {
         toastr_types[toastr_type](message, title, toastr_options);
     }
 
-    // Redirect after toastr message is hidden
     if (redirect_page) {
         toastr.options.onHidden = function() {
             window.location.href = redirect_page;
@@ -3597,17 +3627,16 @@ function show_toastr(title, message, toastr_type, redirect_page = null) {
         }
     }
 
-    // Clear displayed messages array after toastr message is hidden
     toastr.options.onHidden = function() {
         show_toastr.displayedMessages = [];
         toastr.options.onHidden = null;
-
-        const url = new URL(window.location.href);
-        url.searchParams.delete('state');
-        const newUrl = url.toString();
-
-        window.history.replaceState({ path: newUrl }, '', newUrl);
     };
+}
+
+function set_toastr(toastr_title, toastr_message, toastr_type){
+    sessionStorage.setItem('toastr-title', toastr_title);
+    sessionStorage.setItem('toastr-message', toastr_message);
+    sessionStorage.setItem('toastr-type', toastr_type);
 }
 
 show_toastr.displayedMessages = [];

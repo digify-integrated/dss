@@ -21,20 +21,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['EMAIL_SETTING_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('email setting details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The email setting has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Email Setting Inserted', 'The email setting has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['EMAIL_SETTING_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Email Setting Updated', 'The email setting has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -129,7 +130,7 @@ function initialize_click_events(){
         const transaction = 'delete email setting';
 
         Swal.fire({
-            title: 'Delete Email Setting',
+            title: 'Confirm Email Setting Deletion',
             text: 'Are you sure you want to delete this email setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -145,14 +146,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'email-settings.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Email Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'email-settings.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Email Setting Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -166,7 +170,7 @@ function initialize_click_events(){
         const transaction = 'activate email setting';
 
         Swal.fire({
-            title: 'Activate Email Setting',
+            title: 'Confirm Email Setting Activation',
             text: 'Are you sure you want to activate this email setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -182,14 +186,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Activate Email Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Activated':
+                                set_toastr('Email Setting Activated', 'The email setting has been activated successfully.', 'success');
+                                indow.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Email Setting Activation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -203,7 +211,7 @@ function initialize_click_events(){
         const transaction = 'deactivate email setting';
 
         Swal.fire({
-            title: 'Deactivate Email Setting',
+            title: 'Confirm Email Setting Deactivation',
             text: 'Are you sure you want to deactivate this email setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -219,14 +227,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Deactivate Email Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Deactivated':
+                                set_toastr('Email Setting Deactivated', 'The email setting has been deactivated successfully.', 'success');
+                                indow.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Email Setting Deactivation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -236,22 +248,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'email-settings.php';
-                return false;
-            }
-        });
+        discard('email-settings.php');
     });
 
 }

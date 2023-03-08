@@ -37,20 +37,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['JOB_POSITION_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('job position details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The job position has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Job Position Inserted', 'The job position has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['JOB_POSITION_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Job Position Updated', 'The job position has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -343,7 +344,7 @@ function initialize_click_events(){
         const transaction = 'delete job position';
 
         Swal.fire({
-            title: 'Delete Job Position',
+            title: 'Confirm Job Position Deletion',
             text: 'Are you sure you want to delete this job position?',
             icon: 'warning',
             showCancelButton: !0,
@@ -359,14 +360,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'job-positions.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Job Position Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'job-positions.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Job Position Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -380,7 +384,7 @@ function initialize_click_events(){
         const transaction = 'delete job position attachment';
 
         Swal.fire({
-            title: 'Delete Attachment',
+            title: 'Confirm Attachment Deletion',
             text: 'Are you sure you want to delete this attachment?',
             icon: 'warning',
             showCancelButton: !0,
@@ -396,21 +400,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, attachment_id : attachment_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Attachment Successful', 'The attachment has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Attachment Error', 'The attachment does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#job-position-attachment-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Attachment Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Attachment Deleted', 'The attachment has been deleted successfully.', 'success');
+                                reload_datatable('#job-position-attachment-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Attachment Deletion Error', 'The attachment does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#job-position-attachment-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Attachment Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -436,7 +440,7 @@ function initialize_click_events(){
         const transaction = 'delete job position responsibility';
 
         Swal.fire({
-            title: 'Delete Responsibility',
+            title: 'Confirm Responsibility Deletion',
             text: 'Are you sure you want to delete this responsibility?',
             icon: 'warning',
             showCancelButton: !0,
@@ -452,21 +456,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, responsibility_id : responsibility_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Responsibility Successful', 'The responsibility has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Responsibility Error', 'The responsibility does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#job-position-responsibility-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Responsibility Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Responsibility Deleted', 'The responsibility has been deleted successfully.', 'success');
+                                reload_datatable('#job-position-responsibility-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Responsibility Deletion Error', 'The responsibility does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#job-position-responsibility-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Responsibility Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -492,7 +496,7 @@ function initialize_click_events(){
         const transaction = 'delete job position requirement';
 
         Swal.fire({
-            title: 'Delete Requirement',
+            title: 'Confirm Requirement Deletion',
             text: 'Are you sure you want to delete this requirement?',
             icon: 'warning',
             showCancelButton: !0,
@@ -508,21 +512,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, requirement_id : requirement_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Requirement Successful', 'The requirement has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Requirement Error', 'The requirement does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#job-position-requirement-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Requirement Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Requirement Deleted', 'The requirement has been deleted successfully.', 'success');
+                                reload_datatable('#job-position-requirement-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Requirement Deletion Error', 'The requirement does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#job-position-requirement-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Requirement Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -548,7 +552,7 @@ function initialize_click_events(){
         const transaction = 'delete job position qualification';
 
         Swal.fire({
-            title: 'Delete Qualification',
+            title: 'Confirm Qualification Deletion',
             text: 'Are you sure you want to delete this qualification?',
             icon: 'warning',
             showCancelButton: !0,
@@ -564,21 +568,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, qualification_id : qualification_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Qualification Successful', 'The qualification has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Qualification Error', 'The qualification does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#job-position-qualification-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Qualification Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Qualification Deleted', 'The qualification has been deleted successfully.', 'success');
+                                reload_datatable('#job-position-qualification-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Qualification Deletion Error', 'The qualification does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#job-position-qualification-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Qualification Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -592,7 +596,7 @@ function initialize_click_events(){
         const transaction = 'start job position recruitment';
 
         Swal.fire({
-            title: 'Start Job Position Recruitment',
+            title: 'Confirm Job Position Recruitment Start',
             text: 'Are you sure you want to start this job position recruitment?',
             icon: 'warning',
             showCancelButton: !0,
@@ -608,14 +612,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Started'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Start Job Position Recruitment Error', response, 'error');
+                        switch (response) {
+                            case 'Started':
+                                set_toastr('Job Position Recruitment Started', 'The job position recruitment has been started successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Job Position Recruitment Start Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -629,7 +637,7 @@ function initialize_click_events(){
         const transaction = 'stop job position recruitment';
 
         Swal.fire({
-            title: 'Stop Job Position Recruitment',
+            title: 'Confirm Job Position Recruitment Stop',
             text: 'Are you sure you want to stop this job position recruitment?',
             icon: 'warning',
             showCancelButton: !0,
@@ -645,14 +653,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, job_position_id : job_position_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Stopped'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Stop Job Position Recruitment Error', response, 'error');
+                        switch (response) {
+                            case 'Stopped':
+                                set_toastr('Job Position Recruitment Stopped', 'The job position recruitment has been stopped successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Job Position Recruitment Stop Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -662,21 +674,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'job-positions.php';
-                return false;
-            }
-        });
+        discard('job-positions.php');
     });
 }

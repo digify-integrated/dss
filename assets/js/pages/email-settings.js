@@ -87,8 +87,8 @@ function initialize_click_events(){
 
         if(email_setting_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Email Setting',
-                text: 'Are you sure you want to delete these email setting?',
+                title: 'Confirm Multiple Email Setting Deletion',
+                text: 'Are you sure you want to delete these email settings?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, email_setting_id : email_setting_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Email Settings Successful', 'The email settings have been deleted successfully.', 'success');
-    
-                                reload_datatable('#email-settings-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Email Settings Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Email Settings Deleted', 'The selected email settings have been deleted successfully.', 'success');
+                                    reload_datatable('#email-settings-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Email Settings Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Email Settings Error', 'Please select the email settings you want to delete.', 'error');
+            show_toastr('Multiple Email Settings Deletion Error', 'Please select the email settings you wish to delete.', 'error');
         }
     });
 

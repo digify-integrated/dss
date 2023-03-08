@@ -84,7 +84,7 @@ function initialize_click_events(){
 
         if(employee_type_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Employee Types',
+                title: 'Confirm Multiple Employee Types Deletion',
                 text: 'Are you sure you want to delete these employee types?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -101,16 +101,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, employee_type_id : employee_type_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Employee Types Successful', 'The employee types have been deleted successfully.', 'success');
-    
-                                reload_datatable('#employee-types-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Employee Types Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Employee Types Deleted', 'The selected employee types have been deleted successfully.', 'success');
+                                    reload_datatable('#email-settings-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Employee Types Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +125,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Employee Types Error', 'Please select the employee types you want to delete.', 'error');
+            show_toastr('Multiple Employee Types Deletion Error', 'Please select the employee types you wish to delete.', 'error');
         }
     });
 

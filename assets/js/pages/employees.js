@@ -99,8 +99,8 @@ function initialize_click_events(){
 
         if(employee_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Employees',
-                text: 'Are you sure you want to delete these Employees?',
+                title: 'Confirm Multiple Employees Deletion',
+                text: 'Are you sure you want to delete these employees?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -116,16 +116,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, employee_id : employee_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_alert('Delete Multiple Employees Success', 'The Employees have been deleted.', 'success');
-    
-                                reload_datatable('#employees-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                show_alert_event('Delete Multiple Employees Error', 'Your employee is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                            }
-                            else{
-                                show_alert('Delete Multiple Employees Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Employees Deleted', 'The selected employees have been deleted successfully.', 'success');
+                                    reload_datatable('#employees-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Employees Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -139,7 +140,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Delete Multiple Employees', 'Please select the Employees you want to delete.', 'error');
+            show_toastr('Multiple Employees Deletion Error', 'Please select the employees you wish to delete.', 'error');
         }
     });
 
@@ -171,21 +172,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, employee_id : employee_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Unarchived' || response === 'Not Found'){
-                                if(response === 'Unarchived'){
-                                    show_alert('Unarchive Multiple Employees Success', 'The employees have been unarchived.', 'success');
-                                }
-                                else{
-                                    show_alert('Unarchive Multiple Employees Error', 'The employee does not exist.', 'info');
-                                }
-    
-                                reload_datatable('#employees-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                show_alert_event('Unarchive Multiple Employees Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                            }
-                            else{
-                              show_alert('Unarchive Multiple Employees Error', response, 'error');
+                            switch (response) {
+                                case 'Unarchived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Employees Unarchived', 'The selected employees have been unarchived successfully.', 'success');
+                                    reload_datatable('#employees-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Employees Unarchive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -198,7 +195,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Unarchive Multiple Employees Error', 'Please select the employees you want to unarchive.', 'error');
+            show_toastr('Multiple Employees Unarchive Error', 'Please select the employees you wish to unarchive.', 'error');
         }
     });
 
@@ -230,21 +227,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, employee_id : employee_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Archived' || response === 'Not Found'){
-                                if(response === 'Archived'){
-                                    show_alert('Archive Multiple Employees Success', 'The employees have been archived.', 'success');
-                                }
-                                else{
-                                    show_alert('Archive Multiple Employees Error', 'The employee does not exist.', 'info');
-                                }
-    
-                                reload_datatable('#employees-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                show_alert_event('Archive Multiple Employees Error', 'Your user account is inactive. Kindly contact your administrator.', 'error', 'redirect', 'logout.php?logout');
-                            }
-                            else{
-                              show_alert('Archive Multiple Employees Error', response, 'error');
+                            switch (response) {
+                                case 'Archived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Employees Archived', 'The selected employees have been archived successfully.', 'success');
+                                    reload_datatable('#employees-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Employees Archive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -257,7 +250,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_alert('Archive Multiple Employees Error', 'Please select the employees you want to archive.', 'error');
+            show_toastr('Multiple Employees Archive Error', 'Please select the employees you wish to archive.', 'error');
         }
     });
 

@@ -21,20 +21,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['DEPARTURE_REASON_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('departure reason details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The departure reason has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Departure Reason Inserted', 'The departure reason has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['DEPARTURE_REASON_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Departure Reason Updated', 'The departure reason has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -87,7 +88,7 @@ function initialize_click_events(){
         const transaction = 'delete departure reason';
 
         Swal.fire({
-            title: 'Delete Departure Reason',
+            title: 'Confirm Departure Reason Deletion',
             text: 'Are you sure you want to delete this departure reason?',
             icon: 'warning',
             showCancelButton: !0,
@@ -103,14 +104,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, departure_reason_id : departure_reason_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'departure-reasons.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Departure Reason Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'departure-reasons.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Departure Reason Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -120,22 +124,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'departure-reasons.php';
-                return false;
-            }
-        });
+        discard('departure-reasons.php');
     });
 
 }

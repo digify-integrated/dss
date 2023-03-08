@@ -2,11 +2,10 @@
     'use strict';
 
     $(() => {
+        check_toastr();
+
         if($('#action-id').length){
             display_details('action details');
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('state');
 
             if($('#action-access-datatable').length){
                 initialize_action_access_table('#action-access-datatable');
@@ -28,20 +27,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['ACTION_ID'] + '&state=insert';
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('action details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The action has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Action Inserted', 'The action has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['ACTION_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Action Updated', 'The action has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -54,12 +54,12 @@
             rules: {
                 action_name: {
                     required: true
-                },
+                }
             },
             messages: {
                 action_name: {
-                    required: 'Please enter the action name',
-                },
+                    required: 'Please enter the name of the action.',
+                }
             },
             errorPlacement: function(label) {     
                 show_toastr('Form Validation', label.text(), 'error');
@@ -202,7 +202,7 @@ function initialize_click_events(){
         const transaction = 'delete action';
 
         Swal.fire({
-            title: 'Delete Action',
+            title: 'Confirm Action Deletion',
             text: 'Are you sure you want to delete this action?',
             icon: 'warning',
             showCancelButton: !0,
@@ -218,14 +218,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, action_id : action_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'actions.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Action Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'actions.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Action Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -244,7 +247,7 @@ function initialize_click_events(){
         const transaction = 'delete action access';
 
         Swal.fire({
-            title: 'Delete Action Access',
+            title: 'Confirm Action Access Deletion',
             text: 'Are you sure you want to delete this action access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -260,21 +263,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, action_id : action_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                window.location = 'actions.php';
-                            }
-                            else{
-                                show_toastr('Delete Action Access Error', 'The action access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#action-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Action Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Action Access Deleted', 'The selected action access has been deleted successfully.', 'success');
+                                reload_datatable('#action-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Action Access Deletion Error', 'The selected action access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#action-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Action Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -284,20 +287,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',() => {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'actions.php';
-            }
-        });
+        discard('actions.php');
     });
 }

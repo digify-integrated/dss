@@ -32,7 +32,6 @@ function initialize_notification_settings_table(datatable_name, buttons = false,
         { 'width': '10%','bSortable': false, 'aTargets': 3 }
     ];
 
-
     const length_menu = show_all ? [[-1], ['All']] : [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']];
 
     settings = {
@@ -86,7 +85,7 @@ function initialize_click_events(){
 
         if(notification_setting_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Notification Setting',
+                title: 'Confirm Multiple Notification Setting Deletion',
                 text: 'Are you sure you want to delete these notification setting?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -103,16 +102,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, notification_setting_id : notification_setting_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Notification Settings Successful', 'The notification settings have been deleted successfully.', 'success');
-    
-                                reload_datatable('#notification-settings-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Notification Settings Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Notification Settings Deleted', 'The selected notification settings have been deleted successfully.', 'success');
+                                    reload_datatable('#notification-settings-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Notification Settings Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -126,7 +126,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Notification Settings Error', 'Please select the notification settings you want to delete.', 'error');
+            show_toastr('Multiple Notification Settings Deletion Error', 'Please select the notification settings you wish to delete.', 'error');
         }
     });
 

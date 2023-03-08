@@ -96,7 +96,7 @@ function initialize_click_events(){
 
         if(job_position_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Job Positions',
+                title: 'Confirm Multiple Job Positions Deletion',
                 text: 'Are you sure you want to delete these job positions?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -113,16 +113,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, job_position_id : job_position_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Job Positions Successful', 'The job positions have been deleted successfully.', 'success');
-    
-                                reload_datatable('#job-positions-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Job Positions Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Job Positions Deleted', 'The selected job positions have been deleted successfully.', 'success');
+                                    reload_datatable('#job-positions-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Job Positions Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -136,7 +137,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Job Positions Error', 'Please select the job positions you want to delete.', 'error');
+            show_toastr('Multiple Job Positions Deletion Error', 'Please select the job positions you wish to delete.', 'error');
         }
     });
 

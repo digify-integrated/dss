@@ -27,20 +27,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('interface setting details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The interface setting has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Interface Setting Inserted', 'The interface setting has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['INTERFACE_SETTING_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Interface Setting Updated', 'The interface setting has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -99,7 +100,7 @@ function initialize_click_events(){
         const transaction = 'delete interface setting';
 
         Swal.fire({
-            title: 'Delete Interface Setting',
+            title: 'Confirm Interface Setting Deletion',
             text: 'Are you sure you want to delete this interface setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -115,14 +116,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'interface-settings.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Interface Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'interface-settings.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Interface Setting Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -136,7 +140,7 @@ function initialize_click_events(){
         const transaction = 'activate interface setting';
 
         Swal.fire({
-            title: 'Activate Interface Setting',
+            title: 'Confirm Interface Setting Activation',
             text: 'Are you sure you want to activate this interface setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -152,14 +156,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Deactivate Interface Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Activated':
+                                set_toastr('Interface Setting Activated', 'The interface setting has been activated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Interface Setting Activation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -173,7 +181,7 @@ function initialize_click_events(){
         const transaction = 'deactivate interface setting';
 
         Swal.fire({
-            title: 'Deactivate Interface Setting',
+            title: 'Confirm Interface Setting Deactivation',
             text: 'Are you sure you want to deactivate this interface setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -189,14 +197,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Deactivate Interface Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Deactivated':
+                                set_toastr('Interface Setting Deactivated', 'The interface setting has been deactivated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Interface Setting Deactivation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -206,21 +218,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'interface-settings.php';
-                return false;
-            }
-        });
+        discard('interface-settings.php');
     });
 }

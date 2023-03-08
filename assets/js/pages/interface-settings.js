@@ -87,8 +87,8 @@ function initialize_click_events(){
 
         if(interface_setting_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Interface Setting',
-                text: 'Are you sure you want to delete these interface setting?',
+                title: 'Confirm Multiple Interface Settings Deletion',
+                text: 'Are you sure you want to delete these interface settings?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, interface_setting_id : interface_setting_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Interface Settings Successful', 'The interface settings have been deleted successfully.', 'success');
-    
-                                reload_datatable('#interface-settings-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Interface Settings Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Interface Settings Deleted', 'The selected interface settings have been deleted successfully.', 'success');
+                                    reload_datatable('#interface-settings-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Interface Settings Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Interface Settings Error', 'Please select the interface settings you want to delete.', 'error');
+            show_toastr('Multiple Interface Settings Deletion Error', 'Please select the interface settings you wish to delete.', 'error');
         }
     });
 

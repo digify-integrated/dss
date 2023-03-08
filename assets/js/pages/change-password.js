@@ -19,13 +19,13 @@
                             $('#message').removeClass('d-none');
                             $('#change-password-form').addClass('d-none');
 
-                            $('#message').html('Success! Your password has been updated. Please use your new password to log in. Click <a href="index.php">here</a> to sign in.');
+                            $('#message').html('Success! Your password has been successfully updated. For security reasons, please use your new password to log in. Click <a href="index.php">here</a> to go to the login page.');
                         }
                         else if (response === 'Password Exist'){
-                            show_toastr('Change Password Error', 'Your new password must not match your previous one. Please choose a different password.', 'error');
+                            show_toastr('Password Change Error', 'Your new password must not match your previous one. Please choose a different password.', 'error');
                         }
                         else{
-                            show_toastr('Change Password Error', response, 'error');
+                            show_toastr('Password Change Error', response, 'error');
                         }
                     },
                     complete: function(){
@@ -48,7 +48,7 @@
                 }
             },
             errorPlacement: function(label) {
-                show_toastr('Change Password Error', label.text(), 'error');
+                show_toastr('Password Change Error', label.text(), 'error');
             },
             highlight: function(element) {
                 if ($(element).hasClass('select2-hidden-accessible')) {

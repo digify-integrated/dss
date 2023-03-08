@@ -31,26 +31,27 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['MODULE_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('module details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The module has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'File Size'){
-                            show_toastr('Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                        }
-                        else if(response[0]['RESPONSE'] === 'File Type'){
-                            show_toastr('Upload Error', 'The file uploaded is not supported.', 'error');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Module Inserted', 'The module has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['MODULE_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Module Updated', 'The module has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'File Size':
+                                show_toastr('Module Icon Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                                break;
+                            case 'File Type':
+                                show_toastr('Module Icon Upload Error', 'The file uploaded is not supported.', 'error');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -239,7 +240,7 @@ function initialize_click_events(){
         const transaction = 'delete module';
 
         Swal.fire({
-            title: 'Delete Module',
+            title: 'Confirm Module Deletion',
             text: 'Are you sure you want to delete this module?',
             icon: 'warning',
             showCancelButton: !0,
@@ -255,14 +256,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, module_id : module_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'modules.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Module Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'modules.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Module Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -277,7 +281,7 @@ function initialize_click_events(){
         const transaction = 'delete module access';
 
         Swal.fire({
-            title: 'Delete Module Access',
+            title: 'Confirm Module Access Deletion',
             text: 'Are you sure you want to delete this module access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -293,21 +297,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Module Access Successful', 'The module access has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Module Access Error', 'The module access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#module-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Module Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Module Access Deleted', 'The selected module access has been deleted successfully.', 'success');
+                                reload_datatable('#module-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Module Access Deletion Error', 'The selected module access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#module-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Module Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -317,21 +321,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'modules.php';
-                return false;
-            }
-        });
+        discard('modules.php');
     });
 }

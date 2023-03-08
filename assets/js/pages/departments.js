@@ -93,8 +93,8 @@ function initialize_click_events(){
 
         if(department_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Departments',
-                text: 'Are you sure you want to delete these Departments?',
+                title: 'Confirm Multiple Departments Deletion',
+                text: 'Are you sure you want to delete these departments?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -110,16 +110,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Departments Successful', 'The departments have been deleted successfully.', 'success');
-    
-                                reload_datatable('#departments-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Departments Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Departments Deleted', 'The selected departments have been deleted successfully.', 'success');
+                                    reload_datatable('#departments-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Departments Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -133,7 +134,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Departments Error', 'Please select the departments you want to delete.', 'error');
+            show_toastr('Multiple Departments Deletion Error', 'Please select the departments you wish to delete.', 'error');
         }
     });
 
@@ -149,7 +150,7 @@ function initialize_click_events(){
 
         if(department_id.length > 0){
             Swal.fire({
-                title: 'Unarchive Multiple Departments',
+                title: 'Confirm Multiple Departments Unarchive',
                 text: 'Are you sure you want to unarchive these departments?',
                 icon: 'info',
                 showCancelButton: !0,
@@ -165,16 +166,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Unarchived' || response === 'Not Found'){
-                                show_toastr('Unarchive Multiple Departments Successful', 'The departments have been unarchived successfully.', 'success');
-    
-                                reload_datatable('#departments-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Unarchive Multiple Departments Error', response, 'error');
+                            switch (response) {
+                                case 'Unarchived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Departments Unarchived', 'The selected departments have been unarchived successfully.', 'success');
+                                    reload_datatable('#departments-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Departments Unarchive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -187,7 +189,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Unarchive Multiple Departments Error', 'Please select the departments you want to unarchive.', 'error');
+            show_toastr('Multiple Departments Unarchive Error', 'Please select the departments you wish to unarchive.', 'error');
         }
     });
 
@@ -203,7 +205,7 @@ function initialize_click_events(){
 
         if(department_id.length > 0){
             Swal.fire({
-                title: 'Archive Multiple Departments',
+                title: 'Confirm Multiple Departments Archive',
                 text: 'Are you sure you want to archive these departments?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -219,16 +221,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, department_id : department_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Archived' || response === 'Not Found'){
-                                show_toastr('Archive Multiple Departments Successful', 'The departments have been archived successfully.', 'success');
-    
-                                reload_datatable('#departments-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Archive Multiple Departments Error', response, 'error');
+                            switch (response) {
+                                case 'Archived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Departments Archived', 'The selected departments have been archived successfully.', 'success');
+                                    reload_datatable('#departments-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Departments Archive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -241,7 +244,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Archive Multiple Departments Error', 'Please select the departments you want to archive.', 'error');
+            show_toastr('Multiple Departments Archive Error', 'Please select the departments you wish to archive.', 'error');
         }
     });
 

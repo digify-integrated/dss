@@ -84,7 +84,7 @@ function initialize_click_events(){
 
         if(action_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Actions',
+                title: 'Confirm Multiple Actions Deletion',
                 text: 'Are you sure you want to delete these actions?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -100,16 +100,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, action_id : action_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Actions Successful', 'The actions have been deleted successfully.', 'success');
-    
-                                reload_datatable('#actions-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Actions Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Actions Deleted', 'The selected actions have been deleted successfully.', 'success');
+                                    reload_datatable('#actions-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Actions Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -123,7 +124,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Actions Error', 'Please select the actions you want to delete.', 'error');
+            show_toastr('Multiple Actions Deletion Error', 'Please select the actions you wish to remove.', 'error');
         }
     });
 

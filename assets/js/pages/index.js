@@ -16,28 +16,31 @@
                         $('#signin').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Authenticated'){
-                            var username = $('#username').val();
-                            sessionStorage.setItem('username', username);
+                        switch (response[0]['RESPONSE']) {
+                            case 'Authenticated':
+                                var username = $('#username').val();
+                                sessionStorage.setItem('username', username);
 
-                            window.location = 'apps.php';
-                        }
-                        else{
-                            if(response[0]['RESPONSE'] === 'Incorrect'){
+                                window.location = 'apps.php';
+                                break;
+                            case 'Incorrect':
                                 show_toastr('Authentication Error', 'The username or password you entered is incorrect. Please double-check your credentials and try again.', 'error');
-                            }
-                            else if(response[0]['RESPONSE'] === 'Locked'){
+                                break;
+                            case 'Incorrect':
+                                show_toastr('Authentication Error', 'The username or password you entered is incorrect. Please double-check your credentials and try again.', 'error');
+                                break;
+                            case 'Locked':
                                 show_toastr('Account Locked', 'Your account has been locked. Please contact your administrator for assistance.', 'warning');
-                            }
-                            else if(response[0]['RESPONSE'] === 'Inactive'){
+                                break;
+                            case 'Inactive':
                                 show_toastr('Account Inactive', 'Your user account is currently inactive. Please contact your administrator for assistance.', 'warning');
-                            }
-                            else if(response[0]['RESPONSE'] === 'Password Expired'){
+                                break;
+                            case 'Password Expired':
                                 window.location = 'change-password.php?id=' + response[0]['USERNAME'];
-                            }
-                            else{
+                                break;
+                            default:
                                 show_toastr('Authentication Error', response, 'error');
-                            }
+                                break;
                         }
                     },
                     complete: function(){

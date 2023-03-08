@@ -21,20 +21,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('department details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The department has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Department Inserted', 'The department has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['DEPARTMENT_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Department Updated', 'The department has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -87,7 +88,7 @@ function initialize_click_events(){
         const transaction = 'delete department';
 
         Swal.fire({
-            title: 'Delete Department',
+            title: 'Confirm Department Deletion',
             text: 'Are you sure you want to delete this department?',
             icon: 'warning',
             showCancelButton: !0,
@@ -103,14 +104,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'departments.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Department Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'departments.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Department Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -124,7 +128,7 @@ function initialize_click_events(){
         const transaction = 'unarchive department';
 
         Swal.fire({
-            title: 'Unarchive Department',
+            title: 'Confirm Department Unarchive',
             text: 'Are you sure you want to unarchive this department?',
             icon: 'warning',
             showCancelButton: !0,
@@ -140,14 +144,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Unarchived'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Unarchived Department Error', response, 'error');
+                        switch (response) {
+                            case 'Unarchived':
+                                set_toastr('Department Unarchived', 'The department has been unarchived successfully.', 'success');
+                                indow.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Department Unarchived Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -161,7 +169,7 @@ function initialize_click_events(){
         const transaction = 'archive department';
 
         Swal.fire({
-            title: 'Archive Department',
+            title: 'Confirm Department Archive',
             text: 'Are you sure you want to archive this department?',
             icon: 'warning',
             showCancelButton: !0,
@@ -177,14 +185,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, department_id : department_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Archived'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Archived Department Error', response, 'error');
+                        switch (response) {
+                            case 'Archived':
+                                set_toastr('Department Archived', 'The department has been archived successfully.', 'success');
+                                indow.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Department Archived Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -194,22 +206,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'departments.php';
-                return false;
-            }
-        });
+        discard('departments.php');
     });
 
 }

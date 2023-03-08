@@ -21,20 +21,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['EMPLOYEE_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details();
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The employee has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Employee Inserted', 'The employee has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['EMPLOYEE_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Employee Updated', 'The employee has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -177,8 +178,8 @@ function initialize_click_events(){
         const transaction = 'delete employee';
 
         Swal.fire({
-            title: 'Delete Employee',
-            text: 'Are you sure you want to delete this employee?',
+            title: 'Confirm Employee Deactivation',
+            text: 'Are you sure you want to deactivate this employee?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -193,14 +194,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, employee_id : employee_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'employees.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Employee Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'employees.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Employee Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -210,22 +214,7 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'employees.php';
-                return false;
-            }
-        });
+        discard('employees.php');
     });
 
 }

@@ -84,7 +84,7 @@ function initialize_click_events(){
 
         if(departure_reason_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Departure Reasons',
+                title: 'Confirm Multiple Departure Reasons Deletion',
                 text: 'Are you sure you want to delete these departure reasons?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -101,16 +101,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, departure_reason_id : departure_reason_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Departure Reasons Successful', 'The departure reasons have been deleted successfully.', 'success');
-    
-                                reload_datatable('#departure-reasons-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Departure Reasons Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Departure Reasons Deleted', 'The selected departure reasons have been deleted successfully.', 'success');
+                                    reload_datatable('#departure-reasons-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Departure Reasons Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +125,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Departure Reasons Error', 'Please select the departure reasons you want to delete.', 'error');
+            show_toastr('Multiple Departure Reasons Deletion Error', 'Please select the departure reasons you wish to delete.', 'error');
         }
     });
 

@@ -25,20 +25,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['COUNTRY_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('country details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The country has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Country Inserted', 'The country has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['COUNTRY_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Country Updated', 'The country has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -51,12 +52,12 @@
             rules: {
                 country_name: {
                     required: true
-                },
+                }
             },
             messages: {
                 country_name: {
                     required: 'Please enter the country',
-                },
+                }
             },
             errorPlacement: function(label) {                
                 show_toastr('Form Validation', label.text(), 'error');
@@ -145,7 +146,7 @@ function initialize_click_events(){
         const transaction = 'delete country';
 
         Swal.fire({
-            title: 'Delete Country',
+            title: 'Confirm Country Deletion',
             text: 'Are you sure you want to delete this country?',
             icon: 'warning',
             showCancelButton: !0,
@@ -161,14 +162,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, country_id : country_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'country.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Country Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'country.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Country Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -195,7 +199,7 @@ function initialize_click_events(){
         const transaction = 'delete state';
 
         Swal.fire({
-            title: 'Delete State',
+            title: 'Confirm State Deletion',
             text: 'Are you sure you want to delete this state?',
             icon: 'warning',
             showCancelButton: !0,
@@ -211,21 +215,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, state_id : state_id, country_id : country_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete State Successful', 'The state has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete State Error', 'The state does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#state-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete State Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('State Deleted', 'The selected action access has been deleted successfully.', 'success');
+                                reload_datatable('#state-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('State Deletion Error', 'The selected action access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#state-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('State Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -235,21 +239,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'country.php';
-                return false;
-            }
-        });
+        discard('country.php');
     });
 }

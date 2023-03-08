@@ -33,20 +33,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['NOTIFICATION_SETTING_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('notification setting details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The notification setting has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Notification Setting Inserted', 'The notification setting has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['NOTIFICATION_SETTING_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Notification Setting Updated', 'The notification setting has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -441,7 +442,7 @@ function initialize_click_events(){
         const transaction = 'delete notification setting';
 
         Swal.fire({
-            title: 'Delete Notification Setting',
+            title: 'Confirm Notification Setting Deletion',
             text: 'Are you sure you want to delete this notification setting?',
             icon: 'warning',
             showCancelButton: !0,
@@ -457,14 +458,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, notification_setting_id : notification_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'notification-settings.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Notification Setting Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'notification-settings.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Interface Notification Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -491,7 +495,7 @@ function initialize_click_events(){
         const transaction = 'delete notification role recipient';
 
         Swal.fire({
-            title: 'Delete Notification Role Recipient',
+            title: 'Confirm Notification Role Recipient Deletion',
             text: 'Are you sure you want to delete this notification role recipient?',
             icon: 'warning',
             showCancelButton: !0,
@@ -507,21 +511,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, role_id : role_id, notification_setting_id : notification_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Notification Role Recipient Successful', 'The notification role recipient has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Notification Role Recipient Error', 'The notification role recipient does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#notification-role-recipients-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Notification Role Recipient Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Notification Role Recipient Deleted', 'The notification role recipient has been deleted successfully.', 'success');
+                                reload_datatable('#notification-role-recipients-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Notification Role Recipient Deletion Error', 'The notification role recipient does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#notification-role-recipients-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Notification Role Recipient Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -536,7 +540,7 @@ function initialize_click_events(){
         const transaction = 'delete notification user account recipient';
 
         Swal.fire({
-            title: 'Delete Notification User Account Recipient',
+            title: 'Confirm Notification User Account Recipient Deletion',
             text: 'Are you sure you want to delete this notification user account recipient?',
             icon: 'warning',
             showCancelButton: !0,
@@ -552,21 +556,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, notification_setting_id : notification_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Notification User Account Successful', 'The notification user account has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Notification User Account Error', 'The notification user account does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#notification-user-account-recipients-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Notification User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Notification User Account Deleted', 'The notification user account has been deleted successfully.', 'success');
+                                reload_datatable('#notification-user-account-recipients-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Notification User Account Deletion Error', 'The notification user account does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#notification-user-account-recipients-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Notification User Account Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -581,7 +585,7 @@ function initialize_click_events(){
         const transaction = 'delete notification channel';
 
         Swal.fire({
-            title: 'Delete Notification Channel',
+            title: 'Confirm Notification Channel Deletion',
             text: 'Are you sure you want to delete this notification channel?',
             icon: 'warning',
             showCancelButton: !0,
@@ -597,21 +601,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, channel : channel, notification_setting_id : notification_setting_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Notification Channel Successful', 'The notification channel has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Notification Channel Error', 'The notification channel does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#notification-channel-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Notification Channel Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Notification Channel Deleted', 'The notification channel has been deleted successfully.', 'success');
+                                reload_datatable('#notification-channel-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Notification Channel Deletion Error', 'The notification channel does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#notification-channel-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Notification Channel Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -621,21 +625,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'notification-settings.php';
-                return false;
-            }
-        });
+        discard('notification-settings.php');
     });
 }

@@ -84,8 +84,8 @@ function initialize_click_events(){
 
         if(country_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Country',
-                text: 'Are you sure you want to delete these country?',
+                title: 'Confirm Multiple Contries Deletion',
+                text: 'Are you sure you want to delete these countries?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -101,16 +101,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, country_id : country_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Countries Successful', 'The countries have been deleted successfully.', 'success');
-    
-                                reload_datatable('#country-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Countries Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Countries Deleted', 'The selected countries have been deleted successfully.', 'success');
+                                    reload_datatable('#country-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Countries Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +125,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Countries Error', 'Please select the countries you want to delete.', 'error');
+            show_toastr('Multiple Countries Deletion Error', 'Please select the countries you wish to remove.', 'error');
         }
     });
 

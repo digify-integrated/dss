@@ -84,8 +84,8 @@ function initialize_click_events(){
 
         if(company_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Company',
-                text: 'Are you sure you want to delete these company?',
+                title: 'Confirm Multiple Companies Deletion',
+                text: 'Are you sure you want to delete these companies?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -100,16 +100,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, company_id : company_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Companies Successful', 'The companies have been deleted successfully.', 'success');
-    
-                                reload_datatable('#company-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Companies Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Companies Deleted', 'The selected companies have been deleted successfully.', 'success');
+                                    reload_datatable('#company-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Companies Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -123,7 +124,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Companies Error', 'Please select the companies you want to delete.', 'error');
+            show_toastr('Multiple Companies Deletion Error', 'Please select the companies you wish to remove.', 'error');
         }
     });
 

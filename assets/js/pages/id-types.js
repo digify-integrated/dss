@@ -84,7 +84,7 @@ function initialize_click_events(){
 
         if(id_type_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple ID Types',
+                title: 'Confirm Multiple ID Types Deletion',
                 text: 'Are you sure you want to delete these ID types?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -101,16 +101,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, id_type_id : id_type_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple ID Types Successful', 'The ID types have been deleted successfully.', 'success');
-    
-                                reload_datatable('#id-types-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple ID Types Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple ID Types Deleted', 'The selected ID types have been deleted successfully.', 'success');
+                                    reload_datatable('#id-types-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple ID Types Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +125,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple ID Types Error', 'Please select the ID types you want to delete.', 'error');
+            show_toastr('Multiple ID Types Deletion Error', 'Please select the ID types you wish to delete.', 'error');
         }
     });
 
