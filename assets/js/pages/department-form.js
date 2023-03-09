@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#department-id').length){
             display_details('department details');
         }
@@ -147,7 +149,7 @@ function initialize_click_events(){
                         switch (response) {
                             case 'Unarchived':
                                 set_toastr('Department Unarchived', 'The department has been unarchived successfully.', 'success');
-                                indow.location.reload();
+                                window.location.reload();
                                 break;
                             case 'Inactive User':
                             case 'Not Found':
@@ -188,7 +190,7 @@ function initialize_click_events(){
                         switch (response) {
                             case 'Archived':
                                 set_toastr('Department Archived', 'The department has been archived successfully.', 'success');
-                                indow.location.reload();
+                                window.location.reload();
                                 break;
                             case 'Inactive User':
                             case 'Not Found':

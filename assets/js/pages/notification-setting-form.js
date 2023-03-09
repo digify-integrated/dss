@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#notification-setting-id').length){
             display_details('notification setting details');
 

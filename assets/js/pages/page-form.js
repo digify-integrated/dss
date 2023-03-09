@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#page-id').length){
             display_details('page details');
 
@@ -25,20 +27,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['PAGE_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('page details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The page has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Page Inserted', 'The page has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['PAGE_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Page Updated', 'The page has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -209,7 +212,7 @@ function initialize_click_events(){
         const transaction = 'delete page';
 
         Swal.fire({
-            title: 'Delete Page',
+            title: 'Confirm Page Deletion',
             text: 'Are you sure you want to delete this page?',
             icon: 'warning',
             showCancelButton: !0,
@@ -225,14 +228,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, page_id : page_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'pages.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Page Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'pages.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Page Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -247,7 +253,7 @@ function initialize_click_events(){
         const transaction = 'delete page access';
 
         Swal.fire({
-            title: 'Delete Page Access',
+            title: 'Confirm Page Access Deletion',
             text: 'Are you sure you want to delete this page access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -263,21 +269,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, page_id : page_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Page Access Successful', 'The page access has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Page Access Error', 'The page access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#page-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Page Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Page Access Deleted', 'The selected page access has been deleted successfully.', 'success');
+                                reload_datatable('#page-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Page Access Deletion Error', 'The selected page access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#page-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Page Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -287,21 +293,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'pages.php';
-                return false;
-            }
-        });
+        discard('pages.php');
     });
 }

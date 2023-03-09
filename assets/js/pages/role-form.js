@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#role-id').length){
             display_details('role details');
 
@@ -37,20 +39,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['ROLE_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('role details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The role has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Role Inserted', 'The role has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['ROLE_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Role Updated', 'The role has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -541,7 +544,7 @@ function initialize_click_events(){
         const transaction = 'delete role';
 
         Swal.fire({
-            title: 'Delete Role',
+            title: 'Confirm Role Deletion',
             text: 'Are you sure you want to delete this role?',
             icon: 'warning',
             showCancelButton: !0,
@@ -557,14 +560,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'roles.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Role Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'roles.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Role Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -595,7 +601,7 @@ function initialize_click_events(){
         const transaction = 'delete module access';
 
         Swal.fire({
-            title: 'Delete Module Access',
+            title: 'Confirm Module Access Deletion',
             text: 'Are you sure you want to delete this module access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -611,21 +617,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, module_id : module_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Module Access Successful', 'The module access has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Module Access Error', 'The module access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#module-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Module Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Module Access Deleted', 'The selected module access has been deleted successfully.', 'success');
+                                reload_datatable('#module-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Module Access Deletion Error', 'The selected module access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#module-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Module Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -640,7 +646,7 @@ function initialize_click_events(){
         const transaction = 'delete page access';
 
         Swal.fire({
-            title: 'Delete Page Access',
+            title: 'Confirm Page Access Deletion',
             text: 'Are you sure you want to delete this page access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -656,21 +662,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, page_id : page_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Page Access Successful', 'The page access has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Page Access Error', 'The page access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#page-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Page Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Page Access Deleted', 'The selected page access has been deleted successfully.', 'success');
+                                reload_datatable('#page-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Page Access Deletion Error', 'The selected page access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#page-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Page Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -685,7 +691,7 @@ function initialize_click_events(){
         const transaction = 'delete action access';
 
         Swal.fire({
-            title: 'Delete Action Access',
+            title: 'Confirm Action Access Deletion',
             text: 'Are you sure you want to delete this action access?',
             icon: 'warning',
             showCancelButton: !0,
@@ -701,21 +707,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, action_id : action_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete Action Access Successful', 'The action access has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete Action Access Error', 'The action access does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#action-access-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Action Access Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Action Access Deleted', 'The selected action access has been deleted successfully.', 'success');
+                                reload_datatable('#action-access-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Action Access Deletion Error', 'The selected action access does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#action-access-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Action Access Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -730,8 +736,8 @@ function initialize_click_events(){
         const transaction = 'delete role user account';
 
         Swal.fire({
-            title: 'Delete User Account',
-            text: 'Are you sure you want to delete this role user account?',
+            title: 'Confirm User Account Deletion',
+            text: 'Are you sure you want to delete this user account?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -746,21 +752,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete User Account Successful', 'The user account has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete User Account Error', 'The user account does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#user-account-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('User Account Deleted', 'The selected user account has been deleted successfully.', 'success');
+                                reload_datatable('#user-account-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('User Account Deletion Error', 'The selected user account does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#user-account-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -770,21 +776,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'roles.php';
-                return false;
-            }
-        });
+        discard('roles.php');
     });
 }

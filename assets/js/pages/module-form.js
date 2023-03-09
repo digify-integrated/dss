@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#module-id').length){
             display_details('module details');
 

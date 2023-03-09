@@ -87,8 +87,8 @@ function initialize_click_events(){
 
         if(zoom_api_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Zoom APIs',
-                text: 'Are you sure you want to delete these Zoom APIs?',
+                title: 'Confirm Multiple Zoom APIs Deletion',
+                text: 'Are you sure you want to delete these Zoom APIs',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Zoom APIs Successful', 'The Zoom APIs have been deleted successfully.', 'success');
-    
-                                reload_datatable('#zoom-api-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Zoom APIs Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Zoom APIs Deleted', 'The selected Zoom APIs have been deleted successfully.', 'success');
+                                    reload_datatable('#zoom-api-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Zoom APIs Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Zoom APIs Error', 'Please select the Zoom APIs you want to delete.', 'error');
+            show_toastr('Multiple Zoom APIs Deletion Error', 'Please select the Zoom APIs you wish to delete.', 'error');
         }
     });
 

@@ -87,8 +87,8 @@ function initialize_click_events(){
 
         if(state_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple State',
-                text: 'Are you sure you want to delete these state?',
+                title: 'Confirm Multiple States Deletion',
+                text: 'Are you sure you want to delete these states?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, state_id : state_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple States Successful', 'The states have been deleted successfully.', 'success');
-    
-                                reload_datatable('#state-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple States Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple States Deleted', 'The selected states have been deleted successfully.', 'success');
+                                    reload_datatable('#state-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple States Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple States Error', 'Please select the states you want to delete.', 'error');
+            show_toastr('Multiple States Deletion Error', 'Please select the states you wish to remove.', 'error');
         }
     });
 

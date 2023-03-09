@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#state-id').length){
             display_details('state details');
         }
@@ -21,20 +23,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['STATE_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('state details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The state has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('State Inserted', 'The state has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['STATE_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('State Updated', 'The state has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -93,7 +96,7 @@ function initialize_click_events(){
         const transaction = 'delete state';
 
         Swal.fire({
-            title: 'Delete State',
+            title: 'Confirm State Deletion',
             text: 'Are you sure you want to delete this state?',
             icon: 'warning',
             showCancelButton: !0,
@@ -109,14 +112,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, state_id : state_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'state.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete State Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'state.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('State Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -126,21 +132,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'state.php';
-                return false;
-            }
-        });
+        discard('state.php');
     });
 }

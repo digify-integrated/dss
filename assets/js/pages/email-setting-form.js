@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#email-setting-id').length){
             display_details('email setting details');
         }
@@ -189,7 +191,7 @@ function initialize_click_events(){
                         switch (response) {
                             case 'Activated':
                                 set_toastr('Email Setting Activated', 'The email setting has been activated successfully.', 'success');
-                                indow.location.reload();
+                                window.location.reload();
                                 break;
                             case 'Inactive User':
                             case 'Not Found':
@@ -230,7 +232,7 @@ function initialize_click_events(){
                         switch (response) {
                             case 'Deactivated':
                                 set_toastr('Email Setting Deactivated', 'The email setting has been deactivated successfully.', 'success');
-                                indow.location.reload();
+                                window.location.reload();
                                 break;
                             case 'Inactive User':
                             case 'Not Found':

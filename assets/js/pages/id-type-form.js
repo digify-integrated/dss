@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#id-type-id').length){
             display_details('id type details');
         }

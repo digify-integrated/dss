@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#interface-setting-id').length){
             display_details('interface setting details');
         }

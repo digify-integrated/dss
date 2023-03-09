@@ -87,7 +87,7 @@ function initialize_click_events(){
 
         if(working_schedule_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Working Schedules',
+                title: 'Confirm Multiple Working Schedules Deletion',
                 text: 'Are you sure you want to delete these working schedules?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, working_schedule_id : working_schedule_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Working Schedules Successful', 'The working schedules have been deleted successfully.', 'success');
-    
-                                reload_datatable('#working-schedules-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Working Schedules Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Working Schedules Deleted', 'The selected working schedules have been deleted successfully.', 'success');
+                                    reload_datatable('#working-schedule-types-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Working Schedules Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Working Schedules Error', 'Please select the working schedules you want to delete.', 'error');
+            show_toastr('Multiple Working Schedules Deletion Error', 'Please select the working schedules you wish to delete.', 'error');
         }
     });
 

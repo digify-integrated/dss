@@ -88,7 +88,7 @@ function initialize_click_events(){
 
         if(parameter_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple System Parameters',
+                title: 'Confirm Multiple System Parameters Deletion',
                 text: 'Are you sure you want to delete these system parameters?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -105,16 +105,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, parameter_id : parameter_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple System Parameters Successful', 'The system parameters have been deleted successfully.', 'success');
-    
-                                reload_datatable('#system-parameters-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple System Parameters Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple System Parameters Deleted', 'The selected system parameters have been deleted successfully.', 'success');
+                                    reload_datatable('#system-parameters-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple System Parameters Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -128,7 +129,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple System Parameters Error', 'Please select the system parameters you want to delete.', 'error');
+            show_toastr('Multiple System Parameters Deletion Error', 'Please select the system parameters you wish to remove.', 'error');
         }
     });
 

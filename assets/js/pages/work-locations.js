@@ -88,7 +88,7 @@ function initialize_click_events(){
 
         if(work_location_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Work Locations',
+                title: 'Confirm Multiple Work Locations Deletion',
                 text: 'Are you sure you want to delete these work locations?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -105,16 +105,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Work Locations Successful', 'The work locations have been deleted successfully.', 'success');
-    
-                                reload_datatable('#work-locations-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Work Locations Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Work Locations Deleted', 'The selected work location have been deleted successfully.', 'success');
+                                    reload_datatable('#work-locations-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Work Locations Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -128,7 +129,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Work Locations Error', 'Please select the work locations you want to delete.', 'error');
+            show_toastr('Multiple Work Locations Deletion Error', 'Please select the work locations you wish to delete.', 'error');
         }
     });
 
@@ -144,7 +145,7 @@ function initialize_click_events(){
 
         if(work_location_id.length > 0){
             Swal.fire({
-                title: 'Unarchive Multiple Work Locations',
+                title: 'Confirm Multiple Work Locations Unarchive',
                 text: 'Are you sure you want to unarchive these work locations?',
                 icon: 'info',
                 showCancelButton: !0,
@@ -160,16 +161,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Unarchived' || response === 'Not Found'){
-                                show_toastr('Unarchive Multiple Work Locations Successful', 'The work locations have been unarchived successfully.', 'success');
-    
-                                reload_datatable('#work-locations-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Unarchive Multiple Work Locations Error', response, 'error');
+                            switch (response) {
+                                case 'Unarchived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Work Locations Unarchived', 'The selected work locations have been unarchived successfully.', 'success');
+                                    reload_datatable('#work-locations-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Work Locations Unarchive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -182,7 +184,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Unarchive Multiple Work Locations Error', 'Please select the work locations you want to unarchive.', 'error');
+            show_toastr('Multiple Work Locations Unarchive Error', 'Please select the work locations you wish to unarchive.', 'error');
         }
     });
 
@@ -198,7 +200,7 @@ function initialize_click_events(){
 
         if(work_location_id.length > 0){
             Swal.fire({
-                title: 'Archive Multiple Work Locations',
+                title: 'Confirm Multiple Work Locations Archive',
                 text: 'Are you sure you want to archive these work locations?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -214,16 +216,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, work_location_id : work_location_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Archived' || response === 'Not Found'){
-                                show_toastr('Archive Multiple Work Locations Successful', 'The work locations have been archived successfully.', 'success');
-    
-                                reload_datatable('#work-locations-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Archive Multiple Work Locations Error', response, 'error');
+                            switch (response) {
+                                case 'Archived':
+                                case 'Not Found':
+                                    show_toastr('Multiple Work Locations Archived', 'The selected work locations have been archived successfully.', 'success');
+                                    reload_datatable('#work-locations-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Work Locations Archive Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -236,7 +239,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Archive Multiple Work Locations Error', 'Please select the work locations you want to archive.', 'error');
+            show_toastr('Multiple Work Locations Archive Error', 'Please select the work locations you wish to archive.', 'error');
         }
     });
 

@@ -84,7 +84,7 @@ function initialize_click_events(){
 
         if(wage_type_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Wage Types',
+                title: 'Confirm Multiple Wage Types Deletion',
                 text: 'Are you sure you want to delete these wage types?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -101,16 +101,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, wage_type_id : wage_type_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Wage Types Successful', 'The wage tyoes have been deleted successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Wage Types Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Wage Types Deleted', 'The selected wage types have been deleted successfully.', 'success');
+                                    reload_datatable('#wage-types-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Wage Types Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -124,7 +125,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Wage Types Error', 'Please select the wage types you want to delete.', 'error');
+            show_toastr('Multiple Wage Types Deletion Error', 'Please select the wage types you wish to remove.', 'error');
         }
     });
 

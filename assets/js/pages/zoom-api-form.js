@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#zoom-api-id').length){
             display_details('zoom api details');
         }
@@ -21,20 +23,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['ZOOM_API_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('zoom api details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The Zoom API has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('Zoom API Inserted', 'The Zoom API has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['ZOOM_API_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('Zoom API Updated', 'The Zoom API has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -105,7 +108,7 @@ function initialize_click_events(){
         const transaction = 'delete zoom api';
 
         Swal.fire({
-            title: 'Delete Zoom API',
+            title: 'Confirm Zoom API Deletion',
             text: 'Are you sure you want to delete this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
@@ -121,14 +124,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'zoom-api.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete Zoom API Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'zoom-api.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Zoom API Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -142,7 +148,7 @@ function initialize_click_events(){
         const transaction = 'activate zoom api';
 
         Swal.fire({
-            title: 'Activate Zoom API',
+            title: 'Confirm Zoom API Activation',
             text: 'Are you sure you want to activate this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
@@ -158,14 +164,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Activate User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Activated':
+                                set_toastr('Zoom API Activated', 'The Zoom API has been activated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Zoom API Activation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -179,7 +189,7 @@ function initialize_click_events(){
         const transaction = 'deactivate zoom api';
 
         Swal.fire({
-            title: 'Deactivate Zoom API',
+            title: 'Confirm Zoom API Deactivation',
             text: 'Are you sure you want to deactivate this Zoom API?',
             icon: 'warning',
             showCancelButton: !0,
@@ -195,14 +205,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, zoom_api_id : zoom_api_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Deactivate Zoom API Error', response, 'error');
+                        switch (response) {
+                            case 'Deactivated':
+                                set_toastr('Zoom API Deactivated', 'The Zoom API has been deactivated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Zoom API Deactivation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -212,21 +226,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'zoom-api.php';
-                return false;
-            }
-        });
+        discard('zoom-api.php');
     });
 }

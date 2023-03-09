@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#employee-type-id').length){
             display_details('employee type details');
         }

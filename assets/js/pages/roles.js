@@ -87,7 +87,7 @@ function initialize_click_events(){
 
         if(role_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Roles',
+                title: 'Confirm Multiple Roles Deletion',
                 text: 'Are you sure you want to delete these roles?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, role_id : role_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Roles Successful', 'The roles have been deleted successfully.', 'success');
-    
-                                reload_datatable('#roles-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Roles Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Roles Deleted', 'The selected roles have been deleted successfully.', 'success');
+                                    reload_datatable('#roles-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Roles Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Roles Error', 'Please select the roles you want to delete.', 'error');
+            show_toastr('Multiple Roles Deletion Error', 'Please select the roles you wish to remove.', 'error');
         }
     });
 

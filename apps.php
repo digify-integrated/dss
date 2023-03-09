@@ -25,9 +25,6 @@
     </head>
 
     <body data-topbar="dark" data-layout="horizontal">
-
-        <?php require('views/_preloader.php'); ?>
-
         <div id="layout-wrapper">            
             
             <?php require('views/_top_bar.php'); ?>

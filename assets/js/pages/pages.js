@@ -87,7 +87,7 @@ function initialize_click_events(){
 
         if(page_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Pages',
+                title: 'Confirm Multiple Pages Deletion',
                 text: 'Are you sure you want to delete these pages?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -104,16 +104,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, page_id : page_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Pages Successful', 'The pages have been deleted successfully.', 'success');
-    
-                                reload_datatable('#pages-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Pages Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Pages Deleted', 'The selected pages have been deleted successfully.', 'success');
+                                    reload_datatable('#pages-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Pages Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -127,7 +128,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Pages Error', 'Please select the pages you want to delete.', 'error');
+            show_toastr('Multiple Pages Deletion Error', 'Please select the pages you wish to remove.', 'error');
         }
     });
 

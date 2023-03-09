@@ -105,7 +105,7 @@ function initialize_click_events(){
                                 case 'Deleted':
                                 case 'Not Found':
                                     show_toastr('Multiple Employee Types Deleted', 'The selected employee types have been deleted successfully.', 'success');
-                                    reload_datatable('#email-settings-datatable');
+                                    reload_datatable('#email-types-datatable');
                                     break;
                                 case 'Inactive User':
                                     window.location = '404.php';

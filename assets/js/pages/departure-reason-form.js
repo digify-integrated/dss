@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#departure-reason-id').length){
             display_details('departure reason details');
         }

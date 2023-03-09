@@ -88,7 +88,7 @@ function initialize_click_events(){
 
         if(upload_setting_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple Upload Settings',
+                title: 'Confirm Multiple Upload Settings Deletion',
                 text: 'Are you sure you want to delete these upload settings?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -105,16 +105,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, upload_setting_id : upload_setting_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple Upload Settings Successful', 'The upload settings have been deleted successfully.', 'success');
-    
-                                reload_datatable('#upload-settings-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple Upload Settings Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple Upload Settings Deleted', 'The selected upload settings have been deleted successfully.', 'success');
+                                    reload_datatable('#upload-settings-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple Upload Settings Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -128,7 +129,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple Upload Settings Error', 'Please select the upload settings you want to delete.', 'error');
+            show_toastr('Multiple Upload Settings Deletion Error', 'Please select the upload settings you wish to remove.', 'error');
         }
     });
 

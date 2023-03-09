@@ -63,9 +63,6 @@
     </head>
 
     <body data-topbar="dark" data-layout="horizontal">
-
-        <?php require('views/_preloader.php'); ?>
-
         <div id="layout-wrapper">
 
             <?php 
@@ -194,7 +191,7 @@
                                             <div class="row mt-4">
                                                 <input type="hidden" id="notification_setting_id" name="notification_setting_id" value="<?php echo $notification_setting_id; ?>">
                                                 <?php
-                                                    if(empty($module_id) && $add_notification_setting > 0){
+                                                    if(empty($notification_setting_id) && $add_notification_setting > 0){
                                                         echo '<div class="col-md-6">
                                                                 <div class="row mb-4">
                                                                     <label for="notification_setting" class="col-md-3 col-form-label">Notification Setting <span class="text-danger">*</span></label>
@@ -236,7 +233,7 @@
                                                                 </div>
                                                             </div>';
                                                     }
-                                                    else if(!empty($module_id) && $update_notification_setting > 0){
+                                                    else if(!empty($notification_setting_id) && $update_notification_setting > 0){
                                                         echo '<div class="col-md-6">
                                                                 <div class="row mb-4">
                                                                     <input type="hidden" id="transaction_log_id" value="'. $transaction_log_id .'">

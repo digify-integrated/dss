@@ -2,6 +2,8 @@
     'use strict';
 
     $(function() {
+        check_toastr();
+        
         if($('#user-id').length){
             display_details('user account details');
 
@@ -25,20 +27,21 @@
                         $('#submit-data').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
                     },
                     success: function (response) {
-                        if(response[0]['RESPONSE'] === 'Inserted'){
-                            window.location = window.location.href + '?id=' + response[0]['USER_ID'];
-                        }
-                        else if(response[0]['RESPONSE'] === 'Updated'){
-                            display_details('user account details');
-                            reset_form();
-                            
-                            show_toastr('Update Successful', 'The user account has been updated successfully.', 'success');
-                        }
-                        else if(response[0]['RESPONSE'] === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Transaction Error', response, 'error');
+                        switch (response[0]['RESPONSE']) {
+                            case 'Inserted':
+                                set_toastr('User Account Inserted', 'The user account has been inserted successfully.', 'success');
+                                window.location = window.location.href + '?id=' + response[0]['USER_ID'];
+                                break;
+                            case 'Updated':
+                                set_toastr('User Account Updated', 'The user account has been updated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Transaction Error', response, 'error');
+                                break;
                         }
                     },
                     complete: function(){
@@ -212,7 +215,7 @@ function initialize_click_events(){
         const transaction = 'delete user account';
 
         Swal.fire({
-            title: 'Delete User Account',
+            title: 'Confirm User Account Deletion',
             text: 'Are you sure you want to delete this user account?',
             icon: 'warning',
             showCancelButton: !0,
@@ -228,14 +231,17 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted'){
-                            window.location = 'user-accounts.php';
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                window.location = 'user-accounts.php';
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -254,8 +260,8 @@ function initialize_click_events(){
         const transaction = 'delete user account role';
 
         Swal.fire({
-            title: 'Delete User Account Role',
-            text: 'Are you sure you want to delete this user account role?',
+            title: 'Confirm Role Deletion',
+            text: 'Are you sure you want to delete this role?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -270,21 +276,21 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, role_id : role_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deleted' || response === 'Not Found'){
-                            if(response === 'Deleted'){
-                                show_toastr('Delete User Account Role Successful', 'The user account role has been deleted successfully.', 'success');
-                            }
-                            else{
-                                show_toastr('Delete User Account Role Error', 'The user account role does not exist.', 'warning');
-                            }
-
-                            reload_datatable('#user-account-role-datatable');
-                        }
-                        else if(response === 'Inactive User'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Delete User Account Role Error', response, 'error');
+                        switch (response) {
+                            case 'Deleted':
+                                show_toastr('Role Deleted', 'The selected role has been deleted successfully.', 'success');
+                                reload_datatable('#user-account-role-datatable');
+                                break;
+                            case 'Not Found':
+                                show_toastr('Role Deletion Error', 'The selected role does not exist or has already been deleted.', 'warning');
+                                reload_datatable('#user-account-role-datatable');
+                                break;
+                            case 'Inactive User':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Role Deletion Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -298,7 +304,7 @@ function initialize_click_events(){
         const transaction = 'activate user account';
 
         Swal.fire({
-            title: 'Activate User Account',
+            title: 'Confirm User Account Activation',
             text: 'Are you sure you want to activate this user account?',
             icon: 'warning',
             showCancelButton: !0,
@@ -314,14 +320,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Activated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Activate User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Activated':
+                                set_toastr('User Account Activated', 'The user account has been activated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Activation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -335,7 +345,7 @@ function initialize_click_events(){
         const transaction = 'deactivate user account';
 
         Swal.fire({
-            title: 'Deactivate User Account',
+            title: 'Confirm User Account Deactivation',
             text: 'Are you sure you want to deactivate this user account?',
             icon: 'warning',
             showCancelButton: !0,
@@ -351,14 +361,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Deactivated'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Deactivate User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Deactivated':
+                                set_toastr('User Account Deactivated', 'The user account has been deactivated successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Deactivation Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -372,7 +386,7 @@ function initialize_click_events(){
         const transaction = 'unlock user account';
 
         Swal.fire({
-            title: 'Unlock User Account',
+            title: 'Confirm User Account Unlock',
             text: 'Are you sure you want to unlock this user account?',
             icon: 'warning',
             showCancelButton: !0,
@@ -388,14 +402,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Unlocked'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Unlock User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Unlocked':
+                                set_toastr('User Account Unlocked', 'The user account has been unlocked successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Unlock Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -409,7 +427,7 @@ function initialize_click_events(){
         const transaction = 'lock user account';
 
         Swal.fire({
-            title: 'Lock User Account',
+            title: 'Confirm User Account Lock',
             text: 'Are you sure you want to lock this user account?',
             icon: 'warning',
             showCancelButton: !0,
@@ -425,14 +443,18 @@ function initialize_click_events(){
                     url: 'controller.php',
                     data: {username : username, user_id : user_id, transaction : transaction},
                     success: function (response) {
-                        if(response === 'Locked'){
-                            location.reload();
-                        }
-                        else if(response === 'Inactive User' || response === 'Not Found'){
-                            window.location = '404.php';
-                        }
-                        else{
-                            show_toastr('Lock User Account Error', response, 'error');
+                        switch (response) {
+                            case 'Locked':
+                                set_toastr('User Account Locked', 'The user account has been locked successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('User Account Lock Error', response, 'error');
+                                break;
                         }
                     }
                 });
@@ -442,21 +464,6 @@ function initialize_click_events(){
     });
 
     $(document).on('click','#discard-create',function() {
-        Swal.fire({
-            title: 'Discard Changes',
-            text: 'Are you sure you want to discard the changes associated with this item? Once discarded the changes are permanently lost.',
-            icon: 'warning',
-            showCancelButton: !0,
-            confirmButtonText: 'Discard',
-            cancelButtonText: 'Cancel',
-            confirmButtonClass: 'btn btn-danger mt-2',
-            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
-            buttonsStyling: !1
-        }).then(function(result) {
-            if (result.value) {
-                window.location = 'user-accounts.php';
-                return false;
-            }
-        });
+        discard('user-accounts.php');
     });
 }

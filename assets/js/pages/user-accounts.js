@@ -96,8 +96,8 @@ function initialize_click_events(){
 
         if(user_id.length > 0){
             Swal.fire({
-                title: 'Delete Multiple User Account',
-                text: 'Are you sure you want to delete these user account?',
+                title: 'Confirm Multiple User Accounts Deletion',
+                text: 'Are you sure you want to delete these user accounts?',
                 icon: 'warning',
                 showCancelButton: !0,
                 confirmButtonText: 'Delete',
@@ -113,16 +113,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deleted' || response === 'Not Found'){
-                                show_toastr('Delete Multiple User Accounts Successful', 'The user accounts have been deleted successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Delete Multiple User Accounts Error', response, 'error');
+                            switch (response) {
+                                case 'Deleted':
+                                case 'Not Found':
+                                    show_toastr('Multiple User Accounts Deleted', 'The selected user accounts have been deleted successfully.', 'success');
+                                    reload_datatable('#user-accounts-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple User Accounts Deletion Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -136,7 +137,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Delete Multiple User Accounts Error', 'Please select the user accounts you want to delete.', 'error');
+            show_toastr('Multiple User Accounts Deletion Error', 'Please select the user accounts you wish to remove.', 'error');
         }
     });
 
@@ -152,7 +153,7 @@ function initialize_click_events(){
 
         if(user_id.length > 0){
             Swal.fire({
-                title: 'Lock Multiple User Accounts',
+                title: 'Confirm Multiple User Accounts Lock',
                 text: 'Are you sure you want to lock these user accounts?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -168,16 +169,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Locked' || response === 'Not Found'){
-                                show_toastr('Lock Multiple User Accounts Successful', 'The user accounts have been locked successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Lock Multiple User Accounts Error', response, 'error');
+                            switch (response) {
+                                case 'Locked':
+                                case 'Not Found':
+                                    show_toastr('Multiple User Accounts Lock', 'The selected user accounts have been locked successfully.', 'success');
+                                    reload_datatable('#user-accounts-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple User Accounts Lock Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -190,7 +192,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Lock Multiple User Accounts Error', 'Please select the user accounts you want to lock.', 'error');
+            show_toastr('Multiple User Accounts Lock Error', 'Please select the user accounts you wish to lock.', 'error');
         }
     });
 
@@ -206,7 +208,7 @@ function initialize_click_events(){
 
         if(user_id.length > 0){
             Swal.fire({
-                title: 'Unlock Multiple User Accounts',
+                title: 'Confirm Multiple User Accounts Unlock',
                 text: 'Are you sure you want to unlock these user accounts?',
                 icon: 'info',
                 showCancelButton: !0,
@@ -222,16 +224,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Unlocked' || response === 'Not Found'){
-                                show_toastr('Unlock Multiple User Accounts Successful', 'The user accounts have been unlocked successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Unlock Multiple User Accounts Error', response, 'error');
+                            switch (response) {
+                                case 'Unlocked':
+                                case 'Not Found':
+                                    show_toastr('Multiple User Accounts Lock', 'The selected user accounts have been unlocked successfully.', 'success');
+                                    reload_datatable('#user-accounts-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple User Accounts Lock Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -244,7 +247,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Unlock Multiple User Accounts Error', 'Please select the user accounts you want to unlock.', 'error');
+            show_toastr('Multiple User Accounts Unlock Error', 'Please select the user accounts you wish to unlock.', 'error');
         }
     });
 
@@ -260,7 +263,7 @@ function initialize_click_events(){
 
         if(user_id.length > 0){
             Swal.fire({
-                title: 'Activate Multiple User Accounts',
+                title: 'Confirm Multiple User Accounts Activation',
                 text: 'Are you sure you want to activate these user accounts?',
                 icon: 'info',
                 showCancelButton: !0,
@@ -276,16 +279,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Activated' || response === 'Not Found'){
-                                show_toastr('Activate Multiple User Accounts Successful', 'The user accounts have been activated successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Activate Multiple User Accounts Error', response, 'error');
+                            switch (response) {
+                                case 'Activated':
+                                case 'Not Found':
+                                    show_toastr('Multiple User Activated Lock', 'The selected user accounts have been activated successfully.', 'success');
+                                    reload_datatable('#user-accounts-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple User Accounts Activation Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -298,7 +302,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Activate Multiple User Accounts Error', 'Please select the user accounts you want to activate.', 'error');
+            show_toastr('Multiple User Accounts Activation Error', 'Please select the user accounts you wish to activate.', 'error');
         }
     });
 
@@ -314,7 +318,7 @@ function initialize_click_events(){
 
         if(user_id.length > 0){
             Swal.fire({
-                title: 'Deactivate Multiple User Accounts',
+                title: 'Confirm Multiple User Accounts Deactivation',
                 text: 'Are you sure you want to deactivate these user accounts?',
                 icon: 'warning',
                 showCancelButton: !0,
@@ -330,16 +334,17 @@ function initialize_click_events(){
                         url: 'controller.php',
                         data: {username : username, user_id : user_id, transaction : transaction},
                         success: function (response) {
-                            if(response === 'Deactivated' || response === 'Not Found'){
-                                show_toastr('Deactivate Multiple User Accounts Successful', 'The user accounts have been deactivated successfully.', 'success');
-    
-                                reload_datatable('#user-accounts-datatable');
-                            }
-                            else if(response === 'Inactive User'){
-                                window.location = '404.php';
-                            }
-                            else{
-                                show_toastr('Deactivate Multiple User Accounts Error', response, 'error');
+                            switch (response) {
+                                case 'Deactivated':
+                                case 'Not Found':
+                                    show_toastr('Multiple User Deactivate Lock', 'The selected user accounts have been deactivated successfully.', 'success');
+                                    reload_datatable('#user-accounts-datatable');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Multiple User Accounts Deactivation Error', response, 'error');
                             }
                         },
                         complete: function(){
@@ -352,7 +357,7 @@ function initialize_click_events(){
             });
         }
         else{
-            show_toastr('Deactivate Multiple User Accounts Error', 'Please select the user accounts you want to deactivate.', 'error');
+            show_toastr('Multiple User Accounts Deactivation Error', 'Please select the user accounts you wish to deactivate.', 'error');
         }
     });
 

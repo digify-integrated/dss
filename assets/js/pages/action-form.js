@@ -1,7 +1,7 @@
 (function($) {
     'use strict';
 
-    $(() => {
+    $(function() {
         check_toastr();
 
         if($('#action-id').length){
@@ -197,7 +197,7 @@ function initialize_role_assignment_table(datatable_name, buttons = false, show_
 function initialize_click_events(){
     const username = $('#username').text();
 
-    $(document).on('click','#delete-action',() => {
+    $(document).on('click','#delete-action',function() {
         const action_id = $('#action-id').text();
         const transaction = 'delete action';
 
@@ -237,11 +237,11 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#add-action-access',() => {
+    $(document).on('click','#add-action-access',function() {
         generate_modal('action access form', 'Action Access', 'LG' , '1', '1', 'form', 'action-access-form', '1', username);
     });
 
-    $(document).on('click','.delete-action-access',() => {
+    $(document).on('click','.delete-action-access',function() {
         const action_id = $(this).data('action-id');
         const role_id = $(this).data('role-id');
         const transaction = 'delete action access';
@@ -286,7 +286,7 @@ function initialize_click_events(){
         });
     });
 
-    $(document).on('click','#discard-create',() => {
+    $(document).on('click','#discard-create',function() {
         discard('actions.php');
     });
 }
