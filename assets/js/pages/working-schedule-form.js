@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#working-schedule-id').length){
             display_details('working schedule details');
 
@@ -182,6 +180,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Working Schedule Deleted', 'The working schedule has been deleted successfully.', 'success');
                                 window.location = 'working-schedules.php';
                                 break;
                             case 'Inactive User':

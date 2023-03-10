@@ -1,11 +1,9 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#employee-id').length){
-            display_details();
+            display_details('employee details');
         }
 
         $('#employee-form').validate({
@@ -149,29 +147,6 @@
     });
 })(jQuery);
 
-function display_details(){
-    const transaction = 'employee details';
-    const employee_id = $('#employee-id').text();
-
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'JSON',
-        data: {employee_id : employee_id, transaction : transaction},
-        success: function(response) {
-            $('#employee').val(response[0].DEPARTMENT);
-
-            document.getElementById('employee_status').innerHTML = response[0].STATUS;
-
-            check_empty(response[0].PARENT_DEPARTMENT, '#parent_employee', 'select');
-            check_empty(response[0].MANAGER, '#manager', 'select');
-        },
-        complete: function(){
-            generate_transaction_logs();
-        }
-    });
-}
-
 function initialize_click_events(){
     const username = $('#username').text();
 
@@ -180,8 +155,8 @@ function initialize_click_events(){
         const transaction = 'delete employee';
 
         Swal.fire({
-            title: 'Confirm Employee Deactivation',
-            text: 'Are you sure you want to deactivate this employee?',
+            title: 'Confirm Employee Deletion',
+            text: 'Are you sure you want to delete this employee?',
             icon: 'warning',
             showCancelButton: !0,
             confirmButtonText: 'Delete',
@@ -198,6 +173,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Employee Deleted', 'The employee has been deleted successfully.', 'success');
                                 window.location = 'employees.php';
                                 break;
                             case 'Inactive User':

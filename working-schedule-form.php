@@ -196,7 +196,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="row mb-4">
-                                                                    <label for="working_schedule_type" class="col-md-3 col-form-label">Working Schedule <span class="text-danger">*</span></label>
+                                                                    <label for="working_schedule_type" class="col-md-3 col-form-label">Working Schedule Type <span class="text-danger">*</span></label>
                                                                     <div class="col-md-9">
                                                                         <select class="form-control select2" id="working_schedule_type" name="working_schedule_type" '. $disabled .'>
                                                                             <option value="">--</option>
@@ -219,7 +219,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="row mb-4">
-                                                                    <label for="working_schedule_type" class="col-md-3 col-form-label">Working Schedule <span class="text-danger">*</span></label>
+                                                                    <label for="working_schedule_type" class="col-md-3 col-form-label">Working Schedule Type <span class="text-danger">*</span></label>
                                                                     <div class="col-md-9">
                                                                         <label class="col-form-label form-details" id="working_schedule_type_label"></label>
                                                                         <div class="d-none form-edit">

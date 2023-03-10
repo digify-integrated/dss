@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#job-position-id').length){
             display_details('job position details');
 
@@ -364,6 +362,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Job Position Deleted', 'The job position has been deleted successfully.', 'success');
                                 window.location = 'job-positions.php';
                                 break;
                             case 'Inactive User':

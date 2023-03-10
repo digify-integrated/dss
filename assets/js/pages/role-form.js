@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#role-id').length){
             display_details('role details');
 
@@ -562,6 +560,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Role Deleted', 'The role has been deleted successfully.', 'success');
                                 window.location = 'roles.php';
                                 break;
                             case 'Inactive User':

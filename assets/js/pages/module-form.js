@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#module-id').length){
             display_details('module details');
 
@@ -260,6 +258,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Module Deleted', 'The module has been deleted successfully.', 'success');
                                 window.location = 'modules.php';
                                 break;
                             case 'Inactive User':
@@ -301,11 +300,11 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
-                                show_toastr('Module Access Deleted', 'The selected module access has been deleted successfully.', 'success');
+                                show_toastr('Module Access Deleted', 'The module access has been deleted successfully.', 'success');
                                 reload_datatable('#module-access-datatable');
                                 break;
                             case 'Not Found':
-                                show_toastr('Module Access Deletion Error', 'The selected module access does not exist or has already been deleted.', 'warning');
+                                show_toastr('Module Access Deletion Error', 'The module access does not exist or has already been deleted.', 'warning');
                                 reload_datatable('#module-access-datatable');
                                 break;
                             case 'Inactive User':

@@ -2,7 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
 
         if($('#action-id').length){
             display_details('action details');
@@ -220,6 +219,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Action Delete', 'The action has been deleted successfully.', 'success');
                                 window.location = 'actions.php';
                                 break;
                             case 'Inactive User':
@@ -265,11 +265,11 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
-                                show_toastr('Action Access Deleted', 'The selected action access has been deleted successfully.', 'success');
+                                show_toastr('Action Access Deleted', 'The action access has been deleted successfully.', 'success');
                                 reload_datatable('#action-access-datatable');
                                 break;
                             case 'Not Found':
-                                show_toastr('Action Access Deletion Error', 'The selected action access does not exist or has already been deleted.', 'warning');
+                                show_toastr('Action Access Deletion Error', 'The action access does not exist or has already been deleted.', 'warning');
                                 reload_datatable('#action-access-datatable');
                                 break;
                             case 'Inactive User':

@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#employee-type-id').length){
             display_details('employee type details');
         }
@@ -108,6 +106,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Employee Type Deleted', 'The employee type has been deleted successfully.', 'success');
                                 window.location = 'employee-types.php';
                                 break;
                             case 'Inactive User':

@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#upload-setting-id').length){
             display_details('upload setting details');
 
@@ -230,6 +228,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Upload Setting Deleted', 'The upload setting has been deleted successfully.', 'success');
                                 window.location = 'upload-settings.php';
                                 break;
                             case 'Inactive User':

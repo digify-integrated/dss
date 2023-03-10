@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#notification-setting-id').length){
             display_details('notification setting details');
 
@@ -462,6 +460,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Notification Setting Deleted', 'The notification setting has been deleted successfully.', 'success');
                                 window.location = 'notification-settings.php';
                                 break;
                             case 'Inactive User':

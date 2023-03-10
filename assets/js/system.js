@@ -8,6 +8,8 @@
 
 // Initialize function
 function initialize_global_functions(){
+    check_toastr();
+
     $(document).on('click','#datatable-checkbox',function() {
         var status = $(this).is(':checked') ? true : false;
         $('.datatable-checkbox-children').prop('checked',status);
@@ -2250,6 +2252,78 @@ function display_details(transaction){
                     $('#description_label').text(response[0].DESCRIPTION);
 
                     document.getElementById('zoom_api_status').innerHTML = response[0].STATUS;
+                },
+                complete: function(){
+                    generate_transaction_logs();
+                }
+            });
+            break;
+        case 'employee details':
+            const employee_id = $('#employee-id').text();
+
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {employee_id : employee_id, transaction : transaction},
+                success: function(response) {
+                    $('#first_name').val(response[0].FIRST_NAME);
+                    $('#middle_name').val(response[0].MIDDLE_NAME);
+                    $('#last_name').val(response[0].LAST_NAME);
+                    $('#badge_id').val(response[0].BADGE_ID);
+                    $('#nickname').val(response[0].NICKNAME);
+                    $('#birthday').val(response[0].BIRTHDAY);
+                    $('#height').val(response[0].HEIGHT);
+                    $('#birth_place').val(response[0].PLACE_OF_BIRTH);
+                    $('#weight').val(response[0].WEIGHT);
+                    $('#permanency_date').val(response[0].PERMANENCY_DATE);
+                    $('#onboard_date').val(response[0].ONBOARD_DATE);
+
+                    $('#first_name_label').text(response[0].FIRST_NAME);
+                    $('#middle_name_label').text(response[0].MIDDLE_NAME);
+                    $('#last_name_label').text(response[0].LAST_NAME);
+                    $('#suffix_label').text(response[0].SUFFIX);
+                    $('#department_label').text(response[0].DEPARTMENT_NAME);
+                    $('#job_position_label').text(response[0].JOB_POSITION_NAME);
+                    $('#manager_label').text(response[0].MANAGER_NAME);
+                    $('#coach_label').text(response[0].COACH_NAME);
+                    $('#company_label').text(response[0].COMPANY_NAME);
+                    $('#badge_id_label').text(response[0].BADGE_ID);
+                    $('#work_location_label').text(response[0].WORK_LOCATION_NAME);
+                    $('#work_schedule_label').text(response[0].WORKING_HOURS_NAME);
+                    $('#nickname_label').text(response[0].NICKNAME);
+                    $('#nationality_label').text(response[0].NATIONALITY_NAME);
+                    $('#birthday_label').text(response[0].BIRTHDAY);
+                    $('#blood_type_label').text(response[0].BLOOD_TYPE_NAME);
+                    $('#height_label').text(response[0].HEIGHT_LABEL);
+                    $('#civil_status_label').text(response[0].CIVIL_STATUS_NAME);
+                    $('#gender_label').text(response[0].GENDER_NAME);
+                    $('#birth_place_label').text(response[0].PLACE_OF_BIRTH);
+                    $('#religion_label').text(response[0].RELIGION_NAME);
+                    $('#weight_label').text(response[0].WEIGHT_LABEL);
+                    $('#employee_type_label').text(response[0].EMPLOYEE_TYPE_NAME);
+                    $('#permanency_date_label').text(response[0].PERMANENCY_DATE);
+                    $('#onboard_date_label').text(response[0].ONBOARD_DATE);
+
+                    document.getElementById('employee_status').innerHTML = response[0].STATUS;
+                    
+                    document.getElementById('employee_image').innerHTML = response[0].EMPLOYEE_IMAGE;
+                    document.getElementById('employee_digital_signature').innerHTML = response[0].EMPLOYEE_DIGITAL_SIGNATURE;
+
+                    check_empty(response[0].SUFFIX, '#suffix', 'select');
+                    check_empty(response[0].DEPARTMENT, '#department', 'select');
+                    check_empty(response[0].JOB_POSITION, '#job_position', 'select');
+                    check_empty(response[0].MANAGER, '#manager', 'select');
+                    check_empty(response[0].COACH, '#coach', 'select');
+                    check_empty(response[0].COMPANY, '#company', 'select');
+                    check_empty(response[0].WORK_LOCATION, '#work_location', 'select');
+                    check_empty(response[0].WORKING_HOURS, '#work_schedule', 'select');
+                    check_empty(response[0].NATIONALITY, '#nationality', 'select');
+                    check_empty(response[0].BLOOD_TYPE, '#blood_type', 'select');
+                    check_empty(response[0].CIVIL_STATUS, '#civil_status', 'select');
+                    check_empty(response[0].GENDER, '#gender', 'select');
+                    check_empty(response[0].RELIGION, '#religion', 'select');
+                    check_empty(response[0].EMPLOYEE_TYPE, '#employee_type', 'select');
                 },
                 complete: function(){
                     generate_transaction_logs();

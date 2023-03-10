@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#interface-setting-id').length){
             display_details('interface setting details');
         }
@@ -120,6 +118,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Interface Setting Deleted', 'The interface setting has been deleted successfully.', 'success');
                                 window.location = 'interface-settings.php';
                                 break;
                             case 'Inactive User':

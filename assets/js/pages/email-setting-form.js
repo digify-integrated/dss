@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#email-setting-id').length){
             display_details('email setting details');
         }
@@ -150,6 +148,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Email Setting Deleted', 'The email setting has been deleted successfully.', 'success');
                                 window.location = 'email-settings.php';
                                 break;
                             case 'Inactive User':

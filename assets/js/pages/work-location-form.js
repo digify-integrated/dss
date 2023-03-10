@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#work-location-id').length){
             display_details('work location details');
         }
@@ -120,6 +118,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Work Location Deleted', 'The work location has been deleted successfully.', 'success');
                                 window.location = 'work-locations.php';
                                 break;
                             case 'Inactive User':

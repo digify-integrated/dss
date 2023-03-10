@@ -181,15 +181,15 @@
                                                     if(empty($company_id) && $add_company > 0){
                                                         echo '<div class="col-md-6">
                                                                     <div class="row mb-4">
-                                                                        <label for="company_name" class="col-md-3 col-form-label">Company <span class="text-danger">*</span></label>
-                                                                        <div class="col-md-9">
-                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100" '. $disabled .'>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="row mb-4">
                                                                         <label for="company_logo" class="col-md-3 col-form-label">Company Logo</label>
                                                                         <div class="col-md-9">
                                                                             <input class="form-control" type="file" name="company_logo" id="company_logo" '. $disabled .'>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-4">
+                                                                        <label for="company_name" class="col-md-3 col-form-label">Company <span class="text-danger">*</span></label>
+                                                                        <div class="col-md-9">
+                                                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100" '. $disabled .'>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row mb-4">

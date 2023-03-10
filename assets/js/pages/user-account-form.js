@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#user-id').length){
             display_details('user account details');
 
@@ -233,6 +231,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('User Account Deleted', 'The user account has been deleted successfully.', 'success');
                                 window.location = 'user-accounts.php';
                                 break;
                             case 'Inactive User':

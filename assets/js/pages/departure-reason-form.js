@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#departure-reason-id').length){
             display_details('departure reason details');
         }
@@ -108,6 +106,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Departure Reason Deleted', 'The departure reason has been deleted successfully.', 'success');
                                 window.location = 'departure-reasons.php';
                                 break;
                             case 'Inactive User':

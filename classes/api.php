@@ -4627,6 +4627,47 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_employee_personal_information
+    # Purpose    : Updates employee personal information.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $birth_place, $blood_type, $height, $weight, $religion, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL update_employee_personal_information(:employee_id, :file_as, :first_name, :middle_name, :last_name, :suffix, :nickname, :civil_status, :nationality, :gender, :birthday, :birth_place, :blood_type, :height, :weight, :religion, :record_log)');
+            $sql->bindValue(':employee_id', $employee_id);
+            $sql->bindValue(':file_as', $file_as);
+            $sql->bindValue(':first_name', $first_name);
+            $sql->bindValue(':middle_name', $middle_name);
+            $sql->bindValue(':last_name', $last_name);
+            $sql->bindValue(':suffix', $suffix);
+            $sql->bindValue(':nickname', $nickname);
+            $sql->bindValue(':civil_status', $civil_status);
+            $sql->bindValue(':nationality', $nationality);
+            $sql->bindValue(':gender', $gender);
+            $sql->bindValue(':birthday', $birthday);
+            $sql->bindValue(':birth_place', $birth_place);
+            $sql->bindValue(':blood_type', $blood_type);
+            $sql->bindValue(':height', $height);
+            $sql->bindValue(':weight', $weight);
+            $sql->bindValue(':religion', $religion);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -7126,7 +7167,7 @@ class Api{
             $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
             $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
 
-            $sql = $this->db_connection->prepare('CALL update_employee(:id, :badge_id, :company, :job_position, :department, :work_location, :working_hours, :manager, :coach, :employee_type, :permanency_date, :onboard_date, :transaction_log_id, :record_log)');
+            $sql = $this->db_connection->prepare('CALL insert_employee(:id, :badge_id, :company, :job_position, :department, :work_location, :working_hours, :manager, :coach, :employee_type, :permanency_date, :onboard_date, :transaction_log_id, :record_log)');
             $sql->bindValue(':id', $id);
             $sql->bindValue(':badge_id', $badge_id);
             $sql->bindValue(':company', $company);
@@ -7184,6 +7225,47 @@ class Api{
             }
 
             return $response;
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_employee_personal_information
+    # Purpose    : Insert employee personal information.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function insert_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL insert_employee_personal_information(:employee_id, :file_as, :first_name, :middle_name, :last_name, :suffix, :nickname, :civil_status, :nationality, :gender, :birthday, :place_of_birth, :blood_type, :height, :weight, :religion, :record_log)');
+            $sql->bindValue(':employee_id', $employee_id);
+            $sql->bindValue(':file_as', $file_as);
+            $sql->bindValue(':first_name', $first_name);
+            $sql->bindValue(':middle_name', $middle_name);
+            $sql->bindValue(':last_name', $last_name);
+            $sql->bindValue(':suffix', $suffix);
+            $sql->bindValue(':nickname', $nickname);
+            $sql->bindValue(':civil_status', $civil_status);
+            $sql->bindValue(':nationality', $nationality);
+            $sql->bindValue(':gender', $gender);
+            $sql->bindValue(':birthday', $birthday);
+            $sql->bindValue(':place_of_birth', $place_of_birth);
+            $sql->bindValue(':blood_type', $blood_type);
+            $sql->bindValue(':height', $height);
+            $sql->bindValue(':weight', $weight);
+            $sql->bindValue(':religion', $religion);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
         }
     }
     # -------------------------------------------------------------
@@ -9917,7 +9999,6 @@ class Api{
                         'NICKNAME' => $row['NICKNAME'],
                         'CIVIL_STATUS' => $row['CIVIL_STATUS'],
                         'NATIONALITY' => $row['NATIONALITY'],
-                        'WORKING_HOURS' => $row['WORKING_HOURS'],
                         'GENDER' => $row['GENDER'],
                         'BIRTHDAY' => $row['BIRTHDAY'],
                         'PLACE_OF_BIRTH' => $row['PLACE_OF_BIRTH'],
@@ -10231,6 +10312,27 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : get_employee_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_employee_status($stat){
+        $status = ($stat === 1) ? 'Active' : 'Archived';
+        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : get_job_position_recruitment_status
     # Purpose    : Returns the status, badge.
     #
@@ -10295,27 +10397,6 @@ class Api{
                 return $stmt->errorInfo()[2];
             }
         }
-    }
-    # -------------------------------------------------------------
-
-    # -------------------------------------------------------------
-    #
-    # Name       : get_employee_status
-    # Purpose    : Returns the status, badge.
-    #
-    # Returns    : Array
-    #
-    # -------------------------------------------------------------
-    public function get_employee_status($stat){
-        $status = ($stat === 1) ? 'Active' : 'Archived';
-        $button_class = ($stat === 1) ? 'bg-success' : 'bg-danger';
-
-        $response[] = array(
-            'STATUS' => $status,
-            'BADGE' => '<span class="badge ' . $button_class . '">' . $status . '</span>'
-        );
-
-        return $response;
     }
     # -------------------------------------------------------------
 

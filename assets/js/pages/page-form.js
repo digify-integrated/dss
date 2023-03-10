@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#page-id').length){
             display_details('page details');
 
@@ -230,6 +228,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Page Deleted', 'The page has been deleted successfully.', 'success');
                                 window.location = 'pages.php';
                                 break;
                             case 'Inactive User':
@@ -271,11 +270,11 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
-                                show_toastr('Page Access Deleted', 'The selected page access has been deleted successfully.', 'success');
+                                show_toastr('Page Access Deleted', 'The page access has been deleted successfully.', 'success');
                                 reload_datatable('#page-access-datatable');
                                 break;
                             case 'Not Found':
-                                show_toastr('Page Access Deletion Error', 'The selected page access does not exist or has already been deleted.', 'warning');
+                                show_toastr('Page Access Deletion Error', 'The page access does not exist or has already been deleted.', 'warning');
                                 reload_datatable('#page-access-datatable');
                                 break;
                             case 'Inactive User':

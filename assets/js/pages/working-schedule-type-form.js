@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#working-schedule-type-id').length){
             display_details('working schedule type details');
         }
@@ -114,6 +112,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Working Schedule Type Deleted', 'The working schedule type has been deleted successfully.', 'success');
                                 window.location = 'working-schedule-types.php';
                                 break;
                             case 'Inactive User':

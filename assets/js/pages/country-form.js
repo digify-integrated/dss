@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#country-id').length){
             display_details('country details');
 
@@ -166,6 +164,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Country Deleted', 'The country has been deleted successfully.', 'success');
                                 window.location = 'country.php';
                                 break;
                             case 'Inactive User':

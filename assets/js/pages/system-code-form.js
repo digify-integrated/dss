@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#system-code-id').length){
             display_details('system code details');
         }
@@ -120,6 +118,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('System Code Deleted', 'The system code has been deleted successfully.', 'success');
                                 window.location = 'system-codes.php';
                                 break;
                             case 'Inactive User':

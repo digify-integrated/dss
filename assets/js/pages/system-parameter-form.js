@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#parameter-id').length){
             display_details('system parameter details');
         }
@@ -114,6 +112,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('System Parameter Deleted', 'The system parameter has been deleted successfully.', 'success');
                                 window.location = 'system-parameters.php';
                                 break;
                             case 'Inactive User':

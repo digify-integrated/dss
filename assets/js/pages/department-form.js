@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#department-id').length){
             display_details('department details');
         }
@@ -108,6 +106,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Department Deleted', 'The department has been deleted successfully.', 'success');
                                 window.location = 'departments.php';
                                 break;
                             case 'Inactive User':

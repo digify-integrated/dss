@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#id-type-id').length){
             display_details('id type details');
         }
@@ -108,6 +106,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('ID Type Deleted', 'The ID type has been deleted successfully.', 'success');
                                 window.location.href = 'id-types.php';
                                 break;
                             case 'Inactive User':

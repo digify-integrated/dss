@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#wage-type-id').length){
             display_details('wage type details');
         }
@@ -108,6 +106,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Wage Type Deleted', 'The wage type has been deleted successfully.', 'success');
                                 window.location = 'wage-types.php';
                                 break;
                             case 'Inactive User':

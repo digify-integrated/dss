@@ -1766,7 +1766,7 @@ END //
 
 /* Employee Personal Information */
 CREATE TABLE employee_personal_information(
-	EMPLOYEE_ID VARCHAR(100) NOT NULL,
+	EMPLOYEE_ID VARCHAR(100) NOT NULL,'.  $disabled .'
 	FILE_AS VARCHAR(350) NOT NULL,
 	FIRST_NAME VARCHAR(100) NOT NULL,/
 	MIDDLE_NAME VARCHAR(100) NOT NULL,/
@@ -1798,7 +1798,7 @@ END //
 
 CREATE PROCEDURE insert_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'INSERT INTO employee_personal_information (EMPLOYEE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+	SET @query = 'INSERT INTO employee_personal_information (EMPLOYEE_ID, FILE_AS, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SUFFIX, NICKNAME, CIVIL_STATUS, NATIONALITY, GENDER, BIRTHDAY, PLACE_OF_BIRTH, BLOOD_TYPE, HEIGHT, WEIGHT, RELIGION, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt USING employee_id, file_as, first_name, middle_name, last_name, suffix, nickname, civil_status, nationality, gender, birthday, place_of_birth, blood_type, height, weight, religion, record_log;

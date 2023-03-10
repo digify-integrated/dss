@@ -1,9 +1,7 @@
 (function($) {
     'use strict';
 
-    $(function() {
-        check_toastr();
-        
+    $(function() {        
         if($('#company-id').length){
             display_details('company details');
         }
@@ -114,6 +112,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Company Deleted', 'The company has been deleted successfully.', 'success');
                                 window.location = 'company.php';
                                 break;
                             case 'Inactive User':

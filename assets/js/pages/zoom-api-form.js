@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#zoom-api-id').length){
             display_details('zoom api details');
         }
@@ -126,6 +124,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('Zoom API Deleted', 'The Zoom API has been deleted successfully.', 'success');
                                 window.location = 'zoom-api.php';
                                 break;
                             case 'Inactive User':

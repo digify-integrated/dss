@@ -2,8 +2,6 @@
     'use strict';
 
     $(function() {
-        check_toastr();
-        
         if($('#state-id').length){
             display_details('state details');
         }
@@ -114,6 +112,7 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
+                                set_toastr('State Deleted', 'The state has been deleted successfully.', 'success');
                                 window.location = 'state.php';
                                 break;
                             case 'Inactive User':

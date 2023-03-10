@@ -2661,7 +2661,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             $update_employee = $api->update_employee($employee_id, $badge_id, $company, $job_position, $department, $work_location, $work_schedule, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
             
                             if($update_employee){
-                                $update_employee_personal_information = $api->update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username);
+                                $update_employee_personal_information = $api->update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $birth_place, $blood_type, $height, $weight, $religion, $username);
             
                                 if($update_employee_personal_information){
                                     $response[] = array(
@@ -2684,9 +2684,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                             $insert_employee = $api->insert_employee($badge_id, $company, $job_position, $department, $work_location, $work_schedule, $manager, $coach, $employee_type, $permanency_date, $onboard_date, $username);
                 
                             if($insert_employee[0]['RESPONSE']){
-                                $employee_id = $insert_employee[0]['EMPLOYEE_ID'];
+                                $employee_id = $api->decrypt_data($insert_employee[0]['EMPLOYEE_ID']);
 
-                                $insert_employee_personal_information = $api->insert_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $place_of_birth, $blood_type, $height, $weight, $religion, $username);
+                                $insert_employee_personal_information = $api->insert_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $birth_place, $blood_type, $height, $weight, $religion, $username);
             
                                 if($insert_employee_personal_information){
                                     $response[] = array(
@@ -6927,6 +6927,104 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'WORKING_SCHEDULE_TYPE' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE'],
                     'WORKING_SCHEDULE_TYPE_CATEGORY' => $working_schedule_type_details[0]['WORKING_SCHEDULE_TYPE_CATEGORY'],
                     'WORKING_SCHEDULE_TYPE_CATEGORY_NAME' => $working_schedule_type_category_name
+                );
+    
+                echo json_encode($response);
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Employee details
+        case 'employee details':
+            if(isset($_POST['employee_id']) && !empty($_POST['employee_id'])){
+                $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+                
+                $employee_details = $api->get_employee_details($employee_id);
+                $employee_personal_information_details = $api->get_employee_personal_information_details($employee_id);
+                
+                $employee_image_path = $employee_details[0]['EMPLOYEE_IMAGE'] ?? null;
+                $employee_digital_signature_path = $employee_details[0]['EMPLOYEE_DIGITAL_SIGNATURE'] ?? null;
+
+                $company_name = $api->get_company_details($employee_details[0]['COMPANY'])[0]['COMPANY_NAME'] ?? null;
+                $job_position_name = $api->get_job_position_details($employee_details[0]['JOB_POSITION'])[0]['JOB_POSITION'] ?? null;
+                $department_name = $api->get_department_details($employee_details[0]['DEPARTMENT'])[0]['DEPARTMENT'] ?? null;
+                $work_location_name = $api->get_work_location_details($employee_details[0]['WORK_LOCATION'])[0]['WORK_LOCATION'] ?? null;
+                $working_hours_name = $api->get_working_hours_details($employee_details[0]['WORKING_HOURS'])[0]['WORKING_HOURS'] ?? null;
+                $manager_name = $api->get_employee_personal_information_details($employee_details[0]['MANAGER'])[0]['FILE_AS'] ?? null;
+                $coach_name = $api->get_employee_personal_information_details($employee_details[0]['COACH'])[0]['FILE_AS'] ?? null;
+                $employee_type_name = $api->get_employee_type_details($employee_details[0]['EMPLOYEE_TYPE'])[0]['EMPLOYEE_TYPE'] ?? null;
+
+                $suffix_details = $api->get_system_code_details(null, 'SUFFIX', $employee_personal_information_details[0]['SUFFIX']);
+                $suffix_name = $suffix_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                $civil_status_details = $api->get_system_code_details(null, 'CIVILSTATUS', $employee_personal_information_details[0]['CIVIL_STATUS']);
+                $civil_status_name = $civil_status_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                $nationality_details = $api->get_system_code_details(null, 'NATIONALITY', $employee_personal_information_details[0]['NATIONALITY']);
+                $nationality_name = $nationality_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                $gender_details = $api->get_system_code_details(null, 'GENDER', $employee_personal_information_details[0]['GENDER']);
+                $gender_name = $gender_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                $blood_type_details = $api->get_system_code_details(null, 'BLOODTYPE', $employee_personal_information_details[0]['BLOOD_TYPE']);
+                $blood_type_name = $blood_type_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                $religion_details = $api->get_system_code_details(null, 'RELIGION', $employee_personal_information_details[0]['RELIGION']);
+                $religion_name = $religion_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+
+                if(empty($employee_image_path)){
+                    $employee_image_path = $api->check_image($employee_image_path, 'profile');
+                }
+
+                if(empty($employee_digital_signature_path)){
+                    $employee_digital_signature_path = $api->check_image($employee_digital_signature_path, 'default');
+                }
+    
+                $response[] = array(
+                    'BADGE_ID' => $employee_details[0]['BADGE_ID'],
+                    'EMPLOYEE_IMAGE' => '<img class="img-thumbnail" alt="employee image" width="200" src="'. $employee_image_path .'" data-holder-rendered="true">',
+                    'EMPLOYEE_DIGITAL_SIGNATURE' => '<img class="img-thumbnail" alt="digital signature" width="200" src="'. $employee_digital_signature_path .'" data-holder-rendered="true">',
+                    'COMPANY' => $employee_details[0]['COMPANY'],
+                    'JOB_POSITION' => $employee_details[0]['JOB_POSITION'],
+                    'DEPARTMENT' => $employee_details[0]['DEPARTMENT'],
+                    'WORK_LOCATION' => $employee_details[0]['WORK_LOCATION'],
+                    'WORKING_HOURS' => $employee_details[0]['WORKING_HOURS'],
+                    'MANAGER' => $employee_details[0]['MANAGER'],
+                    'COACH' => $employee_details[0]['COACH'],
+                    'EMPLOYEE_TYPE' => $employee_details[0]['EMPLOYEE_TYPE'],
+                    'STATUS' =>  $api->get_employee_status($employee_details[0]['EMPLOYEE_STATUS'])[0]['BADGE'],
+                    'PERMANENCY_DATE' => $api->check_date('empty', $employee_details[0]['PERMANENCY_DATE'], '', 'm/d/Y', '', '', ''),
+                    'ONBOARD_DATE' => $api->check_date('empty', $employee_details[0]['ONBOARD_DATE'], '', 'm/d/Y', '', '', ''),
+                    'FIRST_NAME' => $employee_personal_information_details[0]['FIRST_NAME'],
+                    'MIDDLE_NAME' => $employee_personal_information_details[0]['MIDDLE_NAME'],
+                    'LAST_NAME' => $employee_personal_information_details[0]['LAST_NAME'],
+                    'SUFFIX' => $employee_personal_information_details[0]['SUFFIX'],
+                    'NICKNAME' => $employee_personal_information_details[0]['NICKNAME'],
+                    'CIVIL_STATUS' => $employee_personal_information_details[0]['CIVIL_STATUS'],
+                    'NATIONALITY' => $employee_personal_information_details[0]['NATIONALITY'],
+                    'GENDER' => $employee_personal_information_details[0]['GENDER'],
+                    'BIRTHDAY' => $api->check_date('empty', $employee_personal_information_details[0]['BIRTHDAY'], '', 'm/d/Y', '', '', ''),
+                    'PLACE_OF_BIRTH' => $employee_personal_information_details[0]['PLACE_OF_BIRTH'],
+                    'BLOOD_TYPE' => $employee_personal_information_details[0]['BLOOD_TYPE'],
+                    'HEIGHT' => $employee_personal_information_details[0]['HEIGHT'],
+                    'WEIGHT' => $employee_personal_information_details[0]['WEIGHT'],
+                    'RELIGION' => $employee_personal_information_details[0]['RELIGION'],
+                    'HEIGHT_LABEL' => $employee_personal_information_details[0]['HEIGHT'] . ' cm',
+                    'WEIGHT_LABEL' => $employee_personal_information_details[0]['WEIGHT'] . ' kg',
+                    'COMPANY_NAME' => $company_name,
+                    'JOB_POSITION_NAME' => $job_position_name,
+                    'DEPARTMENT_NAME' => $department_name,
+                    'WORK_LOCATION_NAME' => $work_location_name,
+                    'WORKING_HOURS_NAME' => $working_hours_name,
+                    'MANAGER_NAME' => $manager_name,
+                    'COACH_NAME' => $coach_name,
+                    'EMPLOYEE_TYPE_NAME' => $employee_type_name,
+                    'SUFFIX_NAME' => $suffix_name,
+                    'CIVIL_STATUS_NAME' => $civil_status_name,
+                    'NATIONALITY_NAME' => $nationality_name,
+                    'GENDER_NAME' => $gender_name,
+                    'BLOOD_TYPE_NAME' => $blood_type_name,
+                    'RELIGION_NAME' => $religion_name,
                 );
     
                 echo json_encode($response);

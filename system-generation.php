@@ -3655,7 +3655,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             $response[] = array(
                                 'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" data-archive="'. $data_archive .'" type="checkbox" value="'. $employee_id .'">',
                                 'EMPLOYEE_ID' =>  $employee_id,
-                                'FILE_AS' => $employee_personal_information_details[0]['FILE_AS'],
+                                'FILE_AS' => $employee_personal_information_details[0]['FILE_AS'] ?? null,
                                 'DEPARTMENT' => $department_details[0]['DEPARTMENT'],
                                 'JOB_POSITION' => $job_position_details[0]['JOB_POSITION'],
                                 'WORK_LOCATION' => $work_location_details[0]['WORK_LOCATION'],
