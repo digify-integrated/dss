@@ -138,8 +138,9 @@ function initialize_global_functions(){
 }
 
 function initialize_elements(){
-    var form_max_length = $('.form-maxlength');
-    var formSelect2 = $('.form-select2');
+    const form_max_length = $('.form-maxlength');
+    const formSelect2 = $('.form-select2');
+    const signature_canvas = $('#signaturecanvas');
 
     if (form_max_length.length) {
         form_max_length.maxlength({
@@ -158,6 +159,10 @@ function initialize_elements(){
         formSelect2.on('select2:close', function (e) {  
             $(this).valid(); 
         });
+    }
+
+    if (signature_canvas.length) {
+        const signatureCanvas = set_signature_canvas();
     }
 }
 
@@ -2304,6 +2309,9 @@ function display_details(transaction){
                     $('#employee_type_label').text(response[0].EMPLOYEE_TYPE_NAME);
                     $('#permanency_date_label').text(response[0].PERMANENCY_DATE);
                     $('#onboard_date_label').text(response[0].ONBOARD_DATE);
+                    $('#offboard_date_label').text(response[0].OFFBOARD_DATE);
+                    $('#departure_reason_label').text(response[0].DEPARTURE_REASON);
+                    $('#detailed_reason_label').text(response[0].DETAILED_REASON);
 
                     document.getElementById('employee_status').innerHTML = response[0].STATUS;
                     
@@ -3080,6 +3088,115 @@ function set_toastr(toastr_title, toastr_message, toastr_type){
 }
 
 show_toastr.displayedMessages = [];
+
+// Signature canvas
+function set_signature_canvas() {
+    const canvas = document.getElementById('signaturecanvas');
+    
+    if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+    }
+    
+    const context = canvas.getContext('2d');
+    let isDrawing = false;
+    let strokeColor = 'black';
+    let strokeWidth = 2.5;
+    let lastX, lastY;
+  
+        function getPosition(event) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            return {
+                x: (event.clientX - rect.left) * scaleX,
+                y: (event.clientY - rect.top) * scaleY,
+            };
+        }
+  
+    function setPosition(event) {
+        const pos = getPosition(event);
+        lastX = pos.x;
+        lastY = pos.y;
+        isDrawing = true;
+    }
+  
+    function draw(event) {
+        if (isDrawing) {
+            const pos = getPosition(event);
+            const currentX = pos.x;
+            const currentY = pos.y;
+            const deltaX = currentX - lastX;
+            const deltaY = currentY - lastY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const controlX = (currentX + lastX) / 2;
+            const controlY = (currentY + lastY) / 2;
+            const penWidth = strokeWidth * (1 - distance / 100);
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineWidth = penWidth < 1 ? 1 : penWidth;
+            context.lineCap = 'round';
+            context.quadraticCurveTo(controlX, controlY, currentX, currentY);
+            context.strokeStyle = strokeColor;
+            context.stroke();
+            lastX = currentX;
+            lastY = currentY;
+        }
+    }
+  
+    function clearCanvas() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  
+    function setColor(color) {
+        if (typeof color === 'string') {
+            strokeColor = color;
+        } else {
+            console.error('Invalid color input');
+        }
+    }
+      
+    function setWidth(width) {
+        if (typeof width === 'number') {
+            strokeWidth = width;
+        } else {
+            console.error('Invalid width input');
+        }
+    }
+
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mousedown', setPosition);
+    canvas.addEventListener('mouseup', function () {
+        isDrawing = false;
+    });
+
+    canvas.addEventListener('touchmove', function (event) {
+        event.preventDefault();
+        draw(event.touches[0]);
+    });
+
+    canvas.addEventListener('touchstart', function (event) {
+        event.preventDefault();
+        setPosition(event.touches[0]);
+    });
+
+    canvas.addEventListener('touchend', function (event) {
+        event.preventDefault();
+        isDrawing = false;
+    });
+
+    canvas.addEventListener('touchcancel', function (event) {
+            event.preventDefault();
+            isDrawing = false;
+    });
+  
+    return {
+        clear: clearCanvas,
+        setColor: setColor,
+        setWidth: setWidth,
+    };
+}
 
 // Show alert
 

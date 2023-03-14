@@ -387,6 +387,38 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                             </div>';
                 }
+                else if($form_type == 'update employee image form'){
+                    $form .= '<div class="row mb-3">
+                                <div class="col-md-12">
+                                    <input type="hidden" id="employee_id" name="employee_id">
+                                    <label for="employee_image" class="form-label">Employee Image <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="file" name="employee_image" id="employee_image">
+                                </div>
+                            </div>';
+                }
+                else if($form_type == 'upload digital signature form'){
+                    $form .= '<div class="row mb-3">
+                                <div class="col-md-12">
+                                    <input type="hidden" id="employee_id" name="employee_id">
+                                    <label for="digital_signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="file" name="digital_signature" id="digital_signature">
+                                </div>
+                            </div>';
+                }
+                else if($form_type == 'update digital signature form'){
+                    $form .= '<div class="row mb-3">
+                                <div class="col-md-12">
+                                    <input type="hidden" id="employee_id" name="employee_id">
+                                    <label for="digital_signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                                    <div class="d-flex flex-column flex-sm-row align-items-center">
+                                        <div class="signature-container mb-3 mb-sm-0 mr-sm-3">
+                                            <canvas id="signaturecanvas" style="border: 1px solid black; width: inherit; padding: 0; margin: 0; box-sizing: border-box;"></canvas>
+                                        </div>
+                                        <button type="button" id="clearcanvas" class="btn btn-secondary">Clear</button>
+                                    </div>
+                                </div>
+                            </div>';
+                }
     
                 $form .= '</form>';
     

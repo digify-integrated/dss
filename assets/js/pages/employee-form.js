@@ -191,6 +191,30 @@ function initialize_click_events(){
         });
     });
 
+    $(document).on('click','#update-employee-image',function() {
+        const employee_id = $(this).data('employee-id');
+
+        sessionStorage.setItem('employee_id', employee_id);
+
+        generate_modal('update employee image form', 'Employee Image', 'R' , '1', '1', 'form', 'update-employee-image-form', '0', username);
+    });
+
+    $(document).on('click','#upload-digital-signature',function() {
+        const employee_id = $(this).data('employee-id');
+
+        sessionStorage.setItem('employee_id', employee_id);
+
+        generate_modal('upload digital signature form', 'Digital Signature', 'R' , '1', '1', 'form', 'upload-digital-signature-form', '0', username);
+    });
+
+    $(document).on('click','#update-digital-signature',function() {
+        const employee_id = $(this).data('employee-id');
+
+        sessionStorage.setItem('employee_id', employee_id);
+
+        generate_modal('update digital signature form', 'Digital Signature', 'R' , '1', '1', 'form', 'update-digital-signature-form', '0', username);
+    });
+
     $(document).on('click','#discard-create',function() {
         discard('employees.php');
     });

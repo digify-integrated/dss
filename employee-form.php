@@ -55,6 +55,7 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
+        <link href="/path/to/jquery.signaturepad.css" rel="stylesheet" />
         <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
         <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" type="text/css" href="assets/libs/toastr/build/toastr.min.css">
@@ -127,6 +128,7 @@
 
                                                                         $dropdown_action .= '<div class="dropdown-divider"></div>
                                                                         <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="update-employee-image">Update Employee Image</button>
+                                                                        <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="upload-digital-signature">Upload Digital Signature</button>
                                                                         <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="update-digital-signature">Update Digital Signature</button>';
         
                                                                         if(($archive_employee > 0 && $employee_status == 1) || ($unarchive_employee > 0 && $employee_status == 2)){
@@ -764,6 +766,12 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Departure Reason</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="departure_reason_label"></label>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <div class="row mb-4">
@@ -775,6 +783,18 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Offboard Date</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="offboard_date_label"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Detailed Reason</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="detailed_reason_label"></label>
+                                                                                    </div>
+                                                                                </div>s
                                                                             </div>';
                                                                     }
                                                                     else if(!empty($employee_id) && $update_employee > 0){
@@ -801,6 +821,12 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Departure Reason</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="departure_reason_label"></label>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <div class="row mb-4">
@@ -811,6 +837,18 @@
                                                                                             <input type="text" class="form-control form-date-picker" id="onboard_date" name="onboard_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#onboard-date-container" data-provide="datepicker" data-date-autoclose="true">
                                                                                             <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
                                                                                         </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Offboard Date</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="offboard_date_label"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row mb-4">
+                                                                                    <label for="onboard_date" class="col-md-3 col-form-label">Detailed Reason</label>
+                                                                                    <div class="col-md-9">
+                                                                                        <label class="col-form-label form-details" id="detailed_reason_label"></label>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>';

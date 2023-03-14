@@ -6953,6 +6953,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $manager_name = $api->get_employee_personal_information_details($employee_details[0]['MANAGER'])[0]['FILE_AS'] ?? null;
                 $coach_name = $api->get_employee_personal_information_details($employee_details[0]['COACH'])[0]['FILE_AS'] ?? null;
                 $employee_type_name = $api->get_employee_type_details($employee_details[0]['EMPLOYEE_TYPE'])[0]['EMPLOYEE_TYPE'] ?? null;
+                $departure_reason_name = $api->get_departure_reason_details($employee_details[0]['DEPARTURE_REASON'])[0]['DEPARTURE_REASON'] ?? null;
 
                 $suffix_details = $api->get_system_code_details(null, 'SUFFIX', $employee_personal_information_details[0]['SUFFIX']);
                 $suffix_name = $suffix_details[0]['SYSTEM_DESCRIPTION'] ?? null;
@@ -6995,6 +6996,9 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     'STATUS' =>  $api->get_employee_status($employee_details[0]['EMPLOYEE_STATUS'])[0]['BADGE'],
                     'PERMANENCY_DATE' => $api->check_date('empty', $employee_details[0]['PERMANENCY_DATE'], '', 'm/d/Y', '', '', ''),
                     'ONBOARD_DATE' => $api->check_date('empty', $employee_details[0]['ONBOARD_DATE'], '', 'm/d/Y', '', '', ''),
+                    'OFFBOARD_DATE' => $api->check_date('empty', $employee_details[0]['OFFBOARD_DATE'], '', 'm/d/Y', '', '', ''),
+                    'DETAILED_REASON' => $employee_details[0]['DETAILED_REASON'],
+                    'DEPARTURE_REASON' => $departure_reason_name,
                     'FIRST_NAME' => $employee_personal_information_details[0]['FIRST_NAME'],
                     'MIDDLE_NAME' => $employee_personal_information_details[0]['MIDDLE_NAME'],
                     'LAST_NAME' => $employee_personal_information_details[0]['LAST_NAME'],
