@@ -162,7 +162,11 @@ function initialize_elements(){
     }
 
     if (signature_canvas.length) {
-        const signatureCanvas = set_signature_canvas();
+        const signature_canvas = set_signature_canvas();  
+
+        $(document).on('click','#clearcanvas',function() {
+            signature_canvas.clear();
+        });
     }
 }
 
@@ -3092,10 +3096,14 @@ show_toastr.displayedMessages = [];
 // Signature canvas
 function set_signature_canvas() {
     const canvas = document.getElementById('signaturecanvas');
-    
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
     if (!canvas) {
-        console.error('Canvas element not found');
-        return;
+      console.error('Canvas element not found');
+      return;
     }
     
     const context = canvas.getContext('2d');
@@ -3103,25 +3111,25 @@ function set_signature_canvas() {
     let strokeColor = 'black';
     let strokeWidth = 2.5;
     let lastX, lastY;
-  
-        function getPosition(event) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            
-            return {
-                x: (event.clientX - rect.left) * scaleX,
-                y: (event.clientY - rect.top) * scaleY,
-            };
-        }
-  
-    function setPosition(event) {
-        const pos = getPosition(event);
-        lastX = pos.x;
-        lastY = pos.y;
-        isDrawing = true;
+    
+    function getPosition(event) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      return {
+        x: (event.clientX - rect.left) * scaleX,
+        y: (event.clientY - rect.top) * scaleY,
+      };
     }
-  
+    
+    function setPosition(event) {
+      const pos = getPosition(event);
+      lastX = pos.x;
+      lastY = pos.y;
+      isDrawing = true;
+    }
+    
     function draw(event) {
         if (isDrawing) {
             const pos = getPosition(event);
@@ -3130,73 +3138,75 @@ function set_signature_canvas() {
             const deltaX = currentX - lastX;
             const deltaY = currentY - lastY;
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const controlX = (currentX + lastX) / 2;
-            const controlY = (currentY + lastY) / 2;
+            const controlX1 = (currentX + 2 * lastX) / 3;
+            const controlY1 = (currentY + 2 * lastY) / 3;
+            const controlX2 = (2 * currentX + lastX) / 3;
+            const controlY2 = (2 * currentY + lastY) / 3;
             const penWidth = strokeWidth * (1 - distance / 100);
             context.beginPath();
             context.moveTo(lastX, lastY);
             context.lineWidth = penWidth < 1 ? 1 : penWidth;
             context.lineCap = 'round';
-            context.quadraticCurveTo(controlX, controlY, currentX, currentY);
+            context.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, currentX, currentY);
             context.strokeStyle = strokeColor;
             context.stroke();
             lastX = currentX;
             lastY = currentY;
         }
     }
-  
+    
     function clearCanvas() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(0, 0, canvas.width, canvas.height);
     }
-  
+    
     function setColor(color) {
-        if (typeof color === 'string') {
-            strokeColor = color;
-        } else {
-            console.error('Invalid color input');
-        }
+      if (typeof color === 'string') {
+        strokeColor = color;
+      } else {
+        console.error('Invalid color input');
+      }
     }
-      
+    
     function setWidth(width) {
-        if (typeof width === 'number') {
-            strokeWidth = width;
-        } else {
-            console.error('Invalid width input');
-        }
+      if (typeof width === 'number') {
+        strokeWidth = width;
+      } else {
+        console.error('Invalid width input');
+      }
     }
-
+    
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mousedown', setPosition);
     canvas.addEventListener('mouseup', function () {
-        isDrawing = false;
+      isDrawing = false;
     });
-
+    
     canvas.addEventListener('touchmove', function (event) {
-        event.preventDefault();
-        draw(event.touches[0]);
+      event.preventDefault();
+      draw(event.touches[0]);
     });
-
+    
     canvas.addEventListener('touchstart', function (event) {
-        event.preventDefault();
-        setPosition(event.touches[0]);
+      event.preventDefault();
+      setPosition(event.touches[0]);
     });
-
+    
     canvas.addEventListener('touchend', function (event) {
-        event.preventDefault();
-        isDrawing = false;
+      event.preventDefault();
+      isDrawing = false;
     });
-
+    
     canvas.addEventListener('touchcancel', function (event) {
-            event.preventDefault();
-            isDrawing = false;
+      event.preventDefault();
+      isDrawing = false;
     });
-  
+    
     return {
-        clear: clearCanvas,
-        setColor: setColor,
-        setWidth: setWidth,
+      clear: clearCanvas,
+      setColor: setColor,
+      setWidth: setWidth,
     };
-}
+  }
 
 // Show alert
 

@@ -55,7 +55,6 @@
 <html lang="en">
     <head>
         <?php require('views/_head.php'); ?>
-        <link href="/path/to/jquery.signaturepad.css" rel="stylesheet" />
         <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
         <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" type="text/css" href="assets/libs/toastr/build/toastr.min.css">
