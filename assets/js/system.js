@@ -1534,6 +1534,248 @@ function initialize_form_validation(form_type){
                 }
             });
           break;
+        case 'update employee image form':
+            $('#update-employee-image-form').validate({
+                submitHandler: function (form) {
+                    const employee_id = $('#employee-id').text();
+                    transaction = 'submit employee image'; 
+    
+                    var formData = new FormData(form);
+                    formData.append('username', username);
+                    formData.append('transaction', transaction);
+                    formData.append('employee_id', employee_id);
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            switch (response) {
+                                case 'Updated':
+                                    set_toastr('Employee Image Updated', 'The employee image has been updated successfully.', 'success');
+                                    $('#System-Modal').modal('hide');
+                                    window.location = 'employee-form.php';
+                                    break;
+                                case 'File Size':
+                                    show_toastr('Employee Image Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                                    break;
+                                case 'File Type':
+                                    show_toastr('Employee Image Upload Error', 'The file uploaded is not supported.', 'error');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Transaction Error', response, 'error');
+                                    break;
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    employee_image: {
+                        required: true
+                    }
+                },
+                messages: {
+                    employee_image: {
+                        required: 'Please choose the employee image',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+            break;
+        case 'upload digital signature form':
+            $('#upload-digital-signature-form').validate({
+                submitHandler: function (form) {
+                    const employee_id = $('#employee-id').text();
+                    transaction = 'submit employee image'; 
+        
+                    var formData = new FormData(form);
+                    formData.append('username', username);
+                    formData.append('transaction', transaction);
+                    formData.append('employee_id', employee_id);
+        
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            switch (response) {
+                                case 'Updated':
+                                    set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
+                                    $('#System-Modal').modal('hide');
+                                    window.location = 'employee-form.php';
+                                    break;
+                                case 'File Size':
+                                    show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                                    break;
+                                case 'File Type':
+                                    show_toastr('Digital Signature Upload Error', 'The file uploaded is not supported.', 'error');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Transaction Error', response, 'error');
+                                    break;
+                            }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
+                    return false;
+                },
+                rules: {
+                    digital_signature: {
+                        required: true
+                    }
+                },
+                messages: {
+                    digital_signature: {
+                        required: 'Please choose the digital signature',
+                    }
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+            break;
+            case 'update digital signature form':
+                $('#update-digital-signature-form').validate({
+                    submitHandler: function (form) {
+                        const employee_id = $('#employee-id').text();
+                        transaction = 'submit employee image'; 
+            
+                        var formData = new FormData(form);
+                        formData.append('username', username);
+                        formData.append('transaction', transaction);
+                        formData.append('employee_id', employee_id);
+            
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controller.php',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            beforeSend: function(){
+                                document.getElementById('submit-form').disabled = true;
+                                $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                            },
+                            success: function (response) {
+                                switch (response) {
+                                    case 'Updated':
+                                        set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
+                                        $('#System-Modal').modal('hide');
+                                        window.location = 'employee-form.php';
+                                        break;
+                                    case 'File Size':
+                                        show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                                        break;
+                                    case 'File Type':
+                                        show_toastr('Digital Signature Upload Error', 'The file uploaded is not supported.', 'error');
+                                        break;
+                                    case 'Inactive User':
+                                        window.location = '404.php';
+                                        break;
+                                    default:
+                                        show_toastr('Transaction Error', response, 'error');
+                                        break;
+                                }
+                            },
+                            complete: function(){
+                                document.getElementById('submit-form').disabled = false;
+                                $('#submit-form').html('Submit');
+                            }
+                        });
+                        return false;
+                    },
+                    rules: {
+                        signaturecanvas: {
+                            canvas_required: true
+                        }
+                    },
+                    messages: {
+                        signaturecanvas: {
+                            canvas_required: function() {
+                                return 'Please draw something before submitting the form.';
+                            }
+                        }
+                    },
+                    errorPlacement: function(label) {
+                        show_toastr('Form Validation', label.text(), 'error');
+                    },
+                    highlight: function(element) {
+                        if ($(element).hasClass('select2-hidden-accessible')) {
+                            $(element).next().find('.select2-selection').addClass('is-invalid');
+                        } 
+                        else {
+                            $(element).addClass('is-invalid');
+                        }
+                    },
+                    unhighlight: function(element) {
+                        if ($(element).hasClass('select2-hidden-accessible')) {
+                            $(element).next().find('.select2-selection').removeClass('is-invalid');
+                        }
+                        else {
+                            $(element).removeClass('is-invalid');
+                        }
+                    }
+                });
+                break;
     }
 }
 
@@ -2706,24 +2948,31 @@ function clear_datatable(datatable_name){
 }
 
 // Re-adjust datatable columns
-function readjust_datatable_column(){
-    const adjustDataTable = () => $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-
+function readjust_datatable_column() {
+    const adjustDataTable = () => {
+      const tables = $.fn.dataTable.tables({ visible: true, api: true });
+      tables.columns.adjust();
+      tables.fixedColumns().relayout();
+    };
+  
     $('a[data-bs-toggle="tab"], a[data-bs-toggle="pill"], #System-Modal').on('shown.bs.tab shown.bs.modal', adjustDataTable);
 }
 
 // Check functions
-function check_option_exist(element, option, return_value){
+function check_option_exist(element, option, return_value) {
     const $element = $(element);
-    const $option = $element.find(`option[value="${option}"]`);
+    const optionElement = element.querySelector(`option[value="${option}"]`);
+    const valueToSet = optionElement ? option : return_value;
 
-    $element.val($option.length ? option : return_value).trigger('change');
+    $element.val(valueToSet).trigger('change');
+
+    return valueToSet;
 }
 
 function check_empty(value, id, type){
     const $element = $(id);
 
-    if (value && value !== null) {
+    if (value) {
         switch (type) {
             case 'select':
                 $element.val(value).change();
@@ -3096,14 +3345,10 @@ show_toastr.displayedMessages = [];
 // Signature canvas
 function set_signature_canvas() {
     const canvas = document.getElementById('signaturecanvas');
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
 
     if (!canvas) {
-      console.error('Canvas element not found');
-      return;
+        console.error('Canvas element not found');
+        return;
     }
     
     const context = canvas.getContext('2d');
@@ -3113,21 +3358,21 @@ function set_signature_canvas() {
     let lastX, lastY;
     
     function getPosition(event) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      
-      return {
-        x: (event.clientX - rect.left) * scaleX,
-        y: (event.clientY - rect.top) * scaleY,
-      };
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        return {
+            x: (event.clientX - rect.left) * scaleX,
+            y: (event.clientY - rect.top) * scaleY,
+        };
     }
     
     function setPosition(event) {
-      const pos = getPosition(event);
-      lastX = pos.x;
-      lastY = pos.y;
-      isDrawing = true;
+        const pos = getPosition(event);
+        lastX = pos.x;
+        lastY = pos.y;
+        isDrawing = true;
     }
     
     function draw(event) {
@@ -3156,57 +3401,59 @@ function set_signature_canvas() {
     }
     
     function clearCanvas() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
     }
     
     function setColor(color) {
-      if (typeof color === 'string') {
-        strokeColor = color;
-      } else {
-        console.error('Invalid color input');
-      }
+        if (typeof color === 'string') {
+            strokeColor = color;
+        } 
+        else {
+            console.error('Invalid color input');
+        }
     }
     
     function setWidth(width) {
-      if (typeof width === 'number') {
-        strokeWidth = width;
-      } else {
-        console.error('Invalid width input');
-      }
+        if (typeof width === 'number') {
+            strokeWidth = width;
+        } 
+        else {
+            console.error('Invalid width input');
+        }
     }
     
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mousedown', setPosition);
     canvas.addEventListener('mouseup', function () {
-      isDrawing = false;
+        isDrawing = false;
     });
     
     canvas.addEventListener('touchmove', function (event) {
-      event.preventDefault();
-      draw(event.touches[0]);
+        event.preventDefault();
+        draw(event.touches[0]);
     });
     
     canvas.addEventListener('touchstart', function (event) {
-      event.preventDefault();
-      setPosition(event.touches[0]);
+        event.preventDefault();
+        setPosition(event.touches[0]);
     });
     
     canvas.addEventListener('touchend', function (event) {
-      event.preventDefault();
-      isDrawing = false;
+        event.preventDefault();
+        isDrawing = false;
     });
     
     canvas.addEventListener('touchcancel', function (event) {
-      event.preventDefault();
-      isDrawing = false;
+        event.preventDefault();
+        isDrawing = false;
     });
     
     return {
-      clear: clearCanvas,
-      setColor: setColor,
-      setWidth: setWidth,
+        clear: clearCanvas,
+        setColor: setColor,
+        setWidth: setWidth,
     };
-  }
+}
 
 // Show alert
 
@@ -3244,31 +3491,35 @@ function show_alert_confirmation(confirm_title, confirm_text, confirm_icon, conf
     })
 }
 
-function create_employee_qr_code(container, name, employee_id, email, mobile, width, height){
-    document.getElementById(container).innerHTML = '';
-
-    let card, qrcode;
-
+function create_employee_qr_code(container, name, employee_id, email, mobile, width, height) {
     const qrOptions = {
-    width: width,
-    height: height,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
+        width: width,
+        height: height,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
     };
+  
+    const card = 'BEGIN:VCARD\r\n' +
+      'VERSION:3.0\r\n' +
+      `FN:${name}\r\n` +
+      `EMAIL:${email}\r\n` +
+      `ID NO:[${employee_id}]\r\n` +
+      (mobile ? `TEL:${mobile}\r\n` : '') +
+      'END:VCARD';
+  
+    const qrcodeElement = document.getElementById(container);
 
-    card = 'BEGIN:VCARD\r\n' +
-        'VERSION:3.0\r\n' +
-        `FN:${name}\r\n` +
-        `EMAIL:${email}\r\n` +
-        `ID NO:[${employee_id}]\r\n` +
-        (mobile ? `TEL:${mobile}\r\n` : '') +
-        'END:VCARD';
-
-    qrcode = new QRCode(document.getElementById(container), qrOptions);
+    if (!qrcodeElement) {
+        console.error(`Could not find container element with ID "${container}"`);
+        return;
+    }
+  
+    qrcodeElement.innerHTML = '';
+    const qrcode = new QRCode(qrcodeElement, qrOptions);
     qrcode.makeCode(card);
 }
-
+  
 // Hide
 function hide_multiple_buttons(){
     $('#datatable-checkbox').prop('checked', false);

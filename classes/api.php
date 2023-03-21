@@ -75,7 +75,8 @@ class Api{
             
             if ($return === 0) {
                 return true;
-            } else {
+            } 
+            else {
                 return 'Error: mysqldump command failed with error code ' . $return;
             }
         }
@@ -93,11 +94,22 @@ class Api{
     # Returns    : Date
     #
     # -------------------------------------------------------------
-    public function format_date($format, $date, $modify){
-        $datetime = new DateTime($date);
-        $datestring = $modify ? $datetime->modify($modify)->format($format) : $datetime->format($format);
-
-        return $datestring;
+    public function format_datetime($date, $format = 'Y-m-d H:i:s', $modify = null) {
+        if (empty($date) || empty($format)) {
+            return 'Error: Missing required input';
+        }
+    
+        $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $date);
+    
+        if (!$datetime) {
+            return 'Error: Invalid date format';
+        }
+    
+        if ($modify) {
+            $datetime->modify($modify);
+        }
+    
+        return $datetime->format($format);
     }
     # -------------------------------------------------------------
     
@@ -427,27 +439,26 @@ class Api{
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function time_elapsed_string($datetime, $full = false) {
-        $now = new DateTimeImmutable();
+    public function time_elapsed_string($datetime, $full = false, $units = TIME_UNITS) {
         $ago = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $datetime);
-
+        
         if ($ago === false) {
             return 'Invalid datetime format';
         }
-
+    
+        $now = new DateTimeImmutable();
         $diff = $now->diff($ago);
-
+    
         $elaped_time = [];
         
-        foreach (TIME_UNITS as $unit => $label) {
+        foreach ($units as $unit => $label) {
             if ($diff->$unit) {
-                $elaped_time[] = $diff->$unit . ' ' . $label . ($diff->$unit > 1 ? 's' : '');
+                $elaped_time[] = sprintf('%d %s%s', $diff->$unit, $label, $diff->$unit > 1 ? 's' : '');
                 if (!$full) {
                     break;
                 }
             }
         }
-
         return $elaped_time ? implode(', ', $elaped_time) . ' ago' : 'just now';
     }
     # -------------------------------------------------------------
@@ -461,13 +472,12 @@ class Api{
     #
     # -------------------------------------------------------------
     public function directory_checker($directory) {
-        $directory = escapeshellarg($directory);
-        $result = shell_exec("mkdir $directory 2>&1");
-
-        if (!empty($result)) {
-            return 'Error creating directory: ' . $result;
+        if (!is_dir($directory)) {
+            if (!mkdir($directory, 0755, true)) {
+                return 'Error creating directory: ' . error_get_last()['message'];
+            }
         }
-
+    
         return true;
     }
     # -------------------------------------------------------------

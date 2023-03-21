@@ -411,7 +411,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                     <input type="hidden" id="employee_id" name="employee_id">
                                     <div class="d-flex flex-column flex-sm-row align-items-center">
                                         <div class="signature-container mb-3 mb-sm-0 mr-sm-3">
-                                            <canvas id="signaturecanvas" style="border: 1px solid black; width: inherit; padding: 0; margin: 0; box-sizing: border-box;"></canvas>
+                                            <canvas id="signaturecanvas" name="signaturecanvas" style="border: 1px solid black; width: inherit; padding: 0; margin: 0; box-sizing: border-box;"></canvas>
                                         </div>
                                     </div>
                                 </div>

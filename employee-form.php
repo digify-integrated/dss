@@ -918,5 +918,6 @@
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
         <script src="assets/js/pages/employee-form.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/form-validation-rules.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>
