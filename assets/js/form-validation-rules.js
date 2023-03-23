@@ -22,12 +22,3 @@ $.validator.addMethod('employee_age', function(value, element, min) {
   
     return age >= min;
 }, 'The employee must be at least 18 years old and above');
-
-// Rule for canvas
-$.validator.addMethod('canvas_required', function(value, element) {
-    var canvas = document.getElementById('signaturecanvas');
-    var dataURL = canvas.toDataURL();
-    return dataURL !== 'data:,';
-}, function() {
-    return 'Please draw something before submitting the form.';
-});

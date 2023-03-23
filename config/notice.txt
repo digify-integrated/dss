@@ -1,0 +1,7 @@
+// Use for local
+$directory = './assets/employee/job_position_attachment/';
+$file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/employee/job_position_attachment/' . $file_new;
+
+// Use for public_html
+$directory = '/assets/employee/job_position_attachment/';
+$file_destination = $_SERVER['DOCUMENT_ROOT'] . '/assets/employee/job_position_attachment/' . $file_new;

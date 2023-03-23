@@ -1694,17 +1694,21 @@ function initialize_form_validation(form_type){
                 }
             });
             break;
-            case 'update digital signature form':
-                $('#update-digital-signature-form').validate({
-                    submitHandler: function (form) {
+        case 'update digital signature form':
+            $('#update-digital-signature-form').validate({
+                submitHandler: function (form) {
+                    var canvas = document.getElementById('signaturecanvas');
+                    var dataURL = canvas.toDataURL();
+
+                    if (dataURL != 'data:,') {
                         const employee_id = $('#employee-id').text();
                         transaction = 'submit employee image'; 
-            
+                
                         var formData = new FormData(form);
                         formData.append('username', username);
                         formData.append('transaction', transaction);
                         formData.append('employee_id', employee_id);
-            
+                
                         $.ajax({
                             type: 'POST',
                             url: 'controller.php',
@@ -1741,41 +1745,34 @@ function initialize_form_validation(form_type){
                                 $('#submit-form').html('Submit');
                             }
                         });
-                        return false;
-                    },
-                    rules: {
-                        signaturecanvas: {
-                            canvas_required: true
-                        }
-                    },
-                    messages: {
-                        signaturecanvas: {
-                            canvas_required: function() {
-                                return 'Please draw something before submitting the form.';
-                            }
-                        }
-                    },
-                    errorPlacement: function(label) {
-                        show_toastr('Form Validation', label.text(), 'error');
-                    },
-                    highlight: function(element) {
-                        if ($(element).hasClass('select2-hidden-accessible')) {
-                            $(element).next().find('.select2-selection').addClass('is-invalid');
-                        } 
-                        else {
-                            $(element).addClass('is-invalid');
-                        }
-                    },
-                    unhighlight: function(element) {
-                        if ($(element).hasClass('select2-hidden-accessible')) {
-                            $(element).next().find('.select2-selection').removeClass('is-invalid');
-                        }
-                        else {
-                            $(element).removeClass('is-invalid');
-                        }
+                    } 
+                    else {
+                        //show_toastr('Form Validation', 'Please draw something before submitting the form.', 'error');
+                        show_toastr('Form Validation', dataURL, 'error');
                     }
-                });
-                break;
+                    return false;
+                },
+                errorPlacement: function(label) {
+                    show_toastr('Form Validation', label.text(), 'error');
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').addClass('is-invalid');
+                    } 
+                    else {
+                        $(element).addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next().find('.select2-selection').removeClass('is-invalid');
+                    }
+                    else {
+                        $(element).removeClass('is-invalid');
+                    }
+                }
+            });
+            break;
     }
 }
 
@@ -3286,7 +3283,7 @@ function discard(windows_location){
 }
 
 // toastr
-function show_toastr(title, message, toastr_type, redirect_page = null) {
+function show_toastr(title, message, toastr_type) {
     const toastr_options = {
         closeButton: true,
         debug: false,
@@ -3311,27 +3308,9 @@ function show_toastr(title, message, toastr_type, redirect_page = null) {
         error: toastr.error
     };
 
-    if (show_toastr.displayedMessages.includes(message)) {
-        return;
-    }
-
-    show_toastr.displayedMessages.push(message);
-
     if (toastr_type in toastr_types) {
         toastr_types[toastr_type](message, title, toastr_options);
     }
-
-    if (redirect_page) {
-        toastr.options.onHidden = function() {
-            window.location.href = redirect_page;
-            toastr.options.onHidden = null;
-        }
-    }
-
-    toastr.options.onHidden = function() {
-        show_toastr.displayedMessages = [];
-        toastr.options.onHidden = null;
-    };
 }
 
 function set_toastr(toastr_title, toastr_message, toastr_type){
@@ -3339,8 +3318,6 @@ function set_toastr(toastr_title, toastr_message, toastr_type){
     sessionStorage.setItem('toastr-message', toastr_message);
     sessionStorage.setItem('toastr-type', toastr_type);
 }
-
-show_toastr.displayedMessages = [];
 
 // Signature canvas
 function set_signature_canvas() {
@@ -3352,6 +3329,15 @@ function set_signature_canvas() {
     }
     
     const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    Object.defineProperty(canvas, 'toDataURL', {
+        value: function() { return 'data:,'; },
+        writable: true,
+        configurable: true,
+        enumerable: false
+    });
+
     let isDrawing = false;
     let strokeColor = 'black';
     let strokeWidth = 2.5;

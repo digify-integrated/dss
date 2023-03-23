@@ -66,10 +66,17 @@ class Api{
     public function backup_database($file_name, $username){
         if ($this->databaseConnection()) {
             $backup_file = 'backup/' . $file_name . '_' . time() . '.sql';
-
-            $cmd = sprintf('C:\xampp\mysql\bin\mysqldump.exe --routines --single-transaction -u %s -p%s %s -r %s',
-                escapeshellarg(DB_USER), escapeshellarg(DB_PASS), escapeshellarg(DB_NAME), escapeshellarg($backup_file)
-            );
+    
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $cmd = sprintf('C:\xampp\mysql\bin\mysqldump.exe --routines --single-transaction -u %s -p%s %s -r %s',
+                    escapeshellarg(DB_USER), escapeshellarg(DB_PASS), escapeshellarg(DB_NAME), escapeshellarg($backup_file)
+                );
+            }
+            else {
+                $cmd = sprintf('/usr/bin/mysqldump --routines --single-transaction -u %s -p%s %s -r %s',
+                    escapeshellarg(DB_USER), escapeshellarg(DB_PASS), escapeshellarg(DB_NAME), escapeshellarg($backup_file)
+                );
+            }
             
             exec($cmd, $output, $return);
             
@@ -94,7 +101,7 @@ class Api{
     # Returns    : Date
     #
     # -------------------------------------------------------------
-    public function format_datetime($date, $format = 'Y-m-d H:i:s', $modify = null) {
+    public function format_date($date, $format = 'Y-m-d H:i:s', $modify = null) {
         if (empty($date) || empty($format)) {
             return 'Error: Missing required input';
         }
@@ -474,10 +481,16 @@ class Api{
     public function directory_checker($directory) {
         if (!is_dir($directory)) {
             if (!mkdir($directory, 0755, true)) {
-                return 'Error creating directory: ' . error_get_last()['message'];
+                $error = error_get_last();
+                return 'Error creating directory: ' . $error['message'];
             }
         }
-    
+        else {
+            if (!is_writable($directory)) {
+                return 'Directory exists, but is not writable';
+            }
+        }
+
         return true;
     }
     # -------------------------------------------------------------
@@ -1713,8 +1726,9 @@ class Api{
                 $file_name = $this->generate_file_name(10);
                 $file_new = $file_name . '.' . $module_icon_actual_ext;
 
-                $directory = './assets/images/module_icon/';
-                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/module_icon/' . $file_new;
+                $directory = DEFAULT_IMAGES_RELATIVE_PATH_FILE. 'module_icon/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_IMAGES_FULL_PATH_FILE . 'module_icon/' . $file_new;
+
                 $file_path = $directory . $file_new;
 
                 $directory_checker = $this->directory_checker($directory);
@@ -2214,8 +2228,9 @@ class Api{
                 $file_name = $this->generate_file_name(10);
                 $file_new = $file_name . '.' . $company_logo_actual_ext;
 
-                $directory = './assets/images/company/';
-                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/company/' . $file_new;
+                $directory = DEFAULT_IMAGES_RELATIVE_PATH_FILE . 'company/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_IMAGES_FULL_PATH_FILE . 'company/' . $file_new;
+
                 $file_path = $directory . $file_new;
 
                 $directory_checker = $this->directory_checker($directory);
@@ -2559,8 +2574,9 @@ class Api{
                         $log = 'User ' . $username . ' updated favicon.';
                 }
 
-                $directory = './assets/images/interface_setting/';
-                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/images/interface_setting/' . $file_new;
+                $directory = DEFAULT_IMAGES_RELATIVE_PATH_FILE . 'interface_setting/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_IMAGES_FULL_PATH_FILE . 'interface_setting/' . $file_new;
+
                 $file_path = $directory . $file_new;
 
                 $directory_checker = $this->directory_checker($directory);
@@ -3547,7 +3563,7 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
-    #
+    #   
     # Name       : update_job_position_attachment
     # Purpose    : Updates job position attachment.
     #
@@ -3557,13 +3573,14 @@ class Api{
     public function update_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $attachment_id, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
-
+            
             if(!empty($attachment_tmp_name)){ 
                 $file_name = $this->generate_file_name(10);
                 $file_new = $file_name . '.' . $attachment_actual_ext;
-
-                $directory = './assets/employee/job_position_attachment/';
-                $file_destination = $_SERVER['DOCUMENT_ROOT'] . '/dss/assets/employee/job_position_attachment/' . $file_new;
+                
+                $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE . 'job_position_attachment/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'job_position_attachment/' . $file_new;
+                
                 $file_path = $directory . $file_new;
 
                 $directory_checker = $this->directory_checker($directory);
@@ -6607,7 +6624,7 @@ class Api{
                                 }
                             }
                             else{
-                                return true;
+                                return 'true';
                             }
                         }
                         else{
@@ -10066,16 +10083,16 @@ class Api{
     # -------------------------------------------------------------
     public function get_default_image($type) {
         $defaultImages = [
-            'profile' => './assets/images/default/default-avatar.png',
-            'login background' => './assets/images/default/default-bg.jpg',
-            'login logo' => './assets/images/default/default-login-logo.png',
-            'menu logo' => './assets/images/default/default-menu-logo.png',
-            'module icon' => './assets/images/default/default-module-icon.svg',
-            'favicon' => './assets/images/default/default-favicon.png',
-            'company logo' => './assets/images/default/default-company-logo.png',
+            'profile' => DEFAULT_AVATAR_IMAGE,
+            'login background' => DEFAULT_BG_IMAGE,
+            'login logo' => DEFAULT_LOGIN_LOGO_IMAGE,
+            'menu logo' => DEFAULT_MENU_LOGO_IMAGE,
+            'module icon' => DEFAULT_MODULE_ICON_IMAGE,
+            'favicon' => DEFAULT_FAVICON_IMAGE,
+            'company logo' => DEFAULT_COMPANY_LOGO_IMAGE,
         ];
-
-        return $defaultImages[$type] ?? './assets/images/default/default-image-placeholder.png';
+    
+        return $defaultImages[$type] ?? DEFAULT_PLACEHOLDER_IMAGE;
     }
     # -------------------------------------------------------------
     
