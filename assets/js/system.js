@@ -162,7 +162,10 @@ function initialize_elements(){
     }
 
     if (signature_canvas.length) {
-        const signature_canvas = set_signature_canvas();  
+        const signatureCanvas = set_signature_canvas();
+
+        signatureCanvas.setColor('black');
+        signatureCanvas.setWidth(2.5);
 
         $(document).on('click','#clearcanvas',function() {
             signature_canvas.clear();
@@ -1697,59 +1700,50 @@ function initialize_form_validation(form_type){
         case 'update digital signature form':
             $('#update-digital-signature-form').validate({
                 submitHandler: function (form) {
-                    var canvas = document.getElementById('signaturecanvas');
-                    var dataURL = canvas.toDataURL();
-
-                    if (dataURL != 'data:,') {
-                        const employee_id = $('#employee-id').text();
-                        transaction = 'submit employee image'; 
+                    const employee_id = $('#employee-id').text();
+                    transaction = 'submit employee image'; 
                 
-                        var formData = new FormData(form);
-                        formData.append('username', username);
-                        formData.append('transaction', transaction);
-                        formData.append('employee_id', employee_id);
+                    var formData = new FormData(form);
+                    formData.append('username', username);
+                    formData.append('transaction', transaction);
+                    formData.append('employee_id', employee_id);
                 
-                        $.ajax({
-                            type: 'POST',
-                            url: 'controller.php',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            beforeSend: function(){
-                                document.getElementById('submit-form').disabled = true;
-                                $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
-                            },
-                            success: function (response) {
-                                switch (response) {
-                                    case 'Updated':
-                                        set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
-                                        $('#System-Modal').modal('hide');
-                                        window.location = 'employee-form.php';
-                                        break;
-                                    case 'File Size':
-                                        show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                                        break;
-                                    case 'File Type':
-                                        show_toastr('Digital Signature Upload Error', 'The file uploaded is not supported.', 'error');
-                                        break;
-                                    case 'Inactive User':
-                                        window.location = '404.php';
-                                        break;
-                                    default:
-                                        show_toastr('Transaction Error', response, 'error');
-                                        break;
-                                }
-                            },
-                            complete: function(){
-                                document.getElementById('submit-form').disabled = false;
-                                $('#submit-form').html('Submit');
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controller.php',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function(){
+                            document.getElementById('submit-form').disabled = true;
+                            $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                        },
+                        success: function (response) {
+                            switch (response) {
+                                case 'Updated':
+                                    set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
+                                    $('#System-Modal').modal('hide');
+                                    window.location = 'employee-form.php';
+                                    break;
+                                case 'File Size':
+                                    show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                                    break;
+                                case 'File Type':
+                                    show_toastr('Digital Signature Upload Error', 'The file uploaded is not supported.', 'error');
+                                    break;
+                                case 'Inactive User':
+                                    window.location = '404.php';
+                                    break;
+                                default:
+                                    show_toastr('Transaction Error', response, 'error');
+                                    break;
                             }
-                        });
-                    } 
-                    else {
-                        //show_toastr('Form Validation', 'Please draw something before submitting the form.', 'error');
-                        show_toastr('Form Validation', dataURL, 'error');
-                    }
+                        },
+                        complete: function(){
+                            document.getElementById('submit-form').disabled = false;
+                            $('#submit-form').html('Submit');
+                        }
+                    });
                     return false;
                 },
                 errorPlacement: function(label) {
@@ -3327,69 +3321,71 @@ function set_signature_canvas() {
         console.error('Canvas element not found');
         return;
     }
-    
+
     const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    Object.defineProperty(canvas, 'toDataURL', {
-        value: function() { return 'data:,'; },
-        writable: true,
-        configurable: true,
-        enumerable: false
-    });
-
     let isDrawing = false;
     let strokeColor = 'black';
     let strokeWidth = 2.5;
     let lastX, lastY;
-    
+
+    // Set the canvas size to match its container's size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
     function getPosition(event) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
+
         return {
-            x: (event.clientX - rect.left) * scaleX,
-            y: (event.clientY - rect.top) * scaleY,
+        x: (event.clientX - rect.left) * scaleX,
+        y: (event.clientY - rect.top) * scaleY
         };
     }
-    
+
     function setPosition(event) {
         const pos = getPosition(event);
         lastX = pos.x;
         lastY = pos.y;
         isDrawing = true;
     }
-    
+
     function draw(event) {
         if (isDrawing) {
-            const pos = getPosition(event);
-            const currentX = pos.x;
-            const currentY = pos.y;
-            const deltaX = currentX - lastX;
-            const deltaY = currentY - lastY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const controlX1 = (currentX + 2 * lastX) / 3;
-            const controlY1 = (currentY + 2 * lastY) / 3;
-            const controlX2 = (2 * currentX + lastX) / 3;
-            const controlY2 = (2 * currentY + lastY) / 3;
-            const penWidth = strokeWidth * (1 - distance / 100);
-            context.beginPath();
-            context.moveTo(lastX, lastY);
-            context.lineWidth = penWidth < 1 ? 1 : penWidth;
-            context.lineCap = 'round';
-            context.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, currentX, currentY);
-            context.strokeStyle = strokeColor;
-            context.stroke();
-            lastX = currentX;
-            lastY = currentY;
+        const pos = getPosition(event);
+        const currentX = pos.x;
+        const currentY = pos.y;
+        const deltaX = currentX - lastX;
+        const deltaY = currentY - lastY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const controlX1 = (currentX + 2 * lastX) / 3;
+        const controlY1 = (currentY + 2 * lastY) / 3;
+        const controlX2 = (2 * currentX + lastX) / 3;
+        const controlY2 = (2 * currentY + lastY) / 3;
+        const penWidth = strokeWidth * (1 - distance / 100);
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+        context.lineWidth = penWidth < 1 ? 1 : penWidth;
+        context.lineCap = 'round';
+        context.bezierCurveTo(
+            controlX1,
+            controlY1,
+            controlX2,
+            controlY2,
+            currentX,
+            currentY
+        );
+        context.strokeStyle = strokeColor;
+        context.stroke();
+        lastX = currentX;
+        lastY = currentY;
         }
     }
-    
+
     function clearCanvas() {
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    
+
     function setColor(color) {
         if (typeof color === 'string') {
             strokeColor = color;
