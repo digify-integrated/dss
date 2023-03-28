@@ -204,7 +204,7 @@ function initialize_click_events(){
 
         sessionStorage.setItem('employee_id', employee_id);
 
-        generate_modal('upload digital signature form', 'Digital Signature', 'R' , '1', '1', 'form', 'upload-digital-signature-form', '0', username);
+        generate_modal('upload employee digital signature form', 'Digital Signature', 'R' , '1', '1', 'form', 'upload-digital-signature-form', '0', username);
     });
 
     $(document).on('click','#update-digital-signature',function() {
@@ -212,7 +212,7 @@ function initialize_click_events(){
 
         sessionStorage.setItem('employee_id', employee_id);
 
-        generate_modal('update digital signature form', 'Digital Signature', 'R' , '0', '1', 'form', 'update-digital-signature-form', '0', username);
+        generate_modal('update employee digital signature form', 'Digital Signature', 'R' , '0', '1', 'form', 'update-digital-signature-form', '0', username);
     });
 
     $(document).on('click','#discard-create',function() {

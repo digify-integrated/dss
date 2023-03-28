@@ -140,7 +140,7 @@ function initialize_global_functions(){
 function initialize_elements(){
     const form_max_length = $('.form-maxlength');
     const formSelect2 = $('.form-select2');
-    const signature_canvas = $('#signaturecanvas');
+    const signature_canvas = $('#signature_canvas');
 
     if (form_max_length.length) {
         form_max_length.maxlength({
@@ -160,12 +160,12 @@ function initialize_elements(){
             $(this).valid(); 
         });
     }
-
+   
     if (signature_canvas.length) {
-        const signatureCanvas = set_signature_canvas();
+        const signature_canvas = set_signature_canvas('signature_canvas');
 
-        signatureCanvas.setColor('black');
-        signatureCanvas.setWidth(2.5);
+        signature_canvas.set_color('#000');
+        signature_canvas.set_width(2.25);
 
         $(document).on('click','#clearcanvas',function() {
             signature_canvas.clear();
@@ -1617,11 +1617,11 @@ function initialize_form_validation(form_type){
                 }
             });
             break;
-        case 'upload digital signature form':
+        case 'upload employee digital signature form':
             $('#upload-digital-signature-form').validate({
                 submitHandler: function (form) {
                     const employee_id = $('#employee-id').text();
-                    transaction = 'submit employee image'; 
+                    transaction = 'submit employee signature'; 
         
                     var formData = new FormData(form);
                     formData.append('username', username);
@@ -1697,23 +1697,16 @@ function initialize_form_validation(form_type){
                 }
             });
             break;
-        case 'update digital signature form':
+        case 'update employee digital signature form':
             $('#update-digital-signature-form').validate({
                 submitHandler: function (form) {
                     const employee_id = $('#employee-id').text();
-                    transaction = 'submit employee image'; 
-                
-                    var formData = new FormData(form);
-                    formData.append('username', username);
-                    formData.append('transaction', transaction);
-                    formData.append('employee_id', employee_id);
-                
+                    transaction = 'submit drawn employee digital signature';
+
                     $.ajax({
                         type: 'POST',
                         url: 'controller.php',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
+                        data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&employee_id=' + employee_id,
                         beforeSend: function(){
                             document.getElementById('submit-form').disabled = true;
                             $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
@@ -1721,15 +1714,9 @@ function initialize_form_validation(form_type){
                         success: function (response) {
                             switch (response) {
                                 case 'Updated':
-                                    set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
+                                    set_toastr('Employee Digital Signature Updated', 'The employee digital signature has been updated successfully.', 'success');
                                     $('#System-Modal').modal('hide');
                                     window.location = 'employee-form.php';
-                                    break;
-                                case 'File Size':
-                                    show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
-                                    break;
-                                case 'File Type':
-                                    show_toastr('Digital Signature Upload Error', 'The file uploaded is not supported.', 'error');
                                     break;
                                 case 'Inactive User':
                                     window.location = '404.php';
@@ -1745,6 +1732,17 @@ function initialize_form_validation(form_type){
                         }
                     });
                     return false;
+                },
+                ignore: [],
+                rules: {
+                    canvas_data: {
+                        required: true
+                    }
+                },
+                messages: {
+                    canvas_data: {
+                        required: 'Please draw the digital signature'
+                    }
                 },
                 errorPlacement: function(label) {
                     show_toastr('Form Validation', label.text(), 'error');
@@ -3314,126 +3312,187 @@ function set_toastr(toastr_title, toastr_message, toastr_type){
 }
 
 // Signature canvas
-function set_signature_canvas() {
-    const canvas = document.getElementById('signaturecanvas');
+function set_signature_canvas(canvas_id) {
+    const canvas = document.getElementById(canvas_id);
 
     if (!canvas) {
         console.error('Canvas element not found');
+    }
+    
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+        console.error('Error: Canvas context is null or undefined');
         return;
     }
 
-    const context = canvas.getContext('2d');
     let isDrawing = false;
     let strokeColor = 'black';
-    let strokeWidth = 2.5;
+    let strokeWidth = 2;
     let lastX, lastY;
 
-    // Set the canvas size to match its container's size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    const padding = 0.5;
+    let maxX = 0;
+    let maxY = 0;
+    let minX = canvas.width;
+    let minY = canvas.height;
+    const paths = [];
 
-    function getPosition(event) {
+    paths.forEach((path) => {
+      path.forEach(({ x, y }) => {
+        maxX = Math.max(x, maxX);
+        minX = Math.min(x, minX);
+        maxY = Math.max(y, maxY);
+        minY = Math.min(y, minY);
+      });
+    });
+    
+    maxX *= 1 + padding;
+    minX *= 1 - padding;
+    maxY *= 1 + padding;
+    minY *= 1 - padding;
+    
+    const signatureWidth = maxX - minX;
+    const signatureHeight = maxY - minY;
+    const signatureAspectRatio = signatureWidth / signatureHeight;
+    const canvasAspectRatio = canvas.offset_width / canvas.offsetHeight;
+    
+    let scaleFactor;
+    if (signatureAspectRatio > canvasAspectRatio) {
+      scaleFactor = canvas.offset_width / signatureWidth;
+    } else {
+      scaleFactor = canvas.offsetHeight / signatureHeight;
+    }
+    
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const canvasWidth = Math.ceil(signatureWidth * scaleFactor * devicePixelRatio);
+    const canvasHeight = Math.ceil(signatureHeight * scaleFactor * devicePixelRatio);
+    
+    if (canvas.width == 0 || canvas.height == 0) {
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.width = `${signatureWidth}px`;
+        canvas.style.height = `${signatureHeight}px`;
+        context.scale(devicePixelRatio * scaleFactor, devicePixelRatio * scaleFactor);
+    }
+    
+    function get_position(event) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-
+    
         return {
-        x: (event.clientX - rect.left) * scaleX,
-        y: (event.clientY - rect.top) * scaleY
+          x: (event.clientX - rect.left) * scaleX,
+          y: (event.clientY - rect.top) * scaleY
         };
     }
 
-    function setPosition(event) {
-        const pos = getPosition(event);
+    function set_position(event) {
+        const pos = get_position(event);
         lastX = pos.x;
         lastY = pos.y;
         isDrawing = true;
     }
-
+    
     function draw(event) {
         if (isDrawing) {
-        const pos = getPosition(event);
-        const currentX = pos.x;
-        const currentY = pos.y;
-        const deltaX = currentX - lastX;
-        const deltaY = currentY - lastY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const controlX1 = (currentX + 2 * lastX) / 3;
-        const controlY1 = (currentY + 2 * lastY) / 3;
-        const controlX2 = (2 * currentX + lastX) / 3;
-        const controlY2 = (2 * currentY + lastY) / 3;
-        const penWidth = strokeWidth * (1 - distance / 100);
-        context.beginPath();
-        context.moveTo(lastX, lastY);
-        context.lineWidth = penWidth < 1 ? 1 : penWidth;
-        context.lineCap = 'round';
-        context.bezierCurveTo(
-            controlX1,
-            controlY1,
-            controlX2,
-            controlY2,
-            currentX,
-            currentY
-        );
-        context.strokeStyle = strokeColor;
-        context.stroke();
-        lastX = currentX;
-        lastY = currentY;
-        }
-    }
+            const pos = get_position(event);
+            const currentX = pos.x;
+            const currentY = pos.y;
+            const controlX = (lastX + currentX) / 2;
+            const controlY = (lastY + currentY) / 2;
+            const cp1x = lastX + (controlX - lastX) / 3;
+            const cp1y = lastY + (controlY - lastY) / 3;
+            const cp2x = currentX - (currentX - controlX) / 3;
+            const cp2y = currentY - (currentY - controlY) / 3;
+        
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineWidth = strokeWidth;
+            context.lineCap = 'round';
+            context.lineJoin = 'round';
+            context.shadowBlur = strokeWidth / 2;
+            context.shadowColor = strokeColor;
+            context.imageSmoothingEnabled = true;
+        
+            const curvePoints = 200;
 
-    function clearCanvas() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function setColor(color) {
-        if (typeof color === 'string') {
-            strokeColor = color;
-        } 
-        else {
-            console.error('Invalid color input');
+            for (let i = 0; i < curvePoints; i++) {
+                const t = i / curvePoints;
+                const x =
+                (1 - t) ** 3 * lastX +
+                3 * (1 - t) ** 2 * t * cp1x +
+                3 * (1 - t) * t ** 2 * cp2x +
+                t ** 3 * currentX;
+                const y =
+                (1 - t) ** 3 * lastY +
+                3 * (1 - t) ** 2 * t * cp1y +
+                3 * (1 - t) * t ** 2 * cp2y +
+                t ** 3 * currentY;
+                context.lineTo(x, y);
+            }
+      
+            context.stroke();
+            lastX = currentX;
+            lastY = currentY;
         }
     }
     
-    function setWidth(width) {
-        if (typeof width === 'number') {
-            strokeWidth = width;
-        } 
-        else {
-            console.error('Invalid width input');
-        }
+    function clear_canvas() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById('canvas_data').value = null;
     }
-    
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mousedown', setPosition);
-    canvas.addEventListener('mouseup', function () {
+
+    function stop_draw(){
         isDrawing = false;
-    });
+        const canvas = document.getElementById('signature_canvas');
+        const canvasData = canvas.toDataURL();
+        document.getElementById('canvas_data').value = canvasData;
+    }
+    
+    function set_color(color) {
+      if (typeof color === 'string') {
+        strokeColor = color;
+      } else {
+        console.error('Invalid color input');
+      }
+    }
+    
+    function set_width(width) {
+      if (typeof width === 'number') {
+        strokeWidth = width;
+      } else {
+        console.error('Invalid width input');
+      }
+    }
+    
+    canvas.addEventListener('mousedown', set_position);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stop_draw);
     
     canvas.addEventListener('touchmove', function (event) {
-        event.preventDefault();
-        draw(event.touches[0]);
+      event.preventDefault();
+      draw(event.touches[0]);
     });
     
     canvas.addEventListener('touchstart', function (event) {
-        event.preventDefault();
-        setPosition(event.touches[0]);
+      event.preventDefault();
+      set_position(event.touches[0]);
     });
     
     canvas.addEventListener('touchend', function (event) {
-        event.preventDefault();
-        isDrawing = false;
+      event.preventDefault();
     });
     
     canvas.addEventListener('touchcancel', function (event) {
-        event.preventDefault();
-        isDrawing = false;
+      event.preventDefault();
+      stop_draw();
     });
     
     return {
-        clear: clearCanvas,
-        setColor: setColor,
-        setWidth: setWidth,
+      clear: clear_canvas,
+      set_color: set_color,
+      set_width: set_width
     };
 }
 

@@ -2719,6 +2719,72 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit drawn employee digital signature
+        case 'submit drawn employee digital signature':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && !empty($_POST['employee_id']) && isset($_POST['canvas_data']) && !empty($_POST['canvas_data'])){
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+                        $canvas_data = $_POST['canvas_data'];
+                        $canvas_data = str_replace('data:image/png;base64,', '', $canvas_data);
+                        $canvas_data = base64_decode($canvas_data);
+
+                        $file_name = $api->generate_file_name(10);
+                        $file_new = $file_name . '.png';
+
+                        $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE. 'digital_signature/';
+                        $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'digital_signature/' . $file_new;
+
+                        if (file_put_contents($file_destination, $canvas_data)) {
+                            echo 'success';
+                        } else {
+                            echo 'error';
+                        }
+                        
+                        /*$check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
+             
+                        if($check_working_schedule_type_exist > 0){
+                            $update_working_schedule_type = $api->update_working_schedule_type($working_schedule_type_id, $working_schedule_type, $working_schedule_type_category, $username);
+            
+                            if($update_working_schedule_type){
+                                $response[] = array(
+                                    'RESPONSE' => 'Updated'
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $update_working_schedule_type
+                                );
+                            }
+                        }
+                        else{
+                            $insert_working_schedule_type = $api->insert_working_schedule_type($working_schedule_type, $working_schedule_type_category, $username);
+                
+                            if($insert_working_schedule_type[0]['RESPONSE']){
+                                $response[] = array(
+                                    'RESPONSE' => 'Inserted',
+                                    'WORKING_SCHEDULE_TYPE_ID' => $insert_working_schedule_type[0]['WORKING_SCHEDULE_TYPE_ID']
+                                );
+                            }
+                            else{
+                                $response[] = array(
+                                    'RESPONSE' => $insert_working_schedule_type[0]['RESPONSE']
+                                );
+                            }
+                        }*/
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Delete transactions
         # -------------------------------------------------------------
