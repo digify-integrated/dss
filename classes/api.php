@@ -101,22 +101,15 @@ class Api{
     # Returns    : Date
     #
     # -------------------------------------------------------------
-    public function format_date($date, $format = 'Y-m-d H:i:s', $modify = null) {
-        if (empty($date) || empty($format)) {
-            return 'Error: Missing required input';
+    public function format_date($format, $date, $modify){
+        if(!empty($modify)){
+            $datestring = (new DateTime($date))->modify($modify)->format($format);
         }
-    
-        $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $date);
-    
-        if (!$datetime) {
-            return 'Error: Invalid date format';
+        else{
+            $datestring = (new DateTime($date))->format($format);
         }
-    
-        if ($modify) {
-            $datetime->modify($modify);
-        }
-    
-        return $datetime->format($format);
+
+        return $datestring;
     }
     # -------------------------------------------------------------
     
@@ -1614,7 +1607,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -1685,7 +1677,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -1845,7 +1836,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -1911,7 +1901,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -1979,7 +1968,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2047,7 +2035,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2115,7 +2102,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2187,7 +2173,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2347,7 +2332,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2604,7 +2588,6 @@ class Api{
                                         }
                                     }
                                     else{
-                                        # Update transaction log value
                                         $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
                     
                                         if($update_system_parameter_value){
@@ -2655,7 +2638,6 @@ class Api{
                                     }
                                 }
                                 else{
-                                    # Update transaction log value
                                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
                 
                                     if($update_system_parameter_value){
@@ -2744,7 +2726,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2888,7 +2869,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -2954,7 +2934,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3021,7 +3000,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3090,7 +3068,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3262,7 +3239,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3424,7 +3400,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3537,7 +3512,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3741,7 +3715,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3808,7 +3781,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3875,7 +3847,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -3942,7 +3913,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4013,7 +3983,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4123,7 +4092,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4189,7 +4157,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4255,7 +4222,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4321,7 +4287,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4401,7 +4366,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4485,7 +4449,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4552,7 +4515,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4628,7 +4590,6 @@ class Api{
                     }
                 }
                 else{
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4664,6 +4625,17 @@ class Api{
     public function update_employee_personal_information($employee_id, $file_as, $first_name, $middle_name, $last_name, $suffix, $nickname, $civil_status, $nationality, $gender, $birthday, $birth_place, $blood_type, $height, $weight, $religion, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $employee_details = $this->get_employee_details($employee_id);
+            
+            if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
 
             $sql = $this->db_connection->prepare('CALL update_employee_personal_information(:employee_id, :file_as, :first_name, :middle_name, :last_name, :suffix, :nickname, :civil_status, :nationality, :gender, :birthday, :birth_place, :blood_type, :height, :weight, :religion, :record_log)');
             $sql->bindValue(':employee_id', $employee_id);
@@ -4685,7 +4657,97 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                return true;
+                if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee personal information.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee personal information.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_employee_digital_signature
+    # Purpose    : Updates employee personal information.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee_digital_signature($employee_id, $file_path, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $employee_details = $this->get_employee_details($employee_id);
+            
+            if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_employee_digital_signature(:employee_id, :file_path, :record_log)');
+            $sql->bindValue(':employee_id', $employee_id);
+            $sql->bindValue(':file_path', $file_path);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($employee_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee digital signature.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee digital signature.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
             }
             else{
                 return $stmt->errorInfo()[2];
@@ -4758,11 +4820,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 1, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4838,11 +4898,9 @@ class Api{
             $sql->bindValue(':order_sequence', $order_sequence); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 3, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -4955,11 +5013,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 4, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5054,11 +5110,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 5, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5155,11 +5209,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 6, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5256,11 +5308,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 8, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5333,11 +5383,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 7, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5438,11 +5486,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 9, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5531,11 +5577,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 10, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5652,11 +5696,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 11, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5732,11 +5774,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 12, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5879,11 +5919,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 13, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -5955,11 +5993,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 14, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6033,11 +6069,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 15, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6104,7 +6138,6 @@ class Api{
             $sql->bindValue(':record_log', $record_log); 
         
             if($sql->execute()){
-                # Update transaction log value
                 $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                 if($update_system_parameter_value){
@@ -6184,11 +6217,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 16, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6259,11 +6290,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 23, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6337,11 +6366,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 17, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6413,11 +6440,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 18, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6476,11 +6501,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 18, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6539,11 +6562,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 20, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6602,11 +6623,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 21, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6681,11 +6700,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 22, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6756,11 +6773,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 24, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6831,11 +6846,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 25, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6906,11 +6919,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 29, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -6982,11 +6993,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 26, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -7063,11 +7072,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 27, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -7126,11 +7133,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 28, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -7211,11 +7216,9 @@ class Api{
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                # Update system parameter value
                 $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 30, $username);
 
                 if($update_system_parameter_value){
-                    # Update transaction log value
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
@@ -10483,25 +10486,78 @@ class Api{
     #
     # -------------------------------------------------------------
     public function check_date($type, $date, $time, $format, $modify, $system_date, $current_time){
-        $types = [
-            'default' => [$date, $system_date, 'format_date'],
-            'empty' => [$date, null, 'format_date'],
-            'attendance empty' => [$date, null, 'format_date'],
-            'summary' => [$date, '--', 'format_date'],
-            'na' => [$date, 'N/A', 'format_date'],
-            'complete' => [$date, 'N/A', 'format_date'],
-            'encoded' => [$date, 'N/A', 'format_date'],
-            'date time' => [$date, 'N/A', 'format_date'],
-            'default time' => [$date, $current_time, 'format_date']
-        ];
-        
-        if (array_key_exists($type, $types)) {
-            [$date_value, $default, $function] = $types[$type];
-            return !empty($date_value) ? $this->$function($format, $date_value, $modify) : $default;
+        if($type == 'default'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return $system_date;
+            }
         }
-        
-        return null;
-        
+        else if($type == 'empty'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return null;
+            }
+        }
+        else if($type == 'attendance empty'){
+            if(!empty($date) && $date != ' '){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return null;
+            }
+        }
+        else if($type == 'summary'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return '--';
+            }
+        }
+        else if($type == 'na'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify);
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'complete'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'encoded'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'date time'){
+            if(!empty($date)){
+                return $this->format_date($format, $date, $modify) . ' ' . $time;
+            }
+            else{
+                return 'N/A';
+            }
+        }
+        else if($type == 'default time'){
+            if(!empty($date)){
+                return $time;
+            }
+            else{
+                return $current_time;
+            }
+        }
     }
     # -------------------------------------------------------------
 

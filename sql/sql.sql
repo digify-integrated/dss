@@ -1727,12 +1727,12 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_employee_digital_signature(IN employee_id VARCHAR(100), IN employee_digital_signature VARCHAR(500))
+CREATE PROCEDURE update_employee_digital_signature(IN employee_id VARCHAR(100), IN employee_digital_signature VARCHAR(500), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'UPDATE employees SET EMPLOYEE_DIGITAL_SIGNATURE = ? WHERE EMPLOYEE_ID = ?';
+	SET @query = 'UPDATE employees SET EMPLOYEE_DIGITAL_SIGNATURE = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING employee_digital_signature, employee_id;
+	EXECUTE stmt USING employee_digital_signature, record_log, employee_id;
 	DEALLOCATE PREPARE stmt;
 END //
 

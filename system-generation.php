@@ -476,19 +476,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                     </tbody>
                                 </table>';
                 }
-                else if($element_type == 'transaction log'){
-                    $element = '<table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
-                                    <thead>
-                                        <tr>
-                                            <th class="all">Log Type</th>
-                                            <th class="all">Log</th>
-                                            <th class="all">Log Date</th>
-                                            <th class="all">Log By</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                </table>';
-                }
                 else if($element_type == 'system parameter details'){
                     $element = '<table class="table table-nowrap mb-0">
                                     <tbody>

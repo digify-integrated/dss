@@ -1563,7 +1563,7 @@ function initialize_form_validation(form_type){
                                 case 'Updated':
                                     set_toastr('Employee Image Updated', 'The employee image has been updated successfully.', 'success');
                                     $('#System-Modal').modal('hide');
-                                    window.location = 'employee-form.php';
+                                    window.location.reload();
                                     break;
                                 case 'File Size':
                                     show_toastr('Employee Image Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
@@ -1643,7 +1643,7 @@ function initialize_form_validation(form_type){
                                 case 'Updated':
                                     set_toastr('Digital Signature Updated', 'The digital signature has been updated successfully.', 'success');
                                     $('#System-Modal').modal('hide');
-                                    window.location = 'employee-form.php';
+                                    window.location.reload();
                                     break;
                                 case 'File Size':
                                     show_toastr('Digital Signature Upload Error', 'The file uploaded exceeds the maximum file size.', 'error');
@@ -1716,9 +1716,10 @@ function initialize_form_validation(form_type){
                                 case 'Updated':
                                     set_toastr('Employee Digital Signature Updated', 'The employee digital signature has been updated successfully.', 'success');
                                     $('#System-Modal').modal('hide');
-                                    window.location = 'employee-form.php';
+                                    window.location.reload();
                                     break;
                                 case 'Inactive User':
+                                case 'Not Found':
                                     window.location = '404.php';
                                     break;
                                 default:
