@@ -2719,6 +2719,119 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Submit employee image
+        case 'submit employee image':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && !empty($_POST['employee_id'])){
+                        $file_type = '';
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+            
+                        $employee_image_file_name = $_FILES['employee_image']['name'];
+                        $employee_image_size = $_FILES['employee_image']['size'];
+                        $employee_image_error = $_FILES['employee_image']['error'];
+                        $employee_image_tmp_name = $_FILES['employee_image']['tmp_name'];
+                        $employee_image_ext = explode('.', $employee_image_file_name);
+                        $employee_image_actual_ext = strtolower(end($employee_image_ext));
+            
+                        $upload_setting_details = $api->get_upload_setting_details(8);
+                        $upload_file_type_details = $api->get_upload_file_type_details(8);
+                        $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+            
+                        for($i = 0; $i < count($upload_file_type_details); $i++) {
+                            $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+            
+                            if($i != (count($upload_file_type_details) - 1)){
+                                $file_type .= ',';
+                            }
+                        }
+            
+                        $allowed_ext = explode(',', $file_type);
+            
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
+
+                        if($check_employee_exist > 0){
+                            if(!empty($employee_image_tmp_name)){
+                                if(in_array($employee_image_actual_ext, $allowed_ext)){
+                                    if(!$employee_image_error){
+                                        if($employee_image_size < $file_max_size){
+                                            $update_job_position_attachment = $api->update_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $attachment_id, $username);
+                    
+                                            if($update_job_position_attachment){
+                                                $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
+            
+                                                if($update_job_position_attachment_details){
+                                                    echo 'Updated';
+                                                }
+                                                else{
+                                                    echo $update_job_position_attachment_details;
+                                                }
+                                            }
+                                            else{
+                                                echo $update_job_position_attachment;
+                                            }
+                                        }
+                                        else{
+                                            echo 'File Size';
+                                        }
+                                    }
+                                    else{
+                                        echo 'There was an error uploading the file.';
+                                    }
+                                }
+                                else{
+                                    echo 'File Type';
+                                }
+                            }
+                            else{
+                                $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
+            
+                                if($update_job_position_attachment_details){
+                                    echo 'Updated';
+                                }
+                                else{
+                                    echo $update_job_position_attachment_details;
+                                }
+                            }
+                        }
+                        else{
+                            if(in_array($attachment_actual_ext, $allowed_ext)){
+                                if(!$attachment_error){
+                                    if($attachment_size < $file_max_size){
+                                        $insert_job_position_attachment = $api->insert_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $job_position_id, $attachment_name, $username);
+            
+                                        if($insert_job_position_attachment){
+                                            echo 'Inserted';
+                                        }
+                                        else{
+                                            echo $insert_job_position_attachment;
+                                        }
+                                    }
+                                    else{
+                                        echo 'File Size';
+                                    }
+                                }
+                                else{
+                                    echo 'There was an error uploading the file.';
+                                }
+                            }
+                            else{
+                                echo 'File Type';
+                            }
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # Submit drawn employee digital signature
         case 'submit drawn employee digital signature':
             if(isset($_POST['username']) && !empty($_POST['username'])){
@@ -2730,52 +2843,68 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     if(isset($_POST['employee_id']) && !empty($_POST['employee_id']) && isset($_POST['canvas_data']) && !empty($_POST['canvas_data'])){
                         $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
                         $canvas_data = $_POST['canvas_data'];
-                        $canvas_data = str_replace('data:image/png;base64,', '', $canvas_data);
-                        $canvas_data = base64_decode($canvas_data);
 
-                        $file_name = $api->generate_file_name(10);
-                        $file_new = $file_name . '.png';
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
 
-                        $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE. 'digital_signature/';
-                        $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'digital_signature/' . $file_new;
+                        if($check_employee_exist > 0){
+                            $file_name = $api->generate_file_name(10);
+                            $file_new = $file_name . '.png';
+                            $canvas_data = str_replace('data:image/png;base64,', '', $canvas_data);
+                            $canvas_data = base64_decode($canvas_data);
 
-                        if (file_put_contents($file_destination, $canvas_data)) {
-                            echo 'success';
-                        } else {
-                            echo 'error';
-                        }
-                        
-                        /*$check_working_schedule_type_exist = $api->check_working_schedule_type_exist($working_schedule_type_id);
-             
-                        if($check_working_schedule_type_exist > 0){
-                            $update_working_schedule_type = $api->update_working_schedule_type($working_schedule_type_id, $working_schedule_type, $working_schedule_type_category, $username);
-            
-                            if($update_working_schedule_type){
-                                $response[] = array(
-                                    'RESPONSE' => 'Updated'
-                                );
+                            $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE. 'digital_signature/';
+                            $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'digital_signature/' . $file_new;
+                            $file_path = $directory . $file_new;
+
+                            $directory_checker = $api->directory_checker($directory);
+
+                            if($directory_checker){
+                                $employee_details = $api->get_employee_details($employee_id);
+                                $employee_digital_signature = $employee_details[0]['EMPLOYEE_DIGITAL_SIGNATURE'];
+
+                                if(file_exists($employee_digital_signature) && !empty($employee_digital_signature)){
+                                    if (unlink($employee_digital_signature)) {
+                                        if (file_put_contents($file_destination, $canvas_data)) {
+                                            $update_employee_digital_signature = $api->update_employee_digital_signature($employee_id, $file_path, $username);
+        
+                                            if($update_employee_digital_signature){
+                                                echo 'Updated';
+                                            }
+                                            else{
+                                                echo $update_employee_digital_signature;
+                                            }
+                                        } 
+                                        else {
+                                            echo 'There was an error uploading your file.';
+                                        }
+                                    }
+                                    else{
+                                        $employee_digital_signature . ' cannot be deleted due to an error.';
+                                    }
+                                }
+                                else{
+                                    if (file_put_contents($file_destination, $canvas_data)) {
+                                        $update_employee_digital_signature = $api->update_employee_digital_signature($employee_id, $file_path, $username);
+    
+                                        if($update_employee_digital_signature){
+                                            echo 'Updated';
+                                        }
+                                        else{
+                                            echo $update_employee_digital_signature;
+                                        }
+                                    } 
+                                    else {
+                                        echo 'There was an error uploading your file.';
+                                    }
+                                }
                             }
                             else{
-                                $response[] = array(
-                                    'RESPONSE' => $update_working_schedule_type
-                                );
+                                echo $directory_checker;
                             }
                         }
                         else{
-                            $insert_working_schedule_type = $api->insert_working_schedule_type($working_schedule_type, $working_schedule_type_category, $username);
-                
-                            if($insert_working_schedule_type[0]['RESPONSE']){
-                                $response[] = array(
-                                    'RESPONSE' => 'Inserted',
-                                    'WORKING_SCHEDULE_TYPE_ID' => $insert_working_schedule_type[0]['WORKING_SCHEDULE_TYPE_ID']
-                                );
-                            }
-                            else{
-                                $response[] = array(
-                                    'RESPONSE' => $insert_working_schedule_type[0]['RESPONSE']
-                                );
-                            }
-                        }*/
+                            echo 'Not Found';
+                        }
                     }
                 }
                 else{
@@ -7008,8 +7137,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $employee_details = $api->get_employee_details($employee_id);
                 $employee_personal_information_details = $api->get_employee_personal_information_details($employee_id);
                 
-                $employee_image_path = $employee_details[0]['EMPLOYEE_IMAGE'] ?? null;
-                $employee_digital_signature_path = $employee_details[0]['EMPLOYEE_DIGITAL_SIGNATURE'] ?? null;
+                $employee_image_path = $api->check_image($employee_details[0]['EMPLOYEE_IMAGE'] ?? null, 'profile');
+                $employee_digital_signature_path = $api->check_image($employee_details[0]['EMPLOYEE_DIGITAL_SIGNATURE'] ?? null, 'default');
 
                 $company_name = $api->get_company_details($employee_details[0]['COMPANY'])[0]['COMPANY_NAME'] ?? null;
                 $job_position_name = $api->get_job_position_details($employee_details[0]['JOB_POSITION'])[0]['JOB_POSITION'] ?? null;
