@@ -131,6 +131,8 @@
                                                                         <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="update-digital-signature">Update Digital Signature</button>';
         
                                                                         if(($archive_employee > 0 && $employee_status == 1) || ($unarchive_employee > 0 && $employee_status == 2)){
+                                                                            $dropdown_action .= '<div class="dropdown-divider"></div>';
+                                                                            
                                                                             if($archive_employee > 0 && $employee_status == 1){
                                                                                 $dropdown_action .= '<button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="archive-employee">Archive Employee</button>';
                                                                             }

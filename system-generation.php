@@ -400,8 +400,8 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     $form .= '<div class="row mb-3">
                                 <div class="col-md-12">
                                     <input type="hidden" id="employee_id" name="employee_id">
-                                    <label for="digital_signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="file" name="digital_signature" id="digital_signature">
+                                    <label for="employee_digital_signature" class="form-label">Digital Signature <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="file" name="employee_digital_signature" id="employee_digital_signature">
                                 </div>
                             </div>';
                 } 
@@ -420,6 +420,37 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             <div class="row">
                                 <div class="col-md-12">
                                     <button type="button" id="clearcanvas" class="btn btn-info">Clear</button>
+                                </div>
+                            </div>';
+                }
+                else if($form_type == 'archive employee form'){
+                    $form .= '<div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-2">
+                                        <input type="hidden" id="employee_id" name="employee_id">
+                                        <label for="departure_date" class="form-label">Departure Date <span class="text-danger">*</span></label>
+                                        <div class="input-group" id="departure-date-container">
+                                            <input type="text" class="form-control" id="departure_date" name="departure_date" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#departure-date-container" data-provide="datepicker" data-date-autoclose="true">
+                                            <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-2">
+                                        <label for="departure_reason" class="form-label">Departure Reason <span class="text-danger">*</span></label>
+                                        <select class="form-control form-select2" id="departure_reason" name="departure_reason">
+                                        <option value="">--</option>';
+                                        $form .= $api->generate_departure_reason_options();
+                                        $form .='</select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="detailed_reason" class="form-label">Detailed Reason <span class="text-danger">*</span></label>
+                                        <textarea class="form-control form-maxlength" id="detailed_reason" name="detailed_reason" maxlength="500" rows="5"></textarea>
+                                    </div>
                                 </div>
                             </div>';
                 }

@@ -1621,7 +1621,7 @@ function initialize_form_validation(form_type){
             $('#upload-digital-signature-form').validate({
                 submitHandler: function (form) {
                     const employee_id = $('#employee-id').text();
-                    transaction = 'submit employee signature'; 
+                    transaction = 'submit employee digital signature'; 
         
                     var formData = new FormData(form);
                     formData.append('username', username);
@@ -1765,6 +1765,86 @@ function initialize_form_validation(form_type){
                     }
                 }
             });
+            break;
+            case 'archive employee form':
+                $('#archive-employee-form').validate({
+                    submitHandler: function (form) {
+                        const employee_id = $('#employee-id').text();
+                        transaction = 'archive employee'; 
+        
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controller.php',
+                            data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&employee_id=' + employee_id,
+                            beforeSend: function(){
+                                document.getElementById('submit-form').disabled = true;
+                                $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                            },
+                            success: function (response) {
+                                switch (response) {
+                                    case 'Archived':
+                                        set_toastr('Employee Digital Signature Archived', 'The employee has been archived successfully.', 'success');
+                                        $('#System-Modal').modal('hide');
+                                        window.location.reload();
+                                        break;
+                                    case 'Inactive User':
+                                    case 'Not Found':
+                                        window.location = '404.php';
+                                        break;
+                                    default:
+                                        show_toastr('Transaction Error', response, 'error');
+                                        break;
+                                }
+                            },
+                            complete: function(){
+                                document.getElementById('submit-form').disabled = false;
+                                $('#submit-form').html('Submit');
+                            }
+                        });
+                        return false;
+                    },
+                    rules: {
+                        departure_date: {
+                            required: true
+                        },
+                        departure_reason: {
+                            required: true
+                        },
+                        detailed_reason: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        departure_date: {
+                            required: 'Please choose the departure date',
+                        },
+                        departure_reason: {
+                            required: 'Please choose the departure reason',
+                        },
+                        detailed_reason: {
+                            required: 'Please enter the detailed reason',
+                        }
+                    },
+                    errorPlacement: function(label) {
+                        show_toastr('Form Validation', label.text(), 'error');
+                    },
+                    highlight: function(element) {
+                        if ($(element).hasClass('select2-hidden-accessible')) {
+                            $(element).next().find('.select2-selection').addClass('is-invalid');
+                        } 
+                        else {
+                            $(element).addClass('is-invalid');
+                        }
+                    },
+                    unhighlight: function(element) {
+                        if ($(element).hasClass('select2-hidden-accessible')) {
+                            $(element).next().find('.select2-selection').removeClass('is-invalid');
+                        }
+                        else {
+                            $(element).removeClass('is-invalid');
+                        }
+                    }
+                });
             break;
     }
 }

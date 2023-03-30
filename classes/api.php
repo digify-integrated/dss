@@ -101,15 +101,14 @@ class Api{
     # Returns    : Date
     #
     # -------------------------------------------------------------
-    public function format_date($format, $date, $modify){
-        if(!empty($modify)){
-            $datestring = (new DateTime($date))->modify($modify)->format($format);
-        }
-        else{
-            $datestring = (new DateTime($date))->format($format);
-        }
+    public function format_date($format, $date, $modify = null) {
+        $dateTime = new DateTime($date);
 
-        return $datestring;
+        if ($modify) {
+            $dateTime->modify($modify);
+        }
+        
+        return $dateTime->format($format);
     }
     # -------------------------------------------------------------
     
@@ -191,17 +190,16 @@ class Api{
     # Returns    : Number
     #
     # -------------------------------------------------------------
-    public function validate_email($email){
+    public function validate_email($email) {
         $email = trim($email);
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return 'Error: Invalid email';
-        }
 
         if (empty($email)) {
             return 'Error: Missing email';
         }
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'Error: Invalid email';
+        }
         return true;
     }
     # -------------------------------------------------------------
@@ -4693,14 +4691,204 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
-    #
-    # Name       : update_employee_digital_signature
-    # Purpose    : Updates employee personal information.
+    #   
+    # Name       : update_employee_image
+    # Purpose    : Updates employee image.
     #
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function update_employee_digital_signature($employee_id, $file_path, $username){
+    public function update_employee_image($employee_image_tmp_name, $employee_image_actual_ext, $employee_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            
+            if(!empty($employee_image_tmp_name)){ 
+                $file_name = $this->generate_file_name(10);
+                $file_new = $file_name . '.' . $employee_image_actual_ext;
+                
+                $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE . 'employee_image/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'employee_image/' . $file_new;
+                
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    $employee_details = $this->get_employee_details($employee_id);
+                    $employee_image = $employee_details[0]['EMPLOYEE_IMAGE'];
+                    $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+    
+                    if(file_exists($employee_image)){
+                        if (unlink($employee_image)) {
+                            if(move_uploaded_file($employee_image_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_employee_image(:employee_id, :file_path, :record_log)');
+                                $sql->bindValue(':employee_id', $employee_id);
+                                $sql->bindValue(':file_path', $file_path);
+                                $sql->bindValue(':record_log', $record_log);
+                            
+                                if($sql->execute()){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee image.');
+                                        
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    return $stmt->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your file.';
+                            }
+                        }
+                        else {
+                            return $attachment . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($employee_image_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_employee_image(:employee_id, :file_path, :record_log)');
+                            $sql->bindValue(':employee_id', $employee_id);
+                            $sql->bindValue(':file_path', $file_path);
+                            $sql->bindValue(':record_log', $record_log);
+                        
+                            if($sql->execute()){
+                                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee image.');
+                                    
+                                if($insert_transaction_log){
+                                    return true;
+                                }
+                                else{
+                                    return $insert_transaction_log;
+                                }
+                            }
+                            else{
+                                return $stmt->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #   
+    # Name       : update_employee_digital_signature
+    # Purpose    : Updates employee digtal signature.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee_digital_signature($employee_digital_signature_tmp_name, $employee_digital_signature_actual_ext, $employee_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            
+            if(!empty($employee_digital_signature_tmp_name)){ 
+                $file_name = $this->generate_file_name(10);
+                $file_new = $file_name . '.' . $employee_digital_signature_actual_ext;
+                
+                $directory = DEFAULT_EMPLOYEE_RELATIVE_PATH_FILE . 'digital_signature/';
+                $file_destination = $_SERVER['DOCUMENT_ROOT'] . DEFAULT_EMPLOYEE_FULL_PATH_FILE . 'digital_signature/' . $file_new;
+                
+                $file_path = $directory . $file_new;
+
+                $directory_checker = $this->directory_checker($directory);
+
+                if($directory_checker){
+                    $employee_details = $this->get_employee_details($employee_id);
+                    $employee_digital_signature = $employee_details[0]['EMPLOYEE_DIGITAL_SIGNATURE'];
+                    $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+    
+                    if(file_exists($employee_digital_signature)){
+                        if (unlink($employee_digital_signature)) {
+                            if(move_uploaded_file($employee_digital_signature_tmp_name, $file_destination)){
+                                $sql = $this->db_connection->prepare('CALL update_employee_digital_signature(:employee_id, :file_path, :record_log)');
+                                $sql->bindValue(':employee_id', $employee_id);
+                                $sql->bindValue(':file_path', $file_path);
+                                $sql->bindValue(':record_log', $record_log);
+                            
+                                if($sql->execute()){
+                                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee digital signature.');
+                                        
+                                    if($insert_transaction_log){
+                                        return true;
+                                    }
+                                    else{
+                                        return $insert_transaction_log;
+                                    }
+                                }
+                                else{
+                                    return $stmt->errorInfo()[2];
+                                }
+                            }
+                            else{
+                                return 'There was an error uploading your file.';
+                            }
+                        }
+                        else {
+                            return $attachment . ' cannot be deleted due to an error.';
+                        }
+                    }
+                    else{
+                        if(move_uploaded_file($employee_digital_signature_tmp_name, $file_destination)){
+                            $sql = $this->db_connection->prepare('CALL update_employee_digital_signature(:employee_id, :file_path, :record_log)');
+                            $sql->bindValue(':employee_id', $employee_id);
+                            $sql->bindValue(':file_path', $file_path);
+                            $sql->bindValue(':record_log', $record_log);
+                        
+                            if($sql->execute()){
+                                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated employee digital signature.');
+                                    
+                                if($insert_transaction_log){
+                                    return true;
+                                }
+                                else{
+                                    return $insert_transaction_log;
+                                }
+                            }
+                            else{
+                                return $stmt->errorInfo()[2];
+                            }
+                        }
+                        else{
+                            return 'There was an error uploading your file.';
+                        }
+                    }
+                }
+                else{
+                    return $directory_checker;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_drawn_employee_digital_signature
+    # Purpose    : Updates drawn employee digital signature.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_drawn_employee_digital_signature($employee_id, $file_path, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
             $employee_details = $this->get_employee_details($employee_id);
@@ -4747,6 +4935,52 @@ class Api{
                     else{
                         return $update_system_parameter_value;
                     }
+                }
+            }
+            else{
+                return $stmt->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_employee_status
+    # Purpose    : Updates employee status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_employee_status($employee_id, $status, $departure_date, $departure_reason, $detailed_reason, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $employee_details = $this->get_employee_details($employee_id);
+            $transaction_log_id = $employee_details[0]['TRANSACTION_LOG_ID'];
+
+            if($status == 1){
+                $log_status = 'Unarchive';
+            }
+            else{
+                $log_status = 'Archive';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_employee_status(:employee_id, :status, :departure_date, :departure_reason, :detailed_reason, :record_log)');
+            $sql->bindValue(':employee_id', $employee_id);
+            $sql->bindValue(':status', $status);
+            $sql->bindValue(':departure_date', $departure_date);
+            $sql->bindValue(':departure_reason', $departure_reason);
+            $sql->bindValue(':detailed_reason', $detailed_reason);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_status, 'User ' . $username . ' updated employee status.');
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
                 }
             }
             else{

@@ -1709,21 +1709,21 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_employee_status(IN employee_id VARCHAR(100), IN employee_status TINYINT(1), IN offboard_date DATE, IN departure_reason VARCHAR(50), IN details_reason VARCHAR(500), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_employee_status(IN employee_id VARCHAR(100), IN employee_status TINYINT(1), IN offboard_date DATE, IN departure_reason VARCHAR(50), IN detailed_reason VARCHAR(500), IN record_log VARCHAR(100))
 BEGIN
 	SET @query = 'UPDATE employees SET EMPLOYEE_STATUS = ?, OFFBOARD_DATE = ?, DEPARTURE_REASON = ?, DETAILED_REASON = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING employee_status, offboard_date, departure_reason, details_reason, record_log, employee_id;
+	EXECUTE stmt USING employee_status, offboard_date, departure_reason, detailed_reason, record_log, employee_id;
 	DEALLOCATE PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_employee_image(IN employee_id VARCHAR(100), IN employee_image VARCHAR(500))
+CREATE PROCEDURE update_employee_image(IN employee_id VARCHAR(100), IN employee_image VARCHAR(500), IN record_log VARCHAR(100))
 BEGIN
-	SET @query = 'UPDATE employees SET EMPLOYEE_IMAGE = ? WHERE EMPLOYEE_ID = ?';
+	SET @query = 'UPDATE employees SET EMPLOYEE_IMAGE = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
 
 	PREPARE stmt FROM @query;
-	EXECUTE stmt USING employee_image, employee_id;
+	EXECUTE stmt USING employee_image, record_log, employee_id;
 	DEALLOCATE PREPARE stmt;
 END //
 

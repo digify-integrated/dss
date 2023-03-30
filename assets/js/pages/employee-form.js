@@ -215,6 +215,55 @@ function initialize_click_events(){
         generate_modal('update employee digital signature form', 'Digital Signature', 'R' , '0', '1', 'form', 'update-digital-signature-form', '0', username);
     });
 
+    $(document).on('click','#archive-employee',function() {
+        const employee_id = $(this).data('employee-id');
+
+        sessionStorage.setItem('employee_id', employee_id);
+
+        generate_modal('archive employee form', 'Archive Employee', 'R' , '0', '1', 'form', 'archive-employee-form', '0', username);
+    });
+
+    $(document).on('click','#unarchive-employee',function() {
+        const employee_id = $(this).data('employee-id');
+        const transaction = 'unarchive employee';
+
+        Swal.fire({
+            title: 'Confirm Employee Unarchive',
+            text: 'Are you sure you want to unarchive this employee?',
+            icon: 'warning',
+            showCancelButton: !0,
+            confirmButtonText: 'Unarchive',
+            cancelButtonText: 'Cancel',
+            confirmButtonClass: 'btn btn-success mt-2',
+            cancelButtonClass: 'btn btn-secondary ms-2 mt-2',
+            buttonsStyling: !1
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: {username : username, employee_id : employee_id, transaction : transaction},
+                    success: function (response) {
+                        switch (response) {
+                            case 'Unarchived':
+                                set_toastr('Employee Unarchived', 'The employee has been unarchived successfully.', 'success');
+                                window.location.reload();
+                                break;
+                            case 'Inactive User':
+                            case 'Not Found':
+                                window.location = '404.php';
+                                break;
+                            default:
+                                show_toastr('Employee Unarchived Error', response, 'error');
+                                break;
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
     $(document).on('click','#discard-create',function() {
         discard('employees.php');
     });

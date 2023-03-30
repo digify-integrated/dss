@@ -2759,20 +2759,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                 if(in_array($employee_image_actual_ext, $allowed_ext)){
                                     if(!$employee_image_error){
                                         if($employee_image_size < $file_max_size){
-                                            $update_job_position_attachment = $api->update_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $attachment_id, $username);
+                                            $update_employee_image = $api->update_employee_image($employee_image_tmp_name, $employee_image_actual_ext, $employee_id, $username);
                     
-                                            if($update_job_position_attachment){
-                                                $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
-            
-                                                if($update_job_position_attachment_details){
-                                                    echo 'Updated';
-                                                }
-                                                else{
-                                                    echo $update_job_position_attachment_details;
-                                                }
+                                            if($update_employee_image){
+                                                echo 'Updated';
                                             }
                                             else{
-                                                echo $update_job_position_attachment;
+                                                echo $update_employee_image;
                                             }
                                         }
                                         else{
@@ -2788,40 +2781,102 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                 }
                             }
                             else{
-                                $update_job_position_attachment_details = $api->update_job_position_attachment_details($attachment_id, $job_position_id, $attachment_name, $username);
-            
-                                if($update_job_position_attachment_details){
+                                $update_employee_image = $api->update_employee_image($employee_image_tmp_name, $employee_image_actual_ext, $employee_id, $username);
+                    
+                                if($update_employee_image){
                                     echo 'Updated';
                                 }
                                 else{
-                                    echo $update_job_position_attachment_details;
+                                    echo $update_employee_image;
                                 }
                             }
                         }
                         else{
-                            if(in_array($attachment_actual_ext, $allowed_ext)){
-                                if(!$attachment_error){
-                                    if($attachment_size < $file_max_size){
-                                        $insert_job_position_attachment = $api->insert_job_position_attachment($attachment_tmp_name, $attachment_actual_ext, $job_position_id, $attachment_name, $username);
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Submit employee digital signature
+        case 'submit employee digital signature':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $response = array();
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && !empty($_POST['employee_id'])){
+                        $file_type = '';
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
             
-                                        if($insert_job_position_attachment){
-                                            echo 'Inserted';
+                        $employee_digital_signature_file_name = $_FILES['employee_digital_signature']['name'];
+                        $employee_digital_signature_size = $_FILES['employee_digital_signature']['size'];
+                        $employee_digital_signature_error = $_FILES['employee_digital_signature']['error'];
+                        $employee_digital_signature_tmp_name = $_FILES['employee_digital_signature']['tmp_name'];
+                        $employee_digital_signature_ext = explode('.', $employee_digital_signature_file_name);
+                        $employee_digital_signature_actual_ext = strtolower(end($employee_digital_signature_ext));
+            
+                        $upload_setting_details = $api->get_upload_setting_details(9);
+                        $upload_file_type_details = $api->get_upload_file_type_details(9);
+                        $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+            
+                        for($i = 0; $i < count($upload_file_type_details); $i++) {
+                            $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+            
+                            if($i != (count($upload_file_type_details) - 1)){
+                                $file_type .= ',';
+                            }
+                        }
+            
+                        $allowed_ext = explode(',', $file_type);
+            
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
+
+                        if($check_employee_exist > 0){
+                            if(!empty($employee_digital_signature_tmp_name)){
+                                if(in_array($employee_digital_signature_actual_ext, $allowed_ext)){
+                                    if(!$employee_digital_signature_error){
+                                        if($employee_digital_signature_size < $file_max_size){
+                                            $update_employee_digital_signature = $api->update_employee_digital_signature($employee_digital_signature_tmp_name, $employee_digital_signature_actual_ext, $employee_id, $username);
+                    
+                                            if($update_employee_digital_signature){
+                                                echo 'Updated';
+                                            }
+                                            else{
+                                                echo $update_employee_digital_signature;
+                                            }
                                         }
                                         else{
-                                            echo $insert_job_position_attachment;
+                                            echo 'File Size';
                                         }
                                     }
                                     else{
-                                        echo 'File Size';
+                                        echo 'There was an error uploading the file.';
                                     }
                                 }
                                 else{
-                                    echo 'There was an error uploading the file.';
+                                    echo 'File Type';
                                 }
                             }
                             else{
-                                echo 'File Type';
+                                $update_employee_digital_signature = $api->update_employee_digital_signature($employee_digital_signature_tmp_name, $employee_digital_signature_actual_ext, $employee_id, $username);
+                    
+                                if($update_employee_digital_signature){
+                                    echo 'Updated';
+                                }
+                                else{
+                                    echo $update_employee_digital_signature;
+                                }
                             }
+                        }
+                        else{
+                            echo 'Not Found';
                         }
                     }
                 }
@@ -2865,13 +2920,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                 if(file_exists($employee_digital_signature) && !empty($employee_digital_signature)){
                                     if (unlink($employee_digital_signature)) {
                                         if (file_put_contents($file_destination, $canvas_data)) {
-                                            $update_employee_digital_signature = $api->update_employee_digital_signature($employee_id, $file_path, $username);
+                                            $update_drawn_employee_digital_signature = $api->update_drawn_employee_digital_signature($employee_id, $file_path, $username);
         
-                                            if($update_employee_digital_signature){
+                                            if($update_drawn_employee_digital_signature){
                                                 echo 'Updated';
                                             }
                                             else{
-                                                echo $update_employee_digital_signature;
+                                                echo $update_drawn_employee_digital_signature;
                                             }
                                         } 
                                         else {
@@ -2884,13 +2939,13 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                                 }
                                 else{
                                     if (file_put_contents($file_destination, $canvas_data)) {
-                                        $update_employee_digital_signature = $api->update_employee_digital_signature($employee_id, $file_path, $username);
+                                        $update_drawn_employee_digital_signature = $api->update_drawn_employee_digital_signature($employee_id, $file_path, $username);
     
-                                        if($update_employee_digital_signature){
+                                        if($update_drawn_employee_digital_signature){
                                             echo 'Updated';
                                         }
                                         else{
-                                            echo $update_employee_digital_signature;
+                                            echo $update_drawn_employee_digital_signature;
                                         }
                                     } 
                                     else {
@@ -6199,6 +6254,43 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
         break;
         # -------------------------------------------------------------
 
+        # Archive employee
+        case 'archive employee':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && !empty($_POST['employee_id']) && isset($_POST['departure_date']) && !empty($_POST['departure_date'])  && isset($_POST['departure_reason']) && !empty($_POST['departure_reason']) && isset($_POST['detailed_reason']) && !empty($_POST['detailed_reason'])){
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+                        $departure_date = $api->check_date('empty', htmlspecialchars($_POST['departure_date'], ENT_QUOTES, 'UTF-8'), '', 'Y-m-d', '', '', '');
+                        $departure_reason = htmlspecialchars($_POST['departure_reason'], ENT_QUOTES, 'UTF-8');
+                        $detailed_reason = htmlspecialchars($_POST['detailed_reason'], ENT_QUOTES, 'UTF-8');
+            
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
+            
+                        if($check_employee_exist > 0){
+                            $update_employee_status = $api->update_employee_status($employee_id, '2', $departure_date, $departure_reason, $detailed_reason, $username);
+                
+                            if($update_employee_status){
+                                echo 'Archived';
+                            }
+                            else{
+                                echo $update_employee_status;
+                            }
+                        }
+                        else{
+                            echo 'Not Found';
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
         # -------------------------------------------------------------
         #   Unarchive transactions
         # -------------------------------------------------------------
@@ -6345,6 +6437,40 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         }
                         else{
                             echo $error;
+                        }
+                    }
+                }
+                else{
+                    echo 'Inactive User';
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Unarchive employee
+        case 'unarchive employee':
+            if(isset($_POST['username']) && !empty($_POST['username'])){
+                $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+                $check_user_account_status = $api->check_user_account_status($username);
+    
+                if($check_user_account_status){
+                    if(isset($_POST['employee_id']) && !empty($_POST['employee_id'])){
+                        $employee_id = htmlspecialchars($_POST['employee_id'], ENT_QUOTES, 'UTF-8');
+            
+                        $check_employee_exist = $api->check_employee_exist($employee_id);
+            
+                        if($check_employee_exist > 0){
+                            $update_employee_status = $api->update_employee_status($employee_id, '1', null, null, null, $username);
+                
+                            if($update_employee_status){
+                                echo 'Unarchived';
+                            }
+                            else{
+                                echo $update_employee_status;
+                            }
+                        }
+                        else{
+                            echo 'Not Found';
                         }
                     }
                 }
@@ -7144,7 +7270,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $job_position_name = $api->get_job_position_details($employee_details[0]['JOB_POSITION'])[0]['JOB_POSITION'] ?? null;
                 $department_name = $api->get_department_details($employee_details[0]['DEPARTMENT'])[0]['DEPARTMENT'] ?? null;
                 $work_location_name = $api->get_work_location_details($employee_details[0]['WORK_LOCATION'])[0]['WORK_LOCATION'] ?? null;
-                $working_hours_name = $api->get_working_hours_details($employee_details[0]['WORKING_HOURS'])[0]['WORKING_HOURS'] ?? null;
+                $working_hours_name = $api->get_working_schedule_details($employee_details[0]['WORKING_HOURS'])[0]['WORKING_SCHEDULE'] ?? null;
                 $manager_name = $api->get_employee_personal_information_details($employee_details[0]['MANAGER'])[0]['FILE_AS'] ?? null;
                 $coach_name = $api->get_employee_personal_information_details($employee_details[0]['COACH'])[0]['FILE_AS'] ?? null;
                 $employee_type_name = $api->get_employee_type_details($employee_details[0]['EMPLOYEE_TYPE'])[0]['EMPLOYEE_TYPE'] ?? null;
