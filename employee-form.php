@@ -35,6 +35,7 @@
             $delete_employee = $api->check_role_access_rights($username, '133', 'action');
             $archive_employee = $api->check_role_access_rights($username, '134', 'action');
             $unarchive_employee = $api->check_role_access_rights($username, '135', 'action');
+            $add_employee_contact_information = $api->check_role_access_rights($username, '136', 'action');
 
             if($update_employee > 0){
                 $disabled = null;
@@ -130,7 +131,7 @@
                                                                         <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="upload-digital-signature">Upload Digital Signature</button>
                                                                         <button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="update-digital-signature">Update Digital Signature</button>';
         
-                                                                        if(($archive_employee > 0 && $employee_status == 1) || ($unarchive_employee > 0 && $employee_status == 2)){
+                                                                        if(($archive_employee > 0 && $employee_status == 1) || ($unarchive_employee > 0 && $employee_status == 2) || $add_employee_contact_information > 0){
                                                                             $dropdown_action .= '<div class="dropdown-divider"></div>';
                                                                             
                                                                             if($archive_employee > 0 && $employee_status == 1){
@@ -139,6 +140,10 @@
             
                                                                             if($unarchive_employee > 0 && $employee_status == 2){
                                                                                 $dropdown_action .= '<button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="unarchive-employee">Unarchive Employee</button>';
+                                                                            }
+            
+                                                                            if($add_employee_contact_information > 0){
+                                                                                $dropdown_action .= '<button class="dropdown-item" type="button" data-employee-id="'. $employee_id .'" id="add-employee-contact-information">Add Contact Information</button>';
                                                                             }
                                                                         }
 
@@ -860,7 +865,22 @@
                                                         <?php
                                                             if(!empty($employee_id)){
                                                                 echo '<div class="tab-pane" id="employee-contact-information" role="tabpanel">
-                                                                
+                                                                    <div class="row mt-4">
+                                                                        <div class="col-md-12">
+                                                                            <table id="employee-contact-information-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th class="all">Contact Information Type</th>
+                                                                                        <th class="all">Email</th>
+                                                                                        <th class="all">Mobile</th>
+                                                                                        <th class="all">Telephone</th>
+                                                                                        <th class="all">Action</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody></tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="tab-pane" id="employee-address" role="tabpanel">
                                                                 

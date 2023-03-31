@@ -454,6 +454,39 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                             </div>';
                 }
+                else if($form_type == 'employee contact information form'){
+                    $form .= '<div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-2">
+                                        <label for="contact_information_type" class="form-label">Contact Information Type <span class="text-danger">*</span></label>
+                                        <select class="form-control form-select2" id="contact_information_type" name="contact_information_type">
+                                        <option value="">--</option>';
+                                        $form .= $api->generate_system_code_options('CONTACTINFOTYPE');
+                                        $form .='</select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" id="email" name="email" class="form-control form-maxlength" maxlength="50" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="mobile" class="form-label">Mobile <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="20">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="telephone" class="form-label">Telephone</label>
+                                            <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="20">
+                                        </div>
+                                    </div>
+                                </div>';
+                }
     
                 $form .= '</form>';
     
@@ -3720,6 +3753,70 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                                     <i class="bx bx-show font-size-16 align-middle"></i>
                                                 </a>
                                             </div>'
+                            );
+                        }
+        
+                        echo json_encode($response);
+                    }
+                    else{
+                        echo $sql->errorInfo()[2];
+                    }
+                }
+            }
+        break;
+        # -------------------------------------------------------------
+
+        # Employee contact information table
+        case 'employee contact information table':
+            if(isset($_POST['employee_id']) && !empty($_POST['employee_id'])){
+                if ($api->databaseConnection()) {
+                    $employee_id = $_POST['employee_id'];
+    
+                    $update_employee = $api->check_role_access_rights($username, '132', 'action');
+                    $update_employee_contact_information = $api->check_role_access_rights($username, '137', 'action');
+                    $delete_employee_contact_information = $api->check_role_access_rights($username, '138', 'action');
+        
+                    $sql = $api->db_connection->prepare('SELECT EMPLOYEE_CONTACT_INFORMATION_ID, CONTACT_INFORMATION_TYPE, EMAIL, TELEPHONE, MOBILE FROM employee_contact_information WHERE EMPLOYEE_ID = :employee_id');
+                    $sql->bindValue(':employee_id', $employee_id);
+        
+                    if($sql->execute()){
+                        while($row = $sql->fetch()){
+                            $employee_contact_information_id = $row['EMPLOYEE_CONTACT_INFORMATION_ID'];
+                            $contact_information_type = $row['CONTACT_INFORMATION_TYPE'];
+                            $email = $row['EMAIL'];
+                            $telephone = $row['TELEPHONE'];
+                            $mobile = $row['MOBILE'];
+
+                            $system_code_details = $api->get_system_code_details(null, 'CONTACTINFOTYPE', $contact_information_type);
+                            $contact_information_type_name = $system_code_details[0]['SYSTEM_DESCRIPTION'] ?? null;
+    
+                            if($update_employee_contact_information > 0 && $update_employee > 0){
+                                $update = '<button type="button" class="btn btn-info waves-effect waves-light update-employee-contact-information" data-employee-id="'. $employee_id .'" data-employee-contact-information-id="'. $employee_contact_information_id .'" title="Edit Employee Contact Information">
+                                                <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                            </button>';
+                            }
+                            else{
+                                $update = null;
+                            }
+    
+                            if($delete_employee_contact_information > 0 && $update_employee > 0){
+                                $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-employee-contact-information" data-employee-id="'. $employee_id .'" data-employee-contact-information-id="'. $employee_contact_information_id .'" title="Delete Employee Contact Information">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                            }
+                            else{
+                                $delete = null;
+                            }
+        
+                            $response[] = array(
+                                'CONTACT_INFORMATION_TYPE' => $contact_information_type_name,
+                                'EMAIL' => $email,
+                                'MOBILE' => $mobile,
+                                'TELEPHONE' => $telephone,
+                                'ACTION' => '<div class="d-flex gap-2">
+                                    '. $update .'
+                                    '. $delete .'
+                                </div>'
                             );
                         }
         

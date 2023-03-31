@@ -218,11 +218,11 @@ function initialize_click_events(){
                     success: function (response) {
                         switch (response) {
                             case 'Deleted':
-                                show_toastr('State Deleted', 'The selected action access has been deleted successfully.', 'success');
+                                show_toastr('State Deleted', 'The selected state access has been deleted successfully.', 'success');
                                 reload_datatable('#state-datatable');
                                 break;
                             case 'Not Found':
-                                show_toastr('State Deletion Error', 'The selected action access does not exist or has already been deleted.', 'warning');
+                                show_toastr('State Deletion Error', 'The selected state does not exist or has already been deleted.', 'warning');
                                 reload_datatable('#state-datatable');
                                 break;
                             case 'Inactive User':

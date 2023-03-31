@@ -1530,9 +1530,6 @@ ADD FOREIGN KEY (COUNTRY_ID) REFERENCES global_country(COUNTRY_ID);
 
 CREATE INDEX global_state_index ON global_state(STATE_ID);
 
-DELIMITER //
-DROP PROCEDURE check_state_exist //
-
 CREATE PROCEDURE check_state_exist(IN state_id INT(50))
 BEGIN
 	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_state WHERE STATE_ID = ?';
@@ -1786,6 +1783,9 @@ CREATE TABLE employee_personal_information(
 
 CREATE INDEX employee_personal_information_index ON employee_personal_information(EMPLOYEE_ID);
 
+ALTER TABLE employee_personal_information
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE PROCEDURE update_employee_personal_information(IN employee_id VARCHAR(100), IN file_as VARCHAR(350), IN first_name VARCHAR(100), IN middle_name VARCHAR(100), IN last_name VARCHAR(100), IN suffix VARCHAR(5), IN nickname VARCHAR(20), IN civil_status VARCHAR(20), IN nationality VARCHAR(20), IN gender VARCHAR(20), IN birthday DATE, IN place_of_birth VARCHAR(500), IN blood_type VARCHAR(20), IN height DOUBLE, IN weight DOUBLE, IN religion VARCHAR(20), IN record_log VARCHAR(100))
 BEGIN
 	SET @query = 'UPDATE employee_personal_information SET FILE_AS = ?, FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, SUFFIX = ?, NICKNAME = ?, CIVIL_STATUS = ?, NATIONALITY = ?, GENDER = ?, BIRTHDAY = ?, PLACE_OF_BIRTH = ?, BLOOD_TYPE = ?, HEIGHT = ?, WEIGHT = ?, RELIGION = ?, RECORD_LOG = ? WHERE EMPLOYEE_ID = ?';
@@ -1851,7 +1851,55 @@ CREATE TABLE employee_training_seminars(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_training_seminars
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_training_seminars_index ON employee_training_seminars(EMPLOYEE_TRAINING_SEMINARS_ID);
+
+CREATE PROCEDURE check_employee_training_seminars_exist(IN employee_training_seminars_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_training_seminars WHERE EMPLOYEE_TRAINING_SEMINARS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_training_seminars_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_training_seminars(IN employee_training_seminars_id VARCHAR(100), IN training_name VARCHAR(200), IN training_date DATE, IN training_location VARCHAR(100), IN training_provider VARCHAR(100), IN description VARCHAR(1000), IN training_certificate VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_training_seminars SET TRAINING_NAME = ?, TRAINING_DATE = ?, TRAINING_LOCATION = ?, TRAINING_PROVIDER = ?, DESCRIPTION = ?, TRAINING_CERTIFICATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_TRAINING_SEMINARS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING training_name, training_date, training_location, training_provider, description, training_certificate, transaction_log_id, record_log, employee_training_seminars_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_training_seminars(IN employee_training_seminars_id VARCHAR(100), IN employee_id VARCHAR(100), IN training_name VARCHAR(200), IN training_date DATE, IN training_location VARCHAR(100), IN training_provider VARCHAR(100), IN description VARCHAR(1000), IN training_certificate VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_training_seminars (EMPLOYEE_TRAINING_SEMINARS_ID, EMPLOYEE_ID, TRAINING_NAME, TRAINING_DATE, TRAINING_LOCATION, TRAINING_PROVIDER, DESCRIPTION, TRAINING_CERTIFICATE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_training_seminars_id, employee_id, training_name, training_date, training_location, training_provider, description, training_certificate, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_training_seminars_details(IN employee_training_seminars_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, TRAINING_NAME, TRAINING_DATE, TRAINING_LOCATION, TRAINING_PROVIDER, DESCRIPTION, TRAINING_CERTIFICATE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_training_seminars WHERE EMPLOYEE_TRAINING_SEMINARS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_training_seminars_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_training_seminars(IN employee_training_seminars_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_training_seminars WHERE EMPLOYEE_TRAINING_SEMINARS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_training_seminars_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Identification */
 CREATE TABLE employee_identification(
@@ -1865,7 +1913,64 @@ CREATE TABLE employee_identification(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_identification
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_identification_index ON employee_identification(EMPLOYEE_IDENTIFICATION_ID);
+
+CREATE PROCEDURE check_employee_identification_exist(IN employee_identification_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_identification WHERE EMPLOYEE_IDENTIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_identification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_identification(IN employee_identification_id VARCHAR(100), IN id_type VARCHAR(100), IN id_number VARCHAR(100), IN id_classification VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_identification SET ID_TYPE = ?, ID_NUMBER = ?, ID_CLASSIFICATION = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_IDENTIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_type, id_number, id_classification, transaction_log_id, record_log, employee_identification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_id_image(IN employee_identification_id VARCHAR(100), IN id_image VARCHAR(500), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_identification SET ID_IMAGE = ?, RECORD_LOG = ? WHERE EMPLOYEE_IDENTIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING id_image, record_log, employee_identification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_identification(IN employee_identification_id VARCHAR(100), IN employee_id VARCHAR(100), IN id_type VARCHAR(100), IN id_number VARCHAR(100), IN id_classification VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_identification (EMPLOYEE_IDENTIFICATION_ID, EMPLOYEE_ID, ID_TYPE, ID_NUMBER, ID_CLASSIFICATION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_identification_id, employee_id, id_type, id_number, id_classification, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_identification_details(IN employee_identification_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, ID_TYPE, ID_NUMBER, ID_CLASSIFICATION, ID_IMAGE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_identification WHERE EMPLOYEE_IDENTIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_identification_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_identification(IN employee_identification_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_identification WHERE EMPLOYEE_IDENTIFICATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_identification_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Address */
 CREATE TABLE employee_address(
@@ -1883,11 +1988,14 @@ CREATE TABLE employee_address(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_address
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_address_index ON employee_address(EMPLOYEE_ADDRESSES_ID);
 
 /* Employee Contact */
 CREATE TABLE employee_contact_information(
-	EMPLOYEE_CONTACT_INFROMATION_ID VARCHAR(100) PRIMARY KEY,
+	EMPLOYEE_CONTACT_INFORMATION_ID VARCHAR(100) PRIMARY KEY,
 	EMPLOYEE_ID VARCHAR(100) NOT NULL,
 	CONTACT_INFORMATION_TYPE VARCHAR(20) NOT NULL,
 	EMAIL VARCHAR(50),
@@ -1897,7 +2005,55 @@ CREATE TABLE employee_contact_information(
 	RECORD_LOG VARCHAR(100)
 );
 
-CREATE INDEX employee_contact_information_index ON employee_contact_information(EMPLOYEE_CONTACT_INFROMATION_ID);
+ALTER TABLE employee_contact_information
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
+CREATE INDEX employee_contact_information_index ON employee_contact_information(EMPLOYEE_CONTACT_INFORMATION_ID);
+
+CREATE PROCEDURE check_employee_contact_information_exist(IN employee_contact_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_contact_information WHERE EMPLOYEE_CONTACT_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_contact_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_contact_information(IN employee_contact_information_id VARCHAR(100), IN contact_information_type VARCHAR(20), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_contact_information SET CONTACT_INFORMATION_TYPE = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_CONTACT_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING contact_information_type, email, telephone, mobile, transaction_log_id, record_log, employee_contact_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_contact_information(IN employee_contact_information_id VARCHAR(100), IN employee_id VARCHAR(100), IN contact_information_type VARCHAR(20), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_contact_information (EMPLOYEE_CONTACT_INFORMATION_ID, EMPLOYEE_ID, CONTACT_INFORMATION_TYPE, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_contact_information_id, employee_id, contact_information_type, email, telephone, mobile, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_contact_information_details(IN employee_contact_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, CONTACT_INFORMATION_TYPE, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_contact_information WHERE EMPLOYEE_CONTACT_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_contact_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_contact_information(IN employee_contact_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_contact_information WHERE EMPLOYEE_CONTACT_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_contact_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Family Details */
 CREATE TABLE employee_family_details(
@@ -1916,7 +2072,55 @@ CREATE TABLE employee_family_details(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_family_details
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_family_details_index ON employee_family_details(EMPLOYEE_FAMILY_DETAILS_ID);
+
+CREATE PROCEDURE check_employee_family_details_exist(IN employee_family_details_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_family_details WHERE EMPLOYEE_FAMILY_DETAILS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_family_details_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_family_details(IN employee_family_details_id VARCHAR(100), IN name VARCHAR(500), IN relationship VARCHAR(20), IN birthday DATE, IN age INT(5), IN school VARCHAR(100), IN employment VARCHAR(100), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_family_details SET NAME = ?, RELATIONSHIP = ?, BIRTHDAY = ?, AGE = ?, SCHOOL = ?, EMPLOYMENT = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_FAMILY_DETAILS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING name, relationship, birthday, age, school, employment, email, telephone, mobile, transaction_log_id, record_log, employee_family_details_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_family_details(IN employee_family_details_id VARCHAR(100), IN employee_id VARCHAR(100), IN name VARCHAR(500), IN relationship VARCHAR(20), IN birthday DATE, IN age INT(5), IN school VARCHAR(100), IN employment VARCHAR(100), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_family_details (EMPLOYEE_FAMILY_DETAILS_ID, EMPLOYEE_ID, NAME, RELATIONSHIP, BIRTHDAY, AGE, SCHOOL, EMPLOYMENT, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_family_details_id, employee_id, name, relationship, birthday, age, school, employment, email, telephone, mobile, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_family_details(IN employee_family_details_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, NAME, RELATIONSHIP, BIRTHDAY, AGE, SCHOOL, EMPLOYMENT, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_family_details WHERE EMPLOYEE_FAMILY_DETAILS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_family_details_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_family_details(IN employee_family_details_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_family_details WHERE EMPLOYEE_FAMILY_DETAILS_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_family_details_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Emergency Contacts */
 CREATE TABLE employee_emergency_contacts(
@@ -1931,7 +2135,55 @@ CREATE TABLE employee_emergency_contacts(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_emergency_contacts
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_emergency_contacts_index ON employee_emergency_contacts(EMPLOYEE_EMERGENCY_CONTACT_ID);
+
+CREATE PROCEDURE check_employee_emergency_contacts_exist(IN employee_emergency_contacts_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_emergency_contacts WHERE EMPLOYEE_EMERGENCY_CONTACT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_emergency_contacts_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_emergency_contacts(IN employee_emergency_contacts_id VARCHAR(100), IN emergency_contact_name VARCHAR(500), IN relationship VARCHAR(20), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_emergency_contacts SET EMERGENCY_CONTACT_NAME = ?, RELATIONSHIP = ?, EMAIL = ?, TELEPHONE = ?, MOBILE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_EMERGENCY_CONTACT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING emergency_contact_name, relationship, email, telephone, mobile, transaction_log_id, record_log, employee_emergency_contacts_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_emergency_contacts(IN employee_emergency_contacts_id VARCHAR(100), IN employee_id VARCHAR(100), IN emergency_contact_name VARCHAR(500), IN relationship VARCHAR(20), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_emergency_contacts (EMPLOYEE_EMERGENCY_CONTACT_ID, EMPLOYEE_ID, EMERGENCY_CONTACT_NAME, RELATIONSHIP, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_emergency_contacts_id, employee_id, emergency_contact_name, relationship, email, telephone, mobile, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_emergency_contacts_details(IN employee_emergency_contacts_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, EMERGENCY_CONTACT_NAME, RELATIONSHIP, EMAIL, TELEPHONE, MOBILE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_emergency_contacts WHERE EMPLOYEE_EMERGENCY_CONTACT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_emergency_contacts_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_emergency_contacts(IN employee_emergency_contacts_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_emergency_contacts WHERE EMPLOYEE_EMERGENCY_CONTACT_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_emergency_contacts_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Educational Background */
 CREATE TABLE employee_educational_background(
@@ -1946,7 +2198,55 @@ CREATE TABLE employee_educational_background(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_educational_background
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_educational_background_index ON employee_educational_background(EMPLOYEE_EDUCATIONAL_BACKGROUND_ID);
+
+CREATE PROCEDURE check_employee_educational_background_exist(IN employee_educational_background_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_educational_background WHERE EMPLOYEE_EDUCATIONAL_BACKGROUND_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_educational_background_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_educational_background(IN employee_educational_background_id VARCHAR(100), IN institution_name VARCHAR(500), IN degree VARCHAR(100), IN field_of_study VARCHAR(200), IN start_date DATE, IN end_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_educational_background SET INSTITUTION_NAME = ?, DEGREE = ?, FIELD_OF_STUDY = ?, START_DATE = ?, END_DATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_EDUCATIONAL_BACKGROUND_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING institution_name, degree, field_of_study, start_date, end_date, transaction_log_id, record_log, employee_educational_background_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_educational_background(IN employee_educational_background_id VARCHAR(100), IN employee_id VARCHAR(100), IN institution_name VARCHAR(500), IN degree VARCHAR(100), IN field_of_study VARCHAR(200), IN start_date DATE, IN end_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_educational_background (EMPLOYEE_EDUCATIONAL_BACKGROUND_ID, EMPLOYEE_ID, INSTITUTION_NAME, DEGREE, FIELD_OF_STUDY, START_DATE, END_DATE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_educational_background_id, employee_id, institution_name, degree, field_of_study, start_date, end_date, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_educational_background_details(IN employee_educational_background_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, INSTITUTION_NAME, DEGREE, FIELD_OF_STUDY, START_DATE, END_DATE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_educational_background WHERE EMPLOYEE_EDUCATIONAL_BACKGROUND_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_educational_background_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_educational_background(IN employee_educational_background_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_educational_background WHERE EMPLOYEE_EDUCATIONAL_BACKGROUND_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_educational_background_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Bank Information */
 CREATE TABLE employee_bank_information(
@@ -1959,7 +2259,55 @@ CREATE TABLE employee_bank_information(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_bank_information
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_bank_information_index ON employee_bank_information(EMPLOYEE_BANK_INFORMATION_ID);
+
+CREATE PROCEDURE check_employee_bank_information_exist(IN employee_bank_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_bank_information WHERE EMPLOYEE_BANK_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_bank_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_bank_information(IN employee_bank_information_id VARCHAR(100), IN bank_name VARCHAR(500), IN account_number VARCHAR(50), IN account_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_bank_information SET BANK_NAME = ?, ACCOUNT_NUMBER = ?, ACCOUNT_TYPE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_BANK_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING bank_name, account_number, account_type, transaction_log_id, record_log, employee_bank_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_bank_information(IN employee_bank_information_id VARCHAR(100), IN employee_id VARCHAR(100), IN bank_name VARCHAR(500), IN account_number VARCHAR(50), IN account_type VARCHAR(20), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_bank_information (EMPLOYEE_BANK_INFORMATION_ID, EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, ACCOUNT_TYPE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_bank_information_id, employee_id, bank_name, account_number, account_type, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_bank_information_details(IN employee_bank_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, ACCOUNT_TYPE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_bank_information WHERE EMPLOYEE_BANK_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_bank_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_bank_information(IN employee_bank_information_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_bank_information WHERE EMPLOYEE_BANK_INFORMATION_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_bank_information_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee Employment History */
 CREATE TABLE employee_employment_history(
@@ -1975,7 +2323,55 @@ CREATE TABLE employee_employment_history(
 	RECORD_LOG VARCHAR(100)
 );
 
+ALTER TABLE employee_employment_history
+ADD FOREIGN KEY (EMPLOYEE_ID) REFERENCES employees(EMPLOYEE_ID);
+
 CREATE INDEX employee_employment_history_index ON employee_employment_history(EMPLOYEE_EMPLOYMENT_HISTORY_ID);
+
+CREATE PROCEDURE check_employee_employment_history_exist(IN employee_employment_history_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM employee_employment_history WHERE EMPLOYEE_EMPLOYMENT_HISTORY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_employment_history_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_employee_employment_history(IN employee_employment_history_id VARCHAR(100), IN company_name VARCHAR(500), IN job_title VARCHAR(100), IN start_date DATE, IN end_date DATE, IN description VARCHAR(10000), IN employment_certificate VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'UPDATE employee_employment_history SET COMPANY_NAME = ?, JOB_TITLE = ?, START_DATE = ?, END_DATE = ?, DESCRIPTION = ?, EMPLOYMENT_CERTIFICATE = ?, TRANSACTION_LOG_ID = ?, RECORD_LOG = ? WHERE EMPLOYEE_EMPLOYMENT_HISTORY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING company_name, job_title, start_date, end_date, description, employment_certificate, transaction_log_id, record_log, employee_employment_history_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_employee_employment_history(IN employee_employment_history_id VARCHAR(100), IN employee_id VARCHAR(100), IN company_name VARCHAR(500), IN job_title VARCHAR(100), IN start_date DATE, IN end_date DATE, IN description VARCHAR(10000), IN employment_certificate VARCHAR(500), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @query = 'INSERT INTO employee_employment_history (EMPLOYEE_EMPLOYMENT_HISTORY_ID, EMPLOYEE_ID, COMPANY_NAME, JOB_TITLE, START_DATE, END_DATE, DESCRIPTION, EMPLOYMENT_CERTIFICATE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_employment_history_id, employee_id, company_name, job_title, start_date, end_date, description, employment_certificate, transaction_log_id, record_log;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_employee_employment_history_details(IN employee_employment_history_id VARCHAR(100))
+BEGIN
+	SET @query = 'SELECT EMPLOYEE_ID, COMPANY_NAME, JOB_TITLE, START_DATE, END_DATE, DESCRIPTION, EMPLOYMENT_CERTIFICATE, TRANSACTION_LOG_ID, RECORD_LOG FROM employee_employment_history WHERE EMPLOYEE_EMPLOYMENT_HISTORY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_employment_history_id;
+	DEALLOCATE PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_employee_employment_history(IN employee_employment_history_id VARCHAR(100))
+BEGIN
+	SET @query = 'DELETE FROM employee_employment_history WHERE EMPLOYEE_EMPLOYMENT_HISTORY_ID = ?';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt USING employee_employment_history_id;
+	DEALLOCATE PREPARE stmt;
+END //
 
 /* Employee id Type */
 CREATE TABLE employee_id_type(

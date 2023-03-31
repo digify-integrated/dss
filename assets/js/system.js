@@ -1853,128 +1853,150 @@ function initialize_form_validation(form_type){
 function display_form_details(form_type){
     var transaction;
 
-    if(form_type == 'state form'){
-        transaction = 'state details';
+    switch (transaction) {
+        case 'state form':
+            transaction = 'state details';
 
-        const state_id = sessionStorage.getItem('state_id');
+            const state_id = sessionStorage.getItem('state_id');
+    
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {state_id : state_id, transaction : transaction},
+                success: function(response) {
+                    $('#state_id').val(state_id);
+                    $('#state_name').val(response[0].STATE_NAME);
+                }
+            });
+        break;
+        case 'job position responsibility form':
+            transaction = 'job position responsibility details';
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {state_id : state_id, transaction : transaction},
-            success: function(response) {
-                $('#state_id').val(state_id);
-                $('#state_name').val(response[0].STATE_NAME);
-            }
-        });
-    }
-    else if(form_type == 'job position responsibility form'){
-        transaction = 'job position responsibility details';
+            const responsibility_id = sessionStorage.getItem('responsibility_id');
+    
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {responsibility_id : responsibility_id, transaction : transaction},
+                success: function(response) {
+                    $('#responsibility_id').val(responsibility_id);
+                    $('#responsibility').val(response[0].RESPONSIBILITY);
+                }
+            });
+        break;
+        case 'job position requirement form':
+            transaction = 'job position requirement details';
 
-        const responsibility_id = sessionStorage.getItem('responsibility_id');
+            const requirement_id = sessionStorage.getItem('requirement_id');
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {responsibility_id : responsibility_id, transaction : transaction},
-            success: function(response) {
-                $('#responsibility_id').val(responsibility_id);
-                $('#responsibility').val(response[0].RESPONSIBILITY);
-            }
-        });
-    }
-    else if(form_type == 'job position requirement form'){
-        transaction = 'job position requirement details';
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {requirement_id : requirement_id, transaction : transaction},
+                success: function(response) {
+                    $('#requirement_id').val(requirement_id);
+                    $('#requirement').val(response[0].REQUIREMENT);
+                }
+            });
+        break;
+        case 'job position qualification form':
+            transaction = 'job position qualification details';
 
-        const requirement_id = sessionStorage.getItem('requirement_id');
+            const qualification_id = sessionStorage.getItem('qualification_id');
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {requirement_id : requirement_id, transaction : transaction},
-            success: function(response) {
-                $('#requirement_id').val(requirement_id);
-                $('#requirement').val(response[0].REQUIREMENT);
-            }
-        });
-    }
-    else if(form_type == 'job position qualification form'){
-        transaction = 'job position qualification details';
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {qualification_id : qualification_id, transaction : transaction},
+                success: function(response) {
+                    $('#qualification_id').val(qualification_id);
+                    $('#qualification').val(response[0].QUALIFICATION);
+                }
+            });
+        break;
+        case 'job position attachment form':
+            transaction = 'job position attachment details';
 
-        const qualification_id = sessionStorage.getItem('qualification_id');
+            const attachment_id = sessionStorage.getItem('attachment_id');
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {qualification_id : qualification_id, transaction : transaction},
-            success: function(response) {
-                $('#qualification_id').val(qualification_id);
-                $('#qualification').val(response[0].QUALIFICATION);
-            }
-        });
-    }
-    else if(form_type == 'job position attachment form'){
-        transaction = 'job position attachment details';
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {attachment_id : attachment_id, transaction : transaction},
+                success: function(response) {
+                    $('#attachment_id').val(attachment_id);
+                    $('#attachment_name').val(response[0].ATTACHMENT_NAME);
+                    $('#update').val('1');
+                }
+            });
+        break;
+        case 'fixed working hours form':
+            transaction = 'fixed working hours details';
 
-        const attachment_id = sessionStorage.getItem('attachment_id');
+            var working_hours_id = sessionStorage.getItem('working_hours_id');
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {attachment_id : attachment_id, transaction : transaction},
-            success: function(response) {
-                $('#attachment_id').val(attachment_id);
-                $('#attachment_name').val(response[0].ATTACHMENT_NAME);
-                $('#update').val('1');
-            }
-        });
-    }
-    else if(form_type == 'fixed working hours form'){
-        transaction = 'fixed working hours details';
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {working_hours_id : working_hours_id, transaction : transaction},
+                success: function(response) {
+                    $('#working_hours_id').val(working_hours_id);
+                    $('#working_hours').val(response[0].WORKING_HOURS);
+                    $('#work_from').val(response[0].WORK_FROM);
+                    $('#work_to').val(response[0].WORK_TO);
 
-        const working_hours_id = sessionStorage.getItem('working_hours_id');
+                    check_empty(response[0].DAY_OF_WEEK, '#day_of_week', 'select');
+                    check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
+                }
+            });
+        break;
+        case 'flexible working hours form':
+            transaction = 'flexible working hours details';
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {working_hours_id : working_hours_id, transaction : transaction},
-            success: function(response) {
-                $('#working_hours_id').val(working_hours_id);
-                $('#working_hours').val(response[0].WORKING_HOURS);
-                $('#work_from').val(response[0].WORK_FROM);
-                $('#work_to').val(response[0].WORK_TO);
+            var working_hours_id = sessionStorage.getItem('working_hours_id');
 
-                check_empty(response[0].DAY_OF_WEEK, '#day_of_week', 'select');
-                check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
-            }
-        });
-    }
-    else if(form_type == 'flexible working hours form'){
-        transaction = 'flexible working hours details';
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {working_hours_id : working_hours_id, transaction : transaction},
+                success: function(response) {
+                    $('#working_hours_id').val(working_hours_id);
+                    $('#working_hours').val(response[0].WORKING_HOURS);
+                    $('#working_date').val(response[0].WORKING_DATE);
+                    $('#work_from').val(response[0].WORK_FROM);
+                    $('#work_to').val(response[0].WORK_TO);
 
-        const working_hours_id = sessionStorage.getItem('working_hours_id');
+                    check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
+                }
+            });
+        break;
+        case 'employee contact information form':
+            transaction = 'employee contact information details';
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {working_hours_id : working_hours_id, transaction : transaction},
-            success: function(response) {
-                $('#working_hours_id').val(working_hours_id);
-                $('#working_hours').val(response[0].WORKING_HOURS);
-                $('#working_date').val(response[0].WORKING_DATE);
-                $('#work_from').val(response[0].WORK_FROM);
-                $('#work_to').val(response[0].WORK_TO);
+            var employee_contact_information_id = sessionStorage.getItem('employee_contact_information_id');
 
-                check_empty(response[0].DAY_PERIOD, '#day_period', 'select');
-            }
-        });
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {employee_contact_information_id : employee_contact_information_id, transaction : transaction},
+                success: function(response) {
+                    $('#employee_contact_information_id').val(employee_contact_information_id);
+                    $('#email').val(response[0].EMAIL);
+                    $('#mobile').val(response[0].MOBILE);
+                    $('#telephone').val(response[0].TELEPHONE);
+
+                    check_empty(response[0].CONTACT_INFORMATION_TYPE, '#contact_information_type', 'select');
+                }
+            });
+        break;
     }
 }
 
